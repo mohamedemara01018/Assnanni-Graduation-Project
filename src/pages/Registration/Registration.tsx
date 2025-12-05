@@ -1,4 +1,4 @@
-import logo from "./../assets/logo.png";
+import logo from "../../assets/logo.png"
 import { GoArrowLeft } from "react-icons/go";
 import { NavLink, Outlet } from "react-router";
 import { AiOutlineUser } from "react-icons/ai";

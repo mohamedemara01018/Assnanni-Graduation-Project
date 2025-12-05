@@ -1,9 +1,9 @@
 import { Route, Routes } from "react-router";
-import PatientRegistration from "./Registration/PatientRegistration";
-import Registration from "./Registration/Registration";
-import DoctorRegistration from "./Registration/DoctorRegistration";
-import StudentRegistration from "./Registration/StudentRegistration";
-import ReceptionistRegistration from "./Registration/ReceptionistRegistration";
+import PatientRegistration from "./pages/Registration/PatientRegistration";
+import Registration from "./pages/Registration/Registration";
+import DoctorRegistration from "./pages/Registration/DoctorRegistration";
+import StudentRegistration from "./pages/Registration/StudentRegistration";
+import ReceptionistRegistration from "./pages/Registration/ReceptionistRegistration";
 
 const App = () => {
   return (
