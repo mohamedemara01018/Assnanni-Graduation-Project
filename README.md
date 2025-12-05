@@ -1,60 +1,73 @@
-# Assnani
+# React + TypeScript + Vite
 
-Assnani is a comprehensive healthcare web application that allows **patients, doctors, student doctors, and receptionists** to manage appointments, verify credentials, and handle medical processes efficiently.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
----
+Currently, two official plugins are available:
 
-## Features
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-- **User Roles:** Patients, Doctors, Student Doctors, Receptionists  
-- **Authentication:** Users can register and log in  
-- **Email Verification:** After registration, users are redirected to email verification  
-- **Doctor Verification:** Doctors and student doctors must submit proof of their credentials and clinic information  
-- **Appointment Booking:** Patients can book appointments with verified doctors  
-- **Receptionist Dashboard:** Receptionists manage patient data and forward it to doctors  
-- **Medical Process Workflow:**  
-  - Doctors request medical scans (e.g., X-rays) from patients  
-  - Doctors upload scan results to the system  
-  - System generates outputs based on the uploaded scans  
+## React Compiler
 
----
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Workflow
+## Expanding the ESLint configuration
 
-1. **Registration & Login**  
-   - Patients, Doctors, Student Doctors, and Receptionists can register and log in.  
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-2. **Email Verification**  
-   - After registration, users are redirected to the email verification page.  
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-3. **Doctor Verification**  
-   - Doctors and Student Doctors must provide credentials and clinic information to verify their identity.  
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
 
-4. **Appointment Booking**  
-   - Patients select a doctor and book an appointment.  
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
 
-5. **Receptionist Processing**  
-   - Receptionists collect patient data and send it to the doctor.  
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-6. **Medical Scan & Output**  
-   - Doctors request scans from patients.  
-   - Doctors upload the scan results to the system.  
-   - The system generates the final medical output for the patient.  
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
----
-
-## Tech Stack
-
-- **Frontend:** React, Vite, TypeScript, Tailwind CSS  
-- **Backend:** Node.js, Express.js  
-- **Database:** MongoDB  
-- **Authentication & Authorization:** JWT, Firebase (optional)  
-- **Components:** Shadcn/UI for reusable components  
-
----
-
-## Installation
-
-1. Clone the repo:  
-```bash
-git clone https://github.com/your-username/assnani.git
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
