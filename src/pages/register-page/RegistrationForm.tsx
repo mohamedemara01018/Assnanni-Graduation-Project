@@ -1,44 +1,70 @@
+import { FormInput } from "@/components/form-input/FormInput";
+import { registrationFields, registrationNameFields } from "@/constants/registerConstant";
+import type React from "react";
+import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router";
 
 const RegistrationForm = () => {
+
+  
   const { pathname } = useLocation();
+  const [fields, setFields] = useState({
+    fname: '',
+    lname: '',
+    email: '',
+    phone: '',
+    password: '',
+    cPassword: '',
+  })
+
 
   const isDoctor: boolean =
     pathname.includes("/doctor-registration") ||
     pathname.includes("/student-registration");
 
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const { name, value } = e.target;
+    setFields((prev) => {
+      return {
+        ...prev,
+        [name]: value
+      }
+    })
+  }
+
+
+
   return (
     <div className="register-container">
+
+
       <div id="name">
-        <div>
-          <label htmlFor="fname">First Name</label>
-          <input type="text" placeholder="John" id="fname" />
-        </div>
-        <div>
-          <label htmlFor="lname">Last Name</label>
-          <input type="text" id="lname" placeholder="John" />
-        </div>
+        {registrationNameFields.map((field) => (
+          <FormInput
+            key={field.id}
+            id={field.id}
+            label={field.label}
+            type={field.type}
+            placeholder={field.placeholder}
+            name={field.name}
+            handleChange={handleChange}
+          />
+        ))}
       </div>
 
-      <div>
-        <label htmlFor="email">Email</label>
-        <input type="email" placeholder="John.doe@example.com" id="email" />
-      </div>
 
-      <div>
-        <label htmlFor="phone">Phone Number</label>
-        <input type="text" placeholder="+1 (555) 000-000" id="phone" />
-      </div>
-
-      <div>
-        <label htmlFor="password">Password</label>
-        <input type="password" id="password" placeholder="password" />
-      </div>
-
-      <div>
-        <label htmlFor="cPassword">Confirm Password</label>
-        <input type="password" id="cPassword" placeholder="confirm password" />
-      </div>
+      {registrationFields.map((field) => (
+        <FormInput
+          key={field.id}
+          id={field.id}
+          label={field.label}
+          type={field.type}
+          placeholder={field.placeholder}
+          name={field.name}
+          handleChange={handleChange}
+        />
+      ))}
 
       {isDoctor && (
         <div className="bg-[#00E0a5]/20 p-2 rounded-sm !mt-8 text-[#00AFe5]">

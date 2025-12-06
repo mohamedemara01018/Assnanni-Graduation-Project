@@ -128,7 +128,7 @@
   }
 
   input {
-    @apply bg-gray-200 placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md p-2;
+    @apply bg-gray-200 placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md p-2 text-[var(--foreground)];
   }
 
   #name {
