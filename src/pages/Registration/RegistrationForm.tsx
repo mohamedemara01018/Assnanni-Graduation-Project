@@ -8,7 +8,7 @@ const RegistrationForm = () => {
     pathname.includes("/student-registration");
 
   return (
-    <div className="registrationContainer">
+    <div className="register-container">
       <div id="name">
         <div>
           <label htmlFor="fname">First Name</label>
@@ -56,7 +56,7 @@ const RegistrationForm = () => {
       </div>
 
       <div>
-        <p className="mt-6 mb-4 flex justify-center gap-1">
+        <p className="mt-6 mb-4 flex justify-center gap-1 ">
           Already have an account?{" "}
           <NavLink
             to="/"

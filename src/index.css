@@ -1,4 +1,6 @@
 @import "tailwindcss";
+
+@plugin "tailwindcss-animate";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -114,20 +116,25 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
-.registrationContainer {
+
+.register-container {
   div {
     @apply flex flex-col gap-2 my-2;
   }
+
   input {
     @apply bg-gray-200 placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md p-2;
   }
+
   #name {
     @apply flex flex-row gap-20 max-sm:flex-col max-sm:gap-2;
   }
+
   #name div {
     @apply flex-1;
   }
