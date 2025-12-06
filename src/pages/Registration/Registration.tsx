@@ -32,28 +32,28 @@ const Registration = () => {
         </div>
         <div className="flex justify-between bg-gray-200 rounded-full h-10 items-center my-4 gap-4">
           <NavLink
-            to="/patient-registration"
+            to="/registration/patient-registration"
             className={"flex gap-2 text-gray-500 flex-1  h-full items-center"}
           >
             <AiOutlineUser />
             <span className="max-sm:hidden">Patient</span>
           </NavLink>
           <NavLink
-            to="/doctor-registration"
+            to="/registration/doctor-registration"
             className={"flex gap-2 text-gray-500 flex-1  h-full items-center"}
           >
             <CiHospital1 />
             <span className="max-sm:hidden">Doctor</span>
           </NavLink>
           <NavLink
-            to="/student-registration"
+            to="/registration/student-registration"
             className={"flex gap-2 text-gray-500 flex-1  h-full items-center"}
           >
             <LuGraduationCap />
             <span className="max-sm:hidden">Student</span>
           </NavLink>
           <NavLink
-            to="receptionist-registration"
+            to="/registration/receptionist-registration"
             className={"flex gap-2 text-gray-500 flex-1  h-full items-center"}
           >
             <AiOutlineUser />
