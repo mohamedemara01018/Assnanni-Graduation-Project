@@ -44,6 +44,39 @@
 }
 
 :root {
+  --color-bg: #f1f1f1;
+  /* main background */
+  --color-surface: #ffffff;
+  /* cards, panels */
+  --color-text: #111827;
+  /* main text */
+  --color-text-light: #4b5563;
+  /* secondary text */
+  --color-border: #e5e7eb;
+  /* borders / dividers */
+
+  /* blue accent */
+  --color-primary: #2563eb;
+  /* blue-600 */
+  --color-primary-light: #3b82f6;
+  /* blue-500 */
+  --color-primary-dark: #1e40af;
+  /* blue-800 */
+
+  /* green accent */
+  --color-success: #16a34a;
+  /* green-600 */
+  --color-success-light: #4ade80;
+  /* green-400 */
+  --color-success-dark: #166534;
+  /* green-800 */
+
+  /* shadows */
+  --color-shadow: rgba(0, 0, 0, 0.55);
+  --shadow: 0px 0px 4px var(--color-shadow);
+
+  /* ///////////////////////////// */
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -79,6 +112,37 @@
 }
 
 .dark {
+  --color-bg: #1f2937;
+  /* main background */
+  --color-surface: #111827;
+  /* cards, panels */
+  --color-text: #f9fafb;
+  /* main text */
+  --color-text-light: #9ca3af;
+  /* secondary text */
+  --color-border: #374151;
+  /* borders / dividers */
+
+  /* blue accent */
+  --color-primary: #3b82f6;
+  /* blue-500 */
+  --color-primary-light: #60a5fa;
+  /* blue-400 */
+  --color-primary-dark: #1e3a8a;
+  /* blue-900 */
+
+  /* green accent */
+  --color-success: #4ade80;
+  /* green-400 */
+  --color-success-light: #86efac;
+  /* green-300 */
+  --color-success-dark: #166534;
+  /* green-800 */
+
+  /* shadows */
+  --color-shadow: rgba(0, 0, 0, 0.8);
+  --shadow: 0px 0px 4px var(--color-shadow);
+  /* /////////////// */
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
@@ -112,6 +176,26 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: white;
+  color: var(--gray-900);
+}
+
+
+
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -123,8 +207,8 @@
 }
 
 .register-container {
-  div {
-    @apply flex flex-col gap-2 my-2;
+  .input-field {
+    @apply flex flex-col gap-0.5
   }
 
   input {
@@ -132,7 +216,7 @@
   }
 
   #name {
-    @apply flex flex-row gap-20 max-sm:flex-col max-sm:gap-2;
+    @apply flex flex-col gap-4 sm:flex-row max-sm:gap-2;
   }
 
   #name div {
@@ -142,4 +226,15 @@
 
 a.active {
   @apply flex gap-2 text-gray-800 flex-1 h-full justify-center rounded-full font-bold items-center bg-gray-300 px-8;
+}
+
+.login-form-container {
+  .input-field {
+    @apply flex flex-col gap-0.5
+  }
+
+  input {
+    @apply bg-gray-200 placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md p-2 text-[var(--foreground)];
+  }
+
 }

@@ -4,7 +4,7 @@ const HomePage = () => {
   return (
     <div>
       <h1>this is home page</h1>
-      <Link to="registration">Register</Link>
+      <Link to="register">Register</Link>
     </div>
   );
 };

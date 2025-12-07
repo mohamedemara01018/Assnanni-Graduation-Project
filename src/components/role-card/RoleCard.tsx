@@ -11,9 +11,11 @@ function RoleCard({ path, label, icon }: RoleCardProps) {
     return (
         <NavLink
             to={path}
-            className={"flex gap-2 text-gray-500 flex-1  h-full items-center"}
+            className={"flex gap-2 text-gray-500 flex-1 p-2 items-center"}
         >
-            {icon}
+            <div className="max-sm:text-xl">
+                {icon}
+            </div>
             <span className="max-sm:hidden">{label}</span>
         </NavLink>
     )
