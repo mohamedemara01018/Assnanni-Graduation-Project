@@ -18,6 +18,6 @@ export function FormInput({ id, label, type, placeholder, name, handleChange }: 
                 name={name}
                 onChange={handleChange}
             />
-        </div>
+        </div>  
     )
 }

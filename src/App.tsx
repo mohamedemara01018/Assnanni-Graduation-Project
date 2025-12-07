@@ -9,7 +9,7 @@ import Login from "./pages/login-page/Login";
 
 const App = () => {
   return (
-    <div className="mx-auto w-full max-w-7xl px-4 ">
+    <div className="w-screen max-w-7xl px-4 flex items-center justify-center h-screen" >
       < Routes >
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<Login />} />
