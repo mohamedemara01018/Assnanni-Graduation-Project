@@ -176,7 +176,6 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -184,17 +183,14 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: white;
   color: var(--gray-900);
 }
-
-
-
 
 @layer base {
   * {
@@ -208,7 +204,7 @@ body {
 
 .register-container {
   .input-field {
-    @apply flex flex-col gap-0.5
+    @apply flex flex-col gap-0.5;
   }
 
   input {
@@ -222,19 +218,31 @@ body {
   #name div {
     @apply flex-1;
   }
-}
-
-a.active {
-  @apply flex gap-2 text-gray-800 flex-1 h-full justify-center rounded-full font-bold items-center bg-gray-300 px-8;
+  a.active {
+    @apply flex gap-2 text-gray-800 flex-1 h-full justify-center rounded-full font-bold items-center bg-gray-300 px-8;
+  }
 }
 
 .login-form-container {
   .input-field {
-    @apply flex flex-col gap-0.5
+    @apply flex flex-col gap-0.5;
   }
 
   input {
-    @apply bg-gray-200 placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md p-2 text-[var(--foreground)];
+    @apply bg-gray-200 placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md p-2;
   }
+}
 
+.registerNavigation {
+  a.active {
+    @apply flex gap-2 text-gray-800 flex-1 h-full justify-center rounded-full font-bold items-center bg-gray-300 px-8 max-lg:px-4;
+  }
+  a {
+    @apply flex justify-center;
+  }
+}
+
+.landingScape {
+  background-image: url("./assets/landingScapeImage.jpg");
+  @apply shadow-xl shadow-lime-500;
 }
