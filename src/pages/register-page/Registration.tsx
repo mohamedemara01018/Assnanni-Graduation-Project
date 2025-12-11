@@ -1,7 +1,6 @@
 import BackHome from "@/components/back-home/BackHome";
 import logo from "../../assets/logo.png"
-import { GoArrowLeft } from "react-icons/go";
-import { NavLink, Outlet } from "react-router";
+import { Outlet } from "react-router";
 
 //max-md:w-11/12 md:w-3/4
 const Registration = () => {

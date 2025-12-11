@@ -2,13 +2,12 @@ import LoginForm from '@/components/login-form/LoginForm'
 import loginImg from '../../assets/login-image.jpg'
 import logo from '../../assets/logo.png'
 import { NavLink } from 'react-router'
-import { GoArrowLeft } from 'react-icons/go'
 import BackHome from '@/components/back-home/BackHome'
 
 function Login() {
     return (
-        <div className='flex justify-center items-center gap-10 w-full'>
-            <div className="relative w-[600px] h-[300px] max-md:hidden ">
+        <div className='wrapper flex justify-between items-center gap-2 max-lg:justify-center w-full bg-red-500'>
+            <div className="relative w-[600px] h-[300px] max-xl:w-[500px] max-xl:h-[250px]  max-lg:hidden  ">
                 <img src={loginImg} className='w-full h-full object-cover rounded-lg' alt="login-image" />
                 <div className='absolute bottom-10 left-10 text-(--color-bg)'>
                     <h2>
