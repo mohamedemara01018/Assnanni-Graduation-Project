@@ -10,7 +10,7 @@ function TestimonialsSection() {
                     {
                         testimonials.map((testimonial, idx) => {
                             return (
-                                <div key={idx} className='bg-(--color-surface) flex flex-col gap-4 shadow-sm rounded-lg p-8'>
+                                <div key={idx} className='bg-(--color-surface) flex flex-col gap-4 shadow-sm rounded-lg p-8 border border-(--color-border)'>
                                     <Stars rating={testimonial.rating} className='text-amber-300 text-xl' />
                                     <p className='text-(--color-text-light)'>{testimonial.content}</p>
                                     <div className='flex items-center gap-2'>

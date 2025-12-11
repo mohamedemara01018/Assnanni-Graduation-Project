@@ -11,7 +11,7 @@ function FeaturesSection() {
                     {
                         features.map((feature, idx) => {
                             return (
-                                <div key={idx} className='bg-(--color-surface) shadow-sm p-4 rounded-lg '>
+                                <div key={idx} className='bg-(--color-surface) shadow-sm p-4 rounded-lg border border-(--color-border) '>
                                     <div className='flex items-center justify-start gap-2 '>
                                         <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
                                             {feature.icon("w-6 h-6 text-blue-600 dark:text-blue-400")}
