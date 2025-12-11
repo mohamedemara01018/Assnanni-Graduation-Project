@@ -25,7 +25,7 @@ function Hero() {
                         </Link>
                     </div>
                 </div>
-                <div className='flex-3 w-[300px] h-[300px] rounded-lg overflow-hidden max-sm:hidden'>
+                <div className='flex-3 w-[300px] h-[300px] rounded-lg overflow-hidden max-sm:hidden shadow-2xl'>
                     <img src={img} alt="" className='w-full h-full object-cover' />
                 </div>
             </div>
