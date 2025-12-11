@@ -7,12 +7,13 @@ import ReceptionistRegistration from "./pages/register-page/ReceptionistRegistra
 import Login from "./pages/login-page/Login";
 import Header from "./components/header/Header";
 import Landing from "./pages/landing-page/Landing";
+import Footer from "./components/footer/Footer";
 
 const App = () => {
   return (
     <div className="min-h-screen w-full flex flex-col">
       <Header />
-
+      
       <main className="flex-1 w-full">
         <Routes>
           <Route path="/" element={<Landing />} />
@@ -26,6 +27,8 @@ const App = () => {
           </Route>
         </Routes>
       </main>
+      
+      <Footer />
     </div>
   );
 };

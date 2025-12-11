@@ -6,14 +6,14 @@ import BackHome from '@/components/back-home/BackHome'
 
 function Login() {
     return (
-        <div className='wrapper flex justify-between items-center gap-2 max-lg:justify-center w-full bg-red-500'>
+        <div className='wrapper flex justify-between items-center gap-2 max-lg:justify-center w-full  py-16'>
             <div className="relative w-[600px] h-[300px] max-xl:w-[500px] max-xl:h-[250px]  max-lg:hidden  ">
                 <img src={loginImg} className='w-full h-full object-cover rounded-lg' alt="login-image" />
-                <div className='absolute bottom-10 left-10 text-(--color-bg)'>
-                    <h2>
+                <div className='absolute bottom-10 left-10 '>
+                    <h2 className='text-(--color-primary) text-3xl font-bold'>
                         Welcome Back
                     </h2>
-                    <p className='text-(--color-border)'>
+                    <p className=' text-(--color-primary-dark) text-xl font-bold'>
                         Access your healthcare dashboard
                     </p>
                 </div>

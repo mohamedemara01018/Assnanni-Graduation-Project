@@ -2,6 +2,7 @@ import { IoMoonOutline } from 'react-icons/io5'
 import { IoIosNotificationsOutline } from "react-icons/io";
 
 import logo from '../../assets/logo.png'
+import { Link } from 'react-router';
 
 function Header() {
     return (
@@ -12,13 +13,16 @@ function Header() {
                     <h1>Assnani</h1>
                 </div>
                 <div className='flex items-center gap-2'>
-                    <div className='hover:bg-blue-50 hover:text-(--color-bg) w-fit p-1 rounded-sm'>
+                    <button className=' text-xl text-(--color-text) hover:bg-black/5 hover:dark:bg-white/15 py-2 px-4 rounded-sm  cursor-pointer transform duration-200'>
                         <IoMoonOutline />
-                    </div>
+                    </button>
                     <div className='flex items-center gap-2'>
-                        <button className='text-(--color-primary) hover:bg-blue-50 p-2 rounded-sm'>Login</button>
-                        <button className=' bg-(--color-primary) hover:bg-(--color-primary-dark) p-2 rounded-sm'>Register</button>
+                        <Link to={'/login'} className='text-(--color-primary) hover:bg-black/5 hover:dark:bg-white/15 py-2 px-4 rounded-sm cursor-pointer transform duration-200'>Login</Link>
+                        <Link to={'/register'} className=' text-white bg-(--color-primary) hover:bg-(--color-primary-dark) py-2 px-4 rounded-sm cursor-pointer transform duration-200'>Register</Link>
                     </div>
+
+
+                    {/* when user have auth */}
                     {false && <div>
                         <div className='relative'>
                             <IoIosNotificationsOutline />
