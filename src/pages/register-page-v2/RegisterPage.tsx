@@ -2,9 +2,6 @@ import { useState } from "react"
 import RolePage from "../role-page/RolePage";
 import type { roleType } from "@/types/types";
 import { FaLongArrowAltLeft } from "react-icons/fa";
-import { registrationFields } from "@/constants/registerConstant";
-import { FormInput } from "@/components/form-input/FormInput";
-import { Link } from "react-router";
 import RegisterForm from "@/components/register-form/RegisterForm";
 
 

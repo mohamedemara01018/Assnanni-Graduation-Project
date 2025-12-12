@@ -244,4 +244,56 @@
 .landingScape {
   background-image: url("./assets/landingScapeImage.jpg");
   @apply shadow-xl shadow-lime-500;
+
 }
+
+
+.filter {
+  background-image: url("./assets/filterImage.png");
+  background-size: 100% 100%;
+  @apply h-[40vh] max-[1050px]:h-[50vh]  flex flex-col  justify-center p-10 gap-8 mb-6 rounded-xl;
+}
+.filterPreview {
+  div {
+    @apply flex gap-2 first:bg-blue-400 text-gray-600 first:text-white rounded-lg p-4 py-2 border-gray-700 border-2 cursor-pointer active:bg-blue-500;
+    svg {
+      @apply translate-y-1;
+    }
+  }
+}
+
+.nav {
+  @apply p-2 fixed w-1/6;
+  ul {
+    @apply flex flex-col gap-8 text-lg justify-center  w-full;
+    li {
+      @apply flex gap-2 justify-center [1200px]:justify-normal border-b-2 border-gray-400 py-3 border-dashed;
+      a {
+        @apply flex gap-2;
+        svg {
+          @apply translate-y-1 text-2xl text-blue-700;
+        }
+        span {
+          @apply max-[1200px]:hidden;
+        }
+      }
+    }
+  }
+}
+
+.icon {
+  @apply bg-gray-50 flex flex-col gap-3 justify-center items-center rounded-2xl;
+  div {
+    @apply p-4 w-fit bg-linear-30 from-blue-600 to-cyan-300 rounded-2xl max-sm:p-3;
+    svg {
+      @apply text-5xl fill-gray-100 max-sm:text-4xl;
+    }
+  }
+  h4 {
+    @apply text-lg font-semibold text-center max-sm:text-base;
+  }
+  a {
+    @apply text-base cursor-pointer text-gray-800 hover:text-gray-500 max-sm:text-sm;
+  }
+}
+
