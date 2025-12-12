@@ -48,3 +48,45 @@ export const rolesData = [
         circleColor: "bg-orange-100",
     }
 ];
+
+
+export const doctorVerificationFieldsRowOne = [
+    {
+        id: 'medicalLicenseNumber',
+        label: 'Medical License Number',
+        type: 'text',
+        placeholder: 'ML-123456',
+        name: 'medicalLicenseNumber'
+    },
+    {
+        id: 'nationalIdNumber',
+        label: 'National ID Number',
+        type: 'text', // Can use 'number' or 'text' depending on required format
+        placeholder: '123-45-6789',
+        name: 'nationalIdNumber'
+    },
+]
+export const doctorVerificationFields = [
+
+    {
+        id: 'clinicHospitalName',
+        label: 'Clinic/Hospital Name',
+        type: 'text',
+        placeholder: 'City Medical Center',
+        name: 'clinicHospitalName'
+    },
+    {
+        id: 'clinicAddress',
+        label: 'Clinic Address',
+        type: 'text',
+        placeholder: '123 Main St, City, State 12345',
+        name: 'clinicAddress'
+    },
+    {
+        id: 'clinicPhone',
+        label: 'Clinic Phone',
+        type: 'tel',
+        placeholder: '+1 234-567-8900',
+        name: 'clinicPhone'
+    },
+];

@@ -2,6 +2,7 @@ import { loginFields } from "@/constants/loginConstant"
 import { FormInput } from "../form-input/FormInput"
 import { NavLink } from "react-router"
 import { Button } from "../ui/button"
+import InputField from "../input-field/InputField"
 
 function LoginForm() {
 
@@ -12,7 +13,7 @@ function LoginForm() {
         <div className="login-form-container flex flex-col gap-3">
             <div className="flex flex-col gap-1">
                 <label htmlFor="role">IAM a</label>
-                <select id="role" name="role" className="bg-(--color-bg) p-2   placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md ">
+                <select id="role" name="role" className="border-2 py-3 px-4 w-full rounded-md bg-(--color-bg) focus:ring-2 focus:border-0">
                     <option value={'patient'}>Patient</option>
                     <option value={'doctor'}>Doctor</option>
                     <option value={'student doctor'}>Student Doctor</option>
@@ -23,7 +24,7 @@ function LoginForm() {
 
             {
                 loginFields.map((field) => {
-                    return <FormInput
+                    return <InputField
                         key={field.id}
                         id={field.id}
                         name={field.name}
@@ -36,7 +37,7 @@ function LoginForm() {
             }
 
             <div className="flex justify-between">
-                <div>
+                <div className="flex gap-2">
                     <input type="checkbox" name="check" id="check" />
                     <label htmlFor="check">Remember me</label>
                 </div>
@@ -45,7 +46,7 @@ function LoginForm() {
                 </NavLink>
             </div>
             <div>
-                <Button className="bg-(--color-primary) hover:bg-(--color-primary-dark) cursor-pointer w-full">Sign In</Button>
+                <Button className="bg-(--color-primary) hover:bg-(--color-primary-dark) p-4cursor-pointer w-full">Sign In</Button>
             </div>
 
         </div>

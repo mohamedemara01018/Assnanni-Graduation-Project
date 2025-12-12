@@ -10,6 +10,7 @@ import Landing from "./pages/landing-page/Landing";
 import Footer from "./components/footer/Footer";
 import RegisterPage from "./pages/register-page-v2/RegisterPage";
 import VerifyEmailPage from "./pages/verify-email-page/VerifyEmailPage";
+import VerifyDoctorPage from "./pages/verify-doctor-page/VerifyDoctorPage";
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
+          <Route path="/verify-doctor" element={<VerifyDoctorPage />} />
 
 
           <Route path="/register" element={<Registration />}>

@@ -1,12 +1,13 @@
 import { registrationFields } from "@/constants/registerConstant"
 import { FormInput } from "../form-input/FormInput"
 import { Link } from "react-router"
+import InputField from "../input-field/InputField"
 
 function RegisterForm() {
     return (
-        <form action="" className="login-form-container flex flex-col gap-4 w-full">
+        <form action="" className=" flex flex-col gap-4 w-full">
             {registrationFields.map((field) => (
-                <FormInput
+                <InputField
                     key={field.id}
                     id={field.id}
                     label={field.label}
@@ -24,7 +25,7 @@ function RegisterForm() {
                 </label>
             </div>
             <div >
-                <button type="submit" className="bg-(--color-primary)  w-full px-4 py-2 rounded-md hover:bg-(--color-primary-dark) transition duration-200 cursor-pointer">Create Account</button>
+                <button type="submit" className="text-white bg-(--color-primary)  w-full px-4 py-2 rounded-md hover:bg-(--color-primary-dark) transition duration-200 cursor-pointer">Create Account</button>
             </div>
         </form>
     )
