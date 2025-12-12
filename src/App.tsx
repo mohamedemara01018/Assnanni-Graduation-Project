@@ -91,7 +91,7 @@ const App = () => {
         <Routes>
 
           {/* public routes */}
-          <Route path="/" element={<Landing />} />
+          {/* <Route path="/" element={<Landing />} /> */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
@@ -106,7 +106,7 @@ const App = () => {
           </Route>
 
           {/* authenticated routes */}
-          <Route path="/home" element={<HomePage />}>
+          <Route path="/" element={<HomePage />}>
             <Route index element={<PatientDashboard />} />
             <Route path="browse-doctors" element={<BrowseDoctors />} />
           </Route>
