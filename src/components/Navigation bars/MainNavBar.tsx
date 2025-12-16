@@ -9,7 +9,7 @@ const MainNavBar = () => {
   const registered: boolean = true;
   const notification: boolean = true;
   return (
-    <div className="flex justify-between bg-white rounded-b-2xl px-4 py-1 items-center max-sm:py-3 shadow-2xl shadow-lime-900">
+    <div className="flex justify-between bg-white rounded-br-2xl px-4 py-1 items-center max-sm:py-3 shadow-2xl shadow-lime-900">
       <div>
         <NavLink to={"/"} className="flex cursor-pointer">
           <img

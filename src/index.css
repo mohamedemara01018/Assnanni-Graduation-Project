@@ -176,7 +176,6 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-
 .wrapper {
   margin-inline: auto;
   position: relative;
@@ -230,7 +229,6 @@
   }
 } */
 
-
 .registerNavigation {
   a.active {
     @apply flex gap-2 text-gray-800 flex-1 h-full justify-center rounded-full font-bold items-center bg-gray-300 px-8 max-lg:px-4;
@@ -244,9 +242,7 @@
 .landingScape {
   background-image: url("./assets/landingScapeImage.jpg");
   @apply shadow-xl shadow-lime-500;
-
 }
-
 
 .filter {
   background-image: url("./assets/filterImage.png");
@@ -297,3 +293,8 @@
   }
 }
 
+.doctor {
+  ul {
+    @apply gap-1;
+  }
+}
