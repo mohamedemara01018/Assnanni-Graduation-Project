@@ -46,8 +46,14 @@
 :root {
   --color-bg: #F9FAFB;
   /* main background */
+
+  /* link */
   --color-bg-link: #f9fafb;
   --color-bg-link-hover: #f3f4f6;
+
+  /* bg-blue */
+  --color-bg-blue: #eff6ff;
+  --color-text-blue: #155dfc;
   /* main background when hover */
   --color-surface: #ffffff;
   /* cards, panels */
@@ -119,6 +125,10 @@
   /* main background */
   --color-bg-link: #364153;
   --color-bg-link-hover: #4a5565;
+
+  /* bg-blue */
+  --color-bg-blue: #1c398e;
+  --color-text-blue: #51a2ff;
 
   --color-surface: #1E2939;
   /* cards, panels */

@@ -32,12 +32,13 @@ const App = () => {
     <div className="min-h-screen w-full flex flex-col">
 
       {/* public header */}
-      <Header />
+      {/* <Header /> */}
 
       <main className="flex-1 w-full">
         <Routes>
 
           {/* public routes */}
+
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -49,16 +50,16 @@ const App = () => {
           <Route path="/patient" element={<PatientPage />} />
 
 
-          {/* authenticated routes */}
+          {/* authenticated routes
           <Route path="/home" element={<HomePage />}>
             <Route index element={<PatientDashboard />} />
             <Route path="browse-doctors" element={<BrowseDoctors />} />
-          </Route>
+          </Route> */}
 
         </Routes>
       </main>
 
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
