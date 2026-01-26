@@ -23,6 +23,7 @@ import DoctorDashboard from "./components/Doctor/Dashboard/DoctorDashboard";
 import Schedule from "./components/Doctor/Schedule/Schedule";
 import Reports from "./components/Doctor/Reports/Reports";
 import Scan from "./components/Doctor/Scan/Scan";
+import Notifications from "./components/Doctor/Notifications/Notifications";
 
 const App = () => {
   let role = "doctor";
@@ -85,6 +86,7 @@ const App = () => {
             <Route path="doctor-schedule" element={<Schedule />} />
             <Route path="doctor-reports" element={<Reports />} />
             <Route path="scan" element={<Scan />} />
+            <Route path="notification" element={<Notifications />} />
           </Route>
         </Routes>
       </main>

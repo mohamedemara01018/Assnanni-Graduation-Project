@@ -2,7 +2,6 @@ import { TbLayoutDashboardFilled } from "react-icons/tb";
 import { MdPeopleAlt } from "react-icons/md";
 import { SlCalender } from "react-icons/sl";
 import { LuFileSpreadsheet } from "react-icons/lu";
-import { LuMessageSquareText } from "react-icons/lu";
 import { MdOutlineSettings } from "react-icons/md";
 import { NavLink } from "react-router";
 import logo from "./../../../assets/logo.png";
@@ -54,13 +53,7 @@ const DoctorNav = () => {
           </NavLink>
         </li>
         <li>
-          <NavLink to={"#"}>
-            <LuMessageSquareText />
-            <span>Messages</span>
-          </NavLink>
-        </li>{" "}
-        <li>
-          <NavLink to={"#"}>
+          <NavLink to={"notification"}>
             <FaRegBell />
             <span>Notifications</span>
           </NavLink>
