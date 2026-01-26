@@ -1,4 +1,3 @@
-
 import { Route, Routes } from "react-router";
 
 // public pages
@@ -21,6 +20,9 @@ import PatientDashboard from "./components/Patient/Dashboard/PatientDashboard";
 import BrowseDoctors from "./components/HomePage/BrowseDoctors";
 import PatientPage from "./pages/patient-page/PatientPage";
 import DoctorDashboard from "./components/Doctor/Dashboard/DoctorDashboard";
+import Schedule from "./components/Doctor/Schedule/Schedule";
+import Reports from "./components/Doctor/Reports/Reports";
+import Scan from "./components/Doctor/Scan/Scan";
 
 const App = () => {
   let role = "doctor";
@@ -41,10 +43,8 @@ const App = () => {
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/verify-doctor" element={<VerifyDoctorPage />} />
 
-
           {/* dashboards */}
           <Route path="/patient" element={<PatientPage />} />
-
 
           {/* authenticated routes
           <Route path="/home" element={<HomePage />}>
@@ -72,10 +72,19 @@ const App = () => {
             <Route
               index
               element={
-                role === "patient" ? <PatientDashboard /> : <DoctorDashboard />
+                role === "patient" ? (
+                  <PatientDashboard />
+                ) : role === "doctor" ? (
+                  <DoctorDashboard />
+                ) : (
+                  ""
+                )
               }
             />
             <Route path="browse-doctors" element={<BrowseDoctors />} />
+            <Route path="doctor-schedule" element={<Schedule />} />
+            <Route path="doctor-reports" element={<Reports />} />
+            <Route path="scan" element={<Scan />} />
           </Route>
         </Routes>
       </main>

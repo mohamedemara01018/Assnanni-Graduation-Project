@@ -30,7 +30,7 @@ const DoctorNav = () => {
           </NavLink>
         </li>
         <li>
-          <NavLink to={"#"}>
+          <NavLink to={"doctor-schedule"}>
             <SlCalender />
             <span>Schedule</span>
           </NavLink>
@@ -42,13 +42,13 @@ const DoctorNav = () => {
           </NavLink>
         </li>
         <li>
-          <NavLink to={"#"}>
+          <NavLink to={"/scan"}>
             <GoPulse />
             <span>Scan</span>
           </NavLink>
         </li>
         <li>
-          <NavLink to={"#"}>
+          <NavLink to={"doctor-reports"}>
             <LuFileSpreadsheet />
             <span>Reports</span>
           </NavLink>
