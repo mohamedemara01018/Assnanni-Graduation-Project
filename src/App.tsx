@@ -26,6 +26,7 @@ import ReceptionistRegistration from "./pages/register-page/ReceptionistRegistra
 import { Navigate, Route, Routes } from "react-router";
 import PatientPage from "./pages/patient-page/PatientPage";
 
+
 const App = () => {
   // In a real app, this would come from a Context or Redux store
   const role: "doctor" | "patient" | "student" | "receptionist" = "doctor";
@@ -41,17 +42,22 @@ const App = () => {
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/verify-doctor" element={<VerifyDoctorPage />} />
 
-
           {/* dashboards */}
           <Route path="/patient" element={<PatientPage />} />
 
-          {/* --- Old Registration System ---
+          {/* authenticated routes
+          <Route path="/home" element={<HomePage />}>
+            <Route index element={<PatientDashboard />} />
+            <Route path="browse-doctors" element={<BrowseDoctors />} />
+          </Route> */}
+
+          {/* old registration system */}
           <Route path="/register" element={<Registration />}>
             <Route path="patient-register" element={<PatientRegistration />} />
             <Route path="doctor-register" element={<DoctorRegistration />} />
             <Route path="student-register" element={<StudentRegistration />} />
             <Route path="receptionist-register" element={<ReceptionistRegistration />} />
-          </Route> */}
+          </Route> 
 
           {/* --- Authenticated Shared Layout --- */}
           <Route path="/" element={<HomePage />}>
@@ -59,22 +65,22 @@ const App = () => {
             <Route
               index
               element={
-                role === "doctor" ? <DoctorDashboard /> : <PatientDashboard />
+                role === "doctor" ? (
+                  <PatientDashboard />
+                ) : role === "doctor" ? (
+                  <DoctorDashboard />
+                ) : (
+                  ""
+                )
               }
             />
 
             {/* Shared Routes */}
             <Route path="browse-doctors" element={<BrowseDoctors />} />
+            <Route path="doctor-schedule" element={<Schedule />} />
+            <Route path="doctor-reports" element={<Reports />} />
+            <Route path="scan" element={<Scan />} />
             <Route path="notification" element={<Notifications />} />
-
-            {/* Doctor Specific Routes (You could protect these further) */}
-            {role === "doctor" && (
-              <>
-                <Route path="doctor-schedule" element={<Schedule />} />
-                <Route path="doctor-reports" element={<Reports />} />
-                <Route path="scan" element={<Scan />} />
-              </>
-            )}
           </Route>
 
           {/* Fallback - Redirect to landing if route not found */}
