@@ -25,6 +25,7 @@ import StudentRegistration from "./pages/register-page/StudentRegistration";
 import ReceptionistRegistration from "./pages/register-page/ReceptionistRegistration";
 import { Navigate, Route, Routes } from "react-router";
 import PatientPage from "./pages/patient-page/PatientPage";
+import PublicLayout from "./components/public-layout/PublicLayout";
 
 
 const App = () => {
@@ -36,12 +37,14 @@ const App = () => {
       <main className="flex-grow">
         <Routes>
           {/* --- Public Routes --- */}
-          <Route path="/landing" element={<Landing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register-v2" element={<RegisterPage />} />
-          <Route path="/verify-email" element={<VerifyEmailPage />} />
-          <Route path="/verify-doctor" element={<VerifyDoctorPage />} />
+          <Route element={<PublicLayout />}>
+            <Route path="/landing" element={<Landing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register-v2" element={<RegisterPage />} />
+            <Route path="/verify-email" element={<VerifyEmailPage />} />
+            <Route path="/verify-doctor" element={<VerifyDoctorPage />} />
 
+          </Route>
           {/* dashboards */}
           <Route path="/patient" element={<PatientPage />} />
 
@@ -57,7 +60,7 @@ const App = () => {
             <Route path="doctor-register" element={<DoctorRegistration />} />
             <Route path="student-register" element={<StudentRegistration />} />
             <Route path="receptionist-register" element={<ReceptionistRegistration />} />
-          </Route> 
+          </Route>
 
           {/* --- Authenticated Shared Layout --- */}
           <Route path="/" element={<HomePage />}>
