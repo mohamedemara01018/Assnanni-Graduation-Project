@@ -44,7 +44,7 @@
 }
 
 :root {
-  --color-bg: #F9FAFB;
+  --color-bg: #f9fafb;
   /* main background */
 
   /* link */
@@ -130,7 +130,7 @@
   --color-bg-blue: #1c398e;
   --color-text-blue: #51a2ff;
 
-  --color-surface: #1E2939;
+  --color-surface: #1e2939;
   /* cards, panels */
   --color-text: #f9fafb;
   /* main text */
@@ -140,7 +140,7 @@
   /* borders / dividers */
 
   /* blue accent */
-  --color-primary: #155DFC;
+  --color-primary: #155dfc;
   /* blue-500 */
   --color-primary-light: #60a5fa;
   /* blue-400 */
@@ -320,9 +320,22 @@
   }
 }
 
-
 .doctor {
   ul {
     @apply gap-1;
+  }
+}
+
+.settingsSidebar {
+  @apply flex flex-col gap-6;
+  a {
+    @apply flex gap-2 items-center;
+
+    svg {
+      @apply text-2xl max-md:text-xl;
+    }
+    p {
+      @apply text-lg max-md:text-base;
+    }
   }
 }
