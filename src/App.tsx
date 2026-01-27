@@ -21,6 +21,7 @@ import PatientDashboard from "./components/Patient/Dashboard/PatientDashboard";
 import BrowseDoctors from "./components/HomePage/BrowseDoctors";
 import PatientPage from "./pages/patient-page/PatientPage";
 import DoctorDashboard from "./components/Doctor/Dashboard/DoctorDashboard";
+import PublicLayout from "./components/public-layout/PublicLayout";
 
 const App = () => {
   let role = "doctor";
@@ -31,54 +32,55 @@ const App = () => {
       {/* public header */}
       {/* <Header /> */}
 
-      <main className="flex-1 w-full">
-        <Routes>
-          {/* public routes */}
 
+      <Routes>
+        {/* public routes */}
+        <Route element={<PublicLayout />}>
           <Route path="/landing" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/verify-doctor" element={<VerifyDoctorPage />} />
+        </Route>
 
 
-          {/* dashboards */}
-          <Route path="/patient" element={<PatientPage />} />
+        {/* dashboards */}
+        <Route path="/patient" element={<PatientPage />} />
 
 
-          {/* authenticated routes
+        {/* authenticated routes
           <Route path="/home" element={<HomePage />}>
             <Route index element={<PatientDashboard />} />
             <Route path="browse-doctors" element={<BrowseDoctors />} />
           </Route> */}
 
-          {/* old registration system */}
-          <Route path="/register" element={<Registration />}>
-            <Route
-              index
-              path="patient-register"
-              element={<PatientRegistration />}
-            />
-            <Route path="doctor-register" element={<DoctorRegistration />} />
-            <Route path="student-register" element={<StudentRegistration />} />
-            <Route
-              path="receptionist-register"
-              element={<ReceptionistRegistration />}
-            />
-          </Route>
+        {/* old registration system */}
+        <Route path="/register" element={<Registration />}>
+          <Route
+            index
+            path="patient-register"
+            element={<PatientRegistration />}
+          />
+          <Route path="doctor-register" element={<DoctorRegistration />} />
+          <Route path="student-register" element={<StudentRegistration />} />
+          <Route
+            path="receptionist-register"
+            element={<ReceptionistRegistration />}
+          />
+        </Route>
 
-          {/* authenticated routes */}
-          <Route path="/" element={<HomePage />}>
-            <Route
-              index
-              element={
-                role === "patient" ? <PatientDashboard /> : <DoctorDashboard />
-              }
-            />
-            <Route path="browse-doctors" element={<BrowseDoctors />} />
-          </Route>
-        </Routes>
-      </main>
+        {/* authenticated routes */}
+        <Route path="/" element={<HomePage />}>
+          <Route
+            index
+            element={
+              role === "patient" ? <PatientDashboard /> : <DoctorDashboard />
+            }
+          />
+          <Route path="browse-doctors" element={<BrowseDoctors />} />
+        </Route>
+      </Routes>
+
 
       {/* <Footer /> */}
     </div>
