@@ -1,3 +1,4 @@
+import BrowseDoctors from "@/components/HomePage/BrowseDoctors";
 import LandingScape from "@/components/HomePage/LandingScape";
 import MainNavBar from "@/components/Navigation bars/MainNavBar";
 import DoctorNav from "@/components/Navigation bars/Side Navigation/DoctorNav";
@@ -18,9 +19,8 @@ const HomePage = () => {
       )}
       <div className="flex-4">
         <MainNavBar />
-        {!isRegistered && <LandingScape />}
-        {/* <BrowseDoctors /> */}
-        <Outlet />
+        {isRegistered ? <Outlet /> : <LandingScape />}
+        {!isRegistered && <BrowseDoctors />}
       </div>
     </div>
   );

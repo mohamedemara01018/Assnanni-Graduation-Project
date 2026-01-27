@@ -1,4 +1,3 @@
-
 import { Route, Routes } from "react-router";
 
 // public pages
@@ -21,7 +20,14 @@ import PatientDashboard from "./components/Patient/Dashboard/PatientDashboard";
 import BrowseDoctors from "./components/HomePage/BrowseDoctors";
 import PatientPage from "./pages/patient-page/PatientPage";
 import DoctorDashboard from "./components/Doctor/Dashboard/DoctorDashboard";
+<<<<<<< HEAD
 import PublicLayout from "./components/public-layout/PublicLayout";
+=======
+import Schedule from "./components/Doctor/Schedule/Schedule";
+import Reports from "./components/Doctor/Reports/Reports";
+import Scan from "./components/Doctor/Scan/Scan";
+import Notifications from "./components/Doctor/Notifications/Notifications";
+>>>>>>> c844a3fbc6804fafd5233113fd50a2a3b082d2a0
 
 const App = () => {
   let role = "doctor";
@@ -43,12 +49,19 @@ const App = () => {
           <Route path="/verify-doctor" element={<VerifyDoctorPage />} />
         </Route>
 
+<<<<<<< HEAD
 
         {/* dashboards */}
         <Route path="/patient" element={<PatientPage />} />
 
 
         {/* authenticated routes
+=======
+          {/* dashboards */}
+          <Route path="/patient" element={<PatientPage />} />
+
+          {/* authenticated routes
+>>>>>>> c844a3fbc6804fafd5233113fd50a2a3b082d2a0
           <Route path="/home" element={<HomePage />}>
             <Route index element={<PatientDashboard />} />
             <Route path="browse-doctors" element={<BrowseDoctors />} />
@@ -81,6 +94,31 @@ const App = () => {
         </Route>
       </Routes>
 
+<<<<<<< HEAD
+=======
+          {/* authenticated routes */}
+          <Route path="/" element={<HomePage />}>
+            <Route
+              index
+              element={
+                role === "patient" ? (
+                  <PatientDashboard />
+                ) : role === "doctor" ? (
+                  <DoctorDashboard />
+                ) : (
+                  ""
+                )
+              }
+            />
+            <Route path="browse-doctors" element={<BrowseDoctors />} />
+            <Route path="doctor-schedule" element={<Schedule />} />
+            <Route path="doctor-reports" element={<Reports />} />
+            <Route path="scan" element={<Scan />} />
+            <Route path="notification" element={<Notifications />} />
+          </Route>
+        </Routes>
+      </main>
+>>>>>>> c844a3fbc6804fafd5233113fd50a2a3b082d2a0
 
       {/* <Footer /> */}
     </div>
