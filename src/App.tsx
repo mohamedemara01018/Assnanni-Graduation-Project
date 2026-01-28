@@ -7,7 +7,6 @@ import VerifyDoctorPage from "./pages/verify-doctor-page/VerifyDoctorPage";
 
 // Authenticated Layout & Pages
 import HomePage from "./routers/Home Page/HomePage";
-import PatientDashboard from "./components/Patient/Dashboard/PatientDashboard";
 import BrowseDoctors from "./components/HomePage/BrowseDoctors";
 import DoctorDashboard from "./components/Doctor/Dashboard/DoctorDashboard";
 import Schedule from "./components/Doctor/Schedule/Schedule";
@@ -28,6 +27,7 @@ import Settings from "./components/Doctor/Settings/Settings";
 import ProfileSettings from "./components/Doctor/Settings/SettingsDetails/ProfileSettings";
 import SecuritySettings from "./components/Doctor/Settings/SettingsDetails/SecuritySettings";
 import NotificationPreferences from "./components/Doctor/Settings/SettingsDetails/NotificationPreferences";
+import Patients from "./components/Doctor/Patients/Patients";
 
 const App = () => {
   // In a real app, this would come from a Context or Redux store
@@ -85,6 +85,7 @@ const App = () => {
             {/* Shared Routes */}
             <Route path="browse-doctors" element={<BrowseDoctors />} />
             <Route path="doctor-schedule" element={<Schedule />} />
+            <Route path="doctor-patients" element={<Patients />} />
             <Route path="doctor-reports" element={<Reports />} />
             <Route path="scan" element={<Scan />} />
             <Route path="notification" element={<Notifications />} />

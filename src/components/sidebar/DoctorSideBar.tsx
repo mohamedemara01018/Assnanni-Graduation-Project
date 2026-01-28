@@ -73,7 +73,7 @@ function DoctorSideBar({ toggled, onToggle }: SideBarProp) {
           </li>
           <li>
             <NavLink
-              to={"/"}
+              to={"/doctor-patients"}
               className={({ isActive }) =>
                 `flex  items-center ${
                   toggled ? "justify-center" : ""
