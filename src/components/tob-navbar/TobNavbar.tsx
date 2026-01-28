@@ -17,7 +17,9 @@ function TobNavbar({ pageTitle }: TobNavbarProb) {
         <div className="wrapper flex items-center justify-between gap-2">
             <div className="text-xl font-semibold">{pageTitle}</div>
             <div className="flex items-center gap-2 font-extrabold">
-                <SearchInput />
+                <div className='max-lg:hidden'>
+                    <SearchInput />
+                </div>
                 <button className="p-2  hover:bg-(--color-bg-link-hover) rounded-lg text-2xl cursor-pointer">
                     <HiOutlineMoon />
                 </button>
