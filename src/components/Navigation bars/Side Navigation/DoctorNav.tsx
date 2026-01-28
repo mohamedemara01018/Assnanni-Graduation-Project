@@ -59,7 +59,7 @@ const DoctorNav = () => {
           </NavLink>
         </li>
         <li>
-          <NavLink to={"#"}>
+          <NavLink to={"settings"}>
             <MdOutlineSettings />
             <span>Settings</span>
           </NavLink>

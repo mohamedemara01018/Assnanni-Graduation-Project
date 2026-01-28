@@ -1,5 +1,3 @@
-
-
 // Public pages
 import Landing from "./pages/landing-page/Landing";
 import Login from "./pages/login-page/Login";
@@ -26,11 +24,15 @@ import ReceptionistRegistration from "./pages/register-page/ReceptionistRegistra
 import { Navigate, Route, Routes } from "react-router";
 import PatientPage from "./pages/patient-page/PatientPage";
 import PublicLayout from "./components/public-layout/PublicLayout";
-
+import Settings from "./components/Doctor/Settings/Settings";
+import ProfileSettings from "./components/Doctor/Settings/SettingsDetails/ProfileSettings";
+import SecuritySettings from "./components/Doctor/Settings/SettingsDetails/SecuritySettings";
+import NotificationPreferences from "./components/Doctor/Settings/SettingsDetails/NotificationPreferences";
 
 const App = () => {
   // In a real app, this would come from a Context or Redux store
-  const role: "doctor" | "patient" | "student" | "receptionist" = "doctor";
+  let role: string = "doctor";
+  role = "doctor";
 
   return (
     <div className="min-h-screen w-full flex flex-col">
@@ -43,7 +45,6 @@ const App = () => {
             <Route path="/register-v2" element={<RegisterPage />} />
             <Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="/verify-doctor" element={<VerifyDoctorPage />} />
-
           </Route>
           {/* dashboards */}
           <Route path="/patient" element={<PatientPage />} />
@@ -59,7 +60,10 @@ const App = () => {
             <Route path="patient-register" element={<PatientRegistration />} />
             <Route path="doctor-register" element={<DoctorRegistration />} />
             <Route path="student-register" element={<StudentRegistration />} />
-            <Route path="receptionist-register" element={<ReceptionistRegistration />} />
+            <Route
+              path="receptionist-register"
+              element={<ReceptionistRegistration />}
+            />
           </Route>
 
           {/* --- Authenticated Shared Layout --- */}
@@ -68,7 +72,7 @@ const App = () => {
             <Route
               index
               element={
-                role === "doctor" ? (
+                role === "patient" ? (
                   <PatientDashboard />
                 ) : role === "doctor" ? (
                   <DoctorDashboard />
@@ -84,6 +88,15 @@ const App = () => {
             <Route path="doctor-reports" element={<Reports />} />
             <Route path="scan" element={<Scan />} />
             <Route path="notification" element={<Notifications />} />
+
+            <Route path="settings" element={<Settings />}>
+              <Route index element={<ProfileSettings />} />
+              <Route path="security" element={<SecuritySettings />} />
+              <Route
+                path="notifications"
+                element={<NotificationPreferences />}
+              />
+            </Route>
           </Route>
 
           {/* Fallback - Redirect to landing if route not found */}
