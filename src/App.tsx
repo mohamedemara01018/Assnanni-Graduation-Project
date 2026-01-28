@@ -73,7 +73,7 @@ const App = () => {
               index
               element={
                 role === "patient" ? (
-                  <PatientDashboard />
+                  <PatientPage />
                 ) : role === "doctor" ? (
                   <DoctorDashboard />
                 ) : (

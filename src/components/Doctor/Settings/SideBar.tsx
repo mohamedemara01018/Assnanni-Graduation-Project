@@ -11,7 +11,7 @@ const SideBar = () => {
         <li>
           <NavLink
             to={"/settings"}
-            className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-gray-800 duration-300 ease-in-out hover:bg-gray-400 dark:hover:bg-meta-4 ${
+            className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-gray-800 duration-300 ease-in-out hover:bg-gray-200 dark:hover:bg-meta-4 ${
               !location.pathname.includes("security") &&
               !location.pathname.includes("notifications")
                 ? "bg-blue-200 !text-blue-600"
@@ -25,7 +25,7 @@ const SideBar = () => {
         <li>
           <NavLink
             to={"/settings/security"}
-            className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium  duration-300 text-gray-800 ease-in-out hover:bg-gray-300 dark:hover:bg-meta-4 ${
+            className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium  duration-300 text-gray-800 ease-in-out hover:bg-gray-200 dark:hover:bg-meta-4 ${
               location.pathname.includes("security") &&
               "bg-blue-200 !text-blue-600"
             }`}
@@ -37,7 +37,7 @@ const SideBar = () => {
         <li>
           <NavLink
             to={"/settings/notifications"}
-            className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-gray-800 duration-300 ease-in-out  hover:bg-gray-300 dark:hover:bg-meta-4 ${
+            className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-gray-800 duration-300 ease-in-out  hover:bg-gray-200 dark:hover:bg-meta-4 ${
               location.pathname.includes("/settings/notification") &&
               "bg-blue-200 !text-blue-600"
             }`}

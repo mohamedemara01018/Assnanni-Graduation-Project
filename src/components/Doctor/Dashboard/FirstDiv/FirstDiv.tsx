@@ -8,7 +8,7 @@ const FirstDiv = () => {
     <div className="flex-2">
       <div className="bg-gray-100 p-6 rounded-xl">
         <div className="flex justify-between mb-6 pb-3 border-b-2 border-gray-300 items-center">
-          <h1 className="text-2xl text-gray-800">Today's Schedule</h1>
+          <h1 className="text-2xl text-(--color-text)">Today's Schedule</h1>
           <NavLink
             to={"#"}
             className={"text-sm text-blue-500 hover:text-blue-400"}

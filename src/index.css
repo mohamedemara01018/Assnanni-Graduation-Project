@@ -260,7 +260,7 @@
   @apply shadow-xl shadow-lime-500;
 }
 
-.filter {
+/* .filter {
   background-image: url("./assets/filterImage.png");
   background-size: 100% 100%;
   @apply h-[40vh] max-[1050px]:h-[50vh] flex flex-col justify-center p-10 gap-8 mb-6 rounded-xl;
@@ -338,4 +338,4 @@
       @apply text-lg max-md:text-base;
     }
   }
-}
+} */

@@ -21,8 +21,8 @@ const Card = ({ logo, title, color, status, children }: Props) => {
           {logo}
         </div>
         <div>
-          <h1 className="text-lg font-semibold text-gray-700">{title}</h1>
-          <div className="text-gray-500 text-sm">{children}</div>
+          <h1 className="text-lg font-semibold text-(--color-text)">{title}</h1>
+          <div className="text-(--color-text-light) text-sm">{children}</div>
         </div>
       </div>
       <div
