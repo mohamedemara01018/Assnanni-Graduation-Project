@@ -6,12 +6,12 @@ import { BsBell } from "react-icons/bs";
 const SideBar = () => {
   const location = useLocation();
   return (
-    <div className="bg-gray-100 rounded-2xl m-4 p-4">
-      <ul className="settingsSidebar">
+    <div className="bg-(--color-surface) rounded-2xl m-4 p-4 ">
+      <ul className="settingsSidebar flex flex-col gap-2">
         <li>
           <NavLink
             to={"/settings"}
-            className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-gray-800 duration-300 ease-in-out hover:bg-gray-200 dark:hover:bg-meta-4 ${
+            className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-(--color-text) duration-300 ease-in-out hover:bg-(--color-border) dark:hover:bg-meta-4 ${
               !location.pathname.includes("security") &&
               !location.pathname.includes("notifications")
                 ? "bg-blue-200 !text-blue-600"
@@ -25,7 +25,7 @@ const SideBar = () => {
         <li>
           <NavLink
             to={"/settings/security"}
-            className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium  duration-300 text-gray-800 ease-in-out hover:bg-gray-200 dark:hover:bg-meta-4 ${
+            className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium  duration-300 text-(--color-text) ease-in-out hover:bg-(--color-border) dark:hover:bg-meta-4 ${
               location.pathname.includes("security") &&
               "bg-blue-200 !text-blue-600"
             }`}
@@ -37,7 +37,7 @@ const SideBar = () => {
         <li>
           <NavLink
             to={"/settings/notifications"}
-            className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-gray-800 duration-300 ease-in-out  hover:bg-gray-200 dark:hover:bg-meta-4 ${
+            className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-(--color-text) duration-300 ease-in-out  hover:bg-(--color-border) dark:hover:bg-meta-4 ${
               location.pathname.includes("/settings/notification") &&
               "bg-blue-200 !text-blue-600"
             }`}

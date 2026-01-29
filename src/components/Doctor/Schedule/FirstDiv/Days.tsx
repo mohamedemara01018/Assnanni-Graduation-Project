@@ -8,7 +8,7 @@ interface Props {
 
 const Days = ({ day, time }: Props) => {
   return (
-    <div className="flex flex-col gap-2 mb-4">
+    <div className="flex flex-col text-(--color-text) gap-2 mb-4">
       <h3>{day}</h3>
       <div className="grid max-md:grid-cols-2 gap-4 md:grid-cols-3 max-sm:grid-cols-1">
         {time.length > 0 ? (
@@ -16,7 +16,7 @@ const Days = ({ day, time }: Props) => {
             return (
               <div
                 key={index}
-                className="flex justify-center items-center  gap-2 bg-blue-200/80 rounded-2xl p-2 cursor-pointer "
+                className="flex justify-center items-center  gap-2 bg-blue-100/80 rounded-2xl p-2 cursor-pointer "
               >
                 <FaRegClock className="text-xl text-blue-600 flex-1" />
                 <span className="text-base text-blue-600 flex-2">{item}</span>
@@ -25,7 +25,9 @@ const Days = ({ day, time }: Props) => {
             );
           })
         ) : (
-          <p className="text-gray-400 text-sm">No Available slots</p>
+          <p className="text-(--color-text-light) text-sm">
+            No Available slots
+          </p>
         )}
       </div>
     </div>

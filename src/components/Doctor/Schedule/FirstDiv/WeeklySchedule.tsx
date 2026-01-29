@@ -24,9 +24,11 @@ const WeeklySchedule = () => {
   ];
 
   return (
-    <div className="bg-gray-100 m-4 rounded-2xl p-4">
-      <div className="flex justify-between">
-        <h3 className="text-gray-800 font-thin">Weekly Schedule</h3>
+    <div className="bg-(--color-surface) m-4 rounded-2xl p-4">
+      <div className="flex justify-between border-b-2 border-gray-300 pb-3 mb-3">
+        <h3 className="text-(--color-text) text-xl  font-normal">
+          Weekly Schedule
+        </h3>
         <button className="bg-blue-500 text-white font-semibold rounded-2xl py-2 px-4 cursor-pointer hover:bg-blue-500/90 hover:shadow-2xl">
           + Add Time Slot
         </button>

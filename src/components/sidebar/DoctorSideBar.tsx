@@ -22,7 +22,7 @@ function DoctorSideBar({ toggled, onToggle }: SideBarProp) {
       <div className="relative">
         <button
           onClick={() => onToggle()}
-          className="flex items-center justify-center rounded-full w-8 h-8 absolute -right-4 top-20 bg-(--color-surface) shadow-lg border-2 border-(--color-border) cursor-pointer"
+          className="flex items-center justify-center rounded-full w-8 h-8 absolute -right-4 top-20 bg-(--color-surface) shadow-lg border-2 border-(--color-border) cursor-pointer text-(--color-text)"
         >
           {toggled ? <IoIosArrowForward /> : <IoIosArrowBack />}
         </button>
@@ -31,7 +31,11 @@ function DoctorSideBar({ toggled, onToggle }: SideBarProp) {
           className={`flex items-center ${"justify-center"} gap-1 h-16 px-4  border-b `}
         >
           <img src={logo} alt="" className="w-8 h-8 object-cover" />
-          {!toggled && <h1 className="text-xl font-semibold">Assnani</h1>}
+          {!toggled && (
+            <h1 className="text-xl font-semibold text-(--color-text)">
+              Assnani
+            </h1>
+          )}
         </Link>
         <ul className="p-2 py-5 space-y-1">
           <li>
@@ -165,8 +169,12 @@ function DoctorSideBar({ toggled, onToggle }: SideBarProp) {
         <button
           className={`flex items-center ${"justify-center"} gap-2 px-3 py-2.5 w-full text-start text-sm font-medium bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) rounded-lg`}
         >
-          <FiLogOut className="w-5 h-5 shrink-0" />
-          {!toggled && <span className="text-sm font-medium">logout</span>}
+          <FiLogOut className="w-5 h-5 shrink-0 text-(--color-text)" />
+          {!toggled && (
+            <span className="text-sm font-medium text-(--color-text)">
+              logout
+            </span>
+          )}
         </button>
       </div>
     </>

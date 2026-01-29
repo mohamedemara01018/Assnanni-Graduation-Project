@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { LuUpload } from "react-icons/lu";
 
 const Scan = () => {
@@ -12,28 +12,34 @@ const Scan = () => {
   }
   return (
     <DashboardLayout pageTitle={"Doctor Medical Scan"}>
-      <div className="xl:-ml-6 -mt-6 bg-gray-200 -mr-7 p-4">
-        <h1 className="text-2xl font-semibold text-gray-800 mb-8 mt-2">
+      <div className="xl:-ml-6 -mt-6 bg-(--color-bg) rounded-2xl -mr-7 p-4">
+        <h1 className="text-2xl font-semibold text-(--color-text) mb-8 mt-2">
           Upload Medical Scan
         </h1>
-        <form className="w-2/3 m-auto flex flex-col justify-center items-center bg-gray-50 rounded-2xl p-6 max-md:w-11/12">
+        <form className="w-2/3 m-auto flex flex-col justify-center items-center bg-(--color-surface) rounded-2xl p-6 max-md:w-11/12">
           <div className="w-full flex flex-col items-center gap-2 mb-4 mt-2 ">
-            <p className="text-base font-semibold text-gray-800">Scan Type</p>
+            <p className="text-base font-semibold text-(--color-text)">
+              Scan Type
+            </p>
             <select
               name="type"
               id="type"
-              className="block w-full appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 pr-8 leading-tight text-gray-700 shadow-sm hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500 text-center"
+              className="block w-full appearance-none rounded-lg border border-gray-300 bg-(--color-border) px-4 py-2 pr-8 leading-tight text-(--color-text) shadow-sm hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500 text-center"
             >
               <option value="x-ray">X-Ray</option>
               <option value="ct-scan">CT-Scan</option>
             </select>
           </div>
-          <div className=" flex flex-col items-center gap-4 mt-4 ">
-            <label htmlFor="medicalcertificate">Upload The Scan</label>
-            <div className="flex flex-col items-center justify-center gap-4 w-full p-8 border-dashed border-2 rounded-sm">
+          <div className=" flex flex-col items-center  gap-4 mt-4 ">
+            <label htmlFor="medicalcertificate" className="text-(--color-text)">
+              Upload The Scan
+            </label>
+            <div className="flex flex-col items-center justify-center gap-4 w-full p-8 border-dashed border-2 rounded-sm bg-(--color-border) border-gray-300">
               <LuUpload className="text-5xl text-(--color-text-light)" />
               <div className="text-center">
-                <h3 className="text-xl">Click to upload or drag and drop</h3>
+                <h3 className="text-xl text-(--color-text)">
+                  Click to upload or drag and drop
+                </h3>
                 <p className="text-(--color-text-light)">
                   PDF, JPG or PNG (MAX. 10MB)
                 </p>
@@ -48,13 +54,13 @@ const Scan = () => {
               <input ref={inputFileRef} type="file" className="hidden" />
             </div>
           </div>
-          <div className="w-full flex flex-col gap-2 p-4 mt-6">
+          <div className="w-full flex flex-col gap-2 p-4 mt-6 text-(--color-text)">
             <p>Additional Notes</p>
             <textarea
               name="notes"
               id="notes"
               cols={40}
-              className="w-full p-4 border border-gray-300 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full p-4 border border-gray-300 bg-(--color-border) rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Write any additional notes"
             ></textarea>
           </div>

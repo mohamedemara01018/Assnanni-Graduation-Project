@@ -67,8 +67,8 @@ const options: ChartOptions<"line"> = {
 };
 const PatientGrowth = () => {
   return (
-    <div className="w-11/12 bg-gray-100 rounded-2xl p-4 m-4">
-      <h2 className="mb-2 text-lg font-semibold text-gray-800">
+    <div className="w-11/12 bg-(--color-surface) rounded-2xl p-4 m-4">
+      <h2 className="mb-2 text-lg font-semibold text-(--color-text)">
         Patient Growth
       </h2>
       <Line data={data} options={options} />

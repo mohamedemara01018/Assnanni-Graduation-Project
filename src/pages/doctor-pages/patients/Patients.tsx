@@ -1,25 +1,27 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import PatientsTable from "./PatientsTable";
+import PatientsTable from "../../../components/Doctor/Patients/PatientsTable";
 import { FaDownload } from "react-icons/fa6";
 import { MdOutlinePersonAddAlt1 } from "react-icons/md";
 import { FaSearch } from "react-icons/fa";
 import { useState } from "react";
-import PatientsCard from "./PatientsCard";
+import PatientsCard from "../../../components/Doctor/Patients/PatientsCard";
 
 const Patients = () => {
   const [view, setView] = useState<"Table" | "Cards">("Table");
   return (
     <DashboardLayout pageTitle={"Patients"}>
-      <div className="xl:-ml-6 -mt-6 p-2">
+      <div className="xl:-ml-6 -mt-6 p-4 bg-(--color-bg) min-h-[85vh] rounded-2xl">
         <div className="flex justify-between gap-2 items-center p-1 mb-8">
           <div>
-            <h1 className="text-2xl text-gray-800 font-semibold">
+            <h1 className="text-2xl text-(--color-text) font-semibold">
               Patients List
             </h1>
-            <p className="font-thin text-gray-600 text-sm">8 patients found</p>
+            <p className="font-thin text-(--color-text-light) text-sm">
+              8 patients found
+            </p>
           </div>
           <div className="flex gap-4 items-center">
-            <button className="text-gray-700 font-semibold px-4 py-2 bg-gray-200 hover:bg-gray-300/90 rounded-md flex gap-1.5  items-center cursor-pointer">
+            <button className="text-(--color-text-light) font-semibold px-4 py-2 bg-(--color-surface) hover:bg-gray-300/90 rounded-md flex gap-1.5  items-center cursor-pointer">
               <FaDownload />
               Export
             </button>
@@ -29,12 +31,12 @@ const Patients = () => {
             </button>
           </div>
         </div>
-        <div className="flex justify-between gap-4 bg-white p-5 px-2 rounded-2xl mb-6 max-md:flex-col relative">
+        <div className="flex justify-between gap-4 bg-(--color-surface)  p-5 px-2 rounded-2xl mb-6 max-md:flex-col relative">
           <div className="flex flex-3 p-2">
             <FaSearch className="absolute left-7     top-7   pr-2 border-r-2 border-gray-400 h-11 text-3xl text-gray-400 max-sm:hidden" />
             <input
               type="text"
-              className=" w-full px-3 pl-12 py-2 text-lg border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500 text-gray-600 "
+              className=" w-full px-3 pl-12 py-2 text-lg border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500 text-(--color-text-light)"
               placeholder="Search by Phone or Name"
             />
           </div>
@@ -43,7 +45,7 @@ const Patients = () => {
             <select
               name="status"
               id="status"
-              className=" block min-w-fit  rounded-lg border border-gray-300 bg-white px-2 py-0 pr-8 leading-tight text-gray-800 shadow-sm hover:border-gray-400 h-10 self-center focus:border-blue-500 focus:outline-none focus:ring-blue-500 text-center cursor-pointer  text-xs font-semibold"
+              className=" block min-w-fit  rounded-lg border border-gray-300 bg-(--color-surface) px-2 py-0 pr-8 leading-tight text-(--color-text) shadow-sm hover:border-gray-400 h-10 self-center focus:border-blue-500 focus:outline-none focus:ring-blue-500 text-center cursor-pointer  text-xs font-semibold"
             >
               <option value="allStatus">All Status</option>
               <option value="active">Active</option>
@@ -53,7 +55,7 @@ const Patients = () => {
             <select
               name="doctors"
               id="doctors"
-              className=" block min-w-fit text-xs  rounded-lg border border-gray-300 bg-white px-2 py-0 pr-8 leading-tight text-gray-800 font-semibold h-10 self-center shadow-sm cursor-pointer hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500 text-center "
+              className=" block min-w-fit text-xs  rounded-lg border border-gray-300 bg-(--color-surface) px-2 py-0 pr-8 leading-tight text-(--color-text) font-semibold h-10 self-center shadow-sm cursor-pointer hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500 text-center "
             >
               <option value="allDoctors">All Doctors</option>
               <option value="chen">Dr.Chen</option>
@@ -79,11 +81,11 @@ const Patients = () => {
             </div>
           </div>
         </div>
-        <div className="p-2 overflow-x-auto overflow-y-hidden ">
+        <div className="p-2 overflow-x-auto overflow-y-hidden rounded-2xl">
           {view === "Table" ? (
             <table className=" table-auto w-full border-collapse rounded-2xl  min-w-fit border-2 border-gray-300  ">
               <thead className="border-2 border-gray-200 rounded-2xl ">
-                <tr className="bg-gray-100 rounded-2xl text-gray-500 ">
+                <tr className="bg-(--color-bg) rounded-2xl text-(--color-text-light) ">
                   <th className="px-4 py-3 text-left font-medium ">PATIENT</th>
                   <th className="px-4 py-3 text-left font-medium ">
                     AGE/GENDER

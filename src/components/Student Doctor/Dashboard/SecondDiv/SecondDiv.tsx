@@ -8,8 +8,8 @@ const SecondDiv = () => {
     <div className="flex-1 flex flex-col gap-6">
       <LearningProgress />
       <QuickActions />
-      <div className="mt-6 bg-gray-50 p-6 rounded-2xl flex flex-col gap-6 ">
-        <h1 className="text-xl  font-normal text-gray-800 mb-2">
+      <div className="mt-6 bg-(--color-surface) p-6 rounded-2xl flex flex-col gap-6 ">
+        <h1 className="text-xl  font-normal text-(--color-text) pb-2 border-b-2 border-gray-300 mb-2">
           Assigned Supervisor
         </h1>
         <Patient name="Dr. Sarah Miller">

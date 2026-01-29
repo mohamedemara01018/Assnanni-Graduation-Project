@@ -15,7 +15,7 @@ interface DashboardLayoutProp {
 function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [toggled, setToggle] = useState(false);
-  const role: string = "studentDoctor";
+  const role: string = "doctor";
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width:768px)");
@@ -40,7 +40,7 @@ function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
   return (
     <div>
       <div>
-        <div className="relative flex ">
+        <div className="relative flex dark">
           {!sidebarCollapsed ? (
             <div
               className={`flex flex-col justify-between bg-(--color-surface) border border-(--color-border)  fixed bottom-0 top-0 left-0 h-screen  ${

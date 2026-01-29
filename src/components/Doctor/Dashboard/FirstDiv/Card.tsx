@@ -9,27 +9,29 @@ interface Props {
 }
 const Card = ({ logo, title, color, status, children }: Props) => {
   return (
-    <div className="flex bg-gray-200 justify-between p-4 items-center rounded-xl">
+    <div className="flex bg-(--color-border) justify-between p-4 items-center rounded-xl">
       <div className="flex gap-4 items-center">
         <div
           className={
             color === "blue"
-              ? "text-3xl text-blue-700 p-3 bg-blue-200 rounded-lg"
+              ? "text-3xl text-blue-700 p-2 bg-blue-200 rounded-lg"
               : "text-3xl text-violet-700 p-3 bg-violet-200 rounded-lg"
           }
         >
           {logo}
         </div>
         <div>
-          <h1 className="text-lg font-semibold text-(--color-text)">{title}</h1>
-          <div className="text-(--color-text-light) text-sm">{children}</div>
+          <h1 className="text-base font-semibold text-(--color-text)">
+            {title}
+          </h1>
+          <div className="text-(--color-text-light) text-xs">{children}</div>
         </div>
       </div>
       <div
         className={
           status === "confirmed"
-            ? "bg-green-200 text-green-700 p-2 rounded-lg font-light"
-            : "bg-yellow-200 text-yellow-700 p-2 rounded-lg font-light"
+            ? "bg-green-200 text-green-700 p-0.5 px-2 rounded-lg font-light"
+            : "bg-yellow-200 text-yellow-700 p-0.5 px-2 rounded-lg font-light"
         }
       >
         <span>{status}</span>
