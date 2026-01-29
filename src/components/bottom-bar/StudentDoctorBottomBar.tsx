@@ -5,7 +5,7 @@ import { IoAnalytics } from "react-icons/io5";
 import { SlCalender } from "react-icons/sl";
 import { NavLink } from "react-router";
 
-function DoctorBottomBar() {
+function StudentDoctorBottomBar() {
   return (
     <div className=" bg-(--color-surface) fixed bottom-0 left-0 right-0 z-20 shadow-sm p-4">
       <div>
@@ -91,4 +91,4 @@ function DoctorBottomBar() {
   );
 }
 
-export default DoctorBottomBar;
+export default StudentDoctorBottomBar;

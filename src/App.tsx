@@ -28,11 +28,14 @@ import ProfileSettings from "./components/Doctor/Settings/SettingsDetails/Profil
 import SecuritySettings from "./components/Doctor/Settings/SettingsDetails/SecuritySettings";
 import NotificationPreferences from "./components/Doctor/Settings/SettingsDetails/NotificationPreferences";
 import Patients from "./components/Doctor/Patients/Patients";
+import StudentDoctorDashboard from "./components/Student Doctor/Dashboard/StudentDoctorDashboard";
+import StudentNotifications from "./components/Student Doctor/Notifications/StudentNotifications";
+import StudentSettings from "./components/Student Doctor/Settings/Settings";
 
 const App = () => {
   // In a real app, this would come from a Context or Redux store
   let role: string = "doctor";
-  role = "doctor";
+  role = "studentDoctor";
 
   return (
     <div className="min-h-screen w-full flex flex-col">
@@ -76,6 +79,8 @@ const App = () => {
                   <PatientPage />
                 ) : role === "doctor" ? (
                   <DoctorDashboard />
+                ) : role === "studentDoctor" ? (
+                  <StudentDoctorDashboard />
                 ) : (
                   ""
                 )
@@ -89,7 +94,18 @@ const App = () => {
             <Route path="doctor-reports" element={<Reports />} />
             <Route path="scan" element={<Scan />} />
             <Route path="notification" element={<Notifications />} />
-
+            <Route
+              path="student-notification"
+              element={<StudentNotifications />}
+            />
+            <Route path="student-settings" element={<StudentSettings />}>
+              <Route index element={<ProfileSettings />} />
+              <Route path="security" element={<SecuritySettings />} />
+              <Route
+                path="notifications"
+                element={<NotificationPreferences />}
+              />
+            </Route>
             <Route path="settings" element={<Settings />}>
               <Route index element={<ProfileSettings />} />
               <Route path="security" element={<SecuritySettings />} />

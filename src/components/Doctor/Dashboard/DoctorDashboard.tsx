@@ -6,7 +6,7 @@ import SecondDiv from "./SecondDiv/SecondDiv";
 const DoctorDashboard = () => {
   return (
     <DashboardLayout pageTitle={"Doctor Dashboard"}>
-      <div className="-ml-6 -mt-6">
+      <div className="xl:-ml-6 -mt-6">
         <h1 className="text-2xl text-gray-800 font-bold p-6 font-sans ">
           Welcome, Dr. John Doe!
         </h1>

@@ -2,9 +2,9 @@ import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import Card from "./Card";
 import { SlCalender } from "react-icons/sl";
 
-const Notifications = () => {
+const StudentNotifications = () => {
   return (
-    <DashboardLayout pageTitle={"Doctor Notifications"}>
+    <DashboardLayout pageTitle={"Student Doctor Notifications"}>
       <div className=" p-4 xl:-ml-6 -mt-6 h-[90vh]">
         <div className="flex justify-between mb-8 items-center">
           <h1 className="text-2xl font-semibold text-gray-800">
@@ -39,4 +39,4 @@ const Notifications = () => {
   );
 };
 
-export default Notifications;
+export default StudentNotifications;

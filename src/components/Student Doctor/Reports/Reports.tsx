@@ -5,7 +5,7 @@ import Insights from "./Insights";
 const Reports = () => {
   return (
     <DashboardLayout pageTitle={"Doctor Reports"}>
-      <div className="p-4 xl:-ml-6 -mt-6">
+      <div className="p-4 -ml-6 -mt-6">
         <h1 className="text-2xl text-gray-700 font-semibold mb-2">
           Reports & Analytics
         </h1>

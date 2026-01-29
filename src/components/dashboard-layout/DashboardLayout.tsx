@@ -4,24 +4,28 @@ import PatientBottomBar from "../bottom-bar/PatientBottomBar";
 import TobNavbar from "../tob-navbar/TobNavbar";
 import DoctorSideBar from "../sidebar/DoctorSideBar";
 import DoctorBottomBar from "../bottom-bar/DoctorBottomBar";
+import StudentDoctorSideBar from "../sidebar/StudentDoctorSideBar";
+import StudentDoctorBottomBar from "../bottom-bar/StudentDoctorBottomBar";
 
 interface DashboardLayoutProp {
   children: ReactNode;
-  pageTitle: String;
+  pageTitle: string;
 }
 
 function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [toggled, setToggle] = useState(false);
-  const role: string = "doctor";
+  const role: string = "studentDoctor";
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width:768px)");
     console.log(matchMedia);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleChange = (e: any) => {
       setSidebarCollapsed(e.matches);
     };
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSidebarCollapsed(mediaQuery.matches);
     mediaQuery.addEventListener("change", handleChange);
 
@@ -55,6 +59,12 @@ function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
                   toggled={toggled}
                   onToggle={handleToggle}
                 />
+              ) : role === "studentDoctor" ? (
+                <StudentDoctorSideBar
+                  collapsed={sidebarCollapsed}
+                  toggled={toggled}
+                  onToggle={handleToggle}
+                />
               ) : (
                 ""
               )}
@@ -63,6 +73,8 @@ function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
             <PatientBottomBar />
           ) : role === "doctor" ? (
             <DoctorBottomBar />
+          ) : role === "studentDoctor" ? (
+            <StudentDoctorBottomBar />
           ) : (
             ""
           )}
