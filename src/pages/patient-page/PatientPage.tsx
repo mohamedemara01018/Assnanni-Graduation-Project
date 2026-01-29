@@ -156,7 +156,7 @@ function PatientPage() {
                     <div>
                       <h3 className="text-(--color-text)">mohamed gamal</h3>
                       <div className="flex items-center gap-4 mt-1 text-sm">
-                        <span className="text-(--color-text-light) flex items-center gap-1 text-yellow-500 ">
+                        <span className="text-(--color-text-light) flex items-center gap-1  ">
                           <MdOutlineStar /> 4.1
                         </span>
                         <span className="bg-(--color-text-light) w-1 h-1 rounded-full"></span>
@@ -185,7 +185,7 @@ function PatientPage() {
                     <div>
                       <h3 className="text-(--color-text)">mohamed gamal</h3>
                       <div className="flex items-center gap-4 mt-1 text-sm">
-                        <span className="text-(--color-text-light) flex items-center gap-1 text-yellow-500 ">
+                        <span className="text-(--color-text-light) flex items-center gap-1">
                           <MdOutlineStar /> 4.1
                         </span>
                         <span className="bg-(--color-text-light) w-1 h-1 rounded-full"></span>
@@ -214,7 +214,7 @@ function PatientPage() {
                     <div>
                       <h3 className="text-(--color-text)">mohamed gamal</h3>
                       <div className="flex items-center gap-4 mt-1 text-sm">
-                        <span className="text-(--color-text-light) flex items-center gap-1 text-yellow-500 ">
+                        <span className="text-(--color-text-light) flex items-center gap-1  ">
                           <MdOutlineStar /> 4.1
                         </span>
                         <span className="bg-(--color-text-light) w-1 h-1 rounded-full"></span>

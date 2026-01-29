@@ -15,7 +15,7 @@ interface DashboardLayoutProp {
 function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [toggled, setToggle] = useState(false);
-  const role: string = "studentDoctor";
+  const role: string = "patient";
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width:768px)");
@@ -43,9 +43,8 @@ function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
         <div className="relative flex ">
           {!sidebarCollapsed ? (
             <div
-              className={`flex flex-col justify-between bg-(--color-surface) border border-(--color-border)  fixed bottom-0 top-0 left-0 h-screen  ${
-                sidebarCollapsed ? "hidden" : `${toggled ? "w-20" : "w-60"}`
-              }`}
+              className={`flex flex-col justify-between bg-(--color-surface) border border-(--color-border)  fixed bottom-0 top-0 left-0 h-screen  ${sidebarCollapsed ? "hidden" : `${toggled ? "w-20" : "w-60"}`
+                }`}
             >
               {role === "patient" ? (
                 <PatientSideBar
@@ -80,17 +79,15 @@ function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
           )}
 
           <div
-            className={`w-full ${
-              sidebarCollapsed ? "" : `${toggled ? "ml-20" : "ml-60"}`
-            } max-sm:m-auto`}
+            className={`w-full ${sidebarCollapsed ? "" : `${toggled ? "ml-20" : "ml-60"}`
+              } max-sm:m-auto`}
           >
             <div className="flex items-center justify-center h-16 border-b border-(--color-border) bg-(--color-surface)">
               <TobNavbar pageTitle={pageTitle} />
             </div>
             <div
-              className={`py-6 wrapper flex  flex-col gap-8 ${
-                sidebarCollapsed ? "mb-20" : ""
-              }`}
+              className={`py-6 wrapper flex  flex-col gap-8 ${sidebarCollapsed ? "mb-20" : ""
+                }`}
             >
               {children}
             </div>
