@@ -13,12 +13,12 @@ function SearchInput({ width }: { width?: string }) {
     >
       <div className="flex items-center gap-2 p-2 w-full ">
         <label htmlFor="search">
-          <CiSearch className="text-xl" />
+          <CiSearch className="text-xl text-(--color-text)" />
         </label>
         <input
           id="search"
           type="text"
-          className="outline-0 border-0 text-base font-medium  w-full "
+          className="outline-0 border-0 text-base font-medium  w-full text-(--color-text)"
           placeholder="Search..."
         />
       </div>
