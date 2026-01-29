@@ -93,7 +93,7 @@ function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
               }`}
             >
               {children}
-            </div>
+            </main>
           </div>
         </div>
       </div>
