@@ -31,6 +31,7 @@ import Patients from "./components/Doctor/Patients/Patients";
 import StudentDoctorDashboard from "./components/Student Doctor/Dashboard/StudentDoctorDashboard";
 import StudentNotifications from "./components/Student Doctor/Notifications/StudentNotifications";
 import StudentSettings from "./components/Student Doctor/Settings/Settings";
+import Appointments from "./pages/appointments/Appointments";
 
 const App = () => {
   // In a real app, this would come from a Context or Redux store
@@ -51,6 +52,7 @@ const App = () => {
           </Route>
           {/* dashboards */}
           <Route path="/patient" element={<PatientPage />} />
+          <Route path="/appointments" element={<Appointments />} />
 
           {/* authenticated routes
           <Route path="/home" element={<HomePage />}>
@@ -88,7 +90,7 @@ const App = () => {
             />
 
             {/* Shared Routes */}
-            <Route path="browse-doctors" element={<BrowseDoctors />} />
+            <Route path="doctors-list" element={<BrowseDoctors />} />
             <Route path="doctor-schedule" element={<Schedule />} />
             <Route path="doctor-patients" element={<Patients />} />
             <Route path="doctor-reports" element={<Reports />} />
