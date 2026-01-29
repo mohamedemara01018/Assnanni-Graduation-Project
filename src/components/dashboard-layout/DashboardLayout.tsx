@@ -85,12 +85,12 @@ function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
             <div className="flex items-center justify-center h-16 border-b border-(--color-border) bg-(--color-surface)">
               <TobNavbar pageTitle={pageTitle} />
             </div>
-            <div
+            <main
               className={`py-6 wrapper flex  flex-col gap-8 ${sidebarCollapsed ? "mb-20" : ""
                 }`}
             >
               {children}
-            </div>
+            </main>
           </div>
         </div>
       </div>

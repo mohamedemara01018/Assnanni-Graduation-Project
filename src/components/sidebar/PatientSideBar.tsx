@@ -38,12 +38,10 @@ function PatientSideBar({ toggled, onToggle }: SideBarProp) {
             <NavLink
               to={"/patient"}
               className={({ isActive }) =>
-                `flex  items-center ${
-                  toggled ? "justify-center" : ""
-                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
-                  isActive
-                    ? "bg-(--color-bg-blue) text-(--color-text-blue) "
-                    : ""
+                `flex  items-center ${toggled ? "justify-center" : ""
+                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${isActive
+                  ? "bg-(--color-bg-blue) text-(--color-text-blue) "
+                  : ""
                 }`
               }
             >
@@ -53,14 +51,12 @@ function PatientSideBar({ toggled, onToggle }: SideBarProp) {
           </li>
           <li>
             <NavLink
-              to={"/"}
+              to={"/appointments"}
               className={({ isActive }) =>
-                `flex  items-center ${
-                  toggled ? "justify-center" : ""
-                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
-                  isActive
-                    ? "bg-(--color-bg-blue) text-(--color-text-blue) "
-                    : ""
+                `flex  items-center ${toggled ? "justify-center" : ""
+                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${isActive
+                  ? "bg-(--color-bg-blue) text-(--color-text-blue) "
+                  : ""
                 }`
               }
             >
@@ -70,14 +66,12 @@ function PatientSideBar({ toggled, onToggle }: SideBarProp) {
           </li>
           <li>
             <NavLink
-              to={"/"}
+              to={"/doctors-list"}
               className={({ isActive }) =>
-                `flex  items-center ${
-                  toggled ? "justify-center" : ""
-                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
-                  isActive
-                    ? "bg-(--color-bg-blue) text-(--color-text-blue) "
-                    : ""
+                `flex  items-center ${toggled ? "justify-center" : ""
+                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${isActive
+                  ? "bg-(--color-bg-blue) text-(--color-text-blue) "
+                  : ""
                 }`
               }
             >
@@ -87,14 +81,12 @@ function PatientSideBar({ toggled, onToggle }: SideBarProp) {
           </li>
           <li>
             <NavLink
-              to={"/"}
+              to={"/scan"}
               className={({ isActive }) =>
-                `flex  items-center ${
-                  toggled ? "justify-center" : ""
-                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
-                  isActive
-                    ? "bg-(--color-bg-blue) text-(--color-text-blue) "
-                    : ""
+                `flex  items-center ${toggled ? "justify-center" : ""
+                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${isActive
+                  ? "bg-(--color-bg-blue) text-(--color-text-blue) "
+                  : ""
                 }`
               }
             >
@@ -104,14 +96,12 @@ function PatientSideBar({ toggled, onToggle }: SideBarProp) {
           </li>
           <li>
             <NavLink
-              to={"/"}
+              to={"/notifications"}
               className={({ isActive }) =>
-                `flex  items-center ${
-                  toggled ? "justify-center" : ""
-                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
-                  isActive
-                    ? "bg-(--color-bg-blue) text-(--color-text-blue) "
-                    : ""
+                `flex  items-center ${toggled ? "justify-center" : ""
+                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${isActive
+                  ? "bg-(--color-bg-blue) text-(--color-text-blue) "
+                  : ""
                 }`
               }
             >
@@ -122,14 +112,12 @@ function PatientSideBar({ toggled, onToggle }: SideBarProp) {
 
           <li>
             <NavLink
-              to={"/"}
+              to={"/settings"}
               className={({ isActive }) =>
-                `flex  items-center ${
-                  toggled ? "justify-center" : ""
-                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
-                  isActive
-                    ? "bg-(--color-bg-blue) text-(--color-text-blue) "
-                    : ""
+                `flex  items-center ${toggled ? "justify-center" : ""
+                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${isActive
+                  ? "bg-(--color-bg-blue) text-(--color-text-blue) "
+                  : ""
                 }`
               }
             >
