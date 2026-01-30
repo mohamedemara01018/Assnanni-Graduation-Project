@@ -8,7 +8,7 @@ import { FaGraduationCap } from "react-icons/fa6";
 const StudentDoctorDashboard = () => {
   return (
     <DashboardLayout pageTitle={"Student Doctor Dashboard"}>
-      <div className="xl:-ml-6 -mt-6 bg-(--color-bg) p-4">
+      <div className="xl:-ml-6 -mt-6 bg-(--color-bg) p-4 rounded-2xl">
         <h1 className="text-2xl text-(--color-text) font-normal p-6 pb-2 font-sans flex items-center gap-3">
           Welcome, St. John Doe!
           <span className="flex text-xs py-1 px-2 items-center gap-2 bg-violet-200 rounded-xl text-violet-700 font-thin">
@@ -30,7 +30,7 @@ const StudentDoctorDashboard = () => {
           </div>
         </div>
         <div className="bg-(--color-bg) pb-6 rounded-2xl py-2 px-6 flex flex-col gap-6">
-          <div className="grid grid-rows-1 grid-cols-4 max-lg:grid-rows-2 max-lg:grid-cols-2 gap-4">
+          <div className="grid  grid-cols-4 max-lg:grid-cols-2 max-md:grid-cols-2 max-sm:grid-cols-1 gap-4">
             <Card />
           </div>
           <div className="flex gap-6 max-md:flex-col ">

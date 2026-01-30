@@ -5,7 +5,7 @@ import Insights from "../../../components/Doctor/Reports/Insights";
 const Reports = () => {
   return (
     <DashboardLayout pageTitle={"Doctor Reports"}>
-      <div className="p-4 xl:-ml-6 -mt-6 bg-(--color-bg)">
+      <div className="p-4  -mt-6 bg-(--color-bg) rounded-2xl">
         <h1 className="text-2xl text-(--color-text) font-semibold mb-2">
           Reports & Analytics
         </h1>

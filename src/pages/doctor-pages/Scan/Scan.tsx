@@ -12,7 +12,7 @@ const Scan = () => {
   }
   return (
     <DashboardLayout pageTitle={"Doctor Medical Scan"}>
-      <div className="xl:-ml-6 -mt-6 bg-(--color-bg) rounded-2xl -mr-7 p-4">
+      <div className=" -mt-6 bg-(--color-bg) rounded-2xl  p-6">
         <h1 className="text-2xl font-semibold text-(--color-text) mb-8 mt-2">
           Upload Medical Scan
         </h1>

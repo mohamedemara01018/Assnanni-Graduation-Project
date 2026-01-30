@@ -10,9 +10,9 @@ const FirstDiv = () => {
     <div className="flex-2">
       <div className="bg-(--color-surface) p-6 rounded-xl">
         <div className="flex justify-between mb-6 pb-3 border-b-2 border-gray-300 items-center">
-          <h1 className="text-xl flex items-center gap-2 text-(--color-text)">
+          <h1 className="text-xl flex items-center gap-2 text-(--color-text) ">
             Today's Observations
-            <span className="text-xs "> (Supervised)</span>
+            <span className="text-xs max-sm:hidden"> (Supervised)</span>
           </h1>
           <NavLink
             to={"#"}
@@ -55,7 +55,7 @@ const FirstDiv = () => {
         <div className="flex justify-between mb-6 pb-3 border-b-2 border-gray-300 items-center">
           <h1 className="text-xl text-(--color-text)">
             Scans for Learning
-            <span className="text-xs ml-2 text-(--color-text-light)">
+            <span className="text-xs ml-2 text-(--color-text-light) max-sm:hidden">
               (Educational Access)
             </span>
           </h1>

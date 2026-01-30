@@ -82,14 +82,14 @@ function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
           <div
             className={`w-full ${
               sidebarCollapsed ? "" : `${toggled ? "ml-20" : "ml-60"}`
-            } max-sm:m-auto`}
+            } max-sm:m-auto `}
           >
             <div className="flex items-center justify-center h-16 border-b border-(--color-border) bg-(--color-surface)">
               <TobNavbar pageTitle={pageTitle} />
             </div>
             <main
-              className={`py-6 wrapper flex  flex-col gap-8 ${
-                sidebarCollapsed ? "mb-20" : ""
+              className={`py-8  bg-(--color-surface)  flex  flex-col gap-8 max-sm:pb-2 px-1 ${
+                sidebarCollapsed ? "mb-20 max-sm:mb-11" : ""
               }`}
             >
               {children}

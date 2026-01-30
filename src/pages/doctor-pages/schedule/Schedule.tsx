@@ -5,7 +5,7 @@ import SecondDiv from "../../../components/Doctor/Schedule/SecondDiv/SecondDiv";
 const Schedule = () => {
   return (
     <DashboardLayout pageTitle={"Doctor Weekly Schedule"}>
-      <div className="flex max-md:flex-col xl:-ml-6 -mt-6 bg-(--color-bg) rounded-2xl ">
+      <div className="flex max-md:flex-col -mt-6 bg-(--color-bg) rounded-2xl ">
         <div className="flex-2">
           <FirstDiv />
         </div>

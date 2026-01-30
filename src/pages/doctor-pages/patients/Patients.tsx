@@ -10,7 +10,7 @@ const Patients = () => {
   const [view, setView] = useState<"Table" | "Cards">("Table");
   return (
     <DashboardLayout pageTitle={"Patients"}>
-      <div className="xl:-ml-6 -mt-6 p-4 bg-(--color-bg) min-h-[85vh] rounded-2xl">
+      <div className=" -mt-6 p-4 bg-(--color-bg) min-h-[85vh] rounded-2xl">
         <div className="flex justify-between gap-2 items-center p-1 mb-8">
           <div>
             <h1 className="text-2xl text-(--color-text) font-semibold">
