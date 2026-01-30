@@ -34,11 +34,12 @@ import StudentNotifications from "./pages/student-doctor-pages/notifications/Stu
 import StudentSettings from "./pages/student-doctor-pages/settings/Settings";
 
 import Appointments from "./pages/appointments/Appointments";
+import StudentAppointments from "./pages/student-doctor-pages/appointments/StudentAppointments";
 
 const App = () => {
   // In a real app, this would come from a Context or Redux store
   let role: string = "doctor";
-  role = "doctor";
+  role = "studentDoctor";
 
   return (
     <div className="min-h-screen w-full flex flex-col">
@@ -101,6 +102,10 @@ const App = () => {
             <Route
               path="student-notification"
               element={<StudentNotifications />}
+            />
+            <Route
+              path="student-appointments"
+              element={<StudentAppointments />}
             />
             <Route path="student-settings" element={<StudentSettings />}>
               <Route index element={<ProfileSettings />} />

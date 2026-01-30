@@ -1,14 +1,17 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import Card from "../../../components/Student Doctor/Dashboard/Card";
 import FirstDiv from "../../../components/Student Doctor/Dashboard/FirstDiv/FirstDiv";
 import SecondDiv from "../../../components/Student Doctor/Dashboard/SecondDiv/SecondDiv";
 import { CiCircleAlert } from "react-icons/ci";
 import { FaGraduationCap } from "react-icons/fa6";
+import DashboardCard from "@/components/DashboardCard/DashboardCard";
+import { SlCalender } from "react-icons/sl";
+import { MdPeople } from "react-icons/md";
+import { LuFileSpreadsheet } from "react-icons/lu";
 
 const StudentDoctorDashboard = () => {
   return (
     <DashboardLayout pageTitle={"Student Doctor Dashboard"}>
-      <div className="xl:-ml-6 -mt-6 bg-(--color-bg) p-4 rounded-2xl">
+      <div className="-mt-6 bg-(--color-bg) p-4 rounded-2xl">
         <h1 className="text-2xl text-(--color-text) font-normal p-6 pb-2 font-sans flex items-center gap-3">
           Welcome, St. John Doe!
           <span className="flex text-xs py-1 px-2 items-center gap-2 bg-violet-200 rounded-xl text-violet-700 font-thin">
@@ -31,7 +34,34 @@ const StudentDoctorDashboard = () => {
         </div>
         <div className="bg-(--color-bg) pb-6 rounded-2xl py-2 px-6 flex flex-col gap-6">
           <div className="grid  grid-cols-4 max-lg:grid-cols-2 max-md:grid-cols-2 max-sm:grid-cols-1 gap-4">
-            <Card />
+            <DashboardCard
+              title="Observation"
+              num="3"
+              subTitle="Today"
+              color="blue"
+              logo={<SlCalender />}
+            />
+            <DashboardCard
+              title="Patients (View Only)"
+              num="128"
+              subTitle="+12%"
+              color="green"
+              logo={<MdPeople />}
+            />
+            <DashboardCard
+              title="Scans to Study"
+              num="1"
+              subTitle="Pending"
+              color="yellow"
+              logo={<LuFileSpreadsheet />}
+            />
+            <DashboardCard
+              title="Completion Rate"
+              num="95%"
+              subTitle="95%"
+              color="violet"
+              logo={<FaGraduationCap />}
+            />
           </div>
           <div className="flex gap-6 max-md:flex-col ">
             <FirstDiv />

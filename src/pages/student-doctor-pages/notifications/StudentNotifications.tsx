@@ -5,7 +5,7 @@ import { SlCalender } from "react-icons/sl";
 const StudentNotifications = () => {
   return (
     <DashboardLayout pageTitle={"Student Doctor Notifications"}>
-      <div className=" p-6 xl:-ml-6 -mt-6 h-[85vh] bg-(--color-bg)">
+      <div className=" p-6 rounded-2xl  -mt-6 h-[85vh] bg-(--color-bg)">
         <div className="flex justify-between mb-8 items-center border-b-2 border-gray-300 pb-2">
           <h1 className="text-2xl font-normal text-(--color-text)">
             Notifications

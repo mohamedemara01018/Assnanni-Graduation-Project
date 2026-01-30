@@ -1,11 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
-import PatientSideBar from "../sidebar/PatientSideBar";
-import PatientBottomBar from "../bottom-bar/PatientBottomBar";
 import TobNavbar from "../tob-navbar/TobNavbar";
-import DoctorSideBar from "../sidebar/DoctorSideBar";
-import DoctorBottomBar from "../bottom-bar/DoctorBottomBar";
-import StudentDoctorSideBar from "../sidebar/StudentDoctorSideBar";
-import StudentDoctorBottomBar from "../bottom-bar/StudentDoctorBottomBar";
+import BottomBar from "../bottom-bar/BottomBar";
+import SideBar from "../sidebar/SideBar";
 
 interface DashboardLayoutProp {
   children: ReactNode;
@@ -15,7 +11,6 @@ interface DashboardLayoutProp {
 function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [toggled, setToggle] = useState(false);
-  const role: string = "doctor";
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width:768px)");
@@ -47,36 +42,14 @@ function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
                 sidebarCollapsed ? "hidden" : `${toggled ? "w-20" : "w-60"}`
               }`}
             >
-              {role === "patient" ? (
-                <PatientSideBar
-                  collapsed={sidebarCollapsed}
-                  toggled={toggled}
-                  onToggle={handleToggle}
-                />
-              ) : role === "doctor" ? (
-                <DoctorSideBar
-                  collapsed={sidebarCollapsed}
-                  toggled={toggled}
-                  onToggle={handleToggle}
-                />
-              ) : role === "studentDoctor" ? (
-                <StudentDoctorSideBar
-                  collapsed={sidebarCollapsed}
-                  toggled={toggled}
-                  onToggle={handleToggle}
-                />
-              ) : (
-                ""
-              )}
+              <SideBar
+                collapsed={sidebarCollapsed}
+                toggled={toggled}
+                onToggle={handleToggle}
+              />
             </div>
-          ) : role === "patient" ? (
-            <PatientBottomBar />
-          ) : role === "doctor" ? (
-            <DoctorBottomBar />
-          ) : role === "studentDoctor" ? (
-            <StudentDoctorBottomBar />
           ) : (
-            ""
+            <BottomBar />
           )}
 
           <div

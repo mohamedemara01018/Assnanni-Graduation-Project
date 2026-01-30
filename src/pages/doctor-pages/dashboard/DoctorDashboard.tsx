@@ -1,7 +1,12 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import Card from "../../../components/Doctor/Dashboard/Card";
+
 import FirstDiv from "../../../components/Doctor/Dashboard/FirstDiv/FirstDiv";
 import SecondDiv from "../../../components/Doctor/Dashboard/SecondDiv/SecondDiv";
+import { SlCalender } from "react-icons/sl";
+import { LuFileSpreadsheet } from "react-icons/lu";
+import { MdPeople } from "react-icons/md";
+import { GoPulse } from "react-icons/go";
+import DashboardCard from "@/components/DashboardCard/DashboardCard";
 
 const DoctorDashboard = () => {
   return (
@@ -15,7 +20,34 @@ const DoctorDashboard = () => {
         </p>
         <div className="bg-gray-200 dark:bg-(--color-bg) rounded-2xl py-4 px-6 flex flex-col gap-6">
           <div className="grid grid-rows-1 grid-cols-4 max-lg:grid-rows-2 max-lg:grid-cols-2 max-sm:grid-cols-1 gap-4">
-            <Card />
+            <DashboardCard
+              title="Appointments"
+              subTitle="Today"
+              num={"12"}
+              logo={<SlCalender />}
+              color="blue"
+            />
+            <DashboardCard
+              title="Total Patients"
+              subTitle="+12%"
+              num={"128"}
+              logo={<MdPeople />}
+              color="green"
+            />
+            <DashboardCard
+              title="Appointments"
+              subTitle="Pending"
+              num={"1"}
+              logo={<LuFileSpreadsheet />}
+              color="yellow"
+            />
+            <DashboardCard
+              title="Appointments"
+              subTitle="95%"
+              num={"95%"}
+              logo={<GoPulse />}
+              color="violet"
+            />
           </div>
           <div className="flex gap-6 max-md:flex-col">
             <FirstDiv />
