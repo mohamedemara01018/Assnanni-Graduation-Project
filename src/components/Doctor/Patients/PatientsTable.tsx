@@ -23,20 +23,26 @@ const PatientsTable = ({
 }: Props) => {
   return (
     <>
-      <tr className="px-4 py-4 bg-white border-b border-gray-300">
+      <tr className="px-4 py-4 bg-(--color-surface) border-b border-gray-300">
         <td className="px-4 pl-8 py-6 text-left">
           <div>
-            <h3 className="text-base text-gray-800 font-semibold    ">
+            <h3 className="text-base text-(--color-text) font-semibold    ">
               {title}
             </h3>
-            <p className="text-xs font-thin text-gray-500">{phone}</p>
+            <p className="text-xs font-thin text-(--color-text-light)">
+              {phone}
+            </p>
           </div>
         </td>
 
         <td className="text-left px-4  py-6">
           <div>
-            <h3 className="text-base text-gray-800 font-medium">{age} yrs</h3>
-            <p className="text-sm text-gray-600 font-thin ">{gender}</p>
+            <h3 className="text-base text-(--color-text) font-medium">
+              {age} yrs
+            </h3>
+            <p className="text-sm text-(--color-text-light) font-thin ">
+              {gender}
+            </p>
           </div>
         </td>
 
@@ -47,18 +53,20 @@ const PatientsTable = ({
                 ? "bg-green-100 text-green-600"
                 : status === "Pending"
                 ? "bg-orange-100 text-orange-600"
-                : "bg-gray-100 text-gray-600"
+                : "bg-gray-100 text-(--color-text-light)"
             }`}
           >
             <span>{status}</span>
           </div>
         </td>
 
-        <td className="text-left px-4  py-6 font-medium text-base text-gray-800">
+        <td className="text-left px-4  py-6 font-medium text-base text-(--color-text)">
           {lastVisit}
         </td>
 
-        <td className="text-left px-4  py-6 text-base font-medium">{doctor}</td>
+        <td className="text-left px-4  py-6 text-base font-medium text-(--color-text)">
+          {doctor}
+        </td>
 
         <td className="text-left px-4  py-6">
           <div className="flex  justify-around gap-2   items-center">

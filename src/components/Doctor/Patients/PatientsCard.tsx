@@ -23,15 +23,19 @@ const PatientsCard = ({
 }: Props) => {
   const firstChar = title.charAt(0);
   return (
-    <div className="flex flex-col bg-white rounded-2xl p-6 px-10 gap-4 md:p-4">
+    <div className="flex flex-col bg-(--color-surface) rounded-2xl p-6 px-10 gap-4 md:p-4">
       <div className="flex justify-between items-center">
         <div className="flex gap-3 items-center">
           <div className="from-green-500 to-blue-500 bg-linear-90 p-3 rounded-full px-5.5 text-xl font-semibold text-white ">
             <span>{firstChar}</span>
           </div>
           <div>
-            <h3 className="text-base text-gray-800 font-medium">{title}</h3>
-            <p className="text-xs font-thin text-gray-500">{phone}</p>
+            <h3 className="text-base text-(--color-text) font-medium">
+              {title}
+            </h3>
+            <p className="text-xs font-thin text-(--color-text-light)">
+              {phone}
+            </p>
           </div>
         </div>
         <p
@@ -47,20 +51,20 @@ const PatientsCard = ({
         </p>
       </div>
       <div className="flex justify-between items-center pr-3">
-        <p className="text-gray-500">Age:</p>
-        <p className="text-gray-800">{age} years</p>
+        <p className="text-(--color-text-light)">Age:</p>
+        <p className="text-(--color-text)">{age} years</p>
       </div>
       <div className="flex justify-between items-center pr-3">
-        <p className="text-gray-500">Gender:</p>
-        <p className="text-gray-800">{gender}</p>
+        <p className="text-(--color-text-light)">Gender:</p>
+        <p className="text-(--color-text)">{gender}</p>
       </div>
       <div className="flex justify-between items-center pr-3">
-        <p className="text-gray-500">lastVisit:</p>
-        <p className="text-gray-800">{lastVisit}</p>
+        <p className="text-(--color-text-light)">lastVisit:</p>
+        <p className="text-(--color-text)">{lastVisit}</p>
       </div>
       <div className="flex justify-between items-center pr-3">
-        <p className="text-gray-500">Assigned Doctor:</p>
-        <p className="text-gray-800">{doctor}</p>
+        <p className="text-(--color-text-light)">Assigned Doctor:</p>
+        <p className="text-(--color-text)">{doctor}</p>
       </div>
       <div className="flex  justify-around gap-2   items-center mt-10 max-sm:grid max-sm:grid-col-2">
         <div className="flex gap-2 items-center text-blue-500 bg-blue-100 md:px-4 md:gap-1 px-8 py-2 rounded-2xl">

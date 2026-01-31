@@ -8,11 +8,11 @@ import VerifyDoctorPage from "./pages/verify-doctor-page/VerifyDoctorPage";
 // Authenticated Layout & Pages
 import HomePage from "./routers/Home Page/HomePage";
 import BrowseDoctors from "./components/HomePage/BrowseDoctors";
-import DoctorDashboard from "./components/Doctor/Dashboard/DoctorDashboard";
-import Schedule from "./components/Doctor/Schedule/Schedule";
-import Reports from "./components/Doctor/Reports/Reports";
-import Scan from "./components/Doctor/Scan/Scan";
-import Notifications from "./components/Doctor/Notifications/Notifications";
+import DoctorDashboard from "./pages/doctor-pages/dashboard/DoctorDashboard";
+import Schedule from "./pages/doctor-pages/schedule/Schedule";
+import Reports from "./pages/doctor-pages/reports/Reports";
+import Scan from "./pages/doctor-pages/Scan/Scan";
+import Notifications from "./pages/doctor-pages/notifications/Notifications";
 
 // Registration (Old system - kept as requested)
 import Registration from "./pages/register-page/Registration";
@@ -23,17 +23,20 @@ import ReceptionistRegistration from "./pages/register-page/ReceptionistRegistra
 import { Navigate, Route, Routes } from "react-router";
 import PatientPage from "./pages/patient-page/PatientPage";
 import PublicLayout from "./components/public-layout/PublicLayout";
-import Settings from "./components/Doctor/Settings/Settings";
+import Settings from "./pages/doctor-pages/settings/Settings";
 import ProfileSettings from "./components/Doctor/Settings/SettingsDetails/ProfileSettings";
 import SecuritySettings from "./components/Doctor/Settings/SettingsDetails/SecuritySettings";
 import NotificationPreferences from "./components/Doctor/Settings/SettingsDetails/NotificationPreferences";
-import Patients from "./components/Doctor/Patients/Patients";
-import StudentDoctorDashboard from "./components/Student Doctor/Dashboard/StudentDoctorDashboard";
-import StudentNotifications from "./components/Student Doctor/Notifications/StudentNotifications";
-import StudentSettings from "./components/Student Doctor/Settings/Settings";
 import AppointmentsPage from "./pages/appointments-page/AppointmentsPage";
 import DoctorsListPage from "./pages/doctors-list-page/DoctorsListPage";
 import DoctorProfilePage from "./pages/doctor-profile-page/DoctorProfilePage";
+
+import Patients from "./pages/doctor-pages/patients/Patients";
+import StudentDoctorDashboard from "./pages/student-doctor-pages/dashboard/StudentDoctorDashboard";
+import StudentNotifications from "./pages/student-doctor-pages/notifications/StudentNotifications";
+import StudentSettings from "./pages/student-doctor-pages/settings/Settings";
+
+import StudentAppointments from "./pages/student-doctor-pages/appointments/StudentAppointments";
 
 const App = () => {
   // In a real app, this would come from a Context or Redux store
@@ -103,6 +106,10 @@ const App = () => {
             <Route
               path="student-notification"
               element={<StudentNotifications />}
+            />
+            <Route
+              path="student-appointments"
+              element={<StudentAppointments />}
             />
             <Route path="student-settings" element={<StudentSettings />}>
               <Route index element={<ProfileSettings />} />

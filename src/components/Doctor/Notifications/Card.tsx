@@ -13,15 +13,15 @@ interface Props {
 const Card = ({ icon, title, desc, time, isRead, color, bgColor }: Props) => {
   return (
     <div
-      className={`bg-gray-50 flex gap-4 p-4 items-center rounded-xl relative`}
+      className={`bg-(--color-surface) flex gap-4 p-4 items-center rounded-xl relative cursor-pointer hover:bg-(--color-border)`}
     >
       {!isRead && (
-        <div className="absolute bg-blue-500 h-25 rounded-l-2xl w-3 -left-2.5"></div>
+        <div className="absolute bg-blue-500 h-25 rounded-l-2xl w-3 -left-1.5"></div>
       )}
       <div className={`text-3xl ${color} ${bgColor} p-4 rounded-full `}>
         {icon}
       </div>
-      <div>
+      <div className="text-(--color-text)">
         <h3>{title}</h3>
         <p>{desc}</p>
         <p>{time}</p>

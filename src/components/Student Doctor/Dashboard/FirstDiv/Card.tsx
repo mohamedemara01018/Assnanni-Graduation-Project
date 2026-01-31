@@ -9,7 +9,7 @@ interface Props {
 }
 const Card = ({ logo, title, color, status, children }: Props) => {
   return (
-    <div className="flex bg-gray-100 justify-between p-4 items-center rounded-xl">
+    <div className="flex bg-(--color-border) justify-between p-4 items-center rounded-xl">
       <div className="flex gap-4 items-center">
         <div
           className={

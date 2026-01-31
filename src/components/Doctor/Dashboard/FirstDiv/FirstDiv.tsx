@@ -6,12 +6,16 @@ import Patient from "./Patient";
 const FirstDiv = () => {
   return (
     <div className="flex-2">
-      <div className="bg-gray-100 p-6 rounded-xl">
+      <div className="bg-(--color-surface) p-6 rounded-xl">
         <div className="flex justify-between mb-6 pb-3 border-b-2 border-gray-300 items-center">
-          <h1 className="text-2xl text-(--color-text)">Today's Schedule</h1>
+          <h1 className="text-xl font-normal text-(--color-text)">
+            Today's Schedule
+          </h1>
           <NavLink
             to={"#"}
-            className={"text-sm text-blue-500 hover:text-blue-400"}
+            className={
+              "text-sm text-(--color-primary) hover:text-(--color-primary-light)"
+            }
           >
             View Calender
           </NavLink>
@@ -46,9 +50,11 @@ const FirstDiv = () => {
           </Card>
         </div>
       </div>
-      <div className="bg-gray-100 p-6 rounded-xl mt-6">
+      <div className="bg-(--color-surface) p-6 rounded-xl mt-6">
         <div className="flex justify-between mb-6 pb-3 border-b-2 border-gray-300 items-center">
-          <h1 className="text-2xl text-gray-800">Scans Awaiting Review</h1>
+          <h1 className="text-xl font-normal text-(--color-text)">
+            Scans Awaiting Review
+          </h1>
           <NavLink
             to={"#"}
             className={"text-sm text-blue-500 hover:text-blue-400"}
@@ -68,9 +74,11 @@ const FirstDiv = () => {
           </Card>
         </div>
       </div>
-      <div className="bg-gray-100 p-6 rounded-xl mt-6">
+      <div className="bg-(--color-surface) p-6 rounded-xl mt-6">
         <div className="flex justify-between mb-6 pb-3 border-b-2 border-gray-300 items-center">
-          <h1 className="text-2xl text-gray-800">Recent Patients</h1>
+          <h1 className="text-xl font-normal text-(--color-text)">
+            Recent Patients
+          </h1>
           <NavLink
             to={"#"}
             className={"text-sm text-blue-500 hover:text-blue-400"}
@@ -78,7 +86,7 @@ const FirstDiv = () => {
             View All
           </NavLink>
         </div>
-        <div className="flex flex-col gap-4 max-h-60 overflow-y-auto">
+        <div className="flex flex-col gap-4 max-h-60 overflow-y-auto ">
           <Patient name="John Doe" />
           <Patient name="Mary Smith" />
           <Patient name="Robert Brown" />

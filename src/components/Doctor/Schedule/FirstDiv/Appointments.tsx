@@ -4,10 +4,12 @@ import { GrFormSchedule } from "react-icons/gr";
 
 const Appointments = () => {
   return (
-    <div className="bg-gray-100 p-4 rounded-2xl m-4">
-      <div className="flex items-center mb-4">
-        <GrFormSchedule className="text-4xl text-blue-500" />
-        <p className="text-gray-900 font-thin text-lg">Today's Appointments</p>
+    <div className="bg-(--color-surface) p-4 rounded-2xl m-4">
+      <div className="flex items-center mb-4 border-b-2 border-gray-300 pb-2">
+        <GrFormSchedule className="text-4xl text-blue-500 " />
+        <p className="text-(--color-text) font-normal text-xl">
+          Today's Appointments
+        </p>
       </div>
       <div>
         <Card

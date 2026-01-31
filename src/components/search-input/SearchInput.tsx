@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { CiSearch } from "react-icons/ci"
+import { useState } from "react";
+import { CiSearch } from "react-icons/ci";
 
 function SearchInput({ style, placeholder = 'search...', padding = 'p-2' }: { style?: string, placeholder?: string, padding?: string }) {
     const [isFoucs, setFoucs] = useState(false)
@@ -15,4 +15,4 @@ function SearchInput({ style, placeholder = 'search...', padding = 'p-2' }: { st
     )
 }
 
-export default SearchInput
+export default SearchInput;
