@@ -37,6 +37,7 @@ import StudentNotifications from "./pages/student-doctor-pages/notifications/Stu
 import StudentSettings from "./pages/student-doctor-pages/settings/Settings";
 
 import StudentAppointments from "./pages/student-doctor-pages/appointments/StudentAppointments";
+import AppointmentsBookingPage from "./pages/appointments-booking-page/AppointmentsBookingPage";
 
 const App = () => {
   // In a real app, this would come from a Context or Redux store
@@ -60,6 +61,7 @@ const App = () => {
           <Route path="/appointments" element={<AppointmentsPage />} />
           <Route path="/doctors-list" element={<DoctorsListPage />} />
           <Route path="/doctors-list/:id" element={<DoctorProfilePage />} />
+          <Route path="/appointments/booking/:id" element={<AppointmentsBookingPage />} />
 
           {/* authenticated routes
           <Route path="/home" element={<HomePage />}>
