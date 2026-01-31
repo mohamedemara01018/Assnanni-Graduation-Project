@@ -31,7 +31,9 @@ import Patients from "./components/Doctor/Patients/Patients";
 import StudentDoctorDashboard from "./components/Student Doctor/Dashboard/StudentDoctorDashboard";
 import StudentNotifications from "./components/Student Doctor/Notifications/StudentNotifications";
 import StudentSettings from "./components/Student Doctor/Settings/Settings";
-import Appointments from "./pages/appointments/Appointments";
+import AppointmentsPage from "./pages/appointments-page/AppointmentsPage";
+import DoctorsListPage from "./pages/doctors-list-page/DoctorsListPage";
+import DoctorProfilePage from "./pages/doctor-profile-page/DoctorProfilePage";
 
 const App = () => {
   // In a real app, this would come from a Context or Redux store
@@ -52,7 +54,9 @@ const App = () => {
           </Route>
           {/* dashboards */}
           <Route path="/patient" element={<PatientPage />} />
-          <Route path="/appointments" element={<Appointments />} />
+          <Route path="/appointments" element={<AppointmentsPage />} />
+          <Route path="/doctors-list" element={<DoctorsListPage />} />
+          <Route path="/doctors-list/:id" element={<DoctorProfilePage />} />
 
           {/* authenticated routes
           <Route path="/home" element={<HomePage />}>
