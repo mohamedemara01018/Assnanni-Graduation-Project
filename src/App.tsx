@@ -42,7 +42,7 @@ import AppointmentsBookingPage from "./pages/appointments-booking-page/Appointme
 const App = () => {
   // In a real app, this would come from a Context or Redux store
   let role: string = "doctor";
-  role = "studentDoctor";
+
 
   return (
     <div className="min-h-screen w-full flex flex-col">
@@ -69,8 +69,8 @@ const App = () => {
             <Route path="browse-doctors" element={<BrowseDoctors />} />
           </Route> */}
 
-          {/* old registration system */}
-          <Route path="/register" element={<Registration />}>
+          {/* // TODO */}
+          {/* <Route path="/register" element={<Registration />}>
             <Route path="patient-register" element={<PatientRegistration />} />
             <Route path="doctor-register" element={<DoctorRegistration />} />
             <Route path="student-register" element={<StudentRegistration />} />
@@ -78,7 +78,7 @@ const App = () => {
               path="receptionist-register"
               element={<ReceptionistRegistration />}
             />
-          </Route>
+          </Route> */}
 
           {/* --- Authenticated Shared Layout --- */}
           <Route path="/" element={<HomePage />}>

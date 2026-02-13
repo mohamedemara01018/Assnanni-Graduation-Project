@@ -13,10 +13,10 @@ const Scan = () => {
   return (
     <DashboardLayout pageTitle={"Doctor Medical Scan"}>
       <div className=" -mt-6 bg-(--color-bg) rounded-2xl  p-6">
-        <h1 className="text-2xl font-semibold text-(--color-text) mb-8 mt-2">
+        <h1 className="text-2xl font-semibold text-(--color-text) mb-8 ml-44 mt-2">
           Upload Medical Scan
         </h1>
-        <form className="w-2/3 m-auto flex flex-col justify-center items-center bg-(--color-surface) rounded-2xl p-6 max-md:w-11/12">
+        <form className="w-2/3 m-auto flex flex-col justify-center items-center bg-(--color-surface) rounded-2xl p-6 max-md:w-11/12 shadowk">
           <div className="w-full flex flex-col items-center gap-2 mb-4 mt-2 ">
             <p className="text-base font-semibold text-(--color-text)">
               Scan Type

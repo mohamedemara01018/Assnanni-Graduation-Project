@@ -1,5 +1,46 @@
 const selectInputData = [
     {
+        id: 'governorate',
+        label: 'Governorate',
+        options: [
+            'Choose a governorate',
+            'Alexandria',
+            'Aswan',
+            'Assiut',
+            'Beheira',
+            'Beni Suef',
+            'Cairo',
+            'Dakahlia',
+            'Damietta',
+            'Fayoum',
+            'Gharbia',
+            'Giza',
+            'Ismailia',
+            'Kafr el-Sheikh',
+            'Luxor',
+            'Matrouh',
+            'Minya',
+            'Menofia',
+            'New Valley',
+            'North Sinai',
+            'Port Said',
+            'Qalyubia',
+            'Qena',
+            'Red Sea',
+            'Al Sharqia',
+            'Sohag',
+            'South Sinai',
+            'Suez'
+        ]
+    },
+    {
+        id: 'region',
+        label: 'Region',
+        options: [
+           'choose a region'
+        ]
+    },
+    {
         id: 'experience',
         label: 'Experience',
         options: [
