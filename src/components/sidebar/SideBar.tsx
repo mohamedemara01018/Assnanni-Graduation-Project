@@ -14,7 +14,7 @@ import { MdOutlineSettings, MdPeopleAlt } from "react-icons/md";
 import { LuFileSpreadsheet } from "react-icons/lu";
 import { FaRegBell } from "react-icons/fa6";
 import { AiOutlineSchedule } from "react-icons/ai";
-import { CiSettings } from "react-icons/ci";
+import { FaStethoscope } from "react-icons/fa";
 
 interface SideBarProp {
   collapsed: boolean;
@@ -47,77 +47,19 @@ function SideBar({ toggled, onToggle }: SideBarProp) {
         <ul className="p-2 py-5 space-y-1">
           <li>
             <NavLink
-              to={"/patient"}
+              to={"/"}
               className={({ isActive }) =>
-                `flex  items-center ${toggled ? "justify-center" : ""
-                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${isActive
-                  ? "bg-(--color-bg-blue) text-(--color-text-blue) "
-                  : ""
+                `flex  items-center ${
+                  toggled ? "justify-center" : ""
+                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
+                  isActive
+                    ? "bg-(--color-bg-blue) text-(--color-text-blue) "
+                    : ""
                 }`
               }
             >
               <FiLogOut className="text-xl" />
               {!toggled && <span>dashboard</span>}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to={"/appointments"}
-              className={({ isActive }) =>
-                `flex  items-center ${toggled ? "justify-center" : ""
-                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${isActive
-                  ? "bg-(--color-bg-blue) text-(--color-text-blue) "
-                  : ""
-                }`
-              }
-            >
-              <AiOutlineSchedule className="text-xl" />
-              {!toggled && <span>Appointments</span>}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to={"/doctors-list"}
-              className={({ isActive }) =>
-                `flex  items-center ${toggled ? "justify-center" : ""
-                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${isActive
-                  ? "bg-(--color-bg-blue) text-(--color-text-blue) "
-                  : ""
-                }`
-              }
-            >
-              <IoPersonAddOutline className="text-xl" />
-              {!toggled && <span>Doctors</span>}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to={"/scan"}
-              className={({ isActive }) =>
-                `flex  items-center ${toggled ? "justify-center" : ""
-                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${isActive
-                  ? "bg-(--color-bg-blue) text-(--color-text-blue) "
-                  : ""
-                }`
-              }
-            >
-              <IoAnalytics className="text-xl" />
-              {!toggled && <span>Scans</span>}
-            </NavLink>
-          </li>
-          <li>
-            <NavLink
-              to={"/student-settings/notifications"}
-              className={({ isActive }) =>
-                `flex  items-center ${toggled ? "justify-center" : ""
-                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${isActive
-                  ? "bg-(--color-bg-blue) text-(--color-text-blue) "
-                  : ""
-                }`
-              }
-            >
-              <IoIosNotificationsOutline className="text-xl" />
-              {!toggled && <span>Notifications</span>}
             </NavLink>
           </li>
           {role === "doctor" && (
@@ -279,7 +221,7 @@ function SideBar({ toggled, onToggle }: SideBarProp) {
                     }`
                   }
                 >
-                  <IoPersonAddOutline className="text-xl" />
+                  <FaStethoscope className="text-xl" />
                   {!toggled && <span>Doctors</span>}
                 </NavLink>
               </li>
@@ -431,7 +373,7 @@ function SideBar({ toggled, onToggle }: SideBarProp) {
               </li>
               <li>
                 <NavLink
-                  to={"/notifications"}
+                  to={"/student-settings/notifications"}
                   className={({ isActive }) =>
                     `flex  items-center ${
                       toggled ? "justify-center" : ""
@@ -446,22 +388,8 @@ function SideBar({ toggled, onToggle }: SideBarProp) {
                   {!toggled && <span>Notifications</span>}
                 </NavLink>
               </li>
-
-          <li>
-            <NavLink
-              to={"/settings"}
-              className={({ isActive }) =>
-                `flex  items-center ${toggled ? "justify-center" : ""
-                } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${isActive
-                  ? "bg-(--color-bg-blue) text-(--color-text-blue) "
-                  : ""
-                }`
-              }
-            >
-              <CiSettings className="text-xl" />
-              {!toggled && <span>Settings</span>}
-            </NavLink>
-          </li>
+            </>
+          )}
         </ul>
       </div>
       <div className="p-2  border-t border-(--color-border)">
