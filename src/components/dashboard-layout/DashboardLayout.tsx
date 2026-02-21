@@ -61,7 +61,7 @@ function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
               <TobNavbar pageTitle={pageTitle} />
             </div>
             <main
-              className={`py-8  bg-(--color-surface)  flex  flex-col gap-8 max-sm:pb-2 px-1 ${
+              className={`py-8  wrapper  flex  flex-col gap-8 max-sm:pb-2 px-1 ${
                 sidebarCollapsed ? "mb-20 max-sm:mb-11" : ""
               }`}
             >

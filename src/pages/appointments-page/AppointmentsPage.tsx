@@ -7,7 +7,7 @@ import { FaPlus } from 'react-icons/fa'
 import { Link } from 'react-router'
 
 
-function Appointments() {
+function AppointmentsPage() {
     const [onFilter, setFilter] = useState(false);
     return (
         <DashboardLayout pageTitle='patient'>
@@ -30,7 +30,7 @@ function Appointments() {
                 <CardComp>
                     <div className='w-full'>
                         <div className=' flex items-center justify-between gap-4'>
-                            <SearchInput width='w-full' />
+                            <SearchInput style='w-full' />
                             <button
                                 onClick={() => setFilter(!onFilter)}
                                 className={`flex items-center gap-2 border-2 border-(--color-border) py-2 px-4 hover:bg-(--color-bg)  rounded-lg cursor-pointer ${onFilter ? 'bg-(--color-bg-blue) text-(--color-text-blue)' : ''} `}>
@@ -224,4 +224,4 @@ function Appointments() {
     )
 }
 
-export default Appointments
+export default AppointmentsPage

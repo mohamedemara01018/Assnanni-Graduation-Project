@@ -27,15 +27,21 @@ import Settings from "./pages/doctor-pages/settings/Settings";
 import ProfileSettings from "./components/Doctor/Settings/SettingsDetails/ProfileSettings";
 import SecuritySettings from "./components/Doctor/Settings/SettingsDetails/SecuritySettings";
 import NotificationPreferences from "./components/Doctor/Settings/SettingsDetails/NotificationPreferences";
+import AppointmentsPage from "./pages/appointments-page/AppointmentsPage";
+import DoctorsListPage from "./pages/doctors-list-page/DoctorsListPage";
+import DoctorProfilePage from "./pages/doctor-profile-page/DoctorProfilePage";
 
 import Patients from "./pages/doctor-pages/patients/Patients";
 import StudentDoctorDashboard from "./pages/student-doctor-pages/dashboard/StudentDoctorDashboard";
 import StudentNotifications from "./pages/student-doctor-pages/notifications/StudentNotifications";
 import StudentSettings from "./pages/student-doctor-pages/settings/Settings";
 
-import Appointments from "./pages/appointments/Appointments";
 import StudentAppointments from "./pages/student-doctor-pages/appointments/StudentAppointments";
+<<<<<<< HEAD
 import ReceptionistDashboard from "./pages/receptionist-pages/dashboard/ReceptionistDashboard";
+=======
+import AppointmentsBookingPage from "./pages/appointments-booking-page/AppointmentsBookingPage";
+>>>>>>> fbcbf590f6f66bd01823db3b7637782011f6b539
 
 const App = () => {
   // In a real app, this would come from a Context or Redux store
@@ -56,7 +62,10 @@ const App = () => {
           </Route>
           {/* dashboards */}
           <Route path="/patient" element={<PatientPage />} />
-          <Route path="/appointments" element={<Appointments />} />
+          <Route path="/appointments" element={<AppointmentsPage />} />
+          <Route path="/doctors-list" element={<DoctorsListPage />} />
+          <Route path="/doctors-list/:id" element={<DoctorProfilePage />} />
+          <Route path="/appointments/booking/:id" element={<AppointmentsBookingPage />} />
 
           {/* authenticated routes
           <Route path="/home" element={<HomePage />}>
