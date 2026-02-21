@@ -35,11 +35,12 @@ import StudentSettings from "./pages/student-doctor-pages/settings/Settings";
 
 import Appointments from "./pages/appointments/Appointments";
 import StudentAppointments from "./pages/student-doctor-pages/appointments/StudentAppointments";
+import ReceptionistDashboard from "./pages/receptionist-pages/dashboard/ReceptionistDashboard";
 
 const App = () => {
   // In a real app, this would come from a Context or Redux store
   let role: string = "doctor";
-  role = "studentDoctor";
+  role = "receptionist";
 
   return (
     <div className="min-h-screen w-full flex flex-col">
@@ -86,6 +87,8 @@ const App = () => {
                   <DoctorDashboard />
                 ) : role === "studentDoctor" ? (
                   <StudentDoctorDashboard />
+                ) : role === "receptionist" ? (
+                  <ReceptionistDashboard />
                 ) : (
                   ""
                 )

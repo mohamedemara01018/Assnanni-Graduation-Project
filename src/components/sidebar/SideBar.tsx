@@ -23,7 +23,7 @@ interface SideBarProp {
 }
 
 function SideBar({ toggled, onToggle }: SideBarProp) {
-  const role: string = "studentDoctor";
+  const role: string = "receptionist";
   return (
     <>
       <div className="relative">
@@ -133,6 +133,97 @@ function SideBar({ toggled, onToggle }: SideBarProp) {
                 >
                   <LuFileSpreadsheet className="text-xl" />
                   {!toggled && <span>Reports</span>}
+                </NavLink>
+              </li>
+
+              <li>
+                <NavLink
+                  to={"/notification"}
+                  className={({ isActive }) =>
+                    `flex  items-center ${
+                      toggled ? "justify-center" : ""
+                    } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
+                      isActive
+                        ? "bg-(--color-bg-blue) text-(--color-text-blue) "
+                        : ""
+                    }`
+                  }
+                >
+                  <FaRegBell className="text-xl" />
+                  {!toggled && <span>Notifications</span>}
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to={"/settings"}
+                  className={({ isActive }) =>
+                    `flex  items-center ${
+                      toggled ? "justify-center" : ""
+                    } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
+                      isActive
+                        ? "bg-(--color-bg-blue) text-(--color-text-blue) "
+                        : ""
+                    }`
+                  }
+                >
+                  <MdOutlineSettings className="text-xl" />
+                  {!toggled && <span>Settings</span>}
+                </NavLink>
+              </li>
+            </>
+          )}
+          {role === "receptionist" && (
+            <>
+              <li>
+                <NavLink
+                  to={"/doctor-patients"}
+                  className={({ isActive }) =>
+                    `flex  items-center ${
+                      toggled ? "justify-center" : ""
+                    } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
+                      isActive
+                        ? "bg-(--color-bg-blue) text-(--color-text-blue) "
+                        : ""
+                    }`
+                  }
+                >
+                  <MdPeopleAlt />
+                  {!toggled && <span>Patients</span>}
+                  {/* <IoPersonAddOutline className="text-xl" /> */}
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to={"/student-appointments"}
+                  className={({ isActive }) =>
+                    `flex  items-center ${
+                      toggled ? "justify-center" : ""
+                    } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
+                      isActive
+                        ? "bg-(--color-bg-blue) text-(--color-text-blue) "
+                        : ""
+                    }`
+                  }
+                >
+                  <SlCalender className="text-xl" />
+                  {!toggled && <span>Appointments</span>}
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to={"/doctors-list"}
+                  className={({ isActive }) =>
+                    `flex  items-center ${
+                      toggled ? "justify-center" : ""
+                    } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
+                      isActive
+                        ? "bg-(--color-bg-blue) text-(--color-text-blue) "
+                        : ""
+                    }`
+                  }
+                >
+                  <IoPersonAddOutline className="text-xl" />
+                  {!toggled && <span>Doctors</span>}
                 </NavLink>
               </li>
 
