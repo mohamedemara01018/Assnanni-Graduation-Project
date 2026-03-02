@@ -1,7 +1,7 @@
 // Public pages
 import Landing from "./pages/landing-page/Landing";
 import Login from "./pages/login-page/Login";
-import RegisterPage from "./pages/register-page-v2/RegisterPage";
+// import RegisterPage from "./pages/register-page-v2/RegisterPage";
 import VerifyEmailPage from "./pages/verify-email-page/VerifyEmailPage";
 import VerifyDoctorPage from "./pages/verify-doctor-page/VerifyDoctorPage";
 
@@ -42,10 +42,15 @@ import ReceptionistDashboard from "./pages/receptionist-pages/dashboard/Receptio
 
 import AppointmentsBookingPage from "./pages/appointments-booking-page/AppointmentsBookingPage";
 
+import { ToastContainer } from "react-toastify";
+import { useSelector } from "react-redux";
+
 const App = () => {
   // In a real app, this would come from a Context or Redux store
-  let role: string = "doctor";
-  role = "receptionist";
+  // let role: string = "doctor";
+  // role = "receptionist";
+  const role = useSelector((state) => state.auth.role);
+  // role = "doctor";
 
   return (
     <div className="min-h-screen w-full flex flex-col">
@@ -55,7 +60,7 @@ const App = () => {
           <Route element={<PublicLayout />}>
             <Route path="/landing" element={<Landing />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register-v2" element={<RegisterPage />} />
+            {/* <Route path="/register-v2" element={<RegisterPage />} /> */}
             <Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="/verify-doctor" element={<VerifyDoctorPage />} />
           </Route>
@@ -77,6 +82,7 @@ const App = () => {
 
           {/* old registration system */}
           <Route path="/register" element={<Registration />}>
+            {/* <Route index element={<PatientRegistration />} /> */}
             <Route path="patient-register" element={<PatientRegistration />} />
             <Route path="doctor-register" element={<DoctorRegistration />} />
             <Route path="student-register" element={<StudentRegistration />} />
@@ -87,62 +93,55 @@ const App = () => {
           </Route>
 
           {/* --- Authenticated Shared Layout --- */}
-          <Route path="/" element={<HomePage />}>
-            {/* Conditional Dashboard based on Role */}
-            <Route
-              index
-              element={
-                role === "patient" ? (
-                  <PatientPage />
-                ) : role === "doctor" ? (
-                  <DoctorDashboard />
-                ) : role === "studentDoctor" ? (
-                  <StudentDoctorDashboard />
-                ) : role === "receptionist" ? (
-                  <ReceptionistDashboard />
-                ) : (
-                  ""
-                )
-              }
-            />
+          {role === "guest" && <Route path="/" element={<HomePage />} />}
+          {/* Conditional Dashboard based on Role */}
 
-            {/* Shared Routes */}
-            <Route path="doctors-list" element={<BrowseDoctors />} />
-            <Route path="doctor-schedule" element={<Schedule />} />
-            <Route path="doctor-patients" element={<Patients />} />
-            <Route path="doctor-reports" element={<Reports />} />
-            <Route path="scan" element={<Scan />} />
-            <Route path="notification" element={<Notifications />} />
-            <Route
-              path="student-notification"
-              element={<StudentNotifications />}
-            />
-            <Route
-              path="student-appointments"
-              element={<StudentAppointments />}
-            />
-            <Route path="student-settings" element={<StudentSettings />}>
-              <Route index element={<ProfileSettings />} />
-              <Route path="security" element={<SecuritySettings />} />
-              <Route
-                path="notifications"
-                element={<NotificationPreferences />}
-              />
-            </Route>
-            <Route path="settings" element={<Settings />}>
-              <Route index element={<ProfileSettings />} />
-              <Route path="security" element={<SecuritySettings />} />
-              <Route
-                path="notifications"
-                element={<NotificationPreferences />}
-              />
-            </Route>
+          <Route
+            path="/"
+            element={
+              role === "patient" ? (
+                <PatientPage />
+              ) : role === "doctor" ? (
+                <DoctorDashboard />
+              ) : role === "studentDoctor" ? (
+                <StudentDoctorDashboard />
+              ) : (
+                role === "receptionist" && <ReceptionistDashboard />
+              )
+            }
+          />
+
+          {/* Shared Routes */}
+          <Route path="doctors-list" element={<BrowseDoctors />} />
+          <Route path="doctor-schedule" element={<Schedule />} />
+          <Route path="doctor-patients" element={<Patients />} />
+          <Route path="doctor-reports" element={<Reports />} />
+          <Route path="scan" element={<Scan />} />
+          <Route path="notification" element={<Notifications />} />
+          <Route
+            path="student-notification"
+            element={<StudentNotifications />}
+          />
+          <Route
+            path="student-appointments"
+            element={<StudentAppointments />}
+          />
+          <Route path="student-settings" element={<StudentSettings />}>
+            <Route index element={<ProfileSettings />} />
+            <Route path="security" element={<SecuritySettings />} />
+            <Route path="notifications" element={<NotificationPreferences />} />
+          </Route>
+          <Route path="settings" element={<Settings />}>
+            <Route index element={<ProfileSettings />} />
+            <Route path="security" element={<SecuritySettings />} />
+            <Route path="notifications" element={<NotificationPreferences />} />
           </Route>
 
           {/* Fallback - Redirect to landing if route not found */}
-          <Route path="*" element={<Navigate to="/landing" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+      <ToastContainer />
     </div>
   );
 };

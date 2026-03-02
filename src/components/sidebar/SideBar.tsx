@@ -15,7 +15,7 @@ import { LuFileSpreadsheet } from "react-icons/lu";
 import { FaRegBell } from "react-icons/fa6";
 import { AiOutlineSchedule } from "react-icons/ai";
 import { FaStethoscope } from "react-icons/fa";
-
+import { useSelector } from "react-redux";
 interface SideBarProp {
   collapsed: boolean;
   toggled: boolean;
@@ -23,7 +23,7 @@ interface SideBarProp {
 }
 
 function SideBar({ toggled, onToggle }: SideBarProp) {
-  const role: string = "receptionist";
+  const role = useSelector((state) => state.auth.role);
   return (
     <>
       <div className="relative">

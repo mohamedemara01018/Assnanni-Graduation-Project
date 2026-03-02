@@ -1,9 +1,9 @@
-import RegistrationForm from "./RegistrationForm";
+import RegisterForm from "./RegisterForm";
 
 const DoctorRegistration = () => {
   return (
     <div>
-      <RegistrationForm />
+      <RegisterForm />
     </div>
   );
 };

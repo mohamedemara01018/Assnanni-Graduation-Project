@@ -1,19 +1,16 @@
-import BrowseDoctors from "@/components/HomePage/BrowseDoctors";
-import LandingScape from "@/components/HomePage/LandingScape";
+import Footer from "@/components/footer/Footer";
+import Header from "@/components/header/Header";
+import Landing from "@/pages/landing-page/Landing";
 // import MainNavBar from "@/components/Navigation bars/MainNavBar";
 // import DoctorNav from "@/components/Navigation bars/Side Navigation/DoctorNav";
 // import PatientNav from "@/components/Navigation bars/Side Navigation/PatientNav";
 
-import { Outlet } from "react-router";
-
 const HomePage = () => {
-  const isRegistered = true;
-  // let role = "patient";
-  // role = "doctor";
   return (
     <div>
-      {isRegistered ? <Outlet /> : <LandingScape />}
-      {!isRegistered && <BrowseDoctors />}
+      <Header />
+      <Landing />
+      <Footer />
     </div>
     // <div className="flex justify-between">
     //   {isRegistered && (
