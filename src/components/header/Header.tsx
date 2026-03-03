@@ -1,5 +1,5 @@
 import { IoMoonOutline } from "react-icons/io5";
-import { IoIosNotificationsOutline } from "react-icons/io";
+// import { IoIosNotificationsOutline } from "react-icons/io";
 
 import logo from "../../assets/logo.png";
 import { Link } from "react-router";
@@ -30,17 +30,15 @@ function Header() {
               Register
             </Link>
           </div>
-
           {/* when user have auth */}
-          {false && (
-            <div>
-              <div className="relative">
-                <IoIosNotificationsOutline />
-                <div className="w-2 h-2 rounded-full bg-red-500 absolute top-0.5 right-0.5"></div>
-              </div>
-              <div></div>
+
+          {/* <div>
+            <div className="relative">
+              <IoIosNotificationsOutline />
+              <div className="w-2 h-2 rounded-full bg-red-500 absolute top-0.5 right-0.5"></div>
             </div>
-          )}
+            <div></div>
+          </div> */}
         </div>
       </div>
     </header>

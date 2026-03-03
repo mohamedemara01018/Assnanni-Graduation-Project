@@ -49,12 +49,15 @@ const App = () => {
   // In a real app, this would come from a Context or Redux store
   // let role: string = "doctor";
   // role = "receptionist";
-  const role = useSelector((state) => state.auth.role);
+  const role = useSelector(
+    (state: { auth: { role: string } }) => state.auth.role
+  );
+  console.log(role);
   // role = "doctor";
 
   return (
     <div className="min-h-screen w-full flex flex-col">
-      <main className="flex-grow">
+      <main className="grow">
         <Routes>
           {/* --- Public Routes --- */}
           <Route element={<PublicLayout />}>

@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { updateRole } from "@/features/auth/authSlice";
+import { getEmail } from "@/features/email/emailSlice";
 
 interface Inputs {
   firstName: string;
@@ -35,19 +36,22 @@ const RegistrationForm = () => {
     formState: { errors },
   } = useForm<Inputs>();
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const password = watch("password");
   const navigator = useNavigate();
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       if (doctor) {
-        axios.post(backendUrl + "Register-Doctor", data);
+        await axios.post(backendUrl + "Register-Doctor", data);
         dispatch(updateRole("doctor"));
-        toast.success("Register Successfully");
-        navigator("/");
+        dispatch(getEmail(data.email));
+        navigator("/verify-doctor");
       }
-    } catch (error) {
-      toast.error(error?.message);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.message);
     }
   };
   return (

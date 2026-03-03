@@ -23,7 +23,9 @@ interface SideBarProp {
 }
 
 function SideBar({ toggled, onToggle }: SideBarProp) {
-  const role = useSelector((state) => state.auth.role);
+  const role = useSelector(
+    (state: { auth: { role: string } }) => state.auth.role
+  );
   return (
     <>
       <div className="relative">

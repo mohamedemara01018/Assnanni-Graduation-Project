@@ -3,7 +3,7 @@ import img from "../../assets/landing-img.jpg";
 
 function Hero() {
   return (
-    <section className="gap-10 bg-linear-to-br from-blue-600 min-h-screen flex justify-center items-center to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white w-full py-24">
+    <section className="gap-10 bg-linear-to-br from-blue-600 min-h-[90vh] flex justify-center items-center to-blue-800 dark:from-blue-800 dark:to-blue-950 text-white w-full py-24">
       <div className="wrapper flex justify-between gap-10">
         <div className="flex flex-col justify-center items-start gap-4 flex-4 ">
           <h1 className="text-5xl">Your Health, Our Priority</h1>
