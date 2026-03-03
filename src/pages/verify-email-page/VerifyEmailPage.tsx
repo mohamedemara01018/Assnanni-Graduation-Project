@@ -1,40 +1,35 @@
 import { updateRole } from "@/features/auth/authSlice";
 import axios from "axios";
-import { useForm, type SubmitHandler } from "react-hook-form";
 import { MdOutlineMail } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
-// import { InputOtp } from "@heroui/input-otp";
-// import { useState } from "react";
-
-interface Inputs {
-  num1: string;
-  num2: string;
-  num3: string;
-  num4: string;
-  num5: string;
-  num6: string;
-}
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { useState, type FormEvent } from "react";
 
 function VerifyEmailPage() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const dispatch = useDispatch();
   const navigator = useNavigate();
+  const [value, setValue] = useState("000000");
+
   const email = useSelector(
     (state: { email: { emailAddress: string } }) => state.email.emailAddress
   );
-  const { register, handleSubmit } = useForm<Inputs>();
-  //   const [value, setValue] = useState("");
+  const onSubmit = async (e: FormEvent) => {
+    e.preventDefault();
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const formData = {
+    const data = {
       email,
-      code:
-        data.num1 + data.num2 + data.num3 + data.num4 + data.num5 + data.num6,
+      code: value,
     };
     try {
-      await axios.post(backendUrl + "Verify-Email", formData);
+      await axios.post(backendUrl + "Verify-Email", data);
       dispatch(updateRole("doctor"));
       navigator("/");
       toast.success("You have successfully verified your email address");
@@ -58,43 +53,26 @@ function VerifyEmailPage() {
             <span className="text-(--color-primary)">{email}</span>
           </p>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={onSubmit}>
           <div className="flex flex-col  items-center">
             <p className="text-(--color-text)">Enter Verification Code</p>
             <div>
               <div className="flex items-center gap-2 my-4">
-                {/* <InputOtp length={4} value={value} onValueChange={setValue} /> */}
-                <input
-                  type="text"
-                  {...register("num1")}
-                  className="w-10 py-3 pl-4 sm:w-14 sm:py-4 sm:pl-7 border-2 outline-0 bg-(--color-bg) rounded-xl  focus:border-(--color-primary)"
-                />
-
-                <input
-                  type="text"
-                  {...register("num2")}
-                  className="w-10 py-3 pl-4 sm:w-14 sm:py-4 sm:pl-7 border-2 outline-0 bg-(--color-bg) rounded-xl  focus:border-(--color-primary)"
-                />
-                <input
-                  type="text"
-                  {...register("num3")}
-                  className="w-10 py-3 pl-4 sm:w-14 sm:py-4 sm:pl-7 border-2 outline-0 bg-(--color-bg) rounded-xl  focus:border-(--color-primary)"
-                />
-                <input
-                  type="text"
-                  {...register("num4")}
-                  className="w-10 py-3 pl-4 sm:w-14 sm:py-4 sm:pl-7 border-2 outline-0 bg-(--color-bg) rounded-xl  focus:border-(--color-primary)"
-                />
-                <input
-                  type="text"
-                  {...register("num5")}
-                  className="w-10 py-3 pl-4 sm:w-14 sm:py-4 sm:pl-7 border-2 outline-0 bg-(--color-bg) rounded-xl  focus:border-(--color-primary)"
-                />
-                <input
-                  type="text"
-                  {...register("num6")}
-                  className="w-10 py-3 pl-4 sm:w-14 sm:py-4 sm:pl-7 border-2 outline-0 bg-(--color-bg) rounded-xl  focus:border-(--color-primary)"
-                />
+                <InputOTP
+                  maxLength={6}
+                  pattern={REGEXP_ONLY_DIGITS}
+                  value={value}
+                  onChange={setValue}
+                >
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} className="w-15 h-15" />
+                    <InputOTPSlot index={1} className="w-15 h-15" />
+                    <InputOTPSlot index={2} className="w-15 h-15" />
+                    <InputOTPSlot index={3} className="w-15 h-15" />
+                    <InputOTPSlot index={4} className="w-15 h-15" />
+                    <InputOTPSlot index={5} className="w-15 h-15" />
+                  </InputOTPGroup>
+                </InputOTP>
               </div>
               <button className="bg-(--color-primary) py-2 px-4 rounded-sm w-full hover:bg-(--color-primary-light) cursor-pointer duration-100 transition duration-200">
                 Verify Email

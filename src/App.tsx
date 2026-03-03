@@ -77,15 +77,8 @@ const App = () => {
             element={<AppointmentsBookingPage />}
           />
 
-          {/* authenticated routes
-          <Route path="/home" element={<HomePage />}>
-            <Route index element={<PatientDashboard />} />
-            <Route path="browse-doctors" element={<BrowseDoctors />} />
-          </Route> */}
-
           {/* old registration system */}
           <Route path="/register" element={<Registration />}>
-            {/* <Route index element={<PatientRegistration />} /> */}
             <Route path="patient-register" element={<PatientRegistration />} />
             <Route path="doctor-register" element={<DoctorRegistration />} />
             <Route path="student-register" element={<StudentRegistration />} />

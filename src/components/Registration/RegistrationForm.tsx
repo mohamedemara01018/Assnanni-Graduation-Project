@@ -23,6 +23,7 @@ interface Inputs {
 const RegistrationForm = () => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const dispatch = useDispatch();
+  const navigator = useNavigate();
   const { pathname } = useLocation();
   const doctor: boolean = pathname.includes("doctor-register");
   const isDoctor: boolean =
@@ -35,10 +36,8 @@ const RegistrationForm = () => {
     watch,
     formState: { errors },
   } = useForm<Inputs>();
-
   // eslint-disable-next-line react-hooks/incompatible-library
   const password = watch("password");
-  const navigator = useNavigate();
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
