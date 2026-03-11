@@ -7,9 +7,12 @@ import { LuFileSpreadsheet } from "react-icons/lu";
 import { MdPeopleAlt } from "react-icons/md";
 import { SlCalender } from "react-icons/sl";
 import { NavLink } from "react-router";
+import { useSelector } from "react-redux";
 
 function BottomBar() {
-  const role: string = "studentDoctor";
+  const role = useSelector(
+    (state: { auth: { role: string } }) => state.auth.role
+  );
   return (
     <div className=" bg-(--color-surface) fixed bottom-0 left-0 right-0 z-20 shadow-sm p-4">
       <div>

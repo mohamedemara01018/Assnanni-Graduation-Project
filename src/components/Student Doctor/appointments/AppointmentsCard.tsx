@@ -10,7 +10,7 @@ interface Props {
   desc: string;
   date: string;
   time: string;
-  meeting: "In-Person" | "View Call";
+  meeting: "OnSite" | "View Call";
   address?: string;
   status: "Upcoming" | "Completed" | "Canceled";
 }
@@ -59,10 +59,10 @@ function AppointmentsCard({
             <span>{time}</span>
           </div>
           <div className="flex items-center gap-1 text-(--color-text-light) text-sm font-normal">
-            {meeting === "In-Person" ? <GrLocation /> : <IoVideocamOutline />}
+            {meeting === "OnSite" ? <GrLocation /> : <IoVideocamOutline />}
             <span>{meeting}</span>
           </div>
-          {meeting === "In-Person" && (
+          {meeting === "OnSite" && (
             <div className="flex items-center gap-1 text-(--color-text-light) text-sm font-normal">
               <GrLocation />
               <span>{address}</span>

@@ -47,7 +47,7 @@ const StudentAppointments = () => {
             desc="Annual Checkup"
             date="Feb 5,2025"
             time="10:00 Am"
-            meeting="In-Person"
+            meeting="OnSite"
             address="Room 302, Medical Center"
             status="Upcoming"
           />
@@ -64,7 +64,7 @@ const StudentAppointments = () => {
             desc="Annual Checkup"
             date="Feb 5,2025"
             time="10:00 Am"
-            meeting="In-Person"
+            meeting="OnSite"
             address="Room 302, Medical Center"
             status="Completed"
           />

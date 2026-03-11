@@ -1,97 +1,235 @@
-import { NavLink, useLocation } from "react-router";
+import { NavLink, useLocation, useNavigate } from "react-router";
 import { MdOutlineMail } from "react-icons/md";
 import { LuPhone } from "react-icons/lu";
 import { CiLock } from "react-icons/ci";
 import { IoPersonCircleOutline } from "react-icons/io5";
 import { GrAlert } from "react-icons/gr";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { updateRole } from "@/features/auth/authSlice";
+import { getEmail } from "@/features/email/emailSlice";
+
+interface Inputs {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  confirmPassword: string;
+}
 
 const RegistrationForm = () => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const dispatch = useDispatch();
+  const navigator = useNavigate();
   const { pathname } = useLocation();
-
+  const doctor: boolean = pathname.includes("doctor-register");
   const isDoctor: boolean =
-    pathname.includes("/doctor-registration") ||
-    pathname.includes("/student-registration");
+    pathname.includes("/doctor-register") ||
+    pathname.includes("/student-register");
 
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<Inputs>();
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const password = watch("password");
+
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    try {
+      if (doctor) {
+        await axios.post(backendUrl + "Register-Doctor", data);
+        dispatch(updateRole("doctor"));
+        dispatch(getEmail(data.email));
+        navigator("/verify-doctor");
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
   return (
-    <div className="registrationContainer">
-      <div id="name">
-        <div className="relative">
-          <label htmlFor="fname">First Name</label>
-          <input type="text" className="!pl-12" placeholder="John" id="fname" />
-          <IoPersonCircleOutline className="absolute bottom-1 fill-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <div className="flex flex-col gap-3 ">
+        <div className="name">
+          <div>
+            <label htmlFor="firstName">First Name</label>
+            <div className="relative">
+              <input
+                type="text"
+                className={`pl-12 p-2 bg-(--color-bg) text-(--color-text) border border-(--color-border) placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md  w-full ${
+                  errors.firstName && "border-red-500"
+                }`}
+                placeholder="John"
+                id="firstName"
+                {...register("firstName", {
+                  required: "First name is Required",
+                })}
+              />
+              <IoPersonCircleOutline className="absolute bottom-1 fill-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
+            </div>
+            {errors.firstName?.message && (
+              <p className="text-xs text-red-600 ml-1 font-light">
+                errors.firstName?.message
+              </p>
+            )}
+          </div>
+          <div>
+            {" "}
+            <label htmlFor="lname">Last Name</label>
+            <div className="relative">
+              <input
+                type="text"
+                className={`pl-12 p-2 bg-(--color-bg) text-(--color-text) border border-(--color-border) placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md  w-full ${
+                  errors.lastName && "border-red-500"
+                }`}
+                id="lastName"
+                placeholder="Doe"
+                {...register("lastName", { required: "Last name is Required" })}
+              />
+              <IoPersonCircleOutline className="absolute bottom-1 fill-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
+            </div>
+            {errors.lastName?.message && (
+              <p className="text-xs text-red-600 ml-1 font-light">
+                errors.lastName?.message
+              </p>
+            )}
+          </div>
         </div>
-        <div className="relative">
-          <label htmlFor="lname">Last Name</label>
-          <input type="text" className="!pl-12" id="lname" placeholder="Doe" />
-          <IoPersonCircleOutline className="absolute bottom-1 fill-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
+        <div>
+          <label htmlFor="email">Email</label>
+          <div className="relative">
+            <input
+              type="email"
+              placeholder="John.doe@example.com"
+              className={`pl-12 p-2 bg-(--color-bg) text-(--color-text) border border-(--color-border) placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md  w-full ${
+                errors.email && "border-red-500"
+              }`}
+              id="email"
+              {...register("email", {
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: "Please, make sure your Email Address is correct",
+                },
+                required: "Email Address is Required",
+              })}
+            />
+            <MdOutlineMail className="absolute bottom-1 fill-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
+          </div>
+          {errors.email?.message && (
+            <p className="text-xs text-red-600 ml-1 font-light">
+              {errors.email.message}
+            </p>
+          )}
         </div>
-      </div>
-      <div className="relative">
-        <label htmlFor="email">Email</label>
-        <input
-          type="email"
-          placeholder="John.doe@example.com"
-          className="!pl-12"
-          id="email"
-        />
-        <MdOutlineMail className="absolute bottom-1 fill-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
-      </div>
-      <div className="relative">
-        <label htmlFor="phone">Phone Number</label>
-        <input
-          type="text"
-          className="!pl-12"
-          placeholder="+1 (555) 000-000"
-          id="phone"
-        />
-        <LuPhone className="absolute bottom-1 text-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-2xl" />
-      </div>
-      <div className="relative">
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          placeholder="password"
-          className="!pl-12"
-        />
-        <CiLock className="absolute bottom-1 fill-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
-      </div>
-      <div className="relative">
-        <label htmlFor="cPassword">Confirm Password</label>
-        <input
-          type="password"
-          className="!pl-12"
-          id="cPassword"
-          placeholder="confirm password"
-        />
-        <CiLock className="absolute bottom-1 fill-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
-      </div>
-      {isDoctor && (
-        <div className="bg-[#00E0a5]/20 p-2 rounded-sm font-semibold !mt-8 text-[#00AFe5]">
-          <p className="flex gap-2">
-            <GrAlert className="translate-y-0.5 text-xl" />
-            After registration, you'll need to upload your medical license and
-            credentials for verification.
+        <div>
+          <label htmlFor="phone">Phone Number</label>
+          <div className="relative">
+            <input
+              type="text"
+              className={`pl-12 p-2 bg-(--color-bg) text-(--color-text) border border-(--color-border) placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md  w-full ${
+                errors.phoneNumber && "border-red-500"
+              }`}
+              placeholder="+1 (555) 000-000"
+              id="phoneNumber"
+              {...register("phoneNumber", {
+                required: "PhonephoneNumber Number is Required",
+                pattern: {
+                  value: /^01[0-2]\d{1,8}$/i,
+                  message: "Please, make sure your number is correct",
+                },
+              })}
+            />
+            <LuPhone className="absolute bottom-1 text-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
+          </div>
+          {errors.phoneNumber?.message && (
+            <p className="text-xs text-red-600 ml-1 font-light">
+              {errors.phoneNumber?.message}
+            </p>
+          )}
+        </div>
+        <div>
+          <label htmlFor="password">Password</label>
+          <div className="relative">
+            <input
+              type="password"
+              id="password"
+              placeholder="password"
+              className={`pl-12 p-2 bg-(--color-bg) text-(--color-text) border border-(--color-border) placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md  w-full ${
+                errors.password && "border-red-500"
+              }`}
+              {...register("password", {
+                required: "Password is Required",
+                pattern: {
+                  value:
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/,
+                  message: "Min 8 chars, 1 uppercase, 1 lowercase, 1 number",
+                },
+              })}
+            />
+            <CiLock className="absolute bottom-1 fill-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
+          </div>
+          {errors.password?.message && (
+            <p className="text-xs text-red-600 ml-1 font-light">
+              {errors.password?.message}
+            </p>
+          )}
+        </div>
+        <div>
+          <label htmlFor="cPassword">Confirm Password</label>
+          <div className="relative">
+            <input
+              type="password"
+              className={`pl-12 p-2 bg-(--color-bg) text-(--color-text) border border-(--color-border) placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md  w-full ${
+                errors.confirmPassword && "border-red-500"
+              }`}
+              id="cPassword"
+              placeholder="confirm password"
+              {...register("confirmPassword", {
+                validate: (value) =>
+                  value === password || "Passwords do not match",
+              })}
+            />
+            <CiLock className="absolute bottom-1 fill-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
+          </div>
+          {errors.confirmPassword?.message && (
+            <p className="text-xs text-red-600 ml-1 font-light">
+              {errors.confirmPassword?.message}
+            </p>
+          )}
+        </div>
+        {isDoctor && (
+          <div className="bg-[#00E0a5]/20 p-2 rounded-sm font-semibold  text-[#00AFe5]">
+            <p className="flex gap-2">
+              <GrAlert className="translate-y-0.5 text-xl" />
+              After registration, you'll need to upload your medical license and
+              credentials for verification.
+            </p>
+          </div>
+        )}
+        <div className=" max-sm:w-11/12 w-1/3 m-auto">
+          <button className="self-center text-white bg-linear-90  to-[#00AFE5] from-[#00E0A5] w-full rounded-3xl m-auto py-2 px-6 font-bold cursor-pointer hover:bg-blue-500 ">
+            Register
+          </button>
+        </div>
+        <div>
+          <p className=" mb-4 flex justify-center gap-1 max-sm:flex-col">
+            Already have an account?{" "}
+            <NavLink
+              to="/"
+              className="text-[#0c86ab] inline-block   font-semibold"
+            >
+              Sign in
+            </NavLink>
           </p>
         </div>
-      )}
-      <div className="!mt-10 max-sm:w-11/12 w-1/3 m-auto">
-        <button className="self-center text-white bg-linear-90  to-[#00AFE5] from-[#00E0A5] w-full rounded-3xl m-auto py-2 px-6 font-bold cursor-pointer hover:bg-blue-500 ">
-          Register
-        </button>
       </div>
-      <div>
-        <p className="mt-6 mb-4 flex justify-center gap-1 max-sm:flex-col">
-          Already have an account?{" "}
-          <NavLink
-            to="/"
-            className="text-[#0c86ab] inline-block   font-semibold"
-          >
-            Sign in
-          </NavLink>
-        </p>
-      </div>
-    </div>
+    </form>
   );
 };
 

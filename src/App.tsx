@@ -1,7 +1,7 @@
 // Public pages
 import Landing from "./pages/landing-page/Landing";
 import Login from "./pages/login-page/Login";
-import RegisterPage from "./pages/register-page-v2/RegisterPage";
+// import RegisterPage from "./pages/register-page-v2/RegisterPage";
 import VerifyEmailPage from "./pages/verify-email-page/VerifyEmailPage";
 import VerifyDoctorPage from "./pages/verify-doctor-page/VerifyDoctorPage";
 
@@ -15,11 +15,7 @@ import Scan from "./pages/doctor-pages/Scan/Scan";
 import Notifications from "./pages/doctor-pages/notifications/Notifications";
 
 // Registration (Old system - kept as requested)
-import Registration from "./pages/register-page/Registration";
-import PatientRegistration from "./pages/register-page/PatientRegistration";
-import DoctorRegistration from "./pages/register-page/DoctorRegistration";
-import StudentRegistration from "./pages/register-page/StudentRegistration";
-import ReceptionistRegistration from "./pages/register-page/ReceptionistRegistration";
+
 import { Navigate, Route, Routes } from "react-router";
 import PatientPage from "./pages/patient-page/PatientPage";
 import PublicLayout from "./components/public-layout/PublicLayout";
@@ -37,22 +33,33 @@ import StudentNotifications from "./pages/student-doctor-pages/notifications/Stu
 import StudentSettings from "./pages/student-doctor-pages/settings/Settings";
 
 import StudentAppointments from "./pages/student-doctor-pages/appointments/StudentAppointments";
+
+import ReceptionistDashboard from "./pages/receptionist-pages/dashboard/ReceptionistDashboard";
+
 import AppointmentsBookingPage from "./pages/appointments-booking-page/AppointmentsBookingPage";
+
+import { ToastContainer } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const App = () => {
   // In a real app, this would come from a Context or Redux store
-  let role: string = "doctor";
-
+  // let role: string = "doctor";
+  // role = "receptionist";
+  const role = useSelector(
+    (state: { auth: { role: string } }) => state.auth.role
+  );
+  console.log(role);
+  // role = "doctor";
 
   return (
     <div className="min-h-screen w-full flex flex-col">
-      <main className="flex-grow">
+      <main className="grow">
         <Routes>
           {/* --- Public Routes --- */}
           <Route element={<PublicLayout />}>
             <Route path="/landing" element={<Landing />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register-v2" element={<RegisterPage />} />
+            {/* <Route path="/register-v2" element={<RegisterPage />} /> */}
             <Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="/verify-doctor" element={<VerifyDoctorPage />} />
           </Route>
@@ -61,13 +68,10 @@ const App = () => {
           <Route path="/appointments" element={<AppointmentsPage />} />
           <Route path="/doctors-list" element={<DoctorsListPage />} />
           <Route path="/doctors-list/:id" element={<DoctorProfilePage />} />
-          <Route path="/appointments/booking/:id" element={<AppointmentsBookingPage />} />
-
-          {/* authenticated routes
-          <Route path="/home" element={<HomePage />}>
-            <Route index element={<PatientDashboard />} />
-            <Route path="browse-doctors" element={<BrowseDoctors />} />
-          </Route> */}
+          <Route
+            path="/appointments/booking/:id"
+            element={<AppointmentsBookingPage />}
+          />
 
           {/* // TODO */}
           {/* <Route path="/register" element={<Registration />}>
@@ -81,60 +85,55 @@ const App = () => {
           </Route> */}
 
           {/* --- Authenticated Shared Layout --- */}
-          <Route path="/" element={<HomePage />}>
-            {/* Conditional Dashboard based on Role */}
-            <Route
-              index
-              element={
-                role === "patient" ? (
-                  <PatientPage />
-                ) : role === "doctor" ? (
-                  <DoctorDashboard />
-                ) : role === "studentDoctor" ? (
-                  <StudentDoctorDashboard />
-                ) : (
-                  ""
-                )
-              }
-            />
+          {role === "guest" && <Route path="/" element={<HomePage />} />}
+          {/* Conditional Dashboard based on Role */}
 
-            {/* Shared Routes */}
-            <Route path="doctors-list" element={<BrowseDoctors />} />
-            <Route path="doctor-schedule" element={<Schedule />} />
-            <Route path="doctor-patients" element={<Patients />} />
-            <Route path="doctor-reports" element={<Reports />} />
-            <Route path="scan" element={<Scan />} />
-            <Route path="notification" element={<Notifications />} />
-            <Route
-              path="student-notification"
-              element={<StudentNotifications />}
-            />
-            <Route
-              path="student-appointments"
-              element={<StudentAppointments />}
-            />
-            <Route path="student-settings" element={<StudentSettings />}>
-              <Route index element={<ProfileSettings />} />
-              <Route path="security" element={<SecuritySettings />} />
-              <Route
-                path="notifications"
-                element={<NotificationPreferences />}
-              />
-            </Route>
-            <Route path="settings" element={<Settings />}>
-              <Route index element={<ProfileSettings />} />
-              <Route path="security" element={<SecuritySettings />} />
-              <Route
-                path="notifications"
-                element={<NotificationPreferences />}
-              />
-            </Route>
+          <Route
+            path="/"
+            element={
+              role === "patient" ? (
+                <PatientPage />
+              ) : role === "doctor" ? (
+                <DoctorDashboard />
+              ) : role === "studentDoctor" ? (
+                <StudentDoctorDashboard />
+              ) : (
+                role === "receptionist" && <ReceptionistDashboard />
+              )
+            }
+          />
+
+          {/* Shared Routes */}
+          <Route path="doctors-list" element={<BrowseDoctors />} />
+          <Route path="doctor-schedule" element={<Schedule />} />
+          <Route path="doctor-patients" element={<Patients />} />
+          <Route path="doctor-reports" element={<Reports />} />
+          <Route path="scan" element={<Scan />} />
+          <Route path="notification" element={<Notifications />} />
+          <Route
+            path="student-notification"
+            element={<StudentNotifications />}
+          />
+          <Route
+            path="student-appointments"
+            element={<StudentAppointments />}
+          />
+          <Route path="student-settings" element={<StudentSettings />}>
+            <Route index element={<ProfileSettings />} />
+            <Route path="security" element={<SecuritySettings />} />
+            <Route path="notifications" element={<NotificationPreferences />} />
+          </Route>
+          <Route path="settings" element={<Settings />}>
+            <Route index element={<ProfileSettings />} />
+            <Route path="security" element={<SecuritySettings />} />
+            <Route path="notifications" element={<NotificationPreferences />} />
           </Route>
 
           {/* Fallback - Redirect to landing if route not found */}
-          <Route path="*" element={<Navigate to="/landing" replace />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
+      <ToastContainer />
     </div>
   );
 };
