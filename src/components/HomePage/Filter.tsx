@@ -1,4 +1,4 @@
-import Governorates from "@/libs/Governorates";
+import Governorates from "@/lib/Governorates";
 
 const Filter = () => {
   return (

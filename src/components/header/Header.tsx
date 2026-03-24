@@ -9,8 +9,8 @@ function Header() {
     <header className="bg-(--color-surface) border-b-2 border-b-(--color-border)">
       <div className=" wrapper   flex items-center justify-between py-4 ">
         <div className="flex items-center gap-1">
-          <img src={logo} alt="" className="w-10 h-10" />
-          <h1 className="text-2xl font-bold">Assnani</h1>
+          <img src={logo} alt="" className=" h-15" />
+          {/* <h1 className="text-2xl font-bold">Assnani</h1> */}
         </div>
         <div className="flex items-center gap-2">
           <button className=" text-xl text-(--color-text) hover:bg-black/5 hover:dark:bg-white/15 py-2 px-4 rounded-sm  cursor-pointer transform duration-200">
