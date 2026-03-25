@@ -8,8 +8,8 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { updateRole } from "@/features/auth/authSlice";
-import { getEmail } from "@/features/email/emailSlice";
+import { updateRole } from "@/store/auth/authSlice";
+import { getEmail } from "@/store/email/emailSlice";
 
 interface Inputs {
   firstName: string;

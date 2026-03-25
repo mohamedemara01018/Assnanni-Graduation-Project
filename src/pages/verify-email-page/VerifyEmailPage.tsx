@@ -1,4 +1,4 @@
-import { updateRole } from "@/features/auth/authSlice";
+import { updateRole } from "@/store/auth/authSlice";
 import axios from "axios";
 import { MdOutlineMail } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";

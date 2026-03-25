@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import SearchInput from "@/components/search-input/SearchInput";
 import { selectInputData } from "@/constants/doctorsListConstant";
-import SelectInput from "@/reusable-components/select-input/SelectInput";
+import SelectInput from "@/components/select-input/SelectInput";
 import { CiBookmark } from "react-icons/ci";
 import { FaStar } from "react-icons/fa";
 import { IoLocationOutline } from "react-icons/io5";

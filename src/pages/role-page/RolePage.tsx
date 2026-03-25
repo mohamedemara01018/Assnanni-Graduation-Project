@@ -1,5 +1,5 @@
 import { rolesData } from "@/constants/registerConstant"
-import type { roleType } from "@/types/types"
+import type { roleType } from "@/types"
 interface RolePageProps {
     handleChangeRole: (role: roleType) => void
 }
