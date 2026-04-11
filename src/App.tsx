@@ -40,13 +40,14 @@ import AppointmentsBookingPage from "./pages/appointments-booking-page/Appointme
 
 import { ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
+import AdminPage from "./pages/admin-page/AdminPage";
 
 const App = () => {
   // In a real app, this would come from a Context or Redux store
   // let role: string = "doctor";
   // role = "receptionist";
   const role = useSelector(
-    (state: { auth: { role: string } }) => state.auth.role
+    (state: { auth: { role: string } }) => state.auth.role,
   );
   console.log(role);
   // role = "doctor";
@@ -68,6 +69,7 @@ const App = () => {
           <Route path="/appointments" element={<AppointmentsPage />} />
           <Route path="/doctors-list" element={<DoctorsListPage />} />
           <Route path="/doctors-list/:id" element={<DoctorProfilePage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route
             path="/appointments/booking/:id"
             element={<AppointmentsBookingPage />}
