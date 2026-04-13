@@ -1,4 +1,4 @@
-import { updateRole } from "@/store/auth/authSlice";
+import { updateRole } from "@/store/slices/auth/authSlice";
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { FiFileText } from "react-icons/fi";

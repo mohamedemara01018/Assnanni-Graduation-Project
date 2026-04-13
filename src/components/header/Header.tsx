@@ -1,8 +1,7 @@
-import { IoMoonOutline } from "react-icons/io5";
-// import { IoIosNotificationsOutline } from "react-icons/io";
 
 import logo from "../../assets/logo.png";
 import { Link } from "react-router";
+import ThemeToggle from "../theme-toggle/ThemeToggle";
 
 function Header() {
   return (
@@ -13,9 +12,7 @@ function Header() {
           {/* <h1 className="text-2xl font-bold">Assnani</h1> */}
         </div>
         <div className="flex items-center gap-2">
-          <button className=" text-xl text-(--color-text) hover:bg-black/5 hover:dark:bg-white/15 py-2 px-4 rounded-sm  cursor-pointer transform duration-200">
-            <IoMoonOutline />
-          </button>
+          <ThemeToggle />
           <div className="flex items-center gap-2">
             <Link
               to={"/login"}
