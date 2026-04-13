@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import { HiOutlineMoon } from "react-icons/hi";
+import { useState } from "react";
 import { IoIosNotificationsOutline } from "react-icons/io";
 import SearchInput from "../search-input/SearchInput";
 import { FaRegUser } from "react-icons/fa";
 import { Link } from "react-router";
 import { CiSettings, CiUser } from "react-icons/ci";
 import { FiLogOut } from "react-icons/fi";
+import ThemeToggle from "../theme-toggle/ThemeToggle";
 
 interface TobNavbarProb {
-  pageTitle: String;
+  pageTitle: string;
 }
 
 function TobNavbar({ pageTitle }: TobNavbarProb) {
@@ -22,9 +22,7 @@ function TobNavbar({ pageTitle }: TobNavbarProb) {
         <div className="max-lg:hidden ">
           <SearchInput />
         </div>
-        <button className="p-2  hover:bg-(--color-bg-link-hover) rounded-lg text-2xl cursor-pointer">
-          <HiOutlineMoon className="text-(--color-text)" />
-        </button>
+        <ThemeToggle />
         <Link
           to={"/"}
           className="relative p-2  hover:bg-(--color-bg-link-hover) rounded-lg text-2xl cursor-pointer"

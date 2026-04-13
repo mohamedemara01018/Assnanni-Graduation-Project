@@ -9,10 +9,9 @@ function Footer() {
                 <div className="grid md:grid-cols-4 gap-8 ">
                     <div>
                         <div className="flex items-center space-x-2 mb-4">
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center">
+                            <div className=" h-10 rounded-lg flex items-center justify-center">
                                 <img src={logo} className="w-full h-full" alt="" />
                             </div>
-                            <span className="text-(--color-primary) ">Assnani</span>
                         </div>
                         <p className="text-gray-400 text-sm">
                             Your trusted healthcare platform for seamless medical care.

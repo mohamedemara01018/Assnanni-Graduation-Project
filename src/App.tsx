@@ -1,7 +1,6 @@
 // Public pages
 import Landing from "./pages/landing-page/Landing";
 import Login from "./pages/login-page/Login";
-// import RegisterPage from "./pages/register-page-v2/RegisterPage";
 import VerifyEmailPage from "./pages/verify-email-page/VerifyEmailPage";
 import VerifyDoctorPage from "./pages/verify-doctor-page/VerifyDoctorPage";
 
@@ -31,26 +30,21 @@ import Patients from "./pages/doctor-pages/patients/Patients";
 import StudentDoctorDashboard from "./pages/student-doctor-pages/dashboard/StudentDoctorDashboard";
 import StudentNotifications from "./pages/student-doctor-pages/notifications/StudentNotifications";
 import StudentSettings from "./pages/student-doctor-pages/settings/Settings";
-
 import StudentAppointments from "./pages/student-doctor-pages/appointments/StudentAppointments";
-
 import ReceptionistDashboard from "./pages/receptionist-pages/dashboard/ReceptionistDashboard";
-
 import AppointmentsBookingPage from "./pages/appointments-booking-page/AppointmentsBookingPage";
-
 import { ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
 import AdminPage from "./pages/admin-page/AdminPage";
 
 const App = () => {
-  // In a real app, this would come from a Context or Redux store
-  // let role: string = "doctor";
-  // role = "receptionist";
+
+
   const role = useSelector(
     (state: { auth: { role: string } }) => state.auth.role,
   );
-  console.log(role);
-  // role = "doctor";
+
+
 
   return (
     <div className="min-h-screen w-full flex flex-col">
