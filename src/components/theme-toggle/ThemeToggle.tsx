@@ -35,7 +35,7 @@ function ThemeToggle() {
     };
 
     return (
-        <button onClick={handleTheme} className=' p-2 rounded-xl hover:bg-accent transition-all duration-300 hover:scale-110'>
+        <button onClick={handleTheme} className='cursor-pointer p-2 rounded-xl hover:bg-(--color-bg-link-hover) transition-all duration-300 hover:scale-110'>
             {isDark ? <Sun className="w-5 h-5 text-foreground" /> : <Moon className="w-5 h-5 text-foreground" />}
         </button>
     )

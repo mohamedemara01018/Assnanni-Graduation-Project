@@ -13,7 +13,7 @@ function RegisterForm() {
           type={field.type}
           placeholder={field.placeholder}
           name={field.name}
-          handleChange={() => {}}
+          handleChange={() => { }}
         />
       ))}
 
@@ -22,14 +22,14 @@ function RegisterForm() {
         <label htmlFor="">
           I agree to the
           <Link
-            to={"terms"}
+            to={"/terms"}
             className="text-(--color-primary) hover:text-(--color-primary-light)"
           >
             Terms of Service{" "}
           </Link>
           and{" "}
           <Link
-            to={"privacy"}
+            to={"/privacy"}
             className="text-(--color-primary) hover:text-(--color-primary-light)"
           >
             {" "}

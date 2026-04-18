@@ -19,7 +19,7 @@ function StatCard({
   colorClass = "bg-blue-100",
 }: StatCardProps) {
   return (
-    <div className="p-6 bg-(--color-surface)  w-full h-fit transition duration-150 rounded-xl border border-(--color-border) shadow-sm">
+    <div className="p-6 bg-(--color-surface)   w-full h-fit transition duration-150 rounded-xl border border-(--color-border) shadow-sm">
       <div className="flex items-center justify-between mb-4">
         <div className={`p-2 rounded-lg ${colorClass}`}>
           <Icon size={20} className="text-current" />

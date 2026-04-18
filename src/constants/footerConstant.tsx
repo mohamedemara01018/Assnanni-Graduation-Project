@@ -1,19 +1,19 @@
 export const footerLinks = [
   {
-    title: "platform",
+    title: "Platform",
     links: [
-      { name: "find doctors", path: "/doctors" },
-      { name: "register", path: "/register/patient-register" },
-      { name: "login", path: "/login" },
+      { name: "Find Doctors", path: "/doctors" },
+      { name: "Register", path: "/register/patient-register" },
+      { name: "Login", path: "/login" },
     ],
   },
   {
-    title: "support",
+    title: "Support",
     links: [
-      { name: "faq", path: "/faq" },
-      { name: "contact us", path: "/support" },
-      { name: "terms of service", path: "/terms" },
-      { name: "privacy policy", path: "/privacy" },
+      { name: "FAQ", path: "/faq" },
+      { name: "Contact Us", path: "/support" },
+      { name: "Terms Of Service", path: "/terms" },
+      { name: "Privacy Policy", path: "/privacy" },
     ],
   },
 ];

@@ -36,6 +36,11 @@ import AppointmentsBookingPage from "./pages/appointments-booking-page/Appointme
 import { ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
 import AdminPage from "./pages/admin-page/AdminPage";
+import RegisterPage from "./pages/register-page-v2/RegisterPage";
+import TermsPage from "./pages/terms-page/TermsPage";
+import PrivacyPage from "./pages/privacy-page/PrivacyPage";
+import FAQPage from "./pages/faq-page/FAQPage";
+import SupportPage from "./pages/support-page/SupportPage";
 
 const App = () => {
 
@@ -50,14 +55,24 @@ const App = () => {
     <div className="min-h-screen w-full flex flex-col">
       <main className="grow">
         <Routes>
+
+
+
           {/* --- Public Routes --- */}
           <Route element={<PublicLayout />}>
             <Route path="/landing" element={<Landing />} />
             <Route path="/login" element={<Login />} />
-            {/* <Route path="/register-v2" element={<RegisterPage />} /> */}
+            <Route path="/register-v2" element={<RegisterPage />} />
             <Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="/verify-doctor" element={<VerifyDoctorPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/faq" element={<FAQPage />} />
+            <Route path="/support" element={<SupportPage />} />
           </Route>
+
+
+
           {/* dashboards */}
           <Route path="/patient" element={<PatientPage />} />
           <Route path="/appointments" element={<AppointmentsPage />} />

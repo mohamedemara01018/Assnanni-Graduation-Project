@@ -130,8 +130,8 @@
   --color-bg-link-hover: #4a5565;
 
   /* bg-blue */
-  --color-bg-blue: #1c398e;
-  --color-text-blue: #51a2ff;
+  --color-text-blue: oklch(70.7% 0.165 254.624);
+  --color-bg-blue: oklch(37.9% 0.146 265.522);
 
   --color-surface: #1e2939;
   /* cards, panels */

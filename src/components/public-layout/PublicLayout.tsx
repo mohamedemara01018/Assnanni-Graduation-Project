@@ -7,7 +7,7 @@ function PublicLayout() {
     return (
         <>
             <Header />
-            <main className="flex-1 w-full">
+            <main className="flex-1 w-full mt-25">
                 <Outlet />
             </main>
             <Footer />
