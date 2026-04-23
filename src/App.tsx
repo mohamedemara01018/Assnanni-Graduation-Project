@@ -43,6 +43,10 @@ import FAQPage from "./pages/faq-page/FAQPage";
 import SupportPage from "./pages/support-page/SupportPage";
 import UsersPage from "./pages/users-page/UsersPage";
 import AddUserPage from "./pages/add-user-page/AddUserPage";
+import VerifyDoctorsPage from "./pages/verify-doctors-page/VerifyDoctorsPage";
+import PasswordResetRequestPage from "./pages/password-reset-request-page/PasswordResetRequestPage";
+import PasswordResetNewPage from "./pages/password-reset-new-page/PasswordResetNewPage";
+import PasswordResetSuccessPage from "./pages/password-reset-success-page/PasswordResetSuccessPage";
 
 const App = () => {
 
@@ -71,6 +75,9 @@ const App = () => {
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/support" element={<SupportPage />} />
+            <Route path='/password-reset' element={<PasswordResetRequestPage />} />
+            <Route path='/password-reset/new' element={<PasswordResetNewPage />} />
+            <Route path='/password-reset/success' element={<PasswordResetSuccessPage />} />
           </Route>
 
 
@@ -125,6 +132,7 @@ const App = () => {
           <Route path="student-appointments" element={<StudentAppointments />} />
           <Route path="users" element={<UsersPage />} />
           <Route path="add-user" element={<AddUserPage />} />
+          <Route path="verify-doctors" element={<VerifyDoctorsPage />} />
 
           <Route path="student-settings" element={<StudentSettings />}>
             <Route index element={<ProfileSettings />} />
