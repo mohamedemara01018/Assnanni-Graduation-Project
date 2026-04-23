@@ -1,28 +1,9 @@
 import CardComp from "@/components/card-comp/CardComp";
 import { AiOutlineSchedule } from "react-icons/ai";
-import { Link, NavLink } from "react-router";
-import { FiLogOut } from "react-icons/fi";
-import SideBar from "@/components/sidebar/PatientSideBar";
+import { Link } from "react-router";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import { MdOutlineStar } from "react-icons/md";
-const appointments = [
-  {
-    id: 1,
-    doctorName: "dr. sarah johnson",
-    specialty: "cardiology",
-    date: "2025-12-15",
-    time: "10:00",
-    status: "confirmed",
-  },
-  {
-    id: 2,
-    doctorName: "dr. emily rodriguez",
-    specialty: "pediatrics",
-    date: "2025-12-18",
-    time: "14:00",
-    status: "pending",
-  },
-];
+
 
 function PatientPage() {
   return (

@@ -41,6 +41,8 @@ import TermsPage from "./pages/terms-page/TermsPage";
 import PrivacyPage from "./pages/privacy-page/PrivacyPage";
 import FAQPage from "./pages/faq-page/FAQPage";
 import SupportPage from "./pages/support-page/SupportPage";
+import UsersPage from "./pages/users-page/UsersPage";
+import AddUserPage from "./pages/add-user-page/AddUserPage";
 
 const App = () => {
 
@@ -79,10 +81,8 @@ const App = () => {
           <Route path="/doctors-list" element={<DoctorsListPage />} />
           <Route path="/doctors-list/:id" element={<DoctorProfilePage />} />
           <Route path="/admin" element={<AdminPage />} />
-          <Route
-            path="/appointments/booking/:id"
-            element={<AppointmentsBookingPage />}
-          />
+          <Route path="/appointments/booking/:id" element={<AppointmentsBookingPage />} />
+
 
           {/* // TODO */}
           {/* <Route path="/register" element={<Registration />}>
@@ -121,19 +121,17 @@ const App = () => {
           <Route path="doctor-reports" element={<Reports />} />
           <Route path="scan" element={<Scan />} />
           <Route path="notification" element={<Notifications />} />
-          <Route
-            path="student-notification"
-            element={<StudentNotifications />}
-          />
-          <Route
-            path="student-appointments"
-            element={<StudentAppointments />}
-          />
+          <Route path="student-notification" element={<StudentNotifications />} />
+          <Route path="student-appointments" element={<StudentAppointments />} />
+          <Route path="users" element={<UsersPage />} />
+          <Route path="add-user" element={<AddUserPage />} />
+
           <Route path="student-settings" element={<StudentSettings />}>
             <Route index element={<ProfileSettings />} />
             <Route path="security" element={<SecuritySettings />} />
             <Route path="notifications" element={<NotificationPreferences />} />
           </Route>
+
           <Route path="settings" element={<Settings />}>
             <Route index element={<ProfileSettings />} />
             <Route path="security" element={<SecuritySettings />} />
