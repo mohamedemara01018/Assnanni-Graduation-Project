@@ -67,7 +67,7 @@ function AdminPage() {
           <CardComp classProbs="flex-2">
             <div className="flex justify-between w-full">
               <h2 className="text-lg">Pending Doctor Verifications</h2>
-              <Link to={'/'} className="text-(--color-text-blue) hover:scale-110 transition duration-150">
+              <Link to={'/verify-doctors'} className="text-(--color-text-blue) hover:scale-110 transition duration-150">
                 View all
               </Link>
             </div>
@@ -175,10 +175,10 @@ function AdminPage() {
                 Quick Actions
               </h2>
               <div className="w-full space-y-4">
-                <QuickActionComps title="Verify Doctors" subTitle="3 pending" classProbs="blue" path="/" />
-                <QuickActionComps title="Verify Doctors" subTitle="3 pending" classProbs="green" path="/" />
-                <QuickActionComps title="Verify Doctors" subTitle="3 pending" classProbs="red" path="/" />
-                <QuickActionComps title="Verify Doctors" subTitle="3 pending" classProbs="orange" path="/" />
+                <QuickActionComps title="Verify Doctors" subTitle="3 pending" classProbs="blue" path="/verify-doctors" />
+                <QuickActionComps title="System Analtics" subTitle="Analytics & insights" classProbs="green" path="/analytics" />
+                {/* <QuickActionComps title="Verify Doctors" subTitle="3 pending" classProbs="red" path="/" /> */}
+                <QuickActionComps title="AI Models" subTitle="Manage models" classProbs="orange" path="/al-models" />
               </div>
             </CardComp>
             <CardComp>
@@ -204,11 +204,7 @@ function AdminPage() {
         </div>
 
 
-        {/* Analytics & Insights */}
 
-        <div>
-          <h1>Analytics & Insights</h1>
-        </div>
 
       </>
     </DashboardLayout>

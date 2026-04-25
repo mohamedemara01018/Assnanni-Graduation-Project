@@ -1,22 +1,12 @@
 import { FiLogOut } from "react-icons/fi";
-// import { Link, NavLink } from "react-router-dom";
 import Logo from "../../assets/Logo.png";
 
-import { IoAnalytics, IoPersonAddOutline } from "react-icons/io5";
-import {
-  IoIosArrowBack,
-  IoIosArrowForward,
-  IoIosNotificationsOutline,
-} from "react-icons/io";
 
-import { AiOutlineSchedule } from "react-icons/ai";
-import { FaStethoscope, FaRegBell } from "react-icons/fa";
-import { SlCalender } from "react-icons/sl";
-import { MdPeopleAlt, MdOutlineSettings } from "react-icons/md";
-import { LuFileSpreadsheet } from "react-icons/lu";
+import { IoIosArrowBack, IoIosArrowForward, } from "react-icons/io";
 
-import { useSelector } from "react-redux";
 import { Link, NavLink } from "react-router";
+import { Brain, Calendar, FileText, LayoutDashboard, Scan, Settings, Stethoscope, Users } from "lucide-react";
+
 
 interface SideBarProp {
   collapsed: boolean;
@@ -25,9 +15,13 @@ interface SideBarProp {
 }
 
 function SideBar({ toggled, onToggle }: SideBarProp) {
-  const role = useSelector(
-    (state: { auth: { role: string } }) => state.auth.role
-  );
+
+
+  // const role = useSelector(
+  //   (state: { auth: { role: string } }) => state.auth.role
+  // );
+
+  const role = "admin"
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -57,15 +51,23 @@ function SideBar({ toggled, onToggle }: SideBarProp) {
         </Link>
 
         <ul className="p-2 py-5 space-y-1">
-          <li>
-            <NavLink to={"/"} className={linkStyle}>
-              <IoAnalytics className="text-xl" />
-              {!toggled && <span>Dashboard</span>}
-            </NavLink>
-          </li>
+          {
+            sidebarDataRole && sidebarDataRole[role].map((item, idx) => {
+              const Icon = item.icon
+              return (
+                <li key={idx}>
+                  <NavLink to={item.path} className={linkStyle}>
+                    <Icon className="text-xl w-5 h-5" />
+                    {!toggled && <span className="text-sm font-medium">{item.label}</span>}
+                  </NavLink>
+                </li>
+              )
+            })}
+
+
 
           {/* doctor */}
-          {role === "doctor" && (
+          {/* {role == "doctor" && (
             <>
               <li>
                 <NavLink to={"/doctor-schedule"} className={linkStyle}>
@@ -109,10 +111,10 @@ function SideBar({ toggled, onToggle }: SideBarProp) {
                 </NavLink>
               </li>
             </>
-          )}
+          )} */}
 
           {/* receptionist */}
-          {role === "receptionist" && (
+          {/* {role === "receptionist" && (
             <>
               <li>
                 <NavLink to={"/doctor-patients"} className={linkStyle}>
@@ -149,10 +151,10 @@ function SideBar({ toggled, onToggle }: SideBarProp) {
                 </NavLink>
               </li>
             </>
-          )}
+          )} */}
 
           {/* student doctor */}
-          {role === "studentDoctor" && (
+          {/* {role === "studentDoctor" && (
             <>
               <li>
                 <NavLink to={"/student-appointments"} className={linkStyle}>
@@ -175,10 +177,10 @@ function SideBar({ toggled, onToggle }: SideBarProp) {
                 </NavLink>
               </li>
             </>
-          )}
+          )} */}
 
           {/* patient */}
-          {role === "patient" && (
+          {/* {role === "patient" && (
             <>
               <li>
                 <NavLink to={"/appointments"} className={linkStyle}>
@@ -211,7 +213,7 @@ function SideBar({ toggled, onToggle }: SideBarProp) {
                 </NavLink>
               </li>
             </>
-          )}
+          )} */}
         </ul>
       </div>
 
@@ -234,3 +236,51 @@ function SideBar({ toggled, onToggle }: SideBarProp) {
 }
 
 export default SideBar;
+
+const sidebarDataRole = {
+  admin: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/admin' },
+    { icon: Users, label: 'Users', path: '/users' },
+    { icon: FileText, label: 'Analytics', path: '/analytics' },
+    { icon: Brain, label: 'AI Models', path: '/ai-models' },
+    { icon: Settings, label: 'Settings', path: '/settings' },
+  ],
+
+
+  patient: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/patient' },
+    { icon: Calendar, label: 'Appointments', path: '/appointments' },
+    { icon: Stethoscope, label: 'Doctors', path: '/doctors' },
+    { icon: Scan, label: 'Scans', path: '/scan/upload' },
+    { icon: Users, label: 'Notifications', path: '/notification' },
+    { icon: Settings, label: 'Settings', path: '/settings' },
+  ],
+
+  doctor: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/doctor' },
+    { icon: Calendar, label: 'Schedule', path: '/doctor-schedule' },
+    { icon: Users, label: 'Patients', path: '/doctor-patients' },
+    { icon: Scan, label: 'Scans', path: '/scan/upload' },
+    { icon: FileText, label: 'Reports', path: '/doctor-reports' },
+    { icon: Users, label: 'Notifications', path: '/notification' },
+    { icon: Settings, label: 'Settings', path: '/settings' },
+  ],
+
+  studentDoctor: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/student-doctor' },
+    { icon: Calendar, label: 'Schedule', path: '/doctor-schedule' },
+    { icon: Users, label: 'Patients', path: '/doctor-patients' },
+    { icon: Scan, label: 'Scans', path: '/scan/upload' },
+    { icon: FileText, label: 'Reports', path: '/doctor-reports' },
+    { icon: Users, label: 'Notifications', path: '/notification' },
+    { icon: Settings, label: 'Settings', path: '/settings' },
+  ],
+
+  receptionist: [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/receptionist' },
+    { icon: Users, label: 'Patients', path: '/doctor-patients' },
+    { icon: Calendar, label: 'Appointments', path: '/appointments' },
+    { icon: Stethoscope, label: 'Doctors', path: '/doctors-list' },
+    { icon: Settings, label: 'Settings', path: '/settings' },
+  ]
+}

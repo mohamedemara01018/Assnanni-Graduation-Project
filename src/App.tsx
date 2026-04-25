@@ -47,6 +47,8 @@ import VerifyDoctorsPage from "./pages/verify-doctors-page/VerifyDoctorsPage";
 import PasswordResetRequestPage from "./pages/password-reset-request-page/PasswordResetRequestPage";
 import PasswordResetNewPage from "./pages/password-reset-new-page/PasswordResetNewPage";
 import PasswordResetSuccessPage from "./pages/password-reset-success-page/PasswordResetSuccessPage";
+import AnalyticsPage from "./pages/analytics-page/AnalyticsPage";
+import AIModelsPage from "./pages/ai-models-page/AIModelsPage";
 
 const App = () => {
 
@@ -61,8 +63,6 @@ const App = () => {
     <div className="min-h-screen w-full flex flex-col">
       <main className="grow">
         <Routes>
-
-
 
           {/* --- Public Routes --- */}
           <Route element={<PublicLayout />}>
@@ -80,33 +80,35 @@ const App = () => {
             <Route path='/password-reset/success' element={<PasswordResetSuccessPage />} />
           </Route>
 
-
-
-          {/* dashboards */}
+          {/* patient dashboards */}
           <Route path="/patient" element={<PatientPage />} />
           <Route path="/appointments" element={<AppointmentsPage />} />
           <Route path="/doctors-list" element={<DoctorsListPage />} />
           <Route path="/doctors-list/:id" element={<DoctorProfilePage />} />
-          <Route path="/admin" element={<AdminPage />} />
           <Route path="/appointments/booking/:id" element={<AppointmentsBookingPage />} />
 
+          {/* admin dashboards  */}
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="users" element={<UsersPage />} />
+          <Route path="add-user" element={<AddUserPage />} />
+          <Route path="verify-doctors" element={<VerifyDoctorsPage />} />
+          <Route path="analytics" element={<AnalyticsPage />} />
+          <Route path="ai-models" element={<AIModelsPage />} />
 
-          {/* // TODO */}
-          {/* <Route path="/register" element={<Registration />}>
-            <Route path="patient-register" element={<PatientRegistration />} />
-            <Route path="doctor-register" element={<DoctorRegistration />} />
-            <Route path="student-register" element={<StudentRegistration />} />
-            <Route
-              path="receptionist-register"
-              element={<ReceptionistRegistration />}
-            />
-          </Route> */}
+          {/* doctor dashboards */}
+          <Route path="/doctor" element={<DoctorDashboard />} />
+
+          {/* student doctor dashboards */}
+          <Route path="/student-doctor" element={<StudentDoctorDashboard />} />
+
+          {/* receptionist dashboards */}
+          <Route path="/receptionist" element={<ReceptionistDashboard />} />
 
           {/* --- Authenticated Shared Layout --- */}
-          {role === "guest" && <Route path="/" element={<HomePage />} />}
+          {/* {role === "guest" && <Route path="/" element={<HomePage />} />} */}
           {/* Conditional Dashboard based on Role */}
 
-          <Route
+          {/* <Route
             path="/"
             element={
               role === "patient" ? (
@@ -119,20 +121,18 @@ const App = () => {
                 role === "receptionist" && <ReceptionistDashboard />
               )
             }
-          />
+          /> */}
 
-          {/* Shared Routes */}
-          <Route path="doctors-list" element={<BrowseDoctors />} />
+          {/* Shared dashboard Routes */}
+          {/* <Route path="doctors-list" element={<BrowseDoctors />} />  */}
           <Route path="doctor-schedule" element={<Schedule />} />
           <Route path="doctor-patients" element={<Patients />} />
           <Route path="doctor-reports" element={<Reports />} />
-          <Route path="scan" element={<Scan />} />
+          <Route path="scan/upload" element={<Scan />} />
           <Route path="notification" element={<Notifications />} />
           <Route path="student-notification" element={<StudentNotifications />} />
           <Route path="student-appointments" element={<StudentAppointments />} />
-          <Route path="users" element={<UsersPage />} />
-          <Route path="add-user" element={<AddUserPage />} />
-          <Route path="verify-doctors" element={<VerifyDoctorsPage />} />
+
 
           <Route path="student-settings" element={<StudentSettings />}>
             <Route index element={<ProfileSettings />} />

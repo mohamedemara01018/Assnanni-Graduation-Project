@@ -9,9 +9,11 @@ import { Link } from "react-router";
 import { useSelector } from "react-redux";
 
 function DoctorsListPage() {
-  let role = useSelector((state) => state.auth.role);
+  // let role = useSelector((state) => state.auth.role);
+  const role: "gurest" | any = "kkk"
 
-  return role === "guest" ? (
+
+  return role == "guest" ? (
     <div className="m-6">
       <div className="flex flex-col items-center gap-9">
         <SearchInput
