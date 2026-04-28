@@ -217,7 +217,7 @@ function SideBar({ toggled, onToggle }: SideBarProp) {
         </ul>
       </div>
 
-      <div className="p-2 border-t border-(--color-border)">
+      <div className="p-2 border-t border-border">
         <button
           onClick={handleLogout}
           className={`flex items-center ${toggled ? "justify-center" : ""
@@ -250,7 +250,7 @@ const sidebarDataRole = {
   patient: [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/patient' },
     { icon: Calendar, label: 'Appointments', path: '/appointments' },
-    { icon: Stethoscope, label: 'Doctors', path: '/doctors' },
+    { icon: Stethoscope, label: 'Doctors', path: '/doctors-list' },
     { icon: Scan, label: 'Scans', path: '/scan/upload' },
     { icon: Users, label: 'Notifications', path: '/notification' },
     { icon: Settings, label: 'Settings', path: '/settings' },

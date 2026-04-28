@@ -49,6 +49,9 @@ import PasswordResetNewPage from "./pages/password-reset-new-page/PasswordResetN
 import PasswordResetSuccessPage from "./pages/password-reset-success-page/PasswordResetSuccessPage";
 import AnalyticsPage from "./pages/analytics-page/AnalyticsPage";
 import AIModelsPage from "./pages/ai-models-page/AIModelsPage";
+import OnboardingPage from "./pages/onboarding-page/OnboardingPage";
+import PatientProfilePage from "./pages/patient-profile-page/PatientProfilePage";
+import EditPatientProfilePage from "./pages/edit-patient-profile-page/EditPatientProfilePage";
 
 const App = () => {
 
@@ -66,7 +69,7 @@ const App = () => {
 
           {/* --- Public Routes --- */}
           <Route element={<PublicLayout />}>
-            <Route path="/landing" element={<Landing />} />
+            <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register-v2" element={<RegisterPage />} />
             <Route path="/verify-email" element={<VerifyEmailPage />} />
@@ -78,6 +81,7 @@ const App = () => {
             <Route path='/password-reset' element={<PasswordResetRequestPage />} />
             <Route path='/password-reset/new' element={<PasswordResetNewPage />} />
             <Route path='/password-reset/success' element={<PasswordResetSuccessPage />} />
+            <Route path="/onboarding" element={<OnboardingPage />} />
           </Route>
 
           {/* patient dashboards */}
@@ -86,6 +90,8 @@ const App = () => {
           <Route path="/doctors-list" element={<DoctorsListPage />} />
           <Route path="/doctors-list/:id" element={<DoctorProfilePage />} />
           <Route path="/appointments/booking/:id" element={<AppointmentsBookingPage />} />
+          <Route path="/patient-profile/:id" element={<PatientProfilePage />} />
+          <Route path="/patient-profile/edit/:id" element={<EditPatientProfilePage />} />
 
           {/* admin dashboards  */}
           <Route path="/admin" element={<AdminPage />} />
