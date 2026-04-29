@@ -1,3 +1,4 @@
+import { NavLink } from "react-router";
 import Days from "./Days";
 
 interface Day {
@@ -30,7 +31,7 @@ const WeeklySchedule = () => {
           Weekly Schedule
         </h3>
         <button className="bg-blue-500 text-white font-semibold rounded-2xl py-2 px-4 cursor-pointer hover:bg-blue-500/90 hover:shadow-2xl">
-          + Add Time Slot
+          <NavLink to={"/add-time-slot"}> + Add Time Slot</NavLink>
         </button>
       </div>
       <div>

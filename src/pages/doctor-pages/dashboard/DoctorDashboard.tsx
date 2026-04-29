@@ -18,7 +18,7 @@ const DoctorDashboard = () => {
         <p className="p-6 pt-0 text-(--color-text-light) font-thin text-sm text-shadow-2xs mb-4">
           Here's your practice overview for today
         </p>
-        <div className="bg-gray-200 dark:bg-(--color-bg) rounded-2xl py-4 px-6 flex flex-col gap-6">
+        <div className=" dark:bg-(--color-bg) rounded-2xl py-4 pt-0 px-6 flex flex-col gap-6">
           <div className="grid grid-rows-1 grid-cols-4 max-lg:grid-rows-2 max-lg:grid-cols-2 max-sm:grid-cols-1 gap-4">
             <DashboardCard
               title="Appointments"

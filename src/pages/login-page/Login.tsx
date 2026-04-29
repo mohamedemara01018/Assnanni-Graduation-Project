@@ -26,7 +26,6 @@ function Login() {
         <BackHome />
 
         <div className="bg-(--color-surface) flex flex-col  gap-5 p-6 rounded-lg shadow-xl">
-
           <div className="flex flex-col gap-1  max-md:items-center">
             <span className="text-2xl font-bold"> Sign In</span>
             <span className="text-(--color-text-light)">

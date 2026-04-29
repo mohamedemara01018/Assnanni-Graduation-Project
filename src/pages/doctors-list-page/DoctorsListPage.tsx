@@ -9,9 +9,7 @@ import { Link } from "react-router";
 import { useSelector } from "react-redux";
 
 function DoctorsListPage() {
-  // let role = useSelector((state) => state.auth.role);
-  const role: "gurest" | any = "kkk"
-
+  const role = useSelector((state) => state.auth.role);
 
   return role == "guest" ? (
     <div className="m-6">
