@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 import { Link, NavLink } from "react-router";
+
 import {
   Brain,
   Calendar,
@@ -13,15 +14,17 @@ import {
   Settings,
   Stethoscope,
   Users,
+  X,
 } from "lucide-react";
 
 interface SideBarProp {
   collapsed: boolean;
+  setCollapsed: (val: boolean) => void;
   toggled: boolean;
   onToggle: () => void;
 }
 
-function SideBar({ toggled, onToggle }: SideBarProp) {
+function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
   const role = useSelector(
     (state: { auth: { role: string } }) => state.auth.role,
   );
@@ -42,20 +45,32 @@ function SideBar({ toggled, onToggle }: SideBarProp) {
 
   return (
     <>
-      <div className="relative">
-        <button
-          onClick={onToggle}
-          className="flex items-center justify-center rounded-full w-8 h-8 absolute -right-4 top-20 bg-(--color-surface) shadow-lg border-2 border-(--color-border) cursor-pointer text-(--color-text)"
-        >
-          {toggled ? <IoIosArrowForward /> : <IoIosArrowBack />}
-        </button>
+      <div className={`relative`}>
+        {!collapsed && (
+          <button
+            onClick={onToggle}
+            className="flex items-center justify-center rounded-full w-8 h-8 absolute -right-4 top-20 bg-(--color-surface) shadow-lg border-2 border-(--color-border) cursor-pointer text-(--color-text)"
+          >
+            {toggled ? <IoIosArrowForward /> : <IoIosArrowBack />}
+          </button>
+        )}
 
-        <Link
-          to={"/"}
-          className="flex items-center justify-center gap-1 h-16 px-4 border-b"
-        >
-          <img className="w-36 mx-auto" src={Logo} alt="logo" />
-        </Link>
+        <div className="flex items-center gap-2 border-b">
+          <Link
+            to={"/"}
+            className="flex items-center justify-center gap-1 h-16 px-4"
+          >
+            <img className="w-36 mx-auto" src={Logo} alt="logo" />
+          </Link>
+          {collapsed && (
+            <button
+              onClick={() => setCollapsed(false)}
+              className="p-2 h-fit cursor-pointer hover:bg-(--color-bg-link-hover) rounded-xl transition-all duration-150"
+            >
+              <X />
+            </button>
+          )}
+        </div>
 
         <ul className="p-2 py-5 space-y-1">
           {sidebarDataRole &&
@@ -228,7 +243,7 @@ function SideBar({ toggled, onToggle }: SideBarProp) {
         </ul>
       </div>
 
-      <div className="p-2 border-t border-(--color-border)">
+      <div className="p-2 border-t border-border">
         <button
           onClick={handleLogout}
           className={`flex items-center ${
@@ -261,7 +276,7 @@ const sidebarDataRole = {
   patient: [
     { icon: LayoutDashboard, label: "Dashboard", path: "/patient" },
     { icon: Calendar, label: "Appointments", path: "/appointments" },
-    { icon: Stethoscope, label: "Doctors", path: "/doctors" },
+    { icon: Stethoscope, label: "Doctors", path: "/doctors-list" },
     { icon: Scan, label: "Scans", path: "/scan/upload" },
     { icon: Users, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },

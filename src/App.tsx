@@ -5,8 +5,8 @@ import VerifyEmailPage from "./pages/verify-email-page/VerifyEmailPage";
 import VerifyDoctorPage from "./pages/verify-doctor-page/VerifyDoctorPage";
 
 // Authenticated Layout & Pages
-// import HomePage from "./routers/Home Page/HomePage";
-// import BrowseDoctors from "./components/HomePage/BrowseDoctors";
+// // import HomePage from "./routers/Home Page/HomePage";
+// // import BrowseDoctors from "./components/HomePage/BrowseDoctors";
 import DoctorDashboard from "./pages/doctor-pages/dashboard/DoctorDashboard";
 import Schedule from "./pages/doctor-pages/schedule/Schedule";
 import Reports from "./pages/doctor-pages/reports/Reports";
@@ -49,6 +49,9 @@ import PasswordResetNewPage from "./pages/password-reset-new-page/PasswordResetN
 import PasswordResetSuccessPage from "./pages/password-reset-success-page/PasswordResetSuccessPage";
 import AnalyticsPage from "./pages/analytics-page/AnalyticsPage";
 import AIModelsPage from "./pages/ai-models-page/AIModelsPage";
+import OnboardingPage from "./pages/onboarding-page/OnboardingPage";
+import PatientProfilePage from "./pages/patient-profile-page/PatientProfilePage";
+import EditPatientProfilePage from "./pages/edit-patient-profile-page/EditPatientProfilePage";
 import Registration from "./pages/register-page/Registration";
 import DoctorRegistration from "./components/Registration/DoctorRegistration";
 import PatientRegistration from "./components/Registration/PatientRegistration";
@@ -119,6 +122,7 @@ const App = () => {
               path="/password-reset/success"
               element={<PasswordResetSuccessPage />}
             />
+            <Route path="/onboarding" element={<OnboardingPage />} />
           </Route>
 
           {/* patient dashboards */}
@@ -129,6 +133,11 @@ const App = () => {
           <Route
             path="/appointments/booking/:id"
             element={<AppointmentsBookingPage />}
+          />
+          <Route path="/patient-profile/:id" element={<PatientProfilePage />} />
+          <Route
+            path="/patient-profile/edit/:id"
+            element={<EditPatientProfilePage />}
           />
 
           {/* admin dashboards  */}
