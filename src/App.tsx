@@ -71,7 +71,7 @@ const App = () => {
         <Routes>
           {/* --- Public Routes --- */}
           {role === "patient" ? (
-            <Route path="/" element={<PatientDashboard />} />
+            <Route path="/" element={<PatientPage />} />
           ) : role === "doctor" ? (
             <Route path="/" element={<DoctorDashboard />} />
           ) : role === "studentDoctor" ? (
@@ -126,7 +126,7 @@ const App = () => {
           </Route>
 
           {/* patient dashboards */}
-          <Route path="/patient" element={<PatientPage />} />
+          {/* <Route path="/patient" element={<PatientPage />} /> */}
           <Route path="/appointments" element={<AppointmentsPage />} />
           <Route path="/doctors-list" element={<DoctorsListPage />} />
           <Route path="/doctors-list/:id" element={<DoctorProfilePage />} />
