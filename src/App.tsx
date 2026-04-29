@@ -52,6 +52,8 @@ import AIModelsPage from "./pages/ai-models-page/AIModelsPage";
 import OnboardingPage from "./pages/onboarding-page/OnboardingPage";
 import PatientProfilePage from "./pages/patient-profile-page/PatientProfilePage";
 import EditPatientProfilePage from "./pages/edit-patient-profile-page/EditPatientProfilePage";
+import PrescriptionsPage from "./pages/prescriptions-page/PrescriptionsPage";
+import AppointmentDetailsPage from "./pages/appointment-details-page/AppointmentDetailsPage";
 
 const App = () => {
 
@@ -87,11 +89,13 @@ const App = () => {
           {/* patient dashboards */}
           <Route path="/patient" element={<PatientPage />} />
           <Route path="/appointments" element={<AppointmentsPage />} />
+          <Route path="/appointments/:id" element={<AppointmentDetailsPage />} />
           <Route path="/doctors-list" element={<DoctorsListPage />} />
           <Route path="/doctors-list/:id" element={<DoctorProfilePage />} />
           <Route path="/appointments/booking/:id" element={<AppointmentsBookingPage />} />
           <Route path="/patient-profile/:id" element={<PatientProfilePage />} />
           <Route path="/patient-profile/edit/:id" element={<EditPatientProfilePage />} />
+          <Route path="/prescriptions" element={<PrescriptionsPage />} />
 
           {/* admin dashboards  */}
           <Route path="/admin" element={<AdminPage />} />

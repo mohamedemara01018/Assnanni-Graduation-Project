@@ -93,7 +93,6 @@ function AdminPage() {
                     <XCircle className="w-4 h-4" />
                   </button>
                 </div>
-
               </div>
 
               <div className="flex justify-between items-center bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) p-4 rounded-lg">

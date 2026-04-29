@@ -22,7 +22,7 @@ function PatientPage() {
               <div className="flex items-center justify-between gap-4 w-full">
                 <h2 className="text-xl">Upcoming Appointments</h2>
                 <Link
-                  to={"/"}
+                  to={"/doctors-list"}
                   className="text-(--color-primary) hover:text-(--color-primary-light) transition duration-200"
                 >
                   Book New
@@ -30,7 +30,7 @@ function PatientPage() {
               </div>
               <div className=" flex flex-col gap-3 w-full">
                 <Link
-                  to={"/"}
+                  to={"/appointments/1"}
                   className="flex items-center justify-between gap-4 p-4 bg-(--color-bg-link)  hover:bg-(--color-bg-link-hover) rounded-md transition duration-150"
                 >
                   <div className="flex items-center gap-4 w-full">
@@ -57,7 +57,7 @@ function PatientPage() {
                 </Link>
 
                 <Link
-                  to={"/"}
+                  to={"/appointments/1"}
                   className="flex items-center justify-between gap-4 p-4 bg-(--color-bg-link)  hover:bg-(--color-bg-link-hover) rounded-md transition duration-150"
                 >
                   <div className="flex items-center gap-4 w-full">
@@ -84,7 +84,7 @@ function PatientPage() {
                 </Link>
 
                 <Link
-                  to={"/"}
+                  to={"/appointments/1"}
                   className="flex items-center justify-between gap-4 p-4 bg-(--color-bg-link)  hover:bg-(--color-bg-link-hover) rounded-md transition duration-150"
                 >
                   <div className="flex items-center gap-4 w-full">
@@ -115,7 +115,7 @@ function PatientPage() {
               <div className="flex items-center justify-between gap-4 w-full">
                 <h2 className="text-xl">Available Doctors</h2>
                 <Link
-                  to={"/"}
+                  to={"/doctors-list"}
                   className="text-(--color-primary) hover:text-(--color-primary-light) transition duration-200"
                 >
                   View All
@@ -123,7 +123,7 @@ function PatientPage() {
               </div>
               <div className=" flex flex-col gap-3 w-full">
                 <Link
-                  to={"/"}
+                  to={"/doctors-list/1"}
                   className="flex items-center justify-between gap-4 p-4 bg-(--color-bg-link)  hover:bg-(--color-bg-link-hover) rounded-md transition duration-150"
                 >
                   <div className="flex items-center gap-4 w-full">
@@ -151,64 +151,7 @@ function PatientPage() {
                     available
                   </div>
                 </Link>
-                <Link
-                  to={"/"}
-                  className="flex items-center justify-between gap-4 p-4 bg-(--color-bg-link)  hover:bg-(--color-bg-link-hover) rounded-md transition duration-150"
-                >
-                  <div className="flex items-center gap-4 w-full">
-                    <div className="flex items-center justify-center bg-(--color-bg-blue) text-(--color-text-blue) w-15 h-15 rounded-full max-sm:hidden overflow-hidden">
-                      <img
-                        src="https://images.pexels.com/photos/7598696/pexels-photo-7598696.jpeg"
-                        className="object-cover w-full h-full"
-                        alt="D"
-                      />
-                    </div>
-                    <div>
-                      <h3 className="text-(--color-text)">mohamed gamal</h3>
-                      <div className="flex items-center gap-4 mt-1 text-sm">
-                        <span className="text-(--color-text-light) flex items-center gap-1">
-                          <MdOutlineStar /> 4.1
-                        </span>
-                        <span className="bg-(--color-text-light) w-1 h-1 rounded-full"></span>
-                        <span className="text-(--color-text-light)">
-                          12 exp{" "}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-green-500 bg-green-500/20 px-3 pb-1 rounded-2xl text-sm flex items-center">
-                    available
-                  </div>
-                </Link>{" "}
-                <Link
-                  to={"/"}
-                  className="flex items-center justify-between gap-4 p-4 bg-(--color-bg-link)  hover:bg-(--color-bg-link-hover) rounded-md transition duration-150"
-                >
-                  <div className="flex items-center gap-4 w-full">
-                    <div className="flex items-center justify-center bg-(--color-bg-blue) text-(--color-text-blue) w-15 h-15 rounded-full max-sm:hidden overflow-hidden">
-                      <img
-                        src="https://images.pexels.com/photos/7598696/pexels-photo-7598696.jpeg"
-                        className="object-cover w-full h-full"
-                        alt="D"
-                      />
-                    </div>
-                    <div>
-                      <h3 className="text-(--color-text)">mohamed gamal</h3>
-                      <div className="flex items-center gap-4 mt-1 text-sm">
-                        <span className="text-(--color-text-light) flex items-center gap-1  ">
-                          <MdOutlineStar /> 4.1
-                        </span>
-                        <span className="bg-(--color-text-light) w-1 h-1 rounded-full"></span>
-                        <span className="text-(--color-text-light)">
-                          12 exp{" "}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-green-500 bg-green-500/20 px-3 pb-1 rounded-2xl text-sm flex items-center">
-                    available
-                  </div>
-                </Link>
+
               </div>
             </CardComp>
           </div>
@@ -218,7 +161,7 @@ function PatientPage() {
               <h2 className="text-(--color-text) text-xl">Quich Actions</h2>
               <div className="flex flex-col gap-3 items-center w-full">
                 <Link
-                  to={"/doctors"}
+                  to={"/doctors-list"}
                   className="flex flex-col  items-start justify-between py-1.5 px-3 rounded-lg text-(--color-text-blue) bg-(--color-bg-blue) w-full hover:shadow-sm"
                 >
                   <h3 className="">Find a Doctor</h3>
@@ -227,7 +170,7 @@ function PatientPage() {
                   </span>
                 </Link>
                 <Link
-                  to={"/doctors"}
+                  to={"/scan/upload"}
                   className="flex flex-col  items-start justify-between py-1.5 px-3 rounded-lg text-(--color-text-blue) bg-(--color-bg-blue) w-full hover:shadow-sm"
                 >
                   <h3 className="">Upload Scan</h3>
@@ -236,7 +179,7 @@ function PatientPage() {
                   </span>
                 </Link>
                 <Link
-                  to={"/doctors"}
+                  to={"/prescriptions"}
                   className="flex flex-col  items-start justify-between py-1.5 px-3 rounded-lg text-(--color-text-blue) bg-(--color-bg-blue) w-full hover:shadow-sm"
                 >
                   <h3 className="">My Prescriptions</h3>

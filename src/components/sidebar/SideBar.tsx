@@ -5,7 +5,7 @@ import Logo from "../../assets/Logo.png";
 import { IoIosArrowBack, IoIosArrowForward, } from "react-icons/io";
 
 import { Link, NavLink } from "react-router";
-import { Brain, Calendar, FileText, LayoutDashboard, Scan, Settings, Stethoscope, Users, X } from "lucide-react";
+import { Brain, Calendar, FileText, LayoutDashboard, Pill, Scan, Settings, Stethoscope, Users, X } from "lucide-react";
 
 
 interface SideBarProp {
@@ -260,6 +260,7 @@ const sidebarDataRole = {
     { icon: LayoutDashboard, label: 'Dashboard', path: '/patient' },
     { icon: Calendar, label: 'Appointments', path: '/appointments' },
     { icon: Stethoscope, label: 'Doctors', path: '/doctors-list' },
+    { icon: Pill, label: 'Prescriptions', path: '/prescriptions' },
     { icon: Scan, label: 'Scans', path: '/scan/upload' },
     { icon: Users, label: 'Notifications', path: '/notification' },
     { icon: Settings, label: 'Settings', path: '/settings' },

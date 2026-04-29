@@ -11,7 +11,6 @@ function AppointmentsPage() {
     const [onFilter, setFilter] = useState(false);
     return (
         <DashboardLayout pageTitle='patient'>
-
             <div className='space-y-6'>
                 {/* first */}
                 <div className='flex items-center justify-between'>
@@ -48,7 +47,6 @@ function AppointmentsPage() {
                                         <option value="upcoming">Upcoming</option>
                                         <option value="completed">Completed</option>
                                         <option value="cancelled">Cancelled</option>
-
                                     </select>
                                 </div>
                             </div>
@@ -81,7 +79,7 @@ function AppointmentsPage() {
                                         </div>
                                     </div>
                                     <div className='flex items-center gap-4'>
-                                        <Link to={'/'} className='text-(--color-primary) hover:underline'>
+                                        <Link to={'/appointments/1'} className='text-(--color-primary) hover:underline'>
                                             View Details
                                         </Link>
                                         <button className='text-red-500 hover:underline'>
@@ -95,7 +93,6 @@ function AppointmentsPage() {
                                 <span>Upcoming</span>
                             </div>
                         </div>
-
                     </CardComp>
                     <CardComp>
                         <div className='flex items-start justify-between w-full'>
@@ -121,7 +118,7 @@ function AppointmentsPage() {
                                         </div>
                                     </div>
                                     <div className='flex items-center gap-4'>
-                                        <Link to={'/'} className='text-(--color-primary) hover:underline'>
+                                        <Link to={'/appointments/1'} className='text-(--color-primary) hover:underline'>
                                             View Details
                                         </Link>
                                         <button className='text-red-500 hover:underline'>
@@ -135,7 +132,6 @@ function AppointmentsPage() {
                                 <span>Upcoming</span>
                             </div>
                         </div>
-
                     </CardComp>
                     <CardComp>
                         <div className='flex items-start justify-between w-full'>
@@ -161,7 +157,7 @@ function AppointmentsPage() {
                                         </div>
                                     </div>
                                     <div className='flex items-center gap-4'>
-                                        <Link to={'/'} className='text-(--color-primary) hover:underline'>
+                                        <Link to={'/appointments/1'} className='text-(--color-primary) hover:underline'>
                                             View Details
                                         </Link>
                                         <button className='text-red-500 hover:underline'>
@@ -175,7 +171,6 @@ function AppointmentsPage() {
                                 <span>Upcoming</span>
                             </div>
                         </div>
-
                     </CardComp>
                     <CardComp>
                         <div className='flex items-start justify-between w-full'>
@@ -201,7 +196,7 @@ function AppointmentsPage() {
                                         </div>
                                     </div>
                                     <div className='flex items-center gap-4'>
-                                        <Link to={'/'} className='text-(--color-primary) hover:underline'>
+                                        <Link to={'/appointments/1'} className='text-(--color-primary) hover:underline'>
                                             View Details
                                         </Link>
                                         <button className='text-red-500 hover:underline'>
@@ -215,10 +210,8 @@ function AppointmentsPage() {
                                 <span>Upcoming</span>
                             </div>
                         </div>
-
                     </CardComp>
                 </div>
-
             </div>
         </DashboardLayout>
     )
