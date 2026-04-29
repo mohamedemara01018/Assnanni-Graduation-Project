@@ -178,7 +178,7 @@ function AdminPage() {
                 <QuickActionComps title="Verify Doctors" subTitle="3 pending" classProbs="blue" path="/verify-doctors" />
                 <QuickActionComps title="System Analtics" subTitle="Analytics & insights" classProbs="green" path="/analytics" />
                 {/* <QuickActionComps title="Verify Doctors" subTitle="3 pending" classProbs="red" path="/" /> */}
-                <QuickActionComps title="AI Models" subTitle="Manage models" classProbs="orange" path="/al-models" />
+                <QuickActionComps title="AI Models" subTitle="Manage models" classProbs="orange" path="/ai-models" />
               </div>
             </CardComp>
             <CardComp>

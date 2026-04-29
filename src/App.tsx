@@ -5,8 +5,8 @@ import VerifyEmailPage from "./pages/verify-email-page/VerifyEmailPage";
 import VerifyDoctorPage from "./pages/verify-doctor-page/VerifyDoctorPage";
 
 // Authenticated Layout & Pages
-import HomePage from "./routers/Home Page/HomePage";
-import BrowseDoctors from "./components/HomePage/BrowseDoctors";
+// import HomePage from "./routers/Home Page/HomePage";
+// import BrowseDoctors from "./components/HomePage/BrowseDoctors";
 import DoctorDashboard from "./pages/doctor-pages/dashboard/DoctorDashboard";
 import Schedule from "./pages/doctor-pages/schedule/Schedule";
 import Reports from "./pages/doctor-pages/reports/Reports";

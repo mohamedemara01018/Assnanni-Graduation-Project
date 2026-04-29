@@ -5,16 +5,17 @@ import Logo from "../../assets/Logo.png";
 import { IoIosArrowBack, IoIosArrowForward, } from "react-icons/io";
 
 import { Link, NavLink } from "react-router";
-import { Brain, Calendar, FileText, LayoutDashboard, Scan, Settings, Stethoscope, Users } from "lucide-react";
+import { Brain, Calendar, FileText, LayoutDashboard, Scan, Settings, Stethoscope, Users, X } from "lucide-react";
 
 
 interface SideBarProp {
   collapsed: boolean;
+  setCollapsed: (val: boolean) => void;
   toggled: boolean;
   onToggle: () => void;
 }
 
-function SideBar({ toggled, onToggle }: SideBarProp) {
+function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
 
 
   // const role = useSelector(
@@ -35,20 +36,28 @@ function SideBar({ toggled, onToggle }: SideBarProp) {
 
   return (
     <>
-      <div className="relative">
-        <button
-          onClick={onToggle}
-          className="flex items-center justify-center rounded-full w-8 h-8 absolute -right-4 top-20 bg-(--color-surface) shadow-lg border-2 border-(--color-border) cursor-pointer text-(--color-text)"
-        >
-          {toggled ? <IoIosArrowForward /> : <IoIosArrowBack />}
-        </button>
+      <div className={`relative`}>
+        {
+          !collapsed && <button
+            onClick={onToggle}
+            className="flex items-center justify-center rounded-full w-8 h-8 absolute -right-4 top-20 bg-(--color-surface) shadow-lg border-2 border-(--color-border) cursor-pointer text-(--color-text)"
+          >
+            {toggled ? <IoIosArrowForward /> : <IoIosArrowBack />}
+          </button>
+        }
 
-        <Link
-          to={"/"}
-          className="flex items-center justify-center gap-1 h-16 px-4 border-b"
-        >
-          <img className="w-36 mx-auto" src={Logo} alt="logo" />
-        </Link>
+        <div className="flex items-center gap-2 border-b">
+          <Link
+            to={"/"}
+            className="flex items-center justify-center gap-1 h-16 px-4"
+          >
+            <img className="w-36 mx-auto" src={Logo} alt="logo" />
+          </Link>
+          {collapsed && <button onClick={() => setCollapsed(false)}
+            className="p-2 h-fit cursor-pointer hover:bg-(--color-bg-link-hover) rounded-xl transition-all duration-150">
+            <X />
+          </button>}
+        </div>
 
         <ul className="p-2 py-5 space-y-1">
           {
