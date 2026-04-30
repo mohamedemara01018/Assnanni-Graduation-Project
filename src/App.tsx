@@ -60,6 +60,7 @@ import PatientRegistration from "./components/Registration/PatientRegistration";
 import ReceptionistRegistration from "./components/Registration/ReceptionistRegistration";
 import StudentRegistration from "./components/Registration/StudentRegistration";
 import AddTimeSlotPage from "./pages/add-time-slot-page/AddTimeSlotPage";
+import PatientDetails from "./pages/doctor-pages/patients/PatientDetails";
 // import PatientDashboard from "./components/Patient/Dashboard/PatientDashboard";
 
 const App = () => {
@@ -70,8 +71,8 @@ const App = () => {
   return (
     <div className="min-h-screen w-full flex flex-col">
       <main className="grow">
+        {/* Set home page according to the role */}
         <Routes>
-          {/* --- Public Routes --- */}
           {role === "patient" ? (
             <Route path="/" element={<PatientPage />} />
           ) : role === "doctor" ? (
@@ -85,6 +86,7 @@ const App = () => {
           ) : (
             ""
           )}
+          {/* --- Public Routes --- */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
@@ -168,6 +170,7 @@ const App = () => {
           <Route path="doctor-schedule" element={<Schedule />} />
           <Route path="add-time-slot" element={<AddTimeSlotPage />} />
           <Route path="doctor-patients" element={<Patients />} />
+          <Route path="doctor-patients/:id" element={<PatientDetails />} />
           <Route path="doctor-reports" element={<Reports />} />
           <Route path="receptionist-access" element={<ReceptionistAccess />} />
           <Route path="receptionist-access/add" element={<AddReceptionist />} />

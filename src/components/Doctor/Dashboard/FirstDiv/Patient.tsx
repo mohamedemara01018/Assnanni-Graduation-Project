@@ -25,15 +25,21 @@ const Patient = ({ name, imageUrl, lastInteractionDate }: Props) => {
           </div>
         )}
         <div className="flex flex-col">
-          <h1 className="text-lg text-(--color-text) dark:text-gray-100 font-semibold">{name}</h1>
+          <h1 className="text-lg text-(--color-text) dark:text-gray-100 font-semibold">
+            {name}
+          </h1>
           {lastInteractionDate && (
             <p className="text-xs text-(--color-text-light) dark:text-gray-400">
-              Last interaction: {new Date(lastInteractionDate).toLocaleDateString()}
+              Last interaction:{" "}
+              {new Date(lastInteractionDate).toLocaleDateString()}
             </p>
           )}
         </div>
       </div>
-      <NavLink to={"#"} className="text-sm text-blue-500 hover:text-blue-400 dark:text-blue-400 dark:hover:text-blue-300">
+      <NavLink
+        to={"#"}
+        className="text-sm text-blue-500 hover:text-blue-400 dark:text-blue-400 dark:hover:text-blue-300"
+      >
         View
       </NavLink>
     </div>

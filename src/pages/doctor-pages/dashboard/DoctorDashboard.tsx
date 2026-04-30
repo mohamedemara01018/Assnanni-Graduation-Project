@@ -1,5 +1,4 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-
 import FirstDiv from "../../../components/Doctor/Dashboard/FirstDiv/FirstDiv";
 import SecondDiv from "../../../components/Doctor/Dashboard/SecondDiv/SecondDiv";
 import { SlCalender } from "react-icons/sl";
@@ -7,48 +6,53 @@ import { LuFileSpreadsheet } from "react-icons/lu";
 import { MdPeople } from "react-icons/md";
 import { GoPulse } from "react-icons/go";
 import DashboardCard from "@/components/DashboardCard/DashboardCard";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { toast } from "react-toastify";
+import { useQuery } from "@tanstack/react-query";
+
+const defaultDashboardData = {
+  todayAppointments: 12,
+  totalPatients: 128,
+  pendingScans: 1,
+  satisfactionRate: 95,
+};
 
 const DoctorDashboard = () => {
-  const [dashboardData, setDashboardData] = useState({
-    todayAppointments: 12,
-    totalPatients: 128,
-    pendingScans: 1,
-    satisfactionRate: 95,
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const token = Cookies.get("jwtToken");
+
+  const { data: dashboardData = defaultDashboardData, isSuccess, isError, error } = useQuery({
+    queryKey: ["DoctorDashboardOverview"],
+    queryFn: async () => {
+      const response = await axios.get(backendUrl + "Doctors/dashboard", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = response.data?.value || response.data;
+      if (data) {
+        return {
+          todayAppointments: data.todayAppointments ?? defaultDashboardData.todayAppointments,
+          totalPatients: data.totalPatients ?? defaultDashboardData.totalPatients,
+          pendingScans: data.pendingScans ?? defaultDashboardData.pendingScans,
+          satisfactionRate: data.satisfactionRate ?? defaultDashboardData.satisfactionRate,
+        };
+      }
+      return defaultDashboardData;
+    },
   });
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        const backendUrl = import.meta.env.VITE_BACKEND_URL;
-        const token = Cookies.get("jwtToken");
-        const response = await axios.get(backendUrl + "Doctors/dashboard", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        // Use response.data.value if it exists, otherwise fallback to response.data
-        const data = response.data?.value || response.data;
-        if (data) {
-          setDashboardData({
-            todayAppointments:
-              data.todayAppointments ?? dashboardData.todayAppointments,
-            totalPatients: data.totalPatients ?? dashboardData.totalPatients,
-            pendingScans: data.pendingScans ?? dashboardData.pendingScans,
-            satisfactionRate:
-              data.satisfactionRate ?? dashboardData.satisfactionRate,
-          });
-        }
-      } catch (error) {
-        console.error("Failed to fetch dashboard data:", error);
-      }
-    };
-
-    fetchDashboardData();
-  }, []);
+    if (isSuccess && dashboardData !== defaultDashboardData) {
+      toast.success("Dashboard overview loaded");
+    }
+    if (isError) {
+      console.error("Failed to fetch dashboard data:", error);
+      toast.error(error.message || "Failed to load dashboard overview");
+    }
+  }, [isSuccess, isError, error, dashboardData]);
 
   return (
     <DashboardLayout pageTitle={"Doctor Dashboard"}>

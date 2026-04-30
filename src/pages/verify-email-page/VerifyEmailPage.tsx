@@ -39,7 +39,7 @@ function VerifyEmailPage() {
         ),
       );
       dispatch(clearEmail());
-      navigator("/");
+      navigator("/onboarding");
       toast.success("You have successfully verified your email address");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

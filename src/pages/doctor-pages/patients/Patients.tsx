@@ -3,162 +3,290 @@ import PatientsTable from "../../../components/Doctor/Patients/PatientsTable";
 import { FaDownload } from "react-icons/fa6";
 import { MdOutlinePersonAddAlt1 } from "react-icons/md";
 import { FaSearch } from "react-icons/fa";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PatientsCard from "../../../components/Doctor/Patients/PatientsCard";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { NavLink } from "react-router";
+
+interface Patient {
+  id: number;
+  name: string;
+  phone: string;
+  age: number;
+  gender: "Male" | "Female";
+  status: "Active" | "Inactive" | "Pending";
+  lastVisit: string;
+  doctor: string;
+}
+
+const fallbackPatients: Patient[] = [
+  {
+    id: 1,
+    name: "John Smith",
+    phone: "555-0101",
+    age: 45,
+    gender: "Male",
+    status: "Active",
+    lastVisit: "2025-12-10",
+    doctor: "Dr. Chen",
+  },
+  {
+    id: 2,
+    name: "Sarah Johnson",
+    phone: "555-0102",
+    age: 32,
+    gender: "Female",
+    status: "Active",
+    lastVisit: "2025-12-12",
+    doctor: "Dr. Williams",
+  },
+  {
+    id: 3,
+    name: "Michael Brown",
+    phone: "555-0103",
+    age: 58,
+    gender: "Male",
+    status: "Pending",
+    lastVisit: "2025-11-28",
+    doctor: "Dr. Chen",
+  },
+  {
+    id: 4,
+    name: "Emma Davis",
+    phone: "555-0104",
+    age: 28,
+    gender: "Female",
+    status: "Active",
+    lastVisit: "2025-12-13",
+    doctor: "Dr. Smith",
+  },
+  {
+    id: 5,
+    name: "David Wilson",
+    phone: "555-0105",
+    age: 62,
+    gender: "Male",
+    status: "Inactive",
+    lastVisit: "2025-10-15",
+    doctor: "Dr. Williams",
+  },
+  {
+    id: 6,
+    name: "Lisa Anderson",
+    phone: "555-0106",
+    age: 41,
+    gender: "Female",
+    status: "Active",
+    lastVisit: "2025-12-11",
+    doctor: "Dr. Chen",
+  },
+];
 
 const Patients = () => {
   const [view, setView] = useState<"Table" | "Cards">("Table");
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/";
+
+  const {
+    data: patients = fallbackPatients,
+    isError,
+    error,
+    isSuccess,
+  } = useQuery<Patient[]>({
+    queryKey: ["DoctorPatients"],
+    queryFn: async () => {
+      const response = await axios.get(`${backendUrl}Doctors/patients`);
+      const data = response.data?.value || response.data;
+      if (Array.isArray(data) && data.length > 0) {
+        return data;
+      }
+      return fallbackPatients;
+    },
+  });
+
+  useEffect(() => {
+    if (isSuccess && patients !== fallbackPatients) {
+      toast.success("Patients list loaded successfully");
+    }
+    if (isError) {
+      console.error("Error fetching patients:", error);
+      toast.error(error.message || "Failed to load patients");
+    }
+  }, [isSuccess, isError, error, patients]);
+
+  const exportToCSV = () => {
+    const headers = [
+      "Name",
+      "Phone",
+      "Age",
+      "Gender",
+      "Status",
+      "Last Visit",
+      "Doctor",
+    ];
+    const rows = patients.map((p) => [
+      p.name,
+      p.phone,
+      p.age,
+      p.gender,
+      p.status,
+      p.lastVisit,
+      p.doctor,
+    ]);
+
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      headers.join(",") +
+      "\n" +
+      rows.map((e) => e.join(",")).join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "patients_list.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Exporting data to CSV...");
+  };
+
   return (
     <DashboardLayout pageTitle={"Patients"}>
-      <div className=" -mt-6 p-4 bg-(--color-bg) min-h-[85vh] rounded-2xl">
-        <div className="flex justify-between gap-2 items-center p-1 mb-8">
+      <div className=" -mt-6 p-6 bg-(--color-bg) min-h-[85vh] rounded-2xl">
+        <div className="flex justify-between gap-2 items-center mb-8">
           <div>
-            <h1 className="text-2xl text-(--color-text) font-semibold">
+            <h1 className="text-2xl text-(--color-text) font-bold">
               Patients List
             </h1>
-            <p className="font-thin text-(--color-text-light) text-sm">
-              8 patients found
+            <p className="font-medium text-(--color-text-light) text-sm mt-1">
+              {patients.length} patients found
             </p>
           </div>
           <div className="flex gap-4 items-center">
-            <button className="text-(--color-text-light) font-semibold px-4 py-2 bg-(--color-surface) hover:bg-gray-300/90 rounded-md flex gap-1.5  items-center cursor-pointer">
-              <FaDownload />
+            <button
+              onClick={exportToCSV}
+              className="text-(--color-text-light) font-semibold px-5 py-2.5 bg-(--color-surface) border border-(--color-border) hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl flex gap-2 items-center cursor-pointer transition-all shadow-sm"
+            >
+              <FaDownload className="text-sm" />
               Export
             </button>
-            <button className="text-white font-semibold px-4 py-2 bg-blue-500 hover:bg-blue-500/90 rounded-md cursor-pointer flex gap-1.5 items-center">
-              <MdOutlinePersonAddAlt1 className="text-lg" />
+            <NavLink
+              to="/register/patient-register"
+              className="text-white font-semibold px-5 py-2.5 bg-blue-600 hover:bg-blue-700 rounded-xl cursor-pointer flex gap-2 items-center transition-all shadow-md shadow-blue-500/20"
+            >
+              <MdOutlinePersonAddAlt1 className="text-xl" />
               Add Patient
-            </button>
+            </NavLink>
           </div>
         </div>
-        <div className="flex justify-between gap-4 bg-(--color-surface)  p-5 px-2 rounded-2xl mb-6 max-md:flex-col relative">
-          <div className="flex flex-3 p-2">
-            <FaSearch className="absolute left-7     top-7   pr-2 border-r-2 border-gray-400 h-11 text-3xl text-gray-400 max-sm:hidden" />
+
+        <div className="flex justify-between gap-4 bg-(--color-surface) p-4 rounded-2xl mb-8 border border-(--color-border) shadow-sm max-md:flex-col relative">
+          <div className="flex-1 relative flex items-center">
+            <FaSearch className="absolute left-4 text-gray-400" />
             <input
               type="text"
-              className=" w-full px-3 pl-12 py-2 text-lg border border-gray-300 rounded-md shadow-sm focus:outline-none focus:border-blue-500 focus:ring-blue-500 text-(--color-text-light)"
-              placeholder="Search by Phone or Name"
+              className="w-full pl-11 pr-4 py-3 bg-(--color-bg) border border-(--color-border) rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-(--color-text)"
+              placeholder="Search by name or phone..."
             />
           </div>
 
-          <div className="flex flex-2 gap-4 justify-between max-sm:px-4">
-            <select
-              name="status"
-              id="status"
-              className=" block min-w-fit  rounded-lg border border-gray-300 bg-(--color-surface) px-2 py-0 pr-8 leading-tight text-(--color-text) shadow-sm hover:border-gray-400 h-10 self-center focus:border-blue-500 focus:outline-none focus:ring-blue-500 text-center cursor-pointer  text-xs font-semibold"
-            >
+          <div className="flex gap-3 max-sm:flex-col">
+            <select className="px-4 py-2 bg-(--color-bg) border border-(--color-border) rounded-xl text-sm font-medium text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer">
               <option value="allStatus">All Status</option>
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
               <option value="pending">Pending</option>
             </select>
-            <select
-              name="doctors"
-              id="doctors"
-              className=" block min-w-fit text-xs  rounded-lg border border-gray-300 bg-(--color-surface) px-2 py-0 pr-8 leading-tight text-(--color-text) font-semibold h-10 self-center shadow-sm cursor-pointer hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500 text-center "
-            >
+            <select className="px-4 py-2 bg-(--color-bg) border border-(--color-border) rounded-xl text-sm font-medium text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 cursor-pointer">
               <option value="allDoctors">All Doctors</option>
-              <option value="chen">Dr.Chen</option>
-              <option value="william">Dr.William</option>
+              <option value="chen">Dr. Chen</option>
+              <option value="william">Dr. Williams</option>
             </select>
-            <div className=" flex  w-fit ml-4 mr-2 self-center  bg-gray-100 justify-between rounded-2xl font-medium text-gray-800 cursor-pointer text-sm max-sm:hidden">
-              <div
+            <div className="flex p-1 bg-(--color-bg) border border-(--color-border) rounded-xl ml-2">
+              <button
                 onClick={() => setView("Table")}
-                className={` rounded-l-2xl w-full p-3 px-6 ${
-                  view === "Table" && "bg-blue-500 text-white"
+                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  view === "Table"
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-(--color-text-light) hover:text-(--color-text)"
                 }`}
               >
-                <span>Table</span>
-              </div>
-              <div
-                className={`p-3 px-6 rounded-r-2xl cursor-pointer ${
-                  view === "Cards" && "bg-blue-500 text-white"
-                }`}
+                Table
+              </button>
+              <button
                 onClick={() => setView("Cards")}
+                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  view === "Cards"
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "text-(--color-text-light) hover:text-(--color-text)"
+                }`}
               >
-                <span>Cards</span>
-              </div>
+                Cards
+              </button>
             </div>
           </div>
         </div>
-        <div className="p-2 overflow-x-auto overflow-y-hidden rounded-2xl">
+
+        <div className="rounded-2xl border border-(--color-border) overflow-hidden shadow-sm bg-(--color-surface)">
           {view === "Table" ? (
-            <table className=" table-auto w-full border-collapse rounded-2xl  min-w-fit border-2 border-gray-300  ">
-              <thead className="border-2 border-gray-200 rounded-2xl ">
-                <tr className="bg-(--color-bg) rounded-2xl text-(--color-text-light) ">
-                  <th className="px-4 py-3 text-left font-medium ">PATIENT</th>
-                  <th className="px-4 py-3 text-left font-medium ">
-                    AGE/GENDER
-                  </th>
-                  <th className="px-4 py-3 text-left font-medium ">STATUS</th>
-                  <th className="px-4 py-3 text-left font-medium ">
-                    LAST VISIT
-                  </th>
-                  <th className="px-4 py-3 text-left font-medium ">
-                    ASSIGNED DOCTOR
-                  </th>
-                  <th className="px-4 py-3 text-center font-medium ">ACTION</th>
-                </tr>
-              </thead>
-              <tbody>
-                <PatientsTable
-                  title="John Smith"
-                  phone="5555-4545-54"
-                  age={45}
-                  gender="Male"
-                  status="Active"
-                  lastVisit="2025-12-10"
-                  doctor="Dr.Chen"
-                />
-                <PatientsTable
-                  title="John Smith"
-                  phone="5555-4545-54"
-                  age={45}
-                  gender="Male"
-                  status="Inactive"
-                  lastVisit="2025-12-10"
-                  doctor="Dr.Chen"
-                />
-                <PatientsTable
-                  title="John Smith"
-                  phone="5555-4545-54"
-                  age={45}
-                  gender="Male"
-                  status="Pending"
-                  lastVisit="2025-12-10"
-                  doctor="Dr.Chen"
-                />
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-50/50 dark:bg-gray-800/30 text-(--color-text-light) text-xs uppercase tracking-wider border-b border-(--color-border)">
+                    <th className="px-8 py-4 text-left font-semibold">
+                      PATIENT
+                    </th>
+                    <th className="px-4 py-4 text-left font-semibold">
+                      AGE/GENDER
+                    </th>
+                    <th className="px-4 py-4 text-left font-semibold">
+                      STATUS
+                    </th>
+                    <th className="px-4 py-4 text-left font-semibold">
+                      LAST VISIT
+                    </th>
+                    <th className="px-4 py-4 text-left font-semibold">
+                      ASSIGNED DOCTOR
+                    </th>
+                    <th className="px-8 py-4 text-right font-semibold">
+                      ACTIONS
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-(--color-border)">
+                  {patients.map((patient) => (
+                    <PatientsTable
+                      key={patient.id}
+                      id={patient.id}
+                      title={patient.name}
+                      phone={patient.phone}
+                      age={patient.age}
+                      gender={patient.gender}
+                      status={patient.status}
+                      lastVisit={patient.lastVisit}
+                      doctor={patient.doctor}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            </div>
           ) : (
-            <div className="grid max-md:grid-cols-1 max-lg:grid-cols-2 grid-cols-3 gap-5">
-              <PatientsCard
-                title="John Smith"
-                phone="5555-4545-54"
-                age={45}
-                gender="Male"
-                status="Pending"
-                lastVisit="2025-12-10"
-                doctor="Dr.Chen"
-              />
-              <PatientsCard
-                title="John Smith"
-                phone="5555-4545-54"
-                age={45}
-                gender="Male"
-                status="Active"
-                lastVisit="2025-12-10"
-                doctor="Dr.Chen"
-              />
-              <PatientsCard
-                title="John Smith"
-                phone="5555-4545-54"
-                age={45}
-                gender="Male"
-                status="InActive"
-                lastVisit="2025-12-10"
-                doctor="Dr.Chen"
-              />
+            <div className="p-6 grid max-md:grid-cols-1 max-lg:grid-cols-2 lg:grid-cols-3 gap-6">
+              {patients.map((patient) => (
+                <PatientsCard
+                  key={patient.id}
+                  id={patient.id}
+                  title={patient.name}
+                  phone={patient.phone}
+                  age={patient.age}
+                  gender={patient.gender}
+                  status={patient.status}
+                  lastVisit={patient.lastVisit}
+                  doctor={patient.doctor}
+                />
+              ))}
             </div>
           )}
         </div>

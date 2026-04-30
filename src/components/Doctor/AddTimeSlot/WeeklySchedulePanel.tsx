@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useEffect } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface TimeSlot {
   id: number;
@@ -19,22 +22,52 @@ const initialSchedule: DaySchedule[] = [
   {
     name: "Monday",
     slots: [
-      { id: nextId++, start: "09:00 AM", end: "09:30 AM", duration: "30 minutes", available: true },
-      { id: nextId++, start: "10:00 AM", end: "10:30 AM", duration: "30 minutes", available: true },
-      { id: nextId++, start: "02:00 PM", end: "02:45 PM", duration: "45 minutes", available: false },
+      {
+        id: nextId++,
+        start: "09:00 AM",
+        end: "09:30 AM",
+        duration: "30 minutes",
+        available: true,
+      },
+      {
+        id: nextId++,
+        start: "10:00 AM",
+        end: "10:30 AM",
+        duration: "30 minutes",
+        available: true,
+      },
+      {
+        id: nextId++,
+        start: "02:00 PM",
+        end: "02:45 PM",
+        duration: "45 minutes",
+        available: false,
+      },
     ],
   },
   {
     name: "Tuesday",
     slots: [
-      { id: nextId++, start: "09:00 AM", end: "09:30 AM", duration: "30 minutes", available: true },
+      {
+        id: nextId++,
+        start: "09:00 AM",
+        end: "09:30 AM",
+        duration: "30 minutes",
+        available: true,
+      },
     ],
   },
   { name: "Wednesday", slots: [] },
   {
     name: "Thursday",
     slots: [
-      { id: nextId++, start: "11:00 AM", end: "12:00 PM", duration: "60 minutes", available: true },
+      {
+        id: nextId++,
+        start: "11:00 AM",
+        end: "12:00 PM",
+        duration: "60 minutes",
+        available: true,
+      },
     ],
   },
   { name: "Friday", slots: [] },
@@ -103,22 +136,63 @@ const SCHEDULING_TIPS = [
 ];
 
 const WeeklySchedulePanel = () => {
-  const [schedule, setSchedule] = useState<DaySchedule[]>(initialSchedule);
+  const queryClient = useQueryClient();
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/";
 
-  const deleteSlot = (dayName: string, slotId: number) => {
-    setSchedule((prev) =>
-      prev.map((day) =>
-        day.name === dayName
-          ? { ...day, slots: day.slots.filter((s) => s.id !== slotId) }
-          : day
-      )
-    );
+  const { data: schedule = initialSchedule, isSuccess, isError, error } = useQuery<DaySchedule[]>({
+    queryKey: ["DoctorSchedules"],
+    queryFn: async () => {
+      const response = await axios.get(`${backendUrl}DoctorSchedules`);
+      const data = response.data?.value || response.data;
+      if (data && Array.isArray(data) && data.length > 0) {
+        let tempId = 1000;
+        return data.map((d: any) => ({
+          name: d.day,
+          slots: d.time
+            ? d.time.map((t: string) => ({
+                id: tempId++,
+                start: t,
+                end: "TBD",
+                duration: "30 minutes",
+                available: true,
+              }))
+            : [],
+        }));
+      }
+      return initialSchedule;
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (slotId: number) => axios.delete(`${backendUrl}DoctorScheduled/${slotId}`),
+    onSuccess: () => {
+      toast.success("Slot deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["DoctorSchedules"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to delete slot");
+    },
+  });
+
+  useEffect(() => {
+    if (isSuccess && schedule !== initialSchedule) {
+      toast.success("Schedules loaded successfully");
+    }
+    if (isError) {
+      console.error("Error fetching schedules:", error);
+      toast.error(error.message || "Failed to fetch schedules");
+    }
+  }, [isSuccess, isError, error, schedule]);
+
+  const deleteSlot = (slotId: number) => {
+    deleteMutation.mutate(slotId);
   };
 
   const totalSlots = schedule.reduce((acc, day) => acc + day.slots.length, 0);
   const availableSlots = schedule.reduce(
     (acc, day) => acc + day.slots.filter((s) => s.available).length,
-    0
+    0,
   );
 
   return (
@@ -126,18 +200,30 @@ const WeeklySchedulePanel = () => {
       {/* Summary bar */}
       <div className="bg-(--color-surface) rounded-2xl border border-(--color-border) p-4 shadow-sm flex items-center gap-6">
         <div className="flex flex-col">
-          <span className="text-2xl font-bold text-(--color-primary)">{totalSlots}</span>
-          <span className="text-xs text-(--color-text-light) mt-0.5">Total Slots</span>
+          <span className="text-2xl font-bold text-(--color-primary)">
+            {totalSlots}
+          </span>
+          <span className="text-xs text-(--color-text-light) mt-0.5">
+            Total Slots
+          </span>
         </div>
         <div className="w-px h-8 bg-(--color-border)" />
         <div className="flex flex-col">
-          <span className="text-2xl font-bold text-(--color-success)">{availableSlots}</span>
-          <span className="text-xs text-(--color-text-light) mt-0.5">Available</span>
+          <span className="text-2xl font-bold text-(--color-success)">
+            {availableSlots}
+          </span>
+          <span className="text-xs text-(--color-text-light) mt-0.5">
+            Available
+          </span>
         </div>
         <div className="w-px h-8 bg-(--color-border)" />
         <div className="flex flex-col">
-          <span className="text-2xl font-bold text-red-500">{totalSlots - availableSlots}</span>
-          <span className="text-xs text-(--color-text-light) mt-0.5">Unavailable</span>
+          <span className="text-2xl font-bold text-red-500">
+            {totalSlots - availableSlots}
+          </span>
+          <span className="text-xs text-(--color-text-light) mt-0.5">
+            Unavailable
+          </span>
         </div>
       </div>
 
@@ -145,7 +231,9 @@ const WeeklySchedulePanel = () => {
       <div className="bg-(--color-surface) rounded-2xl border border-(--color-border) shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-(--color-border) flex items-center gap-2">
           <ClockIcon />
-          <h2 className="text-base font-semibold text-(--color-text)">Weekly Schedule</h2>
+          <h2 className="text-base font-semibold text-(--color-text)">
+            Weekly Schedule
+          </h2>
         </div>
 
         <div className="divide-y divide-(--color-border)">
@@ -154,7 +242,9 @@ const WeeklySchedulePanel = () => {
               {/* Day header */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-(--color-text)">{day.name}</span>
+                  <span className="text-sm font-semibold text-(--color-text)">
+                    {day.name}
+                  </span>
                   <span className="text-xs bg-(--color-primary-lighter) text-(--color-primary) font-medium px-2 py-0.5 rounded-full">
                     {day.slots.length} slot{day.slots.length !== 1 ? "s" : ""}
                   </span>
@@ -179,7 +269,9 @@ const WeeklySchedulePanel = () => {
                         <span className="text-sm font-medium text-(--color-text)">
                           {slot.start} – {slot.end}
                         </span>
-                        <span className="text-xs text-(--color-text-light)">({slot.duration})</span>
+                        <span className="text-xs text-(--color-text-light)">
+                          ({slot.duration})
+                        </span>
                       </div>
 
                       {/* Status badge + delete */}
@@ -194,7 +286,7 @@ const WeeklySchedulePanel = () => {
                           {slot.available ? "Available" : "Unavailable"}
                         </span>
                         <button
-                          onClick={() => deleteSlot(day.name, slot.id)}
+                          onClick={() => deleteSlot(slot.id)}
                           className="text-(--color-text-light) hover:text-red-500 transition-colors duration-150 cursor-pointer p-1 rounded opacity-0 group-hover:opacity-100"
                           aria-label="Delete slot"
                         >
@@ -216,11 +308,16 @@ const WeeklySchedulePanel = () => {
           <span className="text-(--color-primary)">
             <LightbulbIcon />
           </span>
-          <h3 className="text-sm font-semibold text-(--color-primary)">Scheduling Tips</h3>
+          <h3 className="text-sm font-semibold text-(--color-primary)">
+            Scheduling Tips
+          </h3>
         </div>
         <ul className="flex flex-col gap-1.5">
           {SCHEDULING_TIPS.map((tip, i) => (
-            <li key={i} className="flex items-start gap-2 text-xs text-(--color-text-light)">
+            <li
+              key={i}
+              className="flex items-start gap-2 text-xs text-(--color-text-light)"
+            >
               <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-(--color-primary) shrink-0" />
               {tip}
             </li>
