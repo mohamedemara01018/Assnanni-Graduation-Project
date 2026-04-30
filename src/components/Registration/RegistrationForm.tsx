@@ -8,7 +8,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
 // import axios from "axios";
 import { useDispatch } from "react-redux";
-import { updateRole } from "@/store/slices/auth/authSlice";
+import { setToken } from "@/store/slices/auth/authSlice";
 import { getEmail } from "@/store/slices/email/emailSlice";
 import { roles } from "@/constants/rolesConstant";
 import RoleCard from "../role-card/RoleCard";
@@ -55,8 +55,9 @@ const RegistrationForm = () => {
       if (doctor || studentDoctor) {
         navigator("/verify-doctor");
       } else {
-        if (isPatient) dispatch(updateRole("patient"));
-        if (isReceptionist) dispatch(updateRole("receptionist"));
+        // Mock JWT tokens for testing. Replace with actual tokens from backend.
+        if (isPatient) dispatch(setToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicGF0aWVudCJ9.dummy"));
+        if (isReceptionist) dispatch(setToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicmVjZXB0aW9uaXN0In0=.dummy"));
         navigator("/verify-email");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

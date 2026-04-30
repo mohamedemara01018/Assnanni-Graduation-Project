@@ -3,7 +3,8 @@ import { Button } from "../ui/button";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import axios from "axios";
 import { toast } from "react-toastify";
-// import { useDispatch } from "react-redux";
+import { setToken } from "@/store/slices/auth/authSlice";
+import { useDispatch } from "react-redux";
 // import { updateRole } from "@/features/auth/authSlice";
 
 interface Inputs {
@@ -14,7 +15,7 @@ interface Inputs {
 function LoginForm() {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const navigator = useNavigate();
-  //   const dispatch = useDispatch();
+  const dispatch = useDispatch();
   const {
     register,
     handleSubmit,
@@ -23,8 +24,9 @@ function LoginForm() {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      await axios.post(backendUrl + "Login", data);
-      //   dispatch(updateRole("doctor"));
+      // await axios.post(backendUrl + "Login", data);
+      // dispatch(setToken(response.data.token)); // Use real token when uncommenting API
+      dispatch(setToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicGF0aWVudCJ9.dummy"));
       toast.success("Welcome Back");
       navigator("/");
 

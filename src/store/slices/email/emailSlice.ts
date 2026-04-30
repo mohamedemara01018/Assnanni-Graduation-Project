@@ -1,17 +1,19 @@
 import { createSlice } from "@reduxjs/toolkit";
+import Cookies from "js-cookie";
 
 const emailSlice = createSlice({
   name: "email",
   initialState: {
-    emailAddress: localStorage.getItem("userEmail") || null,
+    emailAddress: Cookies.get("userEmail") || null,
   },
   reducers: {
     getEmail: (state, action) => {
       state.emailAddress = action.payload;
-      localStorage.setItem("userEmail", action.payload);
+      Cookies.set("userEmail", action.payload, { expires: 1 });
     },
-    clearEmail: () => {
-      localStorage.removeItem("userEmail");
+    clearEmail: (state) => {
+      state.emailAddress = null;
+      Cookies.remove("userEmail");
     },
   },
 });

@@ -1,4 +1,4 @@
-import { updateRole } from "@/store/slices/auth/authSlice";
+import { setToken } from "@/store/slices/auth/authSlice";
 import { clearEmail } from "@/store/slices/email/emailSlice";
 // import axios from "axios";
 import { MdOutlineMail } from "react-icons/md";
@@ -33,7 +33,7 @@ function VerifyEmailPage() {
     try {
       // await axios.post(backendUrl + "Verify-Email", data);
 
-      dispatch(updateRole("patient"));
+      dispatch(setToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicGF0aWVudCJ9.dummy"));
       dispatch(clearEmail());
       navigator("/");
       toast.success("You have successfully verified your email address");
