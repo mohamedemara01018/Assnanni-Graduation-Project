@@ -23,7 +23,7 @@ interface Inputs {
 }
 
 const RegistrationForm = () => {
-  // const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  // const backendUrl = import.meta.env.VITE_BACKEND_URL + 'Authentications/';
   const dispatch = useDispatch();
   const navigator = useNavigate();
   const { pathname } = useLocation();
@@ -53,11 +53,23 @@ const RegistrationForm = () => {
       // await axios.post(backendUrl + "Register-Doctor", data);
       dispatch(getEmail(data.email));
       if (doctor || studentDoctor) {
+        // if (doctor) dispatch(setToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiZG9jdG9yIn0=.dummy"));
+        // if (studentDoctor) dispatch(setToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic3R1ZGVudCBkb2N0b3IifQ==.dummy"));
         navigator("/verify-doctor");
       } else {
         // Mock JWT tokens for testing. Replace with actual tokens from backend.
-        if (isPatient) dispatch(setToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicGF0aWVudCJ9.dummy"));
-        if (isReceptionist) dispatch(setToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicmVjZXB0aW9uaXN0In0=.dummy"));
+        if (isPatient)
+          dispatch(
+            setToken(
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicGF0aWVudCJ9.dummy",
+            ),
+          );
+        if (isReceptionist)
+          dispatch(
+            setToken(
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicmVjZXB0aW9uaXN0In0=.dummy",
+            ),
+          );
         navigator("/verify-email");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -13,7 +13,7 @@ interface Inputs {
   password: string;
 }
 function LoginForm() {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = import.meta.env.VITE_BACKEND_URL + "Authentications/";
   const navigator = useNavigate();
   const dispatch = useDispatch();
   const {
@@ -26,7 +26,11 @@ function LoginForm() {
     try {
       // await axios.post(backendUrl + "Login", data);
       // dispatch(setToken(response.data.token)); // Use real token when uncommenting API
-      dispatch(setToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicGF0aWVudCJ9.dummy"));
+      dispatch(
+        setToken(
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicGF0aWVudCJ9.dummy",
+        ),
+      );
       toast.success("Welcome Back");
       navigator("/");
 

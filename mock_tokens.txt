@@ -1,0 +1,21 @@
+Here are the mock JWT tokens for each role. You can use these for testing.
+
+1. Patient
+Role Payload: {"role":"patient"}
+Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicGF0aWVudCJ9.dummy
+
+2. Doctor
+Role Payload: {"role":"doctor"}
+Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiZG9jdG9yIn0=.dummy
+
+3. Student Doctor
+Role Payload: {"role":"student doctor"}
+Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic3R1ZGVudCBkb2N0b3IifQ==.dummy
+
+4. Receptionist
+Role Payload: {"role":"receptionist"}
+Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicmVjZXB0aW9uaXN0In0=.dummy
+
+5. Admin
+Role Payload: {"role":"admin"}
+Token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4ifQ==.dummy

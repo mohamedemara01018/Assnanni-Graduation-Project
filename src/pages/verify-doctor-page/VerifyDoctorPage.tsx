@@ -18,7 +18,7 @@ interface Inputs {
 }
 
 function VerifyDoctorPage() {
-  // const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  // const backendUrl = import.meta.env.VITE_BACKEND_URL+"Authentications/";
 
   const navigator = useNavigate();
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
