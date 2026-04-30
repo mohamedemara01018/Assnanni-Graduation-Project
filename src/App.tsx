@@ -12,6 +12,8 @@ import Schedule from "./pages/doctor-pages/schedule/Schedule";
 import Reports from "./pages/doctor-pages/reports/Reports";
 import Scan from "./pages/doctor-pages/Scan/Scan";
 import Notifications from "./pages/doctor-pages/notifications/Notifications";
+import ReceptionistAccess from "./components/Doctor/ReceptionistAccess/ReceptionistAccess";
+import AddReceptionist from "./components/Doctor/ReceptionistAccess/AddReceptionist";
 
 // Registration (Old system - kept as requested)
 
@@ -167,6 +169,8 @@ const App = () => {
           <Route path="add-time-slot" element={<AddTimeSlotPage />} />
           <Route path="doctor-patients" element={<Patients />} />
           <Route path="doctor-reports" element={<Reports />} />
+          <Route path="receptionist-access" element={<ReceptionistAccess />} />
+          <Route path="receptionist-access/add" element={<AddReceptionist />} />
           <Route path="scan/upload" element={<Scan />} />
           <Route path="notification" element={<Notifications />} />
           <Route

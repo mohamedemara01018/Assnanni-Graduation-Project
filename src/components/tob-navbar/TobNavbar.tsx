@@ -7,20 +7,22 @@ import { List } from "lucide-react";
 
 interface TobNavbarProb {
   collapsed: boolean;
-  setCollapsed: (val: boolean) => void
+  setCollapsed: (val: boolean) => void;
   pageTitle: string;
 }
 
 function TobNavbar({ collapsed, setCollapsed, pageTitle }: TobNavbarProb) {
   return (
     <div className="wrapper flex items-center justify-between gap-2">
-
       <div className="flex justify-center items-center gap-4 text-xl text-(--color-text)  font-semibold">
-        {
-          collapsed && <button onClick={() => setCollapsed(true)} className="cursor-pointer p-2 hover:bg-(--color-bg-link-hover) rounded-xl transition duration-150">
+        {collapsed && (
+          <button
+            onClick={() => setCollapsed(true)}
+            className="cursor-pointer p-2 hover:bg-(--color-bg-link-hover) rounded-xl transition duration-150"
+          >
             <List />
           </button>
-        }
+        )}
         <h1>{pageTitle}</h1>
       </div>
       <div className="flex items-center gap-2 font-extrabold">
@@ -29,7 +31,7 @@ function TobNavbar({ collapsed, setCollapsed, pageTitle }: TobNavbarProb) {
         </div>
         <ThemeToggle />
         <Link
-          to={"/"}
+          to={"/notification"}
           className="relative p-2  hover:bg-(--color-bg-link-hover) rounded-lg text-2xl cursor-pointer"
         >
           <IoIosNotificationsOutline className="text-(--color-text)" />
@@ -37,7 +39,7 @@ function TobNavbar({ collapsed, setCollapsed, pageTitle }: TobNavbarProb) {
         </Link>
         <UserComp />
       </div>
-    </div >
+    </div>
   );
 }
 
