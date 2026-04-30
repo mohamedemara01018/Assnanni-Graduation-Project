@@ -58,7 +58,7 @@ import PatientRegistration from "./components/Registration/PatientRegistration";
 import ReceptionistRegistration from "./components/Registration/ReceptionistRegistration";
 import StudentRegistration from "./components/Registration/StudentRegistration";
 import AddTimeSlotPage from "./pages/add-time-slot-page/AddTimeSlotPage";
-import PatientDashboard from "./components/Patient/Dashboard/PatientDashboard";
+// import PatientDashboard from "./components/Patient/Dashboard/PatientDashboard";
 
 const App = () => {
   const role = useSelector(

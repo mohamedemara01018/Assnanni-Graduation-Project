@@ -1,4 +1,5 @@
 import { updateRole } from "@/store/slices/auth/authSlice";
+import { clearEmail } from "@/store/slices/email/emailSlice";
 // import axios from "axios";
 import { MdOutlineMail } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,11 +17,12 @@ function VerifyEmailPage() {
   // const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const dispatch = useDispatch();
   const navigator = useNavigate();
-  const [value, setValue] = useState("000000");
+  const [value, setValue] = useState("");
 
   const email = useSelector(
     (state: { email: { emailAddress: string } }) => state.email.emailAddress,
   );
+
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -30,8 +32,10 @@ function VerifyEmailPage() {
     // };
     try {
       // await axios.post(backendUrl + "Verify-Email", data);
-      dispatch(updateRole("doctor"));
-      navigator("/verify-doctor");
+
+      dispatch(updateRole("patient"));
+      dispatch(clearEmail());
+      navigator("/");
       toast.success("You have successfully verified your email address");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

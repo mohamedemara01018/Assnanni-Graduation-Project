@@ -1,11 +1,10 @@
-import { updateRole } from "@/store/slices/auth/authSlice";
 import { useState } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { FiFileText } from "react-icons/fi";
 import { LuUpload } from "react-icons/lu";
 import { toast } from "react-toastify";
-import { useDispatch } from "react-redux";
-import axios from "axios";
+
+// import axios from "axios";
 import { useNavigate } from "react-router";
 
 interface Inputs {
@@ -19,8 +18,8 @@ interface Inputs {
 }
 
 function VerifyDoctorPage() {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
-  const dispatch = useDispatch();
+  // const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
   const navigator = useNavigate();
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const {
@@ -41,10 +40,11 @@ function VerifyDoctorPage() {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     data.YearsOfExperience = Number(data.YearsOfExperience);
     try {
-      await axios.post(backendUrl + "Submit-Doctor-Verification", data);
-      dispatch(updateRole("doctor"));
+      // await axios.post(backendUrl + "Submit-Doctor-Verification", data);
       navigator("/verify-email");
-
+      toast.success(
+        "You have successfully send the request wait until the admin accept it",
+      );
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error);

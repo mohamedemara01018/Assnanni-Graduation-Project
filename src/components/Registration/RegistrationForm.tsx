@@ -32,6 +32,12 @@ const RegistrationForm = () => {
   const isDoctor: boolean =
     pathname.includes("/doctor-register") ||
     pathname.includes("/student-register");
+  const isPatient =
+    (!pathname.includes("/doctor-register") ||
+      !pathname.includes("/student-register") ||
+      !pathname.includes("/receptionist-register")) &&
+    pathname.includes("register");
+  const isReceptionist = pathname.includes("receptionist-register");
 
   const {
     register,
@@ -44,10 +50,13 @@ const RegistrationForm = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
+      // await axios.post(backendUrl + "Register-Doctor", data);
+      dispatch(getEmail(data.email));
       if (doctor || studentDoctor) {
-        // await axios.post(backendUrl + "Register-Doctor", data);
-        dispatch(updateRole("patient"));
-        dispatch(getEmail(data.email));
+        navigator("/verify-doctor");
+      } else {
+        if (isPatient) dispatch(updateRole("patient"));
+        if (isReceptionist) dispatch(updateRole("receptionist"));
         navigator("/verify-email");
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

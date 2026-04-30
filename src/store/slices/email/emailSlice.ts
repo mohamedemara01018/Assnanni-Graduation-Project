@@ -3,17 +3,18 @@ import { createSlice } from "@reduxjs/toolkit";
 const emailSlice = createSlice({
   name: "email",
   initialState: {
-    emailAddress: localStorage.getItem("userEmail") || null, // Initialize from storage
+    emailAddress: localStorage.getItem("userEmail") || null,
   },
   reducers: {
-    // This is the action you'll call after Axios finishes
     getEmail: (state, action) => {
       state.emailAddress = action.payload;
-      // Optional: Persist to localStorage so it survives a refresh
       localStorage.setItem("userEmail", action.payload);
+    },
+    clearEmail: () => {
+      localStorage.removeItem("userEmail");
     },
   },
 });
 
-export const { getEmail } = emailSlice.actions;
+export const { getEmail, clearEmail } = emailSlice.actions;
 export default emailSlice.reducer;
