@@ -178,16 +178,10 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
               </li>
             </>
           )} */}
-
-          {/* student doctor */}
+          {/* /*   {/* student doctor */}
           {/* {role === "studentDoctor" && (
             <>
-              <li>
-                <NavLink to={"/student-appointments"} className={linkStyle}>
-                  <SlCalender className="text-xl" />
-                  {!toggled && <span>Appointments</span>}
-                </NavLink>
-              </li>
+            
 
               <li>
                 <NavLink to={"/student-notification"} className={linkStyle}>
@@ -203,8 +197,7 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
                 </NavLink>
               </li>
             </>
-          )} */}
-
+          )}  */}
           {/* patient */}
           {/* {role === "patient" && (
             <>
@@ -294,10 +287,7 @@ const sidebarDataRole = {
 
   studentDoctor: [
     { icon: LayoutDashboard, label: "Dashboard", path: "/student-doctor" },
-    { icon: Calendar, label: "Schedule", path: "/doctor-schedule" },
-    { icon: Users, label: "Patients", path: "/doctor-patients" },
-    { icon: Scan, label: "Scans", path: "/scan/upload" },
-    { icon: FileText, label: "Reports", path: "/doctor-reports" },
+    { icon: Calendar, label: "Appointments", path: "/student-appointments" },
     { icon: Users, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ],

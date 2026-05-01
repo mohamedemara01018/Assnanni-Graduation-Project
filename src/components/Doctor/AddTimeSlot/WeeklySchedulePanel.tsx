@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
 
 interface TimeSlot {
   id: number;
@@ -137,16 +137,17 @@ const SCHEDULING_TIPS = [
 
 const WeeklySchedulePanel = () => {
   const queryClient = useQueryClient();
-  const backendUrl =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/";
 
-  const { data: schedule = initialSchedule, isSuccess, isError, error } = useQuery<DaySchedule[]>({
+  const { data: schedule = initialSchedule, isError: isFetchError } = useQuery<
+    DaySchedule[]
+  >({
     queryKey: ["DoctorSchedules"],
     queryFn: async () => {
       const response = await axios.get(`${backendUrl}DoctorSchedules`);
       const data = response.data?.value || response.data;
       if (data && Array.isArray(data) && data.length > 0) {
         let tempId = 1000;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return data.map((d: any) => ({
           name: d.day,
           slots: d.time
@@ -165,28 +166,41 @@ const WeeklySchedulePanel = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (slotId: number) => axios.delete(`${backendUrl}DoctorScheduled/${slotId}`),
-    onSuccess: () => {
-      toast.success("Slot deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["DoctorSchedules"] });
+    mutationFn: async ({ slotId }: { dayName: string; slotId: number }) => {
+      return await axios.delete(`${backendUrl}DoctorScheduled/${slotId}`);
+    },
+    onSuccess: (_, variables) => {
+      // Optimistically update or just invalidate
+      queryClient.setQueryData(
+        ["DoctorSchedules"],
+        (oldData: DaySchedule[] | undefined) => {
+          if (!oldData) return oldData;
+          return oldData.map((day) =>
+            day.name === variables.dayName
+              ? {
+                  ...day,
+                  slots: day.slots.filter((s) => s.id !== variables.slotId),
+                }
+              : day,
+          );
+        },
+      );
+      toast.success("Time slot deleted successfully");
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to delete slot");
+      console.error("Error deleting slot:", error);
+      toast.error(error.response?.data?.message || "Failed to delete slot");
     },
   });
 
   useEffect(() => {
-    if (isSuccess && schedule !== initialSchedule) {
-      toast.success("Schedules loaded successfully");
+    if (isFetchError) {
+      toast.error("Failed to load schedules. Showing local data.");
     }
-    if (isError) {
-      console.error("Error fetching schedules:", error);
-      toast.error(error.message || "Failed to fetch schedules");
-    }
-  }, [isSuccess, isError, error, schedule]);
+  }, [isFetchError]);
 
-  const deleteSlot = (slotId: number) => {
-    deleteMutation.mutate(slotId);
+  const deleteSlot = (dayName: string, slotId: number) => {
+    deleteMutation.mutate({ dayName, slotId });
   };
 
   const totalSlots = schedule.reduce((acc, day) => acc + day.slots.length, 0);
@@ -286,7 +300,7 @@ const WeeklySchedulePanel = () => {
                           {slot.available ? "Available" : "Unavailable"}
                         </span>
                         <button
-                          onClick={() => deleteSlot(slot.id)}
+                          onClick={() => deleteSlot(day.name, slot.id)}
                           className="text-(--color-text-light) hover:text-red-500 transition-colors duration-150 cursor-pointer p-1 rounded opacity-0 group-hover:opacity-100"
                           aria-label="Delete slot"
                         >

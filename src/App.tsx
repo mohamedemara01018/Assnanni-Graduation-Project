@@ -78,7 +78,7 @@ const App = () => {
             <Route path="/" element={<PatientPage />} />
           ) : role === "doctor" ? (
             <Route path="/" element={<DoctorDashboard />} />
-          ) : role === "studentDoctor" ? (
+          ) : role === "student doctor" ? (
             <Route path="/" element={<StudentDoctorDashboard />} />
           ) : role === "receptionist" ? (
             <Route path="/" element={<ReceptionistDashboard />} />
@@ -172,7 +172,10 @@ const App = () => {
           <Route path="add-time-slot" element={<AddTimeSlotPage />} />
           <Route path="doctor-patients" element={<Patients />} />
           <Route path="doctor-patients/:id" element={<PatientDetails />} />
-          <Route path="doctor-patients/:id/medical-history" element={<MedicalHistory />} />
+          <Route
+            path="doctor-patients/:id/medical-history"
+            element={<MedicalHistory />}
+          />
           <Route path="doctor-reports" element={<Reports />} />
           <Route path="receptionist-access" element={<ReceptionistAccess />} />
           <Route path="receptionist-access/add" element={<AddReceptionist />} />
