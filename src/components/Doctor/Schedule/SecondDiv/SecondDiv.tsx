@@ -3,7 +3,7 @@ import RequestTimeOff from "./RequestTimeOff";
 
 const SecondDiv = () => {
   return (
-    <div>
+    <div className="flex flex-col gap-6">
       <QuickStats />
       <RequestTimeOff />
     </div>

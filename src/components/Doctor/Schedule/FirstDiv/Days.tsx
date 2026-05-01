@@ -8,25 +8,29 @@ interface Props {
 
 const Days = ({ day, time }: Props) => {
   return (
-    <div className="flex flex-col text-(--color-text) gap-2 mb-4">
-      <h3>{day}</h3>
-      <div className="grid max-md:grid-cols-2 gap-4 md:grid-cols-3 max-sm:grid-cols-1">
+    <div className="flex flex-col gap-3 pb-4 border-b border-gray-100 dark:border-gray-800 last:border-0 last:pb-0">
+      <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        {day}
+      </h3>
+      <div className="flex flex-wrap gap-3">
         {time.length > 0 ? (
           time.map((item, index) => {
             return (
               <div
                 key={index}
-                className="flex justify-center items-center  gap-2 bg-blue-100/80 rounded-2xl p-2 cursor-pointer "
+                className="flex items-center gap-1.5 bg-blue-50 dark:bg-blue-900/20 rounded-full pl-3 pr-2 py-1.5 cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors border border-transparent hover:border-blue-200 dark:hover:border-blue-800"
               >
-                <FaRegClock className="text-xl text-blue-600 flex-1" />
-                <span className="text-base text-blue-600 flex-2">{item}</span>
-                <IoIosClose className="text-2xl text-blue-600 flex-1 " />
+                <FaRegClock className="text-xs text-blue-500" />
+                <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                  {item}
+                </span>
+                <IoIosClose className="text-lg text-blue-400 hover:text-blue-600 dark:hover:text-blue-300 transition-colors ml-0.5" />
               </div>
             );
           })
         ) : (
-          <p className="text-(--color-text-light) text-sm">
-            No Available slots
+          <p className="text-gray-400 dark:text-gray-500 text-sm">
+            No available slots
           </p>
         )}
       </div>

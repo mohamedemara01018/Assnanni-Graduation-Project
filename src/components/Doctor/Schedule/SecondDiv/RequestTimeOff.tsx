@@ -1,8 +1,10 @@
 const RequestTimeOff = () => {
   return (
-    <div className="m-4 ml-0 p-4 bg-(--color-surface) rounded-2xl">
-      <h1 className="text-(--color-text)">Time Off Requests</h1>
-      <button className="border-black border-2 shadow-2xs w-full  rounded-2xl bg-(--color-border) py-2 mt-4 cursor-pointer hover:bg-red-900/10 text-(--color-text)">
+    <div className="flex flex-col gap-4 bg-(--color-surface) p-6 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+      <h3 className="text-lg font-medium text-(--color-text)">
+        Time Off Requests
+      </h3>
+      <button className="w-full border border-gray-200 dark:border-gray-700 rounded-xl py-2.5 text-sm font-medium text-(--color-text) hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer">
         Request Time Off
       </button>
     </div>

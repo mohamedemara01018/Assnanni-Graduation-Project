@@ -1,26 +1,107 @@
-import { FaRegClock } from "react-icons/fa";
-import Card from "../../Dashboard/FirstDiv/Card";
-import { GrFormSchedule } from "react-icons/gr";
+import { useEffect } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { FaRegClock } from "react-icons/fa6";
+import { BsCalendarEvent } from "react-icons/bs";
+import { useQuery } from "@tanstack/react-query";
+
+interface Appointment {
+  id: number;
+  name: string;
+  type: string;
+  time: string;
+  status: "Confirmed" | "Pending";
+}
+
+const fallbackAppointments: Appointment[] = [
+  {
+    id: 1,
+    name: "John Smith",
+    type: "Consultation",
+    time: "09:00 AM",
+    status: "Confirmed",
+  },
+  {
+    id: 2,
+    name: "Sarah Johnson",
+    type: "Follow-up",
+    time: "10:00 AM",
+    status: "Confirmed",
+  },
+  {
+    id: 3,
+    name: "Michael Brown",
+    type: "Checkup",
+    time: "02:00 PM",
+    status: "Pending",
+  },
+];
 
 const Appointments = () => {
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/";
+
+  const { data: appointments = fallbackAppointments, isError, error, isSuccess } = useQuery<Appointment[]>({
+    queryKey: ["TodayAppointments"],
+    queryFn: async () => {
+      const response = await axios.get(`${backendUrl}TodayAppointments`);
+      const data = response.data?.value || response.data;
+      if (Array.isArray(data) && data.length > 0) {
+        return data;
+      }
+      return fallbackAppointments;
+    },
+  });
+
+  useEffect(() => {
+    if (isSuccess && appointments !== fallbackAppointments) {
+      toast.success("Today's appointments loaded");
+    }
+    if (isError) {
+      console.error("Error fetching appointments:", error);
+      toast.error(error.message || "Failed to load appointments");
+    }
+  }, [isSuccess, isError, error, appointments]);
+
   return (
-    <div className="bg-(--color-surface) p-4 rounded-2xl m-4">
-      <div className="flex items-center mb-4 border-b-2 border-gray-300 pb-2">
-        <GrFormSchedule className="text-4xl text-blue-500 " />
-        <p className="text-(--color-text) font-normal text-xl">
+    <div className="bg-(--color-surface) p-6 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+      <div className="flex items-center gap-2 mb-6">
+        <BsCalendarEvent className="text-xl text-blue-500" />
+        <h3 className="text-(--color-text) font-medium text-lg">
           Today's Appointments
-        </p>
+        </h3>
       </div>
-      <div>
-        <Card
-          title="Patient: Dr. Sarah Johnson"
-          status="confirmed"
-          color="blue"
-          logo={<FaRegClock />}
-        >
-          <p>Cardiology</p>
-          <p>10:00 PM</p>
-        </Card>
+
+      <div className="flex flex-col gap-3">
+        {appointments.map((apt) => (
+          <div
+            key={apt.id}
+            className="flex justify-between items-center bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-transparent dark:border-gray-800"
+          >
+            <div className="flex flex-col gap-1">
+              <h4 className="text-(--color-text) font-medium">{apt.name}</h4>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">
+                {apt.type}
+              </p>
+              <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 text-sm mt-0.5">
+                <FaRegClock className="text-xs" />
+                <span>{apt.time}</span>
+              </div>
+            </div>
+
+            <div>
+              <span
+                className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                  apt.status === "Confirmed"
+                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                    : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                }`}
+              >
+                {apt.status}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import Appointments from "./Appointments";
 
 const FirstDiv = () => {
   return (
-    <div>
+    <div className="flex flex-col gap-6">
       <WeeklySchedule />
       <Appointments />
     </div>
