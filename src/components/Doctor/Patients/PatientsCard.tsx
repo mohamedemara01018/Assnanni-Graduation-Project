@@ -1,6 +1,5 @@
 import { IoEyeOutline } from "react-icons/io5";
 import { BsFileMedical } from "react-icons/bs";
-import { MdOutlineMessage } from "react-icons/md";
 import { NavLink } from "react-router";
 
 interface Props {
@@ -25,11 +24,14 @@ const PatientsCard = ({
   doctor,
 }: Props) => {
   const firstChar = title.charAt(0);
-  
+
   const statusColors = {
-    Active: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-    Pending: "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
-    Inactive: "bg-gray-100 text-gray-700 dark:bg-gray-800/50 dark:text-gray-400",
+    Active:
+      "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+    Pending:
+      "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+    Inactive:
+      "bg-gray-100 text-gray-700 dark:bg-gray-800/50 dark:text-gray-400",
   };
 
   return (
@@ -40,15 +42,13 @@ const PatientsCard = ({
             {firstChar}
           </div>
           <div className="flex flex-col">
-            <h3 className="text-sm font-bold text-(--color-text)">
-              {title}
-            </h3>
-            <span className="text-xs text-(--color-text-light)">
-              {phone}
-            </span>
+            <h3 className="text-sm font-bold text-(--color-text)">{title}</h3>
+            <span className="text-xs text-(--color-text-light)">{phone}</span>
           </div>
         </div>
-        <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusColors[status] || statusColors.Inactive}`}>
+        <span
+          className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusColors[status] || statusColors.Inactive}`}
+        >
           {status}
         </span>
       </div>
@@ -56,38 +56,45 @@ const PatientsCard = ({
       <div className="space-y-3 mb-6">
         <div className="flex justify-between items-center">
           <span className="text-xs text-(--color-text-light)">Age:</span>
-          <span className="text-xs font-semibold text-(--color-text)">{age} years</span>
+          <span className="text-xs font-semibold text-(--color-text)">
+            {age} years
+          </span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-xs text-(--color-text-light)">Gender:</span>
-          <span className="text-xs font-semibold text-(--color-text)">{gender}</span>
+          <span className="text-xs font-semibold text-(--color-text)">
+            {gender}
+          </span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-xs text-(--color-text-light)">Last Visit:</span>
-          <span className="text-xs font-semibold text-(--color-text)">{lastVisit}</span>
+          <span className="text-xs font-semibold text-(--color-text)">
+            {lastVisit}
+          </span>
         </div>
         <div className="flex justify-between items-center">
           <span className="text-xs text-(--color-text-light)">Doctor:</span>
-          <span className="text-xs font-semibold text-(--color-text)">{doctor}</span>
+          <span className="text-xs font-semibold text-(--color-text)">
+            {doctor}
+          </span>
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-2">
-        <NavLink 
+        <NavLink
           to={`/doctor-patients/${id}`}
           className="flex flex-col items-center justify-center gap-1 py-2 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors cursor-pointer group"
         >
           <IoEyeOutline className="text-lg group-hover:scale-110 transition-transform" />
           <span className="text-[10px] font-bold">View</span>
         </NavLink>
-        <button className="flex flex-col items-center justify-center gap-1 py-2 rounded-xl bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors cursor-pointer group">
+        <NavLink
+          to={`/doctor-patients/${id}/medical-history`}
+          className="flex flex-col items-center justify-center gap-1 py-2 rounded-xl bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors cursor-pointer group"
+        >
           <BsFileMedical className="text-lg group-hover:scale-110 transition-transform" />
           <span className="text-[10px] font-bold">History</span>
-        </button>
-        <button className="flex flex-col items-center justify-center gap-1 py-2 rounded-xl bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/40 transition-colors cursor-pointer group">
-          <MdOutlineMessage className="text-lg group-hover:scale-110 transition-transform" />
-          <span className="text-[10px] font-bold">Chat</span>
-        </button>
+        </NavLink>
       </div>
     </div>
   );

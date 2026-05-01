@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { NavLink } from "react-router";
+import Cookies from "js-cookie";
 
 interface Patient {
   id: number;
@@ -85,7 +86,9 @@ const fallbackPatients: Patient[] = [
 ];
 
 const Patients = () => {
-  const [view, setView] = useState<"Table" | "Cards">("Table");
+  const [view, setView] = useState<"Table" | "Cards">(
+    (Cookies.get("patientsView") as "Table" | "Cards") || "Table",
+  );
   const backendUrl =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/";
 
@@ -115,6 +118,10 @@ const Patients = () => {
       toast.error(error.message || "Failed to load patients");
     }
   }, [isSuccess, isError, error, patients]);
+
+  useEffect(() => {
+    Cookies.set("patientsView", view, { expires: 365 });
+  }, [view]);
 
   const exportToCSV = () => {
     const headers = [
@@ -207,7 +214,7 @@ const Patients = () => {
             <div className="flex p-1 bg-(--color-bg) border border-(--color-border) rounded-xl ml-2">
               <button
                 onClick={() => setView("Table")}
-                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                   view === "Table"
                     ? "bg-blue-600 text-white shadow-md"
                     : "text-(--color-text-light) hover:text-(--color-text)"
@@ -217,7 +224,7 @@ const Patients = () => {
               </button>
               <button
                 onClick={() => setView("Cards")}
-                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                   view === "Cards"
                     ? "bg-blue-600 text-white shadow-md"
                     : "text-(--color-text-light) hover:text-(--color-text)"

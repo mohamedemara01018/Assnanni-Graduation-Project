@@ -61,6 +61,7 @@ import ReceptionistRegistration from "./components/Registration/ReceptionistRegi
 import StudentRegistration from "./components/Registration/StudentRegistration";
 import AddTimeSlotPage from "./pages/add-time-slot-page/AddTimeSlotPage";
 import PatientDetails from "./pages/doctor-pages/patients/PatientDetails";
+import MedicalHistory from "./pages/doctor-pages/patients/MedicalHistory";
 // import PatientDashboard from "./components/Patient/Dashboard/PatientDashboard";
 
 const App = () => {
@@ -171,6 +172,7 @@ const App = () => {
           <Route path="add-time-slot" element={<AddTimeSlotPage />} />
           <Route path="doctor-patients" element={<Patients />} />
           <Route path="doctor-patients/:id" element={<PatientDetails />} />
+          <Route path="doctor-patients/:id/medical-history" element={<MedicalHistory />} />
           <Route path="doctor-reports" element={<Reports />} />
           <Route path="receptionist-access" element={<ReceptionistAccess />} />
           <Route path="receptionist-access/add" element={<AddReceptionist />} />

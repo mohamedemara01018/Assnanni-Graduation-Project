@@ -1,6 +1,5 @@
 import { IoEyeOutline } from "react-icons/io5";
 import { BsFileMedical } from "react-icons/bs";
-import { MdOutlineMessage } from "react-icons/md";
 import { NavLink } from "react-router";
 
 interface Props {
@@ -28,9 +27,7 @@ const PatientsTable = ({
     <tr className="group hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-colors">
       <td className="px-8 py-5">
         <div className="flex flex-col">
-          <span className="text-sm font-bold text-(--color-text)">
-            {title}
-          </span>
+          <span className="text-sm font-bold text-(--color-text)">{title}</span>
           <span className="text-xs text-(--color-text-light) mt-0.5">
             {phone}
           </span>
@@ -54,8 +51,8 @@ const PatientsTable = ({
             status === "Active"
               ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
               : status === "Pending"
-              ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-              : "bg-gray-100 text-gray-700 dark:bg-gray-800/50 dark:text-gray-400"
+                ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                : "bg-gray-100 text-gray-700 dark:bg-gray-800/50 dark:text-gray-400"
           }`}
         >
           {status}
@@ -76,19 +73,20 @@ const PatientsTable = ({
 
       <td className="px-8 py-5">
         <div className="flex justify-end gap-4 items-center">
-          <NavLink 
+          <NavLink
             to={`/doctor-patients/${id}`}
-            className="p-1.5 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors cursor-pointer" 
+            className="p-1.5 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors cursor-pointer"
             title="View Profile"
           >
             <IoEyeOutline className="text-xl" />
           </NavLink>
-          <button className="p-1.5 text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors cursor-pointer" title="Medical History">
+          <NavLink
+            to={`/doctor-patients/${id}/medical-history`}
+            className="p-1.5 text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors cursor-pointer"
+            title="Medical History"
+          >
             <BsFileMedical className="text-xl" />
-          </button>
-          <button className="p-1.5 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg transition-colors cursor-pointer" title="Chat">
-            <MdOutlineMessage className="text-xl" />
-          </button>
+          </NavLink>
         </div>
       </td>
     </tr>
