@@ -6,6 +6,7 @@ import {
   HiOutlineCalendar,
   HiOutlineDownload,
 } from "react-icons/hi";
+import { FiPlus } from "react-icons/fi";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -108,17 +109,26 @@ const MedicalHistory = () => {
     <DashboardLayout pageTitle="Medical History">
       <div className="-mt-6 p-8 bg-(--color-bg) min-h-[60vh] rounded-2xl">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 text-(--color-text-light) hover:text-(--color-text) transition-colors mb-6 cursor-pointer font-medium"
+            >
+              <IoArrowBack />
+              <span>Back</span>
+            </button>
+            <h1 className="text-3xl text-(--color-text) font-semibold tracking-tight">
+              Medical History
+            </h1>
+          </div>
           <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-(--color-text-light) hover:text-(--color-text) transition-colors mb-6 cursor-pointer font-medium"
+            onClick={() => navigate(`/doctor-patients/${id}/medical-history/add`)}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95 mt-10"
           >
-            <IoArrowBack />
-            <span>Back</span>
+            <FiPlus className="text-xl" />
+            <span>Add New Record</span>
           </button>
-          <h1 className="text-3xl text-(--color-text) font-semibold tracking-tight">
-            Medical History
-          </h1>
         </div>
 
         {isLoading ? (

@@ -14,6 +14,7 @@ import { roles } from "@/constants/rolesConstant";
 import RoleCard from "../role-card/RoleCard";
 
 interface Inputs {
+  image: File;
   firstName: string;
   lastName: string;
   email: string;

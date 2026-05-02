@@ -1,64 +1,63 @@
-import { GoPulse } from "react-icons/go";
-import { LuFileSpreadsheet } from "react-icons/lu";
-import { MdPeople } from "react-icons/md";
-import { SlCalender } from "react-icons/sl";
-import { GrLineChart } from "react-icons/gr";
+import { FiUsers, FiCalendar, FiFileText, FiDollarSign, FiTrendingUp } from "react-icons/fi";
+
+const statCards = [
+  {
+    title: "Total Patients",
+    value: "1,234",
+    change: "+12.5%",
+    icon: <FiUsers className="text-blue-600 text-xl" />,
+    iconBg: "bg-blue-50",
+    trend: "up",
+  },
+  {
+    title: "Appointments",
+    value: "856",
+    change: "+8.3%",
+    icon: <FiCalendar className="text-green-600 text-xl" />,
+    iconBg: "bg-green-50",
+    trend: "up",
+  },
+  {
+    title: "Scans Processed",
+    value: "2,891",
+    change: "+15.7%",
+    icon: <FiFileText className="text-purple-600 text-xl" />,
+    iconBg: "bg-purple-50",
+    trend: "up",
+  },
+  {
+    title: "Revenue",
+    value: "$45,230",
+    change: "+23.1%",
+    icon: <FiDollarSign className="text-orange-600 text-xl" />,
+    iconBg: "bg-orange-50",
+    trend: "up",
+  },
+];
 
 const Insights = () => {
   return (
-    <div className="grid max-md:grid-cols-1 grid-cols-4 max-lg:grid-cols-2 gap-4 m-4">
-      <div className="flex bg-(--color-surface) w-full p-6 rounded-2xl justify-between">
-        <div className="flex flex-col gap-2">
-          <div className="bg-blue-200 w-fit p-2 rounded-md ">
-            <SlCalender className="fill-blue-700 text-xl " />
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {statCards.map((card, index) => (
+        <div
+          key={index}
+          className="bg-white border border-gray-100 p-6 rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-200"
+        >
+          <div className="flex justify-between items-start mb-4">
+            <div className={`${card.iconBg} p-3 rounded-xl`}>
+              {card.icon}
+            </div>
+            <div className="flex items-center gap-1 text-green-500 font-medium text-sm">
+              <FiTrendingUp />
+              <span>{card.change}</span>
+            </div>
           </div>
-          <p className="text-2xl font-semibold text-(--color-text)">3</p>
-          <p className="text-(--color-text-light) text-sm">Appointments</p>
-        </div>
-        <div className="bg-blue-200 h-fit p-2 px-1 rounded-lg flex gap-2 items-center ">
-          <GrLineChart className="text-blue-700" />
-          <span className="text-sm  text-blue-700">+8.3%</span>
-        </div>
-      </div>
-      <div className="flex bg-(--color-surface) w-full p-6 rounded-2xl justify-between">
-        <div className="flex flex-col gap-2">
-          <div className="bg-green-200 w-fit p-2 rounded-md ">
-            <MdPeople className="fill-green-700 text-2xl " />
+          <div>
+            <p className="text-gray-500 text-sm font-medium mb-1">{card.title}</p>
+            <h3 className="text-2xl font-bold text-gray-900">{card.value}</h3>
           </div>
-          <p className="text-2xl font-semibold text-(--color-text)">128</p>
-          <p className="text-(--color-text-light) text-sm">Total Patients</p>
         </div>
-        <div className="bg-green-200 h-fit p-2 px-1 rounded-lg flex gap-2 items-center ">
-          <GrLineChart className="text-green-700" />
-          <span className="text-sm  text-green-700">+12%</span>
-        </div>
-      </div>
-      <div className="flex bg-(--color-surface) w-full p-6 rounded-2xl justify-between">
-        <div className="flex flex-col gap-2">
-          <div className="bg-yellow-200 w-fit p-2 rounded-md ">
-            <LuFileSpreadsheet className="text-yellow-700 text-2xl " />
-          </div>
-          <p className="text-2xl font-semibold text-(--color-text)">1</p>
-          <p className="text-(--color-text-light) text-sm">Scan Reviews</p>
-        </div>
-        <div className="bg-yellow-200 h-fit p-2 px-1 rounded-lg flex gap-2 items-center ">
-          <GrLineChart className="text-yellow-700" />
-          <span className="text-sm  text-yellow-700">+3%</span>
-        </div>
-      </div>
-      <div className="flex bg-(--color-surface) w-full p-6 rounded-2xl justify-between">
-        <div className="flex flex-col gap-2">
-          <div className="bg-violet-200 w-fit p-2 rounded-md ">
-            <GoPulse className="text-violet-700 text-2xl " />
-          </div>
-          <p className="text-2xl font-semibold text-(--color-text)">$45,230 </p>
-          <p className="text-(--color-text-light) text-sm">Revenue</p>
-        </div>
-        <div className="bg-violet-200 h-fit p-2 px-1 rounded-lg flex gap-2 items-center ">
-          <GrLineChart className="text-violet-700" />
-          <span className="text-sm  text-violet-700">+12%</span>
-        </div>
-      </div>
+      ))}
     </div>
   );
 };

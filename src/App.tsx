@@ -14,6 +14,7 @@ import Scan from "./pages/doctor-pages/Scan/Scan";
 import Notifications from "./pages/doctor-pages/notifications/Notifications";
 import ReceptionistAccess from "./components/Doctor/ReceptionistAccess/ReceptionistAccess";
 import AddReceptionist from "./components/Doctor/ReceptionistAccess/AddReceptionist";
+import MedicalReportForm from "./components/Doctor/Reports/MedicalReportForm";
 
 // Registration (Old system - kept as requested)
 
@@ -62,6 +63,7 @@ import StudentRegistration from "./components/Registration/StudentRegistration";
 import AddTimeSlotPage from "./pages/add-time-slot-page/AddTimeSlotPage";
 import PatientDetails from "./pages/doctor-pages/patients/PatientDetails";
 import MedicalHistory from "./pages/doctor-pages/patients/MedicalHistory";
+import AddMedicalHistoryRecord from "./pages/doctor-pages/patients/AddMedicalHistoryRecord";
 // import PatientDashboard from "./components/Patient/Dashboard/PatientDashboard";
 
 const App = () => {
@@ -176,7 +178,12 @@ const App = () => {
             path="doctor-patients/:id/medical-history"
             element={<MedicalHistory />}
           />
+          <Route
+            path="doctor-patients/:id/medical-history/add"
+            element={<AddMedicalHistoryRecord />}
+          />
           <Route path="doctor-reports" element={<Reports />} />
+          <Route path="doctor-reports/generate-new-report" element={<MedicalReportForm />} />
           <Route path="receptionist-access" element={<ReceptionistAccess />} />
           <Route path="receptionist-access/add" element={<AddReceptionist />} />
           <Route path="scan/upload" element={<Scan />} />

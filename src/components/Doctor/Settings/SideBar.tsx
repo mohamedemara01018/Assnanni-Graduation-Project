@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from "react-router";
 import { CgProfile } from "react-icons/cg";
 import { IoLockClosedOutline } from "react-icons/io5";
-import { BsBell } from "react-icons/bs";
+// import { BsBell } from "react-icons/bs";
 
 const SideBar = () => {
   const location = useLocation();
@@ -34,7 +34,7 @@ const SideBar = () => {
             <p>Security</p>
           </NavLink>
         </li>
-        <li>
+        {/* <li>
           <NavLink
             to={"/settings/notifications"}
             className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-(--color-text) duration-300 ease-in-out  hover:bg-(--color-border) dark:hover:bg-meta-4 ${
@@ -45,7 +45,7 @@ const SideBar = () => {
             <BsBell />
             <p>Notification</p>
           </NavLink>
-        </li>
+        </li> */}
       </ul>
     </div>
   );
