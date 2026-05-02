@@ -229,6 +229,7 @@ const FirstDiv = () => {
             recentPatients.map((patient: RecentPatient) => (
               <Patient
                 key={patient.id}
+                id={patient.id}
                 name={patient.name}
                 imageUrl={patient.imageUrl}
                 lastInteractionDate={patient.lastInteractionDate}

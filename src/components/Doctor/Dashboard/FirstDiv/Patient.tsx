@@ -1,12 +1,13 @@
 import { NavLink } from "react-router";
 
 interface Props {
+  id: number;
   name: string;
   imageUrl?: string;
   lastInteractionDate?: string;
 }
 
-const Patient = ({ name, imageUrl, lastInteractionDate }: Props) => {
+const Patient = ({ id, name, imageUrl, lastInteractionDate }: Props) => {
   const firstCharacter = name.charAt(0);
   return (
     <div className="flex justify-between items-center bg-gray-50 dark:bg-slate-700/30 p-4 rounded-xl">
@@ -37,7 +38,7 @@ const Patient = ({ name, imageUrl, lastInteractionDate }: Props) => {
         </div>
       </div>
       <NavLink
-        to={"#"}
+        to={`/doctor-patients/${id}`}
         className="text-sm text-blue-500 hover:text-blue-400 dark:text-blue-400 dark:hover:text-blue-300"
       >
         View
