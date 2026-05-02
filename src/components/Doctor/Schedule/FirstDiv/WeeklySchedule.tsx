@@ -36,11 +36,20 @@ const fallbackDays: Day[] = [
   { day: "Sunday", time: [] },
 ];
 
-const WeeklySchedule = () => {
+interface Props {
+  role: string;
+}
+
+const WeeklySchedule = ({ role }: Props) => {
   const backendUrl =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/";
 
-  const { data: days = fallbackDays, isError, error, isSuccess } = useQuery<Day[]>({
+  const {
+    data: days = fallbackDays,
+    isError,
+    error,
+    isSuccess,
+  } = useQuery<Day[]>({
     queryKey: ["DoctorSchedules"],
     queryFn: async () => {
       const response = await axios.get(`${backendUrl}DoctorSchedules`);
@@ -68,18 +77,20 @@ const WeeklySchedule = () => {
         <h3 className="text-(--color-text) text-lg font-medium">
           Weekly Schedule
         </h3>
-        <NavLink
-          to={"/add-time-slot"}
-          className="bg-blue-600 text-white text-sm font-medium rounded-lg py-2 px-4 cursor-pointer hover:bg-blue-700 transition-colors flex items-center gap-1"
-        >
-          + Add Time Slot
-        </NavLink>
+        {role !== "studentDoctor" && (
+          <NavLink
+            to={"/add-time-slot"}
+            className="bg-blue-600 text-white text-sm font-medium rounded-lg py-2 px-4 cursor-pointer hover:bg-blue-700 transition-colors flex items-center gap-1"
+          >
+            + Add Time Slot
+          </NavLink>
+        )}
       </div>
       <div className="flex flex-col gap-4">
         {days.map((day, index) => {
           return (
             <div key={index}>
-              <Days day={day.day} time={day.time} />
+              <Days day={day.day} time={day.time} role={role} />
             </div>
           );
         })}

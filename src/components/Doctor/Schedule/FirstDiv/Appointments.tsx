@@ -37,11 +37,20 @@ const fallbackAppointments: Appointment[] = [
   },
 ];
 
-const Appointments = () => {
+interface Props {
+  role: string;
+}
+
+const Appointments = ({ role }: Props) => {
   const backendUrl =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/";
 
-  const { data: appointments = fallbackAppointments, isError, error, isSuccess } = useQuery<Appointment[]>({
+  const {
+    data: appointments = fallbackAppointments,
+    isError,
+    error,
+    isSuccess,
+  } = useQuery<Appointment[]>({
     queryKey: ["TodayAppointments"],
     queryFn: async () => {
       const response = await axios.get(`${backendUrl}TodayAppointments`);
@@ -89,17 +98,19 @@ const Appointments = () => {
               </div>
             </div>
 
-            <div>
-              <span
-                className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                  apt.status === "Confirmed"
-                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                    : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-                }`}
-              >
-                {apt.status}
-              </span>
-            </div>
+            {role !== "studentDoctor" && (
+              <div>
+                <span
+                  className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                    apt.status === "Confirmed"
+                      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                      : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                  }`}
+                >
+                  {apt.status}
+                </span>
+              </div>
+            )}
           </div>
         ))}
       </div>

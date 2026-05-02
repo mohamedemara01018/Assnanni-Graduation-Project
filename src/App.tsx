@@ -34,6 +34,8 @@ import StudentDoctorDashboard from "./pages/student-doctor-pages/dashboard/Stude
 import StudentNotifications from "./pages/student-doctor-pages/notifications/StudentNotifications";
 import StudentSettings from "./pages/student-doctor-pages/settings/Settings";
 import StudentAppointments from "./pages/student-doctor-pages/appointments/StudentAppointments";
+import StudentAppointmentDetails from "./pages/student-doctor-pages/appointments/StudentAppointmentDetails";
+import ContactSupervisor from "./pages/student-doctor-pages/supervisor/ContactSupervisor";
 import ReceptionistDashboard from "./pages/receptionist-pages/dashboard/ReceptionistDashboard";
 import AppointmentsBookingPage from "./pages/appointments-booking-page/AppointmentsBookingPage";
 import { ToastContainer } from "react-toastify";
@@ -80,7 +82,7 @@ const App = () => {
             <Route path="/" element={<PatientPage />} />
           ) : role === "doctor" ? (
             <Route path="/" element={<DoctorDashboard />} />
-          ) : role === "student doctor" ? (
+          ) : role === "studentDoctor" ? (
             <Route path="/" element={<StudentDoctorDashboard />} />
           ) : role === "receptionist" ? (
             <Route path="/" element={<ReceptionistDashboard />} />
@@ -183,7 +185,10 @@ const App = () => {
             element={<AddMedicalHistoryRecord />}
           />
           <Route path="doctor-reports" element={<Reports />} />
-          <Route path="doctor-reports/generate-new-report" element={<MedicalReportForm />} />
+          <Route
+            path="doctor-reports/generate-new-report"
+            element={<MedicalReportForm />}
+          />
           <Route path="receptionist-access" element={<ReceptionistAccess />} />
           <Route path="receptionist-access/add" element={<AddReceptionist />} />
           <Route path="scan/upload" element={<Scan />} />
@@ -196,6 +201,11 @@ const App = () => {
             path="student-appointments"
             element={<StudentAppointments />}
           />
+          <Route
+            path="student-appointments/:id"
+            element={<StudentAppointmentDetails />}
+          />
+          <Route path="contact-supervisor" element={<ContactSupervisor />} />
 
           <Route path="student-settings" element={<StudentSettings />}>
             <Route index element={<ProfileSettings />} />
