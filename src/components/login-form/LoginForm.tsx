@@ -13,7 +13,9 @@ interface Inputs {
   password: string;
 }
 function LoginForm() {
-  const loginApiBase = `${useSelector((state: RootState) => state.config.backendUrl)}Authentications/`;
+  const loginApiBase = `${useSelector(
+    (state: RootState) => state.config.backendUrl
+  )}Authentications/`;
   void loginApiBase;
   const navigator = useNavigate();
   const dispatch = useDispatch();
@@ -23,14 +25,14 @@ function LoginForm() {
     formState: { errors },
   } = useForm<Inputs>();
 
-  const onSubmit: SubmitHandler<Inputs> = async (_data) => {
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       // await axios.post(loginApiBase + "Login", data);
       // dispatch(setToken(response.data.token)); // Use real token when uncommenting API
       dispatch(
         setToken(
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicGF0aWVudCJ9.dummy",
-        ),
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicGF0aWVudCJ9.dummy"
+        )
       );
       toast.success("Welcome Back");
       navigator("/");

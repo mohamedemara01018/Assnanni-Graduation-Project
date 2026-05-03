@@ -70,6 +70,9 @@ import AddTimeSlotPage from "./pages/add-time-slot-page/AddTimeSlotPage";
 import PatientDetails from "./pages/doctor-pages/patients/PatientDetails";
 import MedicalHistory from "./pages/doctor-pages/patients/MedicalHistory";
 import AddMedicalHistoryRecord from "./pages/doctor-pages/patients/AddMedicalHistoryRecord";
+import ManageSupervisioning from "./pages/doctor-pages/supervisioning/ManageSupervisioning";
+import ViewSupervisioningRequest from "./pages/doctor-pages/supervisioning/ViewSupervisioningRequest";
+import AssignStudentDoctor from "./pages/doctor-pages/supervisioning/AssignStudentDoctor";
 // import PatientDashboard from "./components/Patient/Dashboard/PatientDashboard";
 
 // Main application component that handles routing and global layouts
@@ -205,6 +208,15 @@ const App = () => {
             element={<AddMedicalHistoryRecord />}
           />
           <Route path="doctor-reports" element={<Reports />} />
+          <Route path="doctor-supervisioning" element={<ManageSupervisioning />} />
+          <Route
+            path="doctor-supervisioning/view-request"
+            element={<ViewSupervisioningRequest />}
+          />
+          <Route
+            path="doctor-supervisioning/assign-student-doctor"
+            element={<AssignStudentDoctor />}
+          />
           <Route
             path="doctor-reports/generate-new-report"
             element={<MedicalReportForm />}
