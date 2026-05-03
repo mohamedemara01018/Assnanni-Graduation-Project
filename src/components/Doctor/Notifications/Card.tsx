@@ -13,22 +13,22 @@ interface Props {
 const Card = ({ icon, title, desc, time, isRead, color, bgColor }: Props) => {
   return (
     <div
-      className={`relative bg-white border border-gray-100 flex gap-5 p-6 items-center rounded-2xl cursor-pointer transition-all duration-200 hover:shadow-md hover:border-blue-100 ${
-        !isRead ? "border-l-[6px] border-l-blue-600" : ""
+      className={`relative bg-(--color-surface) border border-(--color-border) flex gap-5 p-6 items-center rounded-2xl cursor-pointer transition-all duration-300 hover:shadow-lg hover:border-blue-500/30 group ${
+        !isRead ? "shadow-sm" : "opacity-80"
       }`}
     >
-      <div className={`text-2xl ${color} ${bgColor} p-4 rounded-2xl flex-shrink-0`}>
+      <div className={`text-xl ${color} ${bgColor} w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110`}>
         {icon}
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex justify-between items-start mb-1">
-          <h3 className="text-gray-900 font-bold text-base">{title}</h3>
+          <h3 className="text-(--color-text) font-bold text-base leading-none">{title}</h3>
           {!isRead && (
-            <div className="w-2.5 h-2.5 rounded-full bg-blue-600 mt-1.5 ml-4"></div>
+            <div className="w-2 h-2 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
           )}
         </div>
-        <p className="text-gray-600 text-sm mb-1 line-clamp-1">{desc}</p>
-        <p className="text-gray-400 text-[11px] font-medium uppercase tracking-wider">{time}</p>
+        <p className="text-(--color-text-light) text-sm mb-1.5 font-medium">{desc}</p>
+        <p className="text-(--color-text-light) text-[11px] opacity-60 font-medium">{time}</p>
       </div>
     </div>
   );
