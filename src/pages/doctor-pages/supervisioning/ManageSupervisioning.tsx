@@ -102,9 +102,9 @@ const ManageSupervisioning = () => {
                 <button
                   type="button"
                   onClick={() =>
-                    navigate("/doctor-supervisioning/view-request", {
-                      state: { student },
-                    })
+                    navigate(
+                      `/doctor-supervisioning/view-request/${student.id}`,
+                    )
                   }
                   className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700"
                 >
@@ -114,9 +114,9 @@ const ManageSupervisioning = () => {
                   type="button"
                   disabled={student.status !== "Active"}
                   onClick={() =>
-                    navigate("/doctor-supervisioning/assign-student-doctor", {
-                      state: { student },
-                    })
+                    navigate(
+                      `/doctor-supervisioning/assign-student-doctor/${student.id}`,
+                    )
                   }
                   className="rounded-lg border border-(--color-border) px-3 py-1.5 text-xs font-semibold text-(--color-text) transition-opacity hover:bg-(--color-bg) disabled:cursor-not-allowed disabled:opacity-40"
                 >

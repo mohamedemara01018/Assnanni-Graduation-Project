@@ -78,7 +78,7 @@ import AssignStudentDoctor from "./pages/doctor-pages/supervisioning/AssignStude
 // Main application component that handles routing and global layouts
 const App = () => {
   const role = useSelector(
-    (state: { auth: { role: string } }) => state.auth.role
+    (state: { auth: { role: string } }) => state.auth.role,
   );
   console.log(role);
   return (
@@ -208,13 +208,16 @@ const App = () => {
             element={<AddMedicalHistoryRecord />}
           />
           <Route path="doctor-reports" element={<Reports />} />
-          <Route path="doctor-supervisioning" element={<ManageSupervisioning />} />
           <Route
-            path="doctor-supervisioning/view-request"
+            path="doctor-supervisioning"
+            element={<ManageSupervisioning />}
+          />
+          <Route
+            path="doctor-supervisioning/view-request/:id"
             element={<ViewSupervisioningRequest />}
           />
           <Route
-            path="doctor-supervisioning/assign-student-doctor"
+            path="doctor-supervisioning/assign-student-doctor/:id"
             element={<AssignStudentDoctor />}
           />
           <Route

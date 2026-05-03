@@ -1,7 +1,7 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import { FiFileText } from "react-icons/fi";
 import { LuUpload } from "react-icons/lu";
-import { useLocation, useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
 
 type StudentDoctor = {
@@ -14,10 +14,44 @@ type StudentDoctor = {
   dentalUniversityProofImage: string;
 };
 
+// Mock data - in a real app, this would come from an API call
+const studentDoctors: StudentDoctor[] = [
+  {
+    id: 1,
+    name: "Ahmed Khaled",
+    university: "Cairo Dental University",
+    year: "Year 5",
+    supervisor: "Dr. John Doe",
+    status: "Active",
+    dentalUniversityProofImage:
+      "https://images.unsplash.com/photo-1582719471384-894fbb16e074?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: 2,
+    name: "Mariam Ali",
+    university: "Alexandria University",
+    year: "Year 4",
+    supervisor: "Dr. John Doe",
+    status: "Pending Review",
+    dentalUniversityProofImage:
+      "https://images.unsplash.com/photo-1598257006458-087169a1f08d?auto=format&fit=crop&w=1200&q=80",
+  },
+  {
+    id: 3,
+    name: "Youssef Hassan",
+    university: "Ain Shams University",
+    year: "Year 5",
+    supervisor: "Dr. John Doe",
+    status: "Active",
+    dentalUniversityProofImage:
+      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80",
+  },
+];
+
 const ViewSupervisioningRequest = () => {
   const navigate = useNavigate();
-  const { state } = useLocation();
-  const student = (state as { student?: StudentDoctor } | null)?.student;
+  const { id } = useParams<{ id: string }>();
+  const student = studentDoctors.find((s) => s.id === parseInt(id || "0"));
 
   return (
     <DashboardLayout pageTitle="View Supervisioning Request">
@@ -57,7 +91,9 @@ const ViewSupervisioningRequest = () => {
                   </p>
                 </div>
                 <div className="rounded-xl border border-(--color-border) bg-(--color-bg) p-4">
-                  <p className="text-xs text-(--color-text-light)">University</p>
+                  <p className="text-xs text-(--color-text-light)">
+                    University
+                  </p>
                   <p className="text-sm font-medium text-(--color-text)">
                     {student.university}
                   </p>
