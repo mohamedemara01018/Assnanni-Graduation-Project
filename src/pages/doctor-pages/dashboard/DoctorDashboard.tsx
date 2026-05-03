@@ -11,6 +11,8 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 
 const defaultDashboardData = {
   todayAppointments: 12,
@@ -20,10 +22,15 @@ const defaultDashboardData = {
 };
 
 const DoctorDashboard = () => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
 
-  const { data: dashboardData = defaultDashboardData, isSuccess, isError, error } = useQuery({
+  const {
+    data: dashboardData = defaultDashboardData,
+    isSuccess,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["DoctorDashboardOverview"],
     queryFn: async () => {
       const response = await axios.get(backendUrl + "Doctors/dashboard", {
@@ -34,10 +41,13 @@ const DoctorDashboard = () => {
       const data = response.data?.value || response.data;
       if (data) {
         return {
-          todayAppointments: data.todayAppointments ?? defaultDashboardData.todayAppointments,
-          totalPatients: data.totalPatients ?? defaultDashboardData.totalPatients,
+          todayAppointments:
+            data.todayAppointments ?? defaultDashboardData.todayAppointments,
+          totalPatients:
+            data.totalPatients ?? defaultDashboardData.totalPatients,
           pendingScans: data.pendingScans ?? defaultDashboardData.pendingScans,
-          satisfactionRate: data.satisfactionRate ?? defaultDashboardData.satisfactionRate,
+          satisfactionRate:
+            data.satisfactionRate ?? defaultDashboardData.satisfactionRate,
         };
       }
       return defaultDashboardData;

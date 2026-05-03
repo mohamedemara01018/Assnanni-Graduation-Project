@@ -26,11 +26,13 @@ function AppointmentsCard({ appointment }: Props) {
   const { id, name, desc, date, time, meetingType, status, address, imageUrl } =
     appointment;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const role = useSelector((state: any) => state.auth.role);
 
   const nameParts = name.split(" ");
   const initials = (
-    nameParts[0][0] + (nameParts.length > 1 ? nameParts[nameParts.length - 1][0] : "")
+    nameParts[0][0] +
+    (nameParts.length > 1 ? nameParts[nameParts.length - 1][0] : "")
   ).toUpperCase();
 
   const getStatusStyles = () => {
@@ -70,7 +72,7 @@ function AppointmentsCard({ appointment }: Props) {
           initials
         )}
       </div>
-      
+
       <div className="flex-grow flex flex-col gap-4">
         <div className="flex justify-between items-start">
           <div>
@@ -80,8 +82,14 @@ function AppointmentsCard({ appointment }: Props) {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className={`flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${getStatusStyles()}`}>
-              {status === "Upcoming" ? <FaRegClock size={12} /> : status === "Cancelled" ? <IoMdCloseCircle size={14} /> : null}
+            <div
+              className={`flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${getStatusStyles()}`}
+            >
+              {status === "Upcoming" ? (
+                <FaRegClock size={12} />
+              ) : status === "Cancelled" ? (
+                <IoMdCloseCircle size={14} />
+              ) : null}
               {status}
             </div>
             <button className="text-(--color-text-light) hover:text-(--color-text) transition-colors">

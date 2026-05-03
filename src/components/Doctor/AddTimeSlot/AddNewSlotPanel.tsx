@@ -3,6 +3,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import type { ReactNode } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 
 const DAYS = [
   "Monday",
@@ -227,8 +229,7 @@ interface SlotInputs {
 
 const AddNewSlotPanel = () => {
   const queryClient = useQueryClient();
-  const backendUrl =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/";
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
 
   const { handleSubmit, control, watch, reset } = useForm<SlotInputs>({
     defaultValues: {

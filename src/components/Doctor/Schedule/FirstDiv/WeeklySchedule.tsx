@@ -4,6 +4,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Days from "./Days";
 import { useQuery } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 
 interface Day {
   day: string;
@@ -41,8 +43,7 @@ interface Props {
 }
 
 const WeeklySchedule = ({ role }: Props) => {
-  const backendUrl =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/";
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
 
   const {
     data: days = fallbackDays,

@@ -10,6 +10,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { NavLink } from "react-router";
 import Cookies from "js-cookie";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 
 interface Patient {
   id: number;
@@ -89,8 +91,7 @@ const Patients = () => {
   const [view, setView] = useState<"Table" | "Cards">(
     (Cookies.get("patientsView") as "Table" | "Cards") || "Table",
   );
-  const backendUrl =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/";
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
 
   const {
     data: patients = fallbackPatients,

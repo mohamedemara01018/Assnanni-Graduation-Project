@@ -4,6 +4,8 @@ import { LuUpload } from "react-icons/lu";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 
 interface ScanFormData {
   patientId: number;
@@ -33,7 +35,7 @@ const Scan = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const inputFileRef = useRef<HTMLInputElement | null>(null);
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
 
   useEffect(() => {
     return () => {

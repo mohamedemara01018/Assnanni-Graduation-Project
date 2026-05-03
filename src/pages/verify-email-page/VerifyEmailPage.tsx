@@ -14,7 +14,7 @@ import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { useState, type FormEvent } from "react";
 
 function VerifyEmailPage() {
-  // const backendUrl = import.meta.env.VITE_BACKEND_URL+"Authentications/";
+  // API base: useSelector((s: RootState) => s.config.backendUrl) + 'Authentications/'
   const dispatch = useDispatch();
   const navigator = useNavigate();
   const [value, setValue] = useState("");
@@ -31,7 +31,7 @@ function VerifyEmailPage() {
     //   code: value,
     // };
     try {
-      // await axios.post(backendUrl + "Verify-Email", data);
+      // await axios.post(authBase + "Verify-Email", data);
 
       dispatch(
         setToken(

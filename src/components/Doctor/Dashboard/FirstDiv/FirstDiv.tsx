@@ -8,6 +8,8 @@ import { LuFileSpreadsheet } from "react-icons/lu";
 import { NavLink } from "react-router";
 import Patient from "./Patient";
 import { useQuery } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 
 interface Schedule {
   appointmentId: number;
@@ -86,7 +88,7 @@ const dummyPatients: RecentPatient[] = [
 ];
 
 const FirstDiv = () => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
 
   const config = {

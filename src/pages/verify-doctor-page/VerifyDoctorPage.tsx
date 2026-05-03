@@ -18,7 +18,7 @@ interface Inputs {
 }
 
 function VerifyDoctorPage() {
-  // const backendUrl = import.meta.env.VITE_BACKEND_URL+"Authentications/";
+  // API base: useSelector((s: RootState) => s.config.backendUrl) + 'Authentications/'
 
   const navigator = useNavigate();
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
@@ -40,7 +40,7 @@ function VerifyDoctorPage() {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     data.YearsOfExperience = Number(data.YearsOfExperience);
     try {
-      // await axios.post(backendUrl + "Submit-Doctor-Verification", data);
+      // await axios.post(authBase + "Submit-Doctor-Verification", data);
       navigator("/verify-email");
       toast.success(
         "You have successfully send the request wait until the admin accept it",

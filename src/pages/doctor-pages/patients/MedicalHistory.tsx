@@ -11,6 +11,8 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 
 interface MedicalHistoryItem {
   title: string;
@@ -51,7 +53,7 @@ const fallbackHistory: MedicalHistoryItem[] = [
 const MedicalHistory = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
 
   const {
     data: history = fallbackHistory,
@@ -123,7 +125,9 @@ const MedicalHistory = () => {
             </h1>
           </div>
           <button
-            onClick={() => navigate(`/doctor-patients/${id}/medical-history/add`)}
+            onClick={() =>
+              navigate(`/doctor-patients/${id}/medical-history/add`)
+            }
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95 mt-10"
           >
             <FiPlus className="text-xl" />

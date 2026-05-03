@@ -24,7 +24,7 @@ interface Inputs {
 }
 
 const RegistrationForm = () => {
-  // const backendUrl = import.meta.env.VITE_BACKEND_URL + 'Authentications/';
+  // API base: useSelector((s: RootState) => s.config.backendUrl) + 'Authentications/'
   const dispatch = useDispatch();
   const navigator = useNavigate();
   const { pathname } = useLocation();
@@ -51,7 +51,7 @@ const RegistrationForm = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      // await axios.post(backendUrl + "Register-Doctor", data);
+      // await axios.post(authBase + "Register-Doctor", data);
       dispatch(getEmail(data.email));
       if (doctor || studentDoctor) {
         // if (doctor) dispatch(setToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiZG9jdG9yIn0=.dummy"));

@@ -1,10 +1,10 @@
 import { NavLink, useNavigate } from "react-router";
 import { Button } from "../ui/button";
 import { useForm, type SubmitHandler } from "react-hook-form";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { setToken } from "@/store/slices/auth/authSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 // import { updateRole } from "@/features/auth/authSlice";
 
 interface Inputs {
@@ -13,7 +13,8 @@ interface Inputs {
   password: string;
 }
 function LoginForm() {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL + "Authentications/";
+  const loginApiBase = `${useSelector((state: RootState) => state.config.backendUrl)}Authentications/`;
+  void loginApiBase;
   const navigator = useNavigate();
   const dispatch = useDispatch();
   const {
@@ -22,9 +23,9 @@ function LoginForm() {
     formState: { errors },
   } = useForm<Inputs>();
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
+  const onSubmit: SubmitHandler<Inputs> = async (_data) => {
     try {
-      // await axios.post(backendUrl + "Login", data);
+      // await axios.post(loginApiBase + "Login", data);
       // dispatch(setToken(response.data.token)); // Use real token when uncommenting API
       dispatch(
         setToken(

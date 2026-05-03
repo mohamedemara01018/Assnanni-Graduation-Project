@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 import { FaRegClock } from "react-icons/fa6";
 import { BsCalendarEvent } from "react-icons/bs";
 import { useQuery } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 
 interface Appointment {
   id: number;
@@ -42,8 +44,7 @@ interface Props {
 }
 
 const Appointments = ({ role }: Props) => {
-  const backendUrl =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/";
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
 
   const {
     data: appointments = fallbackAppointments,
