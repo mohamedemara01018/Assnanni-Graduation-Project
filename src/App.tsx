@@ -38,6 +38,9 @@ import StudentAppointmentDetails from "./pages/student-doctor-pages/appointments
 import ContactSupervisor from "./pages/student-doctor-pages/supervisor/ContactSupervisor";
 import ReceptionistDashboard from "./pages/receptionist-pages/dashboard/ReceptionistDashboard";
 import AppointmentsBookingPage from "./pages/appointments-booking-page/AppointmentsBookingPage";
+import ScheduleAppointment from "./pages/receptionist-pages/appointments/ScheduleAppointment";
+import CheckIn from "./pages/receptionist-pages/appointments/CheckIn";
+import RescheduleAppointment from "./pages/receptionist-pages/appointments/RescheduleAppointment";
 import { ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
 import AdminPage from "./pages/admin-page/AdminPage";
@@ -57,6 +60,7 @@ import AIModelsPage from "./pages/ai-models-page/AIModelsPage";
 import OnboardingPage from "./pages/onboarding-page/OnboardingPage";
 import PatientProfilePage from "./pages/patient-profile-page/PatientProfilePage";
 import EditPatientProfilePage from "./pages/edit-patient-profile-page/EditPatientProfilePage";
+import RoleSelection from "./pages/auth/RoleSelection";
 import Registration from "./pages/register-page/Registration";
 import DoctorRegistration from "./components/Registration/DoctorRegistration";
 import PatientRegistration from "./components/Registration/PatientRegistration";
@@ -95,21 +99,24 @@ const App = () => {
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<Login />} />
-            {/* old registration system */}
-            <Route path="/register" element={<Registration />}>
-              <Route
-                path="patient-register"
-                element={<PatientRegistration />}
-              />
-              <Route path="doctor-register" element={<DoctorRegistration />} />
-              <Route
-                path="student-register"
-                element={<StudentRegistration />}
-              />
-              <Route
-                path="receptionist-register"
-                element={<ReceptionistRegistration />}
-              />
+            {/* Registration System */}
+            <Route path="/register">
+              <Route index element={<RoleSelection />} />
+              <Route element={<Registration />}>
+                <Route
+                  path="patient-register"
+                  element={<PatientRegistration />}
+                />
+                <Route path="doctor-register" element={<DoctorRegistration />} />
+                <Route
+                  path="student-register"
+                  element={<StudentRegistration />}
+                />
+                <Route
+                  path="receptionist-register"
+                  element={<ReceptionistRegistration />}
+                />
+              </Route>
             </Route>
             /////
             {/* <Route path="/register-v2" element={<RegisterPage />} /> */}
@@ -165,6 +172,18 @@ const App = () => {
 
           {/* receptionist dashboards */}
           <Route path="/receptionist" element={<ReceptionistDashboard />} />
+          <Route
+            path="/receptionist/schedule-appointment"
+            element={<ScheduleAppointment />}
+          />
+          <Route
+            path="/receptionist/check-in"
+            element={<CheckIn />}
+          />
+          <Route
+            path="/receptionist/reschedule/:id"
+            element={<RescheduleAppointment />}
+          />
 
           {/* --- Authenticated Shared Layout --- */}
           {/* {role === "guest" && <Route path="/" element={<HomePage />} />} */}
@@ -198,11 +217,11 @@ const App = () => {
             element={<StudentNotifications />}
           />
           <Route
-            path="student-appointments"
+            path="doctor-appointments"
             element={<StudentAppointments />}
           />
           <Route
-            path="student-appointments/:id"
+            path="doctor-appointments/:id"
             element={<StudentAppointmentDetails />}
           />
           <Route path="contact-supervisor" element={<ContactSupervisor />} />

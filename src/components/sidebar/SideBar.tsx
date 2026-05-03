@@ -150,7 +150,7 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
               </li>
 
               <li>
-                <NavLink to={"/student-appointments"} className={linkStyle}>
+                <NavLink to={"/doctor-appointments"} className={linkStyle}>
                   <SlCalender className="text-xl" />
                   {!toggled && <span>Appointments</span>}
                 </NavLink>
@@ -287,7 +287,7 @@ const sidebarDataRole = {
 
   studentDoctor: [
     { icon: LayoutDashboard, label: "Dashboard", path: "/student-doctor" },
-    { icon: Calendar, label: "Appointments", path: "/student-appointments" },
+    { icon: Calendar, label: "Appointments", path: "/doctor-appointments" },
     { icon: Users, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ],
@@ -295,8 +295,8 @@ const sidebarDataRole = {
   receptionist: [
     { icon: LayoutDashboard, label: "Dashboard", path: "/receptionist" },
     { icon: Users, label: "Patients", path: "/doctor-patients" },
-    { icon: Calendar, label: "Appointments", path: "/appointments" },
-    { icon: Stethoscope, label: "Doctors", path: "/doctors-list" },
+    { icon: Calendar, label: "Appointments", path: "/doctor-appointments" },
+    { icon: Users, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ],
 };

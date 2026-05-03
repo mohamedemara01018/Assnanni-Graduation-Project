@@ -20,9 +20,13 @@ interface Props {
   appointment: AppointmentData;
 }
 
+import { useSelector } from "react-redux";
+
 function AppointmentsCard({ appointment }: Props) {
   const { id, name, desc, date, time, meetingType, status, address, imageUrl } =
     appointment;
+
+  const role = useSelector((state: any) => state.auth.role);
 
   const nameParts = name.split(" ");
   const initials = (
@@ -86,7 +90,7 @@ function AppointmentsCard({ appointment }: Props) {
           </div>
         </div>
 
-        {status !== "Cancelled" && (
+        {(status !== "Cancelled" || role === "receptionist") && (
           <>
             <div className="flex flex-wrap gap-x-6 gap-y-2">
               <div className="flex items-center gap-2 text-xs text-(--color-text-light) font-medium">
@@ -97,10 +101,12 @@ function AppointmentsCard({ appointment }: Props) {
                 <FaRegClock className="text-gray-400" />
                 <span>{time}</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-(--color-text-light) font-medium">
-                {getMeetingIcon()}
-                <span>{meetingType}</span>
-              </div>
+              {!(role === "receptionist" && meetingType === "Video Call") && (
+                <div className="flex items-center gap-2 text-xs text-(--color-text-light) font-medium">
+                  {getMeetingIcon()}
+                  <span>{meetingType}</span>
+                </div>
+              )}
               {meetingType === "In-Person" && address && (
                 <div className="flex items-center gap-2 text-xs text-(--color-text-light) font-medium">
                   <GrLocation className="text-gray-400" />
@@ -109,13 +115,27 @@ function AppointmentsCard({ appointment }: Props) {
               )}
             </div>
 
-            <div className="flex items-center gap-6 mt-2">
+            <div className="flex flex-wrap items-center gap-6 mt-2">
               <NavLink
-                to={`/student-appointments/${id}`}
+                to={`/doctor-appointments/${id}`}
                 className="text-xs font-bold text-blue-600 hover:text-blue-700 underline-offset-4 hover:underline"
               >
                 View Details
               </NavLink>
+
+              {role === "receptionist" && (
+                <>
+                  <NavLink
+                    to={`/receptionist/reschedule/${id}`}
+                    className="text-xs font-bold text-gray-600 hover:text-gray-800 underline-offset-4 hover:underline"
+                  >
+                    Reschedule
+                  </NavLink>
+                  <button className="text-xs font-bold text-red-500 hover:text-red-600 underline-offset-4 hover:underline">
+                    Cancel
+                  </button>
+                </>
+              )}
             </div>
           </>
         )}

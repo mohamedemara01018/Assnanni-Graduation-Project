@@ -1,5 +1,6 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, NavLink } from "react-router";
+import { useSelector } from "react-redux";
 import { FaArrowLeft, FaRegClock, FaEnvelope, FaPhone } from "react-icons/fa6";
 import { BsCalendar3, BsFillPersonFill } from "react-icons/bs";
 import { GrLocation } from "react-icons/gr";
@@ -8,6 +9,8 @@ import { MdOutlineMedicalServices } from "react-icons/md";
 const StudentAppointmentDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const role = useSelector((state: any) => state.auth.role);
 
   // Dummy data based on the ID or general example
   const appointment = {
@@ -27,6 +30,7 @@ const StudentAppointmentDetails = () => {
     duration: "30 minutes",
     location: "Assnani Medical Center, Room 302",
     type: "General Consultation",
+    meetingType: "In-Person",
   };
 
   return (
@@ -156,6 +160,21 @@ const StudentAppointmentDetails = () => {
               </div>
             </div>
           </div>
+
+          {/* Receptionist Actions */}
+          {role === "receptionist" && (
+            <div className="flex gap-4 mt-12 pt-10 border-t border-(--color-border)">
+              <NavLink
+                to={`/receptionist/reschedule/${appointment.id}`}
+                className="flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-sm hover:shadow-md active:scale-[0.98] text-center"
+              >
+                Reschedule
+              </NavLink>
+              <button className="flex-1 py-3 px-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.98]">
+                Cancel Appointment
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>

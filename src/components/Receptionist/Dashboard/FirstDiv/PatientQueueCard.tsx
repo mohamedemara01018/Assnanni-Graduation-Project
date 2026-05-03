@@ -1,58 +1,59 @@
-import type { ReactNode } from "react";
+import { NavLink } from "react-router";
+
+export interface PatientInQueue {
+  id: string | number;
+  name: string;
+  doctorName: string;
+  arrivalTime: string;
+  status: "Waiting" | "In Progress" | "Checked In";
+}
 
 interface Props {
-  title: string;
-
-  status: "Waiting" | "In Progress" | "Checked In";
-  children?: ReactNode;
+  patient: PatientInQueue;
 }
-const PatientQueueCard = ({ title, status, children }: Props) => {
-  const titleArray = title.split(" ");
-  const profilePhoto =
-    titleArray[0][0].toUpperCase() + titleArray[1][0].toUpperCase();
+
+const PatientQueueCard = ({ patient }: Props) => {
+  const { id, name, doctorName, arrivalTime, status } = patient;
+  const initials = name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+
+  const statusStyles = {
+    Waiting: "bg-yellow-50 text-yellow-600 border-yellow-100",
+    "In Progress": "bg-blue-50 text-blue-600 border-blue-100",
+    "Checked In": "bg-emerald-50 text-emerald-600 border-emerald-100",
+  };
 
   return (
-    <div className="flex bg-(--color-border) justify-between p-4 items-center rounded-xl">
+    <div className="flex bg-gray-50/50 dark:bg-gray-800/20 items-center justify-between p-4 rounded-2xl border border-(--color-border) hover:bg-gray-50 transition-colors group">
       <div className="flex gap-4 items-center">
-        <div
-          className={
-            "text-lg text-white w-14 flex  justify-center items-center h-14 tracking-wider bg-linear-90 from-blue-500 to-green-500 rounded-full"
-          }
-        >
-          {profilePhoto}
+        <div className="w-12 h-12 flex items-center justify-center bg-linear-to-br from-blue-500 to-emerald-500 rounded-full text-white font-bold shadow-sm">
+          {initials}
         </div>
         <div>
-          <h1 className="text-base font-semibold text-(--color-text)">
-            {title}
-          </h1>
-          <div className="text-(--color-text-light) text-xs">{children}</div>
+          <h3 className="text-sm font-bold text-(--color-text)">{name}</h3>
+          <p className="text-xs text-(--color-text-light) font-medium">
+            {doctorName}
+          </p>
+          <p className="text-[10px] text-(--color-text-light) font-medium mt-0.5">
+            Arrived: {arrivalTime}
+          </p>
         </div>
       </div>
-      <div className="flex gap-3 justify-center items-center">
+      <div className="flex items-center gap-4">
         <div
-          className={
-            status === "Checked In"
-              ? "bg-green-200 text-green-700 p-0.5 px-2 rounded-lg font-light"
-              : status === "Waiting"
-              ? "bg-yellow-200 text-yellow-700 p-0.5 px-2 rounded-lg font-light"
-              : "bg-blue-200 text-blue-700 p-0.5 px-2 rounded-lg font-light"
-          }
+          className={`px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${statusStyles[status]}`}
         >
-          <span
-            className={
-              status === "Checked In"
-                ? "bg-green-200 text-green-700 px-1 rounded-lg font-normal  text-xs"
-                : status === "Waiting"
-                ? "bg-yellow-200 text-yellow-700  px-1 rounded-lg  font-normal text-xs"
-                : "bg-blue-200 text-blue-700  px-1 rounded-lg font-normal text-xs"
-            }
-          >
-            {status}
-          </span>
+          {status}
         </div>
-        <span className="text-blue-500 hover:text-blue-500/80 cursor-pointer text-sm">
+        <NavLink 
+          to={`/doctor-patients/${id}`}
+          className="text-blue-600 hover:text-blue-700 font-bold text-xs underline-offset-4 hover:underline"
+        >
           View
-        </span>
+        </NavLink>
       </div>
     </div>
   );

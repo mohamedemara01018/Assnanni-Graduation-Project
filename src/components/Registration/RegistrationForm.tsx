@@ -81,19 +81,6 @@ const RegistrationForm = () => {
   };
   return (
     <div className="register-container flex flex-col justify-center gap-4">
-      <div className="flex justify-center items-center gap-4 bg-(--color-bg) border border-(--color-border) rounded-full ">
-        {roles.map((role, idx) => {
-          return (
-            <RoleCard
-              key={idx}
-              path={role.path}
-              label={role.label}
-              icon={role.icon}
-            />
-          );
-        })}
-      </div>
-
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-col gap-3 ">
           <div className="name">

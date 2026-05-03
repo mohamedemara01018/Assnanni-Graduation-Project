@@ -13,7 +13,7 @@ function Hero() {
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
-              to="/register/patient-register"
+              to="/register"
               className="px-8 py-4 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition-colors"
             >
               Get Started

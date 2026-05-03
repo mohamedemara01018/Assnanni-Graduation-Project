@@ -1,9 +1,12 @@
 import SearchInput from "@/components/search-input/SearchInput";
 import { useState } from "react";
 import { CiFilter } from "react-icons/ci";
+import { useSelector } from "react-redux";
 
 function InComingAppointments() {
   const [onFilter, setFilter] = useState(false);
+  const role = useSelector((state: any) => state.auth.role);
+
   return (
     <div className="mt-6">
       <div className="w-full bg-(--color-surface) p-4 rounded-2xl ">
@@ -38,7 +41,9 @@ function InComingAppointments() {
               className="block w-full  rounded-lg border border-gray-300 bg-(--color-border) px-4 py-2 pr-8 leading-tight text-(--color-text) shadow-sm hover:border-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500 text-center cursor-pointer"
             >
               <option value="inPerson">In-Person</option>
-              <option value="videoCall">Video Call</option>
+              {role !== "receptionist" && (
+                <option value="videoCall">Video Call</option>
+              )}
             </select>
           </div>
         )}
