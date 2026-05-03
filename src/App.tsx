@@ -72,9 +72,10 @@ import MedicalHistory from "./pages/doctor-pages/patients/MedicalHistory";
 import AddMedicalHistoryRecord from "./pages/doctor-pages/patients/AddMedicalHistoryRecord";
 // import PatientDashboard from "./components/Patient/Dashboard/PatientDashboard";
 
+// Main application component that handles routing and global layouts
 const App = () => {
   const role = useSelector(
-    (state: { auth: { role: string } }) => state.auth.role,
+    (state: { auth: { role: string } }) => state.auth.role
   );
   console.log(role);
   return (
@@ -107,7 +108,10 @@ const App = () => {
                   path="patient-register"
                   element={<PatientRegistration />}
                 />
-                <Route path="doctor-register" element={<DoctorRegistration />} />
+                <Route
+                  path="doctor-register"
+                  element={<DoctorRegistration />}
+                />
                 <Route
                   path="student-register"
                   element={<StudentRegistration />}
@@ -176,10 +180,7 @@ const App = () => {
             path="/receptionist/schedule-appointment"
             element={<ScheduleAppointment />}
           />
-          <Route
-            path="/receptionist/check-in"
-            element={<CheckIn />}
-          />
+          <Route path="/receptionist/check-in" element={<CheckIn />} />
           <Route
             path="/receptionist/reschedule/:id"
             element={<RescheduleAppointment />}
@@ -216,10 +217,7 @@ const App = () => {
             path="student-notification"
             element={<StudentNotifications />}
           />
-          <Route
-            path="doctor-appointments"
-            element={<StudentAppointments />}
-          />
+          <Route path="doctor-appointments" element={<StudentAppointments />} />
           <Route
             path="doctor-appointments/:id"
             element={<StudentAppointmentDetails />}

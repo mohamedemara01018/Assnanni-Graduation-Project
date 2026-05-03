@@ -23,13 +23,23 @@ interface Inputs {
   confirmPassword: string;
 }
 
-const RegistrationForm = () => {
+interface RegistrationFormProps {
+  isDoctorRegister?: boolean;
+  isStudentDoctorRegister?: boolean;
+}
+
+const RegistrationForm = ({
+  isDoctorRegister = false,
+  isStudentDoctorRegister = false,
+}: RegistrationFormProps) => {
   // API base: useSelector((s: RootState) => s.config.backendUrl) + 'Authentications/'
   const dispatch = useDispatch();
   const navigator = useNavigate();
   const { pathname } = useLocation();
-  const doctor: boolean = pathname.includes("doctor-register");
-  const studentDoctor: boolean = pathname.includes("studentDoctor-register");
+  const doctor: boolean =
+    isDoctorRegister || (!isStudentDoctorRegister && pathname.includes("doctor-register"));
+  const studentDoctor: boolean =
+    isStudentDoctorRegister || pathname.includes("student-register");
   const isDoctor: boolean =
     pathname.includes("/doctor-register") ||
     pathname.includes("/student-register");
@@ -80,7 +90,9 @@ const RegistrationForm = () => {
       if (doctor || studentDoctor) {
         // if (doctor) dispatch(setToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiZG9jdG9yIn0=.dummy"));
         // if (studentDoctor) dispatch(setToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic3R1ZGVudCBkb2N0b3IifQ==.dummy"));
-        navigator("/verify-doctor");
+        navigator("/verify-doctor", {
+          state: { isStudentDoctor: studentDoctor },
+        });
       } else {
         // Mock JWT tokens for testing. Replace with actual tokens from backend.
         if (isPatient)

@@ -4,8 +4,8 @@ import logo from '../../assets/logo.png'
 
 function Footer() {
     return (
-        <footer className="bg-(--color-text) py-16">
-            <div className="wrapper">
+        <footer className="bg-(--color-background) py-16 border-t-2 border-t-(--color-border) mt-10  shadow-(--color-shadow) shadow-top-2xl shadow-bottom-2xl">
+            <div className="wrapper ">
                 <div className="grid md:grid-cols-4 gap-8 ">
                     <div>
                         <div className="flex items-center space-x-2 mb-4">
@@ -23,7 +23,7 @@ function Footer() {
                     ))}
 
                     <div>
-                        <h4 className="mb-4 text-(--color-surface)">Contact</h4>
+                        <h4 className="mb-4 text-(--color-text-light)">Contact</h4>
                         <ul className="space-y-2 text-sm text-gray-400 dark:text-gray-500">
                             <li className=" hover:text-gray-200 hover:dark:text-gray-700 hover:cursor-pointer transition duration-150">support@assnani.com</li>
                             <li className=" hover:text-gray-200 hover:dark:text-gray-700 hover:cursor-pointer transition duration-150">+1 (800) 123-4567</li>
