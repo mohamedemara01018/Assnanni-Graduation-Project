@@ -1,4 +1,5 @@
 import { NavLink, useLocation, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
 import { MdOutlineMail } from "react-icons/md";
 import { LuPhone } from "react-icons/lu";
 import { CiLock } from "react-icons/ci";
@@ -10,11 +11,10 @@ import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { setToken } from "@/store/slices/auth/authSlice";
 import { getEmail } from "@/store/slices/email/emailSlice";
-import { roles } from "@/constants/rolesConstant";
-import RoleCard from "../role-card/RoleCard";
+
 
 interface Inputs {
-  image: File;
+  image: FileList;
   firstName: string;
   lastName: string;
   email: string;
@@ -48,9 +48,33 @@ const RegistrationForm = () => {
   } = useForm<Inputs>();
   // eslint-disable-next-line react-hooks/incompatible-library
   const password = watch("password");
+  const imageFile = watch("image");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const labelClass = "mb-1 inline-block text-sm font-medium text-(--color-text)";
+  const inputBaseClass =
+    "w-full rounded-xl border bg-(--color-bg) py-2.5 pl-12 pr-3 text-(--color-text) placeholder:text-gray-500 placeholder:text-sm transition focus:outline-none focus:ring-2 focus:ring-[#00AFE5]/30";
+  const inputBorderClass = "border-(--color-border)";
+  const inputErrorClass = "border-red-500";
+  const iconClass =
+    "absolute left-0 top-1/2 -translate-y-1/2 border-r-2 border-solid border-gray-300 px-2 text-4xl text-gray-500";
+  const errorClass = "ml-1 mt-1 text-xs font-light text-red-600";
+
+  useEffect(() => {
+    const selectedImage = imageFile?.[0];
+    if (!selectedImage) {
+      setImagePreview(null);
+      return;
+    }
+
+    const imageUrl = URL.createObjectURL(selectedImage);
+    setImagePreview(imageUrl);
+
+    return () => URL.revokeObjectURL(imageUrl);
+  }, [imageFile]);
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
+      console.log(data);
       // await axios.post(authBase + "Register-Doctor", data);
       dispatch(getEmail(data.email));
       if (doctor || studentDoctor) {
@@ -73,7 +97,7 @@ const RegistrationForm = () => {
           );
         navigator("/verify-email");
       }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      
     } catch (error: any) {
       console.log(error);
       toast.error(error.message);
@@ -82,15 +106,53 @@ const RegistrationForm = () => {
   return (
     <div className="register-container flex flex-col justify-center gap-4">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex flex-col gap-3 ">
-          <div className="name">
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col items-center gap-3 py-2">
+            <label htmlFor="image" className="cursor-pointer">
+              {imagePreview ? (
+                <img
+                  src={imagePreview}
+                  alt="Selected profile preview"
+                  className="h-28 w-28 rounded-full object-cover ring-2 ring-[#00AFE5]/40"
+                />
+              ) : (
+                <div className="flex h-28 w-28 items-center justify-center rounded-full border-2 border-dashed border-[#00AFE5]/50 bg-[#00AFE5]/10">
+                  <IoPersonCircleOutline className="text-6xl text-[#00AFE5]" />
+                </div>
+              )}
+            </label>
+            <input
+              id="image"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              {...register("image", {
+                required: "Profile image is required",
+              })}
+            />
+            <label
+              htmlFor="image"
+              className="cursor-pointer rounded-full bg-[#00AFE5] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
+            >
+              {imagePreview ? "Change profile image" : "Upload profile image"}
+            </label>
+            {!errors.image && (
+              <p className="text-xs text-gray-500">JPG, PNG, WEBP supported</p>
+            )}
+            {errors.image?.message && (
+              <p className="text-xs text-red-600">{errors.image.message}</p>
+            )}
+          </div>
+          <div className="name grid grid-cols-2 gap-3 max-sm:grid-cols-1">
             <div>
-              <label htmlFor="firstName">First Name</label>
+              <label htmlFor="firstName" className={labelClass}>
+                First Name
+              </label>
               <div className="relative">
                 <input
                   type="text"
-                  className={`pl-12 p-2 bg-(--color-bg) text-(--color-text) border border-(--color-border) placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md  w-full ${
-                    errors.firstName && "border-red-500"
+                  className={`${inputBaseClass} ${
+                    errors.firstName ? inputErrorClass : inputBorderClass
                   }`}
                   placeholder="John"
                   id="firstName"
@@ -98,22 +160,21 @@ const RegistrationForm = () => {
                     required: "First name is Required",
                   })}
                 />
-                <IoPersonCircleOutline className="absolute bottom-1 fill-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
+                <IoPersonCircleOutline className={iconClass} />
               </div>
               {errors.firstName?.message && (
-                <p className="text-xs text-red-600 ml-1 font-light">
-                  {errors.firstName.message}
-                </p>
+                <p className={errorClass}>{errors.firstName.message}</p>
               )}
             </div>
             <div>
-              {" "}
-              <label htmlFor="lname">Last Name</label>
+              <label htmlFor="lastName" className={labelClass}>
+                Last Name
+              </label>
               <div className="relative">
                 <input
                   type="text"
-                  className={`pl-12 p-2 bg-(--color-bg) text-(--color-text) border border-(--color-border) placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md  w-full ${
-                    errors.lastName && "border-red-500"
+                  className={`${inputBaseClass} ${
+                    errors.lastName ? inputErrorClass : inputBorderClass
                   }`}
                   id="lastName"
                   placeholder="Doe"
@@ -121,23 +182,23 @@ const RegistrationForm = () => {
                     required: "Last name is Required",
                   })}
                 />
-                <IoPersonCircleOutline className="absolute bottom-1 fill-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
+                <IoPersonCircleOutline className={iconClass} />
               </div>
               {errors.lastName?.message && (
-                <p className="text-xs text-red-600 ml-1 font-light">
-                  {errors.lastName.message}
-                </p>
+                <p className={errorClass}>{errors.lastName.message}</p>
               )}
             </div>
           </div>
           <div>
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email" className={labelClass}>
+              Email
+            </label>
             <div className="relative">
               <input
                 type="email"
                 placeholder="John.doe@example.com"
-                className={`pl-12 p-2 bg-(--color-bg) text-(--color-text) border border-(--color-border) placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md  w-full ${
-                  errors.email && "border-red-500"
+                className={`${inputBaseClass} ${
+                  errors.email ? inputErrorClass : inputBorderClass
                 }`}
                 id="email"
                 {...register("email", {
@@ -148,21 +209,21 @@ const RegistrationForm = () => {
                   required: "Email Address is Required",
                 })}
               />
-              <MdOutlineMail className="absolute bottom-1 fill-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
+              <MdOutlineMail className={iconClass} />
             </div>
             {errors.email?.message && (
-              <p className="text-xs text-red-600 ml-1 font-light">
-                {errors.email.message}
-              </p>
+              <p className={errorClass}>{errors.email.message}</p>
             )}
           </div>
           <div>
-            <label htmlFor="phone">Phone Number</label>
+            <label htmlFor="phoneNumber" className={labelClass}>
+              Phone Number
+            </label>
             <div className="relative">
               <input
                 type="text"
-                className={`pl-12 p-2 bg-(--color-bg) text-(--color-text) border border-(--color-border) placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md  w-full ${
-                  errors.phoneNumber && "border-red-500"
+                className={`${inputBaseClass} ${
+                  errors.phoneNumber ? inputErrorClass : inputBorderClass
                 }`}
                 placeholder="+1 (555) 000-000"
                 id="phoneNumber"
@@ -174,23 +235,23 @@ const RegistrationForm = () => {
                   },
                 })}
               />
-              <LuPhone className="absolute bottom-1 text-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
+              <LuPhone className={iconClass} />
             </div>
             {errors.phoneNumber?.message && (
-              <p className="text-xs text-red-600 ml-1 font-light">
-                {errors.phoneNumber?.message}
-              </p>
+              <p className={errorClass}>{errors.phoneNumber?.message}</p>
             )}
           </div>
           <div>
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password" className={labelClass}>
+              Password
+            </label>
             <div className="relative">
               <input
                 type="password"
                 id="password"
                 placeholder="password"
-                className={`pl-12 p-2 bg-(--color-bg) text-(--color-text) border border-(--color-border) placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md  w-full ${
-                  errors.password && "border-red-500"
+                className={`${inputBaseClass} ${
+                  errors.password ? inputErrorClass : inputBorderClass
                 }`}
                 {...register("password", {
                   required: "Password is Required",
@@ -201,21 +262,21 @@ const RegistrationForm = () => {
                   },
                 })}
               />
-              <CiLock className="absolute bottom-1 fill-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
+              <CiLock className={iconClass} />
             </div>
             {errors.password?.message && (
-              <p className="text-xs text-red-600 ml-1 font-light">
-                {errors.password?.message}
-              </p>
+              <p className={errorClass}>{errors.password?.message}</p>
             )}
           </div>
           <div>
-            <label htmlFor="cPassword">Confirm Password</label>
+            <label htmlFor="cPassword" className={labelClass}>
+              Confirm Password
+            </label>
             <div className="relative">
               <input
                 type="password"
-                className={`pl-12 p-2 bg-(--color-bg) text-(--color-text) border border-(--color-border) placeholder:text-gray-500 placeholder:text-sm placeholder:font-sans rounded-md  w-full ${
-                  errors.confirmPassword && "border-red-500"
+                className={`${inputBaseClass} ${
+                  errors.confirmPassword ? inputErrorClass : inputBorderClass
                 }`}
                 id="cPassword"
                 placeholder="confirm password"
@@ -224,12 +285,10 @@ const RegistrationForm = () => {
                     value === password || "Passwords do not match",
                 })}
               />
-              <CiLock className="absolute bottom-1 fill-gray-500 border-r-2 border-solid border-gray-400 w-10 px-2 text-3xl" />
+              <CiLock className={iconClass} />
             </div>
             {errors.confirmPassword?.message && (
-              <p className="text-xs text-red-600 ml-1 font-light">
-                {errors.confirmPassword?.message}
-              </p>
+              <p className={errorClass}>{errors.confirmPassword?.message}</p>
             )}
           </div>
           {isDoctor && (

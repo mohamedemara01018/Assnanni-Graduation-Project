@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { FiFileText } from "react-icons/fi";
 import { LuUpload } from "react-icons/lu";
@@ -22,21 +22,38 @@ function VerifyDoctorPage() {
 
   const navigator = useNavigate();
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [certificateName, setCertificateName] = useState<string>("");
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>();
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const labelClass = "mb-1 inline-block text-sm font-medium text-(--color-text)";
+  const inputClass =
+    "w-full rounded-xl border border-(--color-border) bg-(--color-bg) px-4 py-3 text-(--color-text) placeholder:text-gray-500 placeholder:text-sm transition focus:border-[#00AFE5] focus:outline-none focus:ring-2 focus:ring-[#00AFE5]/25";
+  const errorClass = "ml-1 mt-1 text-xs font-light text-red-600";
+
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
       const file = files[0];
+      setCertificateName(file.name);
       setImagePreviewUrl(URL.createObjectURL(file));
     } else {
+      setCertificateName("");
       setImagePreviewUrl(null);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
+    };
+  }, [imagePreviewUrl]);
+
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     data.YearsOfExperience = Number(data.YearsOfExperience);
     try {
@@ -53,111 +70,95 @@ function VerifyDoctorPage() {
   };
 
   return (
-    <div className="py-16 px-8 flex items-center justify-center">
-      <div className="flex flex-col gap-8 items-center bg-(--color-surface) max-w-[650px] p-8 rounded-xl shadow-2xl">
-        <div className="w-16 h-16 bg-green-300/50 flex items-center justify-center rounded-full">
-          <FiFileText className="text-4xl text-green-500" />
-        </div>
-        <div className="flex flex-col  items-center">
-          <h1 className="text-(--color-text) text-3xl">Doctor Verification</h1>
-          <p className="text-(--color-text-light)">
-            Complete your professional verification to access the platform
+    <div className="flex items-center justify-center px-4 py-10 sm:px-8">
+      <div className="w-full max-w-4xl rounded-2xl border border-(--color-border) bg-(--color-surface) p-5 shadow-xl sm:p-8">
+        <div className="mb-8 flex flex-col items-center gap-3 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#00AFE5]/15">
+            <FiFileText className="text-3xl text-[#00AFE5]" />
+          </div>
+          <h1 className="text-2xl font-semibold text-(--color-text) sm:text-3xl">
+            Doctor Verification
+          </h1>
+          <p className="max-w-2xl text-sm text-(--color-text-light) sm:text-base">
+            Complete your professional details and upload your certificate to
+            request verification.
           </p>
         </div>
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col gap-4 w-full"
+          className="flex w-full flex-col gap-5"
         >
-          <div className="flex gap-2 max-sm:flex-col">
-            <div className="flex flex-col flex-1 items-start w-full gap-1">
-              <div className="input-field w-full">
-                <label
-                  htmlFor={"medicalLicenseNumber"}
-                  className="text-(--color-text)"
-                >
-                  {"Medical License Number"}
-                </label>
-                <input
-                  id={"medicalLicenseNumber"}
-                  type={"text"}
-                  placeholder={"ML-123456"}
-                  className={`"w-full px-4 py-3 bg-(--color-bg) border border-(--color-border) rounded-lg focus:ring-2 focus:ring-(--color-primary)  text-(--color-text)" ${
-                    errors.MedicalLicenseNumber && "border-red-500 w-full"
-                  }`}
-                  {...register("MedicalLicenseNumber", {
-                    required: "You must provide your Medical License Number",
-                  })}
-                />
-                {errors.MedicalLicenseNumber && (
-                  <p className="text-red-600 text-xs font-light mt-1 translate-x-1">
-                    {errors.MedicalLicenseNumber.message}
-                  </p>
-                )}
-              </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="medicalLicenseNumber" className={labelClass}>
+                Medical License Number
+              </label>
+              <input
+                id="medicalLicenseNumber"
+                type="text"
+                placeholder="ML-123456"
+                className={`${inputClass} ${
+                  errors.MedicalLicenseNumber && "border-red-500"
+                }`}
+                {...register("MedicalLicenseNumber", {
+                  required: "You must provide your Medical License Number",
+                })}
+              />
+              {errors.MedicalLicenseNumber && (
+                <p className={errorClass}>
+                  {errors.MedicalLicenseNumber.message}
+                </p>
+              )}
             </div>
-            <div className="flex max-sm:flex-col gap-1 flex-1">
-              <div className="input-field">
-                <label
-                  htmlFor={"nationalIdNumber"}
-                  className="text-(--color-text)"
-                >
-                  {"National ID Number"}
-                </label>
-                <input
-                  id={"nationalIdNumber"}
-                  type={"text"}
-                  placeholder={"123-45-6789"}
-                  className={`"w-full px-4 py-3 bg-(--color-bg) border border-(--color-border) rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent text-(--color-text)" ${
-                    errors.NationalId && "border-red-500 w-full"
-                  }`}
-                  {...register("NationalId", {
-                    required: "You must provide your National ID",
-                  })}
-                />
-                {errors.NationalId && (
-                  <p className="text-red-600 text-xs font-light mt-1 translate-x-1">
-                    {errors.NationalId.message}
-                  </p>
-                )}
-              </div>
+            <div>
+              <label htmlFor="nationalIdNumber" className={labelClass}>
+                National ID Number
+              </label>
+              <input
+                id="nationalIdNumber"
+                type="text"
+                placeholder="123-45-6789"
+                className={`${inputClass} ${
+                  errors.NationalId && "border-red-500"
+                }`}
+                {...register("NationalId", {
+                  required: "You must provide your National ID",
+                })}
+              />
+              {errors.NationalId && (
+                <p className={errorClass}>{errors.NationalId.message}</p>
+              )}
             </div>
           </div>
-          <div className="flex  max-sm:flex-col  gap-2">
-            <div className="flex  flex-col  w-full ">
-              <div className="input-field">
-                <label
-                  htmlFor={"yearsOfExperience"}
-                  className="text-(--color-text)"
-                >
-                  {"Years of Experience"}
-                </label>
-                <input
-                  id={"yearsOfExperience"}
-                  type={"number"}
-                  placeholder={"5"}
-                  className={`"w-full px-4 py-3 bg-(--color-bg) border border-(--color-border) rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent text-(--color-text)" ${
-                    errors.YearsOfExperience && "border-red-500 w-full"
-                  }`}
-                  {...register("YearsOfExperience", {
-                    required: "You must provide your Years of Experience",
-                  })}
-                />
-                {errors.YearsOfExperience && (
-                  <p className="text-red-600 text-xs font-light mt-1 translate-x-1">
-                    {errors.YearsOfExperience.message}
-                  </p>
-                )}
-              </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="yearsOfExperience" className={labelClass}>
+                Years of Experience
+              </label>
+              <input
+                id="yearsOfExperience"
+                type="number"
+                placeholder="5"
+                className={`${inputClass} ${
+                  errors.YearsOfExperience && "border-red-500"
+                }`}
+                {...register("YearsOfExperience", {
+                  required: "You must provide your Years of Experience",
+                })}
+              />
+              {errors.YearsOfExperience && (
+                <p className={errorClass}>{errors.YearsOfExperience.message}</p>
+              )}
             </div>
-            <div className="flex -translate-y-1 flex-col items-start w-full gap-1">
-              <label htmlFor={"clinicName"} className="text-(--color-text)">
+            <div>
+              <label htmlFor="clinicName" className={labelClass}>
                 Clinic Name
               </label>
               <input
-                id={"clinicName"}
-                type={"text"}
-                placeholder={"Assnani"}
-                className={`"w-full px-4 py-3 bg-(--color-bg) border border-(--color-border) rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent text-(--color-text)" ${
+                id="clinicName"
+                type="text"
+                placeholder="Assnani"
+                className={`${inputClass} ${
                   errors.ClinicName && "border-red-500 w-full"
                 }`}
                 {...register("ClinicName", {
@@ -165,121 +166,120 @@ function VerifyDoctorPage() {
                 })}
               />
               {errors.ClinicName && (
-                <p className="text-red-600 text-xs font-light mt-1 translate-x-1">
-                  {errors.ClinicName.message}
-                </p>
+                <p className={errorClass}>{errors.ClinicName.message}</p>
               )}
             </div>
           </div>
-          <div className="flex max-sm:flex-col gap-2">
-            <div className="flex -translate-y-1 flex-col items-start w-full gap-1">
-              <label htmlFor={"clinicAddress"} className="text-(--color-text)">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label htmlFor="clinicAddress" className={labelClass}>
                 Clinic Address
               </label>
               <input
-                id={"clinicAddress"}
-                type={"text"}
-                className={`"w-full px-4 py-3 bg-(--color-bg) border border-(--color-border) rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent text-(--color-text)" ${
+                id="clinicAddress"
+                type="text"
+                placeholder="Street, City, Area"
+                className={`${inputClass} ${
                   errors.ClinicAddress && "border-red-500 w-full"
                 }`}
                 {...register("ClinicAddress", {
-                  required: "You must provide your clinic name",
+                  required: "You must provide your clinic address",
                 })}
               />
               {errors.ClinicAddress && (
-                <p className="text-red-600 text-xs font-light mt-1 translate-x-1">
-                  {errors.ClinicAddress.message}
-                </p>
+                <p className={errorClass}>{errors.ClinicAddress.message}</p>
               )}
             </div>
-            <div className="flex -translate-y-1 flex-col items-start w-full gap-1">
-              <label htmlFor={"clinicPhone"} className="text-(--color-text)">
+            <div>
+              <label htmlFor="clinicPhone" className={labelClass}>
                 Clinic Phone
               </label>
               <input
-                id={"clinicPhone"}
-                type={"text"}
-                placeholder={"01003010"}
-                className={`"w-full px-4 py-3 bg-(--color-bg) border border-(--color-border) rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent text-(--color-text)" ${
+                id="clinicPhone"
+                type="text"
+                placeholder="01003010"
+                className={`${inputClass} ${
                   errors.ClinicPhone && "border-red-500 w-full"
                 }`}
                 {...register("ClinicPhone", {
-                  required: "You must provide your clinic name",
+                  required: "You must provide your clinic phone",
                 })}
               />
               {errors.ClinicPhone && (
-                <p className="text-red-600 text-xs font-light mt-1 translate-x-1">
-                  {errors.ClinicPhone.message}
-                </p>
+                <p className={errorClass}>{errors.ClinicPhone.message}</p>
               )}
             </div>
           </div>
 
-          <div className=" flex flex-col items-start gap-1 ">
-            <label htmlFor="medicalcertificate">
+          <div className="flex flex-col items-start gap-1">
+            <label htmlFor="file" className={labelClass}>
               Upload Medical Certificate
             </label>
-            <div className="flex flex-col items-center justify-center gap-4 w-full p-8 border-dashed border-2 rounded-sm">
-              {!imagePreviewUrl && (
-                <>
-                  <LuUpload className="text-5xl text-(--color-text-light)" />
-                  <div className="text-center">
-                    <h3 className="text-xl">
-                      Click to upload or drag and drop
-                    </h3>
-                    <p className="text-(--color-text-light)">
-                      PDF, JPG or PNG (MAX. 10MB)
-                    </p>
-                  </div>
-                  <label
-                    htmlFor="file"
-                    className="text-white bg-(--color-primary) hover:bg-(--color-primary-dark) py-2 px-4 rounded-sm transition duration-200 cursor-pointer"
-                  >
-                    Choose File
-                  </label>
-                </>
-              )}
+            <div className="w-full rounded-2xl border border-[#00AFE5]/25 bg-linear-to-br from-[#00AFE5]/8 via-transparent to-[#00AFE5]/4 p-6 sm:p-8">
               <input
                 type="file"
                 id="file"
                 className="hidden"
                 {...register("Certificate", {
-                  required: "you Must provide your Certificate",
+                  required: "You must provide your Certificate",
                 })}
                 onChange={handleImageChange}
               />
-
+              {!imagePreviewUrl && (
+                <div className="flex flex-col items-center justify-center gap-4 text-center">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#00AFE5]/15">
+                    <LuUpload className="text-3xl text-[#00AFE5]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-(--color-text)">
+                      Click to upload your certificate
+                    </h3>
+                    <p className="text-sm text-(--color-text-light)">
+                      PDF, JPG or PNG (MAX. 10MB)
+                    </p>
+                  </div>
+                  <label
+                    htmlFor="file"
+                    className="cursor-pointer rounded-full bg-[#00AFE5] px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-[#00AFE5]/30 transition-all hover:-translate-y-0.5 hover:bg-blue-500"
+                  >
+                    Choose File
+                  </label>
+                </div>
+              )}
               {imagePreviewUrl && (
-                <div className="flex justify-center items-center relative flex-col ">
+                <div className="flex flex-col items-center gap-4">
                   <img
                     src={imagePreviewUrl}
                     alt="Preview"
-                    className="w-full h-full rounded-2xl"
+                    className="max-h-80 w-full rounded-xl border border-(--color-border) bg-(--color-surface) object-contain p-2"
                   />
+                  {certificateName && (
+                    <p className="rounded-full bg-(--color-surface) px-4 py-1.5 text-sm text-(--color-text-light)">
+                      Selected: {certificateName}
+                    </p>
+                  )}
                   <label
                     htmlFor="file"
-                    className="text-white bg-(--color-primary) hover:bg-(--color-primary-dark) py-2 px-4 rounded-sm transition duration-200 cursor-pointer absolute opacity-60 hover:opacity-80"
+                    className="cursor-pointer rounded-full bg-[#00AFE5] px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-[#00AFE5]/30 transition-all hover:-translate-y-0.5 hover:bg-blue-500"
                   >
                     Choose another file
                   </label>
-                  {errors.Certificate && (
-                    <p className="text-red-600 text-xs font-light mt-1 translate-x-1">
-                      {errors.Certificate.message}
-                    </p>
-                  )}
                 </div>
               )}
             </div>
+            {errors.Certificate && (
+              <p className={errorClass}>{errors.Certificate.message}</p>
+            )}
           </div>
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
-            <p className="text-yellow-800 dark:text-yellow-200 text-sm">
+          <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
+            <p className="text-sm text-yellow-800 dark:text-yellow-200">
               <strong>Note:</strong> All information will be verified by our
               admin team. Please ensure all details are accurate and documents
               are clear and valid.
             </p>
           </div>
           <div className="w-full">
-            <button className=" text-white bg-(--color-primary) w-full p-4 rounded-sm hover:bg-(--color-primary-dark) cursor-pointer transition duration-200">
+            <button className="w-full cursor-pointer rounded-xl bg-[#00AFE5] p-3.5 text-base font-semibold text-white transition-colors hover:bg-blue-500">
               Submit for Verification
             </button>
           </div>

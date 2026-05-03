@@ -128,7 +128,7 @@ function Header() {
                     Login
                   </Link>
                   <Link
-                    to={"/register/patient-register"}
+                    to={"/register"}
                     className="text-center text-white bg-(--color-primary) hover:bg-(--color-primary-dark) py-2 px-4 rounded-sm cursor-pointer transform duration-200"
                   >
                     Register

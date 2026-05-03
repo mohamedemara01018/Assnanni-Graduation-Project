@@ -49,47 +49,72 @@ function VerifyEmailPage() {
   };
 
   return (
-    <div className="py-16 px-4 flex flex-col items-center">
-      <div className="flex flex-col items-center gap-6 max-sm:max-w-[500px]  sm:w-[500px] bg-(--color-surface) p-8 rounded-xl shadow-xl">
-        <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center ">
-          <MdOutlineMail className="w-8 h-8 text-(--color-primary)" />
-        </div>
-        <div className="flex flex-col  items-center">
-          <h1 className="text-3xl text-(--color-text)">Verify Your Email</h1>
-          <p className="text-(--color-text-light) text-center">
+    <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 py-10">
+      <div className="w-full max-w-[540px] rounded-2xl border border-(--color-border) bg-(--color-surface) p-6 shadow-xl sm:p-8">
+        <div className="mb-6 flex flex-col items-center gap-4 text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#00AFE5]/15">
+            <MdOutlineMail className="h-8 w-8 text-[#00AFE5]" />
+          </div>
+          <h1 className="text-2xl font-semibold text-(--color-text) sm:text-3xl">
+            Verify Your Email
+          </h1>
+          <p className="text-sm text-(--color-text-light) sm:text-base">
             We've sent a 6-digit code to{" "}
-            <span className="text-(--color-primary)">{email}</span>
+            <span className="font-semibold text-(--color-primary)">{email}</span>
           </p>
         </div>
-        <form onSubmit={onSubmit}>
-          <div className="flex flex-col  items-center">
-            <p className="text-(--color-text)">Enter Verification Code</p>
-            <div>
-              <div className="flex items-center gap-2 my-4">
-                <InputOTP
-                  maxLength={6}
-                  pattern={REGEXP_ONLY_DIGITS}
-                  value={value}
-                  onChange={setValue}
-                >
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} className="w-15 h-15" />
-                    <InputOTPSlot index={1} className="w-15 h-15" />
-                    <InputOTPSlot index={2} className="w-15 h-15" />
-                    <InputOTPSlot index={3} className="w-15 h-15" />
-                    <InputOTPSlot index={4} className="w-15 h-15" />
-                    <InputOTPSlot index={5} className="w-15 h-15" />
-                  </InputOTPGroup>
-                </InputOTP>
-              </div>
-              <button className="bg-(--color-primary) py-2 px-4 rounded-sm w-full hover:bg-(--color-primary-light) cursor-pointer duration-100 transition duration-200">
-                Verify Email
-              </button>
+        <form onSubmit={onSubmit} className="flex flex-col gap-5">
+          <div className="flex flex-col items-center">
+            <p className="text-sm font-medium text-(--color-text)">
+              Enter Verification Code
+            </p>
+            <div className="my-4 flex items-center justify-center">
+              <InputOTP
+                maxLength={6}
+                pattern={REGEXP_ONLY_DIGITS}
+                value={value}
+                onChange={setValue}
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot
+                    index={0}
+                    className="h-12 w-11 rounded-lg border-(--color-border) bg-(--color-bg) text-base font-semibold text-(--color-text) focus-visible:ring-2 focus-visible:ring-[#00AFE5]/30"
+                  />
+                  <InputOTPSlot
+                    index={1}
+                    className="h-12 w-11 rounded-lg border-(--color-border) bg-(--color-bg) text-base font-semibold text-(--color-text) focus-visible:ring-2 focus-visible:ring-[#00AFE5]/30"
+                  />
+                  <InputOTPSlot
+                    index={2}
+                    className="h-12 w-11 rounded-lg border-(--color-border) bg-(--color-bg) text-base font-semibold text-(--color-text) focus-visible:ring-2 focus-visible:ring-[#00AFE5]/30"
+                  />
+                  <InputOTPSlot
+                    index={3}
+                    className="h-12 w-11 rounded-lg border-(--color-border) bg-(--color-bg) text-base font-semibold text-(--color-text) focus-visible:ring-2 focus-visible:ring-[#00AFE5]/30"
+                  />
+                  <InputOTPSlot
+                    index={4}
+                    className="h-12 w-11 rounded-lg border-(--color-border) bg-(--color-bg) text-base font-semibold text-(--color-text) focus-visible:ring-2 focus-visible:ring-[#00AFE5]/30"
+                  />
+                  <InputOTPSlot
+                    index={5}
+                    className="h-12 w-11 rounded-lg border-(--color-border) bg-(--color-bg) text-base font-semibold text-(--color-text) focus-visible:ring-2 focus-visible:ring-[#00AFE5]/30"
+                  />
+                </InputOTPGroup>
+              </InputOTP>
             </div>
           </div>
+          <button className="w-full cursor-pointer rounded-xl bg-[#00AFE5] py-3 text-sm font-semibold text-white shadow-md shadow-[#00AFE5]/30 transition-all hover:-translate-y-0.5 hover:bg-blue-500">
+            Verify Email
+          </button>
         </form>
-        <div className="text-(--color-primary) hover:text-(--color-primary-light) cursor-pointer transition duration-200">
-          Didn't receive the code? Resend
+        <div className="mt-4 text-center">
+          <button
+            type="button"
+            className="cursor-pointer text-sm font-medium text-(--color-primary) transition-colors hover:text-(--color-primary-light)"
+          >
+            Didn't receive the code? Resend
+          </button>
         </div>
       </div>
     </div>

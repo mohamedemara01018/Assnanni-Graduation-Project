@@ -66,7 +66,7 @@ const DoctorDashboard = () => {
 
   return (
     <DashboardLayout pageTitle={"Doctor Dashboard"}>
-      <div className=" -mt-6 -ml-6    bg-(--color-bg)  rounded-2xl">
+      <div className=" -mt-6     bg-(--color-bg)  rounded-2xl">
         <h1 className="text-2xl text-(--color-text) font-medium p-6 font-sans pb-2">
           Welcome, Dr. John Doe!
         </h1>
