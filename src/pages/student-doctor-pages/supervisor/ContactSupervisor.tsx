@@ -1,6 +1,7 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
+import { supervisor } from "@/constants/studentConstants";
 import { useState } from "react";
-import { FaPaperPlane, FaUserDoctor, FaPhone, FaEnvelope } from "react-icons/fa6";
+import { FaPaperPlane, FaPhone, FaEnvelope } from "react-icons/fa6";
 import { toast } from "react-toastify";
 
 const ContactSupervisor = () => {
@@ -17,14 +18,6 @@ const ContactSupervisor = () => {
     toast.success("Message sent to supervisor successfully!");
     setMessage("");
     setSubject("");
-  };
-
-  const supervisor = {
-    name: "Dr. Sarah Miller",
-    specialty: "Senior Cardiologist",
-    imageUrl: "https://randomuser.me/api/portraits/women/65.jpg",
-    email: "sarah.miller@hospital.com",
-    phone: "+1 (555) 123-4567",
   };
 
   return (

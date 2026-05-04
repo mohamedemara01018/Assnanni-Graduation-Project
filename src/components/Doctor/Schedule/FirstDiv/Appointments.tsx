@@ -6,38 +6,8 @@ import { BsCalendarEvent } from "react-icons/bs";
 import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-
-interface Appointment {
-  id: number;
-  name: string;
-  type: string;
-  time: string;
-  status: "Confirmed" | "Pending";
-}
-
-const fallbackAppointments: Appointment[] = [
-  {
-    id: 1,
-    name: "John Smith",
-    type: "Consultation",
-    time: "09:00 AM",
-    status: "Confirmed",
-  },
-  {
-    id: 2,
-    name: "Sarah Johnson",
-    type: "Follow-up",
-    time: "10:00 AM",
-    status: "Confirmed",
-  },
-  {
-    id: 3,
-    name: "Michael Brown",
-    type: "Checkup",
-    time: "02:00 PM",
-    status: "Pending",
-  },
-];
+import { fallbackAppointments } from "@/constants/doctorConstants";
+import type { Appointment } from "@/interfaces/doctorInterfaces";
 
 interface Props {
   role: string;

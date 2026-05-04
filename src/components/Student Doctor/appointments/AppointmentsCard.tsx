@@ -4,29 +4,17 @@ import { GrLocation } from "react-icons/gr";
 import { IoMdCloseCircle } from "react-icons/io";
 import { NavLink } from "react-router";
 
-export interface AppointmentData {
-  id: number | string;
-  name: string;
-  desc: string;
-  date: string;
-  time: string;
-  meetingType: "In-Person" | "Video Call" | "Phone Call";
-  address?: string;
-  status: "Upcoming" | "Completed" | "Cancelled";
-  imageUrl?: string;
-}
-
 interface Props {
   appointment: AppointmentData;
 }
 
 import { useSelector } from "react-redux";
+import type { AppointmentData } from "@/interfaces/studentInterfaces";
 
 function AppointmentsCard({ appointment }: Props) {
   const { id, name, desc, date, time, meetingType, status, address, imageUrl } =
     appointment;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const role = useSelector((state: any) => state.auth.role);
 
   const nameParts = name.split(" ");
@@ -61,7 +49,7 @@ function AppointmentsCard({ appointment }: Props) {
 
   return (
     <div className="bg-(--color-surface) rounded-2xl p-6 flex gap-6 shadow-sm border border-(--color-border) hover:shadow-md transition-shadow">
-      <div className="flex-shrink-0 w-12 h-12 bg-linear-to-br from-blue-400 to-emerald-400 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm overflow-hidden">
+      <div className="shrink-0 w-12 h-12 bg-linear-to-br from-blue-400 to-emerald-400 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm overflow-hidden">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -73,7 +61,7 @@ function AppointmentsCard({ appointment }: Props) {
         )}
       </div>
 
-      <div className="flex-grow flex flex-col gap-4">
+      <div className="grow flex flex-col gap-4">
         <div className="flex justify-between items-start">
           <div>
             <h3 className="text-lg font-bold text-(--color-text)">{name}</h3>

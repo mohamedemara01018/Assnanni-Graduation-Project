@@ -6,20 +6,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-
-interface ScanFormData {
-  patientId: number;
-  notes: string;
-}
-
-const fallbackPatients = [
-  { id: 1, name: "John Smith" },
-  { id: 2, name: "Sarah Johnson" },
-  { id: 3, name: "Michael Brown" },
-  { id: 4, name: "Emma Davis" },
-  { id: 5, name: "David Wilson" },
-  { id: 6, name: "Lisa Anderson" },
-];
+import type { ScanFormData } from "@/interfaces/doctorInterfaces";
+import { fallbackPatientsScan } from "@/constants/doctorConstants";
 
 const Scan = () => {
   const {
@@ -30,7 +18,6 @@ const Scan = () => {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [patients, setPatients] = useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const inputFileRef = useRef<HTMLInputElement | null>(null);
@@ -51,11 +38,11 @@ const Scan = () => {
         if (Array.isArray(data) && data.length > 0) {
           setPatients(data);
         } else {
-          setPatients(fallbackPatients);
+          setPatients(fallbackPatientsScan);
         }
       } catch (error) {
         console.error("Error fetching patients:", error);
-        setPatients(fallbackPatients);
+        setPatients(fallbackPatientsScan);
       }
     };
     fetchPatients();
@@ -117,12 +104,11 @@ const Scan = () => {
       toast.success("Medical scan uploaded and analysis initiated!");
       setSelectedFile(null);
       setPreviewUrl(null);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Upload error:", error);
       toast.error(
         error.response?.data?.message ||
-          "Failed to upload scan. Please try again.",
+          "Failed to upload scan. Please try again."
       );
     } finally {
       setIsSubmitting(false);
@@ -174,7 +160,9 @@ const Scan = () => {
               ) : (
                 <>
                   <LuUpload
-                    className={`text-6xl mb-5 transition-colors ${dragActive ? "text-blue-500" : "text-gray-400"}`}
+                    className={`text-6xl mb-5 transition-colors ${
+                      dragActive ? "text-blue-500" : "text-gray-400"
+                    }`}
                   />
 
                   <div className="text-center mb-8">

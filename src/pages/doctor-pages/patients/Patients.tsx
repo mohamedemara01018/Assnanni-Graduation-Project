@@ -12,84 +12,12 @@ import { NavLink } from "react-router";
 import Cookies from "js-cookie";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-
-interface Patient {
-  id: number;
-  name: string;
-  phone: string;
-  age: number;
-  gender: "Male" | "Female";
-  status: "Active" | "Inactive" | "Pending";
-  lastVisit: string;
-  doctor: string;
-}
-
-const fallbackPatients: Patient[] = [
-  {
-    id: 1,
-    name: "John Smith",
-    phone: "555-0101",
-    age: 45,
-    gender: "Male",
-    status: "Active",
-    lastVisit: "2025-12-10",
-    doctor: "Dr. Chen",
-  },
-  {
-    id: 2,
-    name: "Sarah Johnson",
-    phone: "555-0102",
-    age: 32,
-    gender: "Female",
-    status: "Active",
-    lastVisit: "2025-12-12",
-    doctor: "Dr. Williams",
-  },
-  {
-    id: 3,
-    name: "Michael Brown",
-    phone: "555-0103",
-    age: 58,
-    gender: "Male",
-    status: "Pending",
-    lastVisit: "2025-11-28",
-    doctor: "Dr. Chen",
-  },
-  {
-    id: 4,
-    name: "Emma Davis",
-    phone: "555-0104",
-    age: 28,
-    gender: "Female",
-    status: "Active",
-    lastVisit: "2025-12-13",
-    doctor: "Dr. Smith",
-  },
-  {
-    id: 5,
-    name: "David Wilson",
-    phone: "555-0105",
-    age: 62,
-    gender: "Male",
-    status: "Inactive",
-    lastVisit: "2025-10-15",
-    doctor: "Dr. Williams",
-  },
-  {
-    id: 6,
-    name: "Lisa Anderson",
-    phone: "555-0106",
-    age: 41,
-    gender: "Female",
-    status: "Active",
-    lastVisit: "2025-12-11",
-    doctor: "Dr. Chen",
-  },
-];
+import { fallbackPatients } from "@/constants/doctorConstants";
+import type { Patient } from "@/interfaces/doctorInterfaces";
 
 const Patients = () => {
   const [view, setView] = useState<"Table" | "Cards">(
-    (Cookies.get("patientsView") as "Table" | "Cards") || "Table",
+    (Cookies.get("patientsView") as "Table" | "Cards") || "Table"
   );
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
 

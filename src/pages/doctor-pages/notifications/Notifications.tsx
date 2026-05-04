@@ -1,47 +1,14 @@
 import { useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import Card from "../../../components/Doctor/Notifications/Card";
-import { LuCalendar, LuClock, LuActivity } from "react-icons/lu";
-
-const initialNotifications = [
-  {
-    id: 1,
-    icon: <LuCalendar />,
-    title: "Appointment Confirmed",
-    desc: "Your appointment with Dr. Sarah Johnson is confirmed for Dec 15, 2025 at 10:00 AM",
-    time: "2 hours ago",
-    isRead: false,
-    color: "text-blue-500",
-    bgColor: "bg-blue-500/10",
-  },
-  {
-    id: 2,
-    icon: <LuClock />,
-    title: "Appointment Reminder",
-    desc: "You have an appointment tomorrow with Dr. Emily Rodriguez",
-    time: "1 day ago",
-    isRead: false,
-    color: "text-orange-500",
-    bgColor: "bg-orange-500/10",
-  },
-  {
-    id: 3,
-    icon: <LuActivity />,
-    title: "Scan Results Ready",
-    desc: "Your X Ray scan results are now available",
-    time: "3 days ago",
-    isRead: true,
-    color: "text-emerald-500",
-    bgColor: "bg-emerald-500/10",
-  },
-];
+import { initialNotifications } from "@/constants/doctorConstants";
 
 const Notifications = () => {
   const [notifications, setNotifications] = useState(initialNotifications);
 
   const markAsRead = (id: number) => {
     setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)),
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
     );
   };
 

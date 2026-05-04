@@ -203,7 +203,7 @@ const AddMedicalHistoryRecord = () => {
                 </button>
                 <button
                   type="submit"
-                  className="flex-[2] bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-2xl transition-all shadow-xl shadow-blue-100 active:scale-95"
+                  className="flex-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-2xl transition-all shadow-xl shadow-blue-100 active:scale-95"
                 >
                   Save Record
                 </button>

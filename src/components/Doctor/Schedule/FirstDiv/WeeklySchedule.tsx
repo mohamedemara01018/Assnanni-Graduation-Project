@@ -6,37 +6,8 @@ import Days from "./Days";
 import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-
-interface Day {
-  day: string;
-  time: string[];
-}
-
-const fallbackDays: Day[] = [
-  {
-    day: "Monday",
-    time: [
-      "09:00 AM",
-      "10:00 AM",
-      "11:00 AM",
-      "02:00 PM",
-      "03:00 PM",
-      "04:00 PM",
-    ],
-  },
-  {
-    day: "Tuesday",
-    time: ["09:00 AM", "10:00 AM", "11:00 AM", "02:00 PM", "03:00 PM"],
-  },
-  {
-    day: "Wednesday",
-    time: ["09:00 AM", "10:00 AM", "02:00 PM", "03:00 PM", "04:00 PM"],
-  },
-  { day: "Thursday", time: [] },
-  { day: "Friday", time: ["09:00 AM", "10:00 AM", "11:00 AM", "02:00 PM"] },
-  { day: "Saturday", time: ["09:00 AM", "10:00 AM", "11:00 AM"] },
-  { day: "Sunday", time: [] },
-];
+import { fallbackDays } from "@/constants/doctorConstants";
+import type { Day } from "@/interfaces/doctorInterfaces";
 
 interface Props {
   role: string;

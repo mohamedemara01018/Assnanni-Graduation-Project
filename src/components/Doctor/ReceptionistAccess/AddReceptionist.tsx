@@ -1,20 +1,20 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import { NavLink } from "react-router";
-import { FiArrowLeft, FiUser, FiMail, FiPhone, FiLock, FiCamera, FiCheckCircle } from "react-icons/fi";
+import {
+  FiArrowLeft,
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiLock,
+  FiCamera,
+  FiCheckCircle,
+} from "react-icons/fi";
 import { BsBuilding } from "react-icons/bs";
 import { BiInfoCircle } from "react-icons/bi";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { toast } from "react-toastify";
-
-interface ReceptionistFormInput {
-  fullName: string;
-  email: string;
-  phone: string;
-  clinic: string;
-  username: string;
-  password?: string;
-}
+import type { ReceptionistFormInput } from "@/interfaces/receptionistInterfaces";
 
 const AddReceptionist = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -54,7 +54,10 @@ const AddReceptionist = () => {
             className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition mb-6 text-sm w-fit group"
           >
             <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" />
-            Access Control / <span className="text-gray-500 dark:text-gray-400">Add Receptionist</span>
+            Access Control /{" "}
+            <span className="text-gray-500 dark:text-gray-400">
+              Add Receptionist
+            </span>
           </NavLink>
 
           <div className="flex flex-col mb-8">
@@ -69,7 +72,7 @@ const AddReceptionist = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl">
             <div className="bg-(--color-surface) border border-gray-100 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
               {/* Profile Header Decoration */}
-              <div className="h-24 bg-gradient-to-r from-blue-600 to-indigo-600 w-full relative"></div>
+              <div className="h-24 bg-linear-to-r from-blue-600 to-indigo-600 w-full relative"></div>
 
               <div className="px-8 pb-8">
                 {/* Profile Picture Upload */}
@@ -77,7 +80,11 @@ const AddReceptionist = () => {
                   <div className="relative group">
                     <div className="w-32 h-32 rounded-2xl border-4 border-(--color-surface) bg-gray-100 dark:bg-gray-800 overflow-hidden shadow-lg transition-transform group-hover:scale-[1.02]">
                       {profileImage ? (
-                        <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+                        <img
+                          src={profileImage}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-gray-400">
                           <FiUser className="text-5xl" />
@@ -86,49 +93,83 @@ const AddReceptionist = () => {
                     </div>
                     <label className="absolute bottom-2 right-2 p-2.5 bg-blue-600 text-white rounded-xl cursor-pointer shadow-lg hover:bg-blue-700 transition-all hover:scale-110 active:scale-95">
                       <FiCamera className="text-lg" />
-                      <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                      />
                     </label>
                   </div>
-                  <p className="text-xs text-(--color-text-light) mt-3 font-medium">Upload Profile Photo</p>
+                  <p className="text-xs text-(--color-text-light) mt-3 font-medium">
+                    Upload Profile Photo
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-2 max-md:grid-cols-1 gap-x-8 gap-y-6">
                   {/* Full Name */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-(--color-text)">Full Name</label>
+                    <label className="text-sm font-medium text-(--color-text)">
+                      Full Name
+                    </label>
                     <div className="relative">
                       <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                       <input
-                        {...register("fullName", { required: "Full name is required" })}
+                        {...register("fullName", {
+                          required: "Full name is required",
+                        })}
                         type="text"
                         placeholder="Jane Smith"
-                        className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${errors.fullName ? 'border-red-400' : 'border-gray-200 dark:border-gray-700'} rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}
+                        className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${
+                          errors.fullName
+                            ? "border-red-400"
+                            : "border-gray-200 dark:border-gray-700"
+                        } rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}
                       />
                     </div>
-                    {errors.fullName && <span className="text-[11px] text-red-500 mt-1">{errors.fullName.message as string}</span>}
+                    {errors.fullName && (
+                      <span className="text-[11px] text-red-500 mt-1">
+                        {errors.fullName.message as string}
+                      </span>
+                    )}
                   </div>
 
                   {/* Email Address */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-(--color-text)">Email Address</label>
+                    <label className="text-sm font-medium text-(--color-text)">
+                      Email Address
+                    </label>
                     <div className="relative">
                       <FiMail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                       <input
                         {...register("email", {
                           required: "Email is required",
-                          pattern: { value: /^\S+@\S+$/i, message: "Invalid email address" }
+                          pattern: {
+                            value: /^\S+@\S+$/i,
+                            message: "Invalid email address",
+                          },
                         })}
                         type="email"
                         placeholder="jane.smith@assnani.com"
-                        className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${errors.email ? 'border-red-400' : 'border-gray-200 dark:border-gray-700'} rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}
+                        className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${
+                          errors.email
+                            ? "border-red-400"
+                            : "border-gray-200 dark:border-gray-700"
+                        } rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}
                       />
                     </div>
-                    {errors.email && <span className="text-[11px] text-red-500 mt-1">{errors.email.message as string}</span>}
+                    {errors.email && (
+                      <span className="text-[11px] text-red-500 mt-1">
+                        {errors.email.message as string}
+                      </span>
+                    )}
                   </div>
 
                   {/* Phone Number */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-(--color-text)">Phone Number</label>
+                    <label className="text-sm font-medium text-(--color-text)">
+                      Phone Number
+                    </label>
                     <div className="relative">
                       <FiPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                       <input
@@ -142,7 +183,9 @@ const AddReceptionist = () => {
 
                   {/* Clinic Assignment */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-(--color-text)">Clinic Assignment</label>
+                    <label className="text-sm font-medium text-(--color-text)">
+                      Clinic Assignment
+                    </label>
                     <div className="relative">
                       <BsBuilding className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                       <select
@@ -155,42 +198,79 @@ const AddReceptionist = () => {
                         <option value="west">West Side Medical</option>
                       </select>
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
                       </div>
                     </div>
                   </div>
 
                   {/* Username */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-(--color-text)">Username</label>
+                    <label className="text-sm font-medium text-(--color-text)">
+                      Username
+                    </label>
                     <div className="relative">
                       <FiUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                       <input
-                        {...register("username", { required: "Username is required" })}
+                        {...register("username", {
+                          required: "Username is required",
+                        })}
                         type="text"
                         placeholder="janesmith"
-                        className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${errors.username ? 'border-red-400' : 'border-gray-200 dark:border-gray-700'} rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}
+                        className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${
+                          errors.username
+                            ? "border-red-400"
+                            : "border-gray-200 dark:border-gray-700"
+                        } rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}
                       />
                     </div>
-                    {errors.username && <span className="text-[11px] text-red-500 mt-1">{errors.username.message as string}</span>}
+                    {errors.username && (
+                      <span className="text-[11px] text-red-500 mt-1">
+                        {errors.username.message as string}
+                      </span>
+                    )}
                   </div>
 
                   {/* Temporary Password */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-(--color-text)">Temporary Password</label>
+                    <label className="text-sm font-medium text-(--color-text)">
+                      Temporary Password
+                    </label>
                     <div className="relative">
                       <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                       <input
-                        {...register("password", { required: "Password is required", minLength: { value: 8, message: "Min 8 characters" } })}
+                        {...register("password", {
+                          required: "Password is required",
+                          minLength: { value: 8, message: "Min 8 characters" },
+                        })}
                         type="password"
                         placeholder="Min. 8 characters"
-                        className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${errors.password ? 'border-red-400' : 'border-gray-200 dark:border-gray-700'} rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}
+                        className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${
+                          errors.password
+                            ? "border-red-400"
+                            : "border-gray-200 dark:border-gray-700"
+                        } rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}
                       />
                     </div>
                     {errors.password ? (
-                      <span className="text-[11px] text-red-500 mt-1">{errors.password.message as string}</span>
+                      <span className="text-[11px] text-red-500 mt-1">
+                        {errors.password.message as string}
+                      </span>
                     ) : (
-                      <p className="text-[11px] text-(--color-text-light) mt-1">User will be prompted to change password on first login</p>
+                      <p className="text-[11px] text-(--color-text-light) mt-1">
+                        User will be prompted to change password on first login
+                      </p>
                     )}
                   </div>
                 </div>
@@ -204,13 +284,15 @@ const AddReceptionist = () => {
                     <div className="flex gap-2.5 items-start">
                       <FiCheckCircle className="text-blue-500 mt-0.5 shrink-0" />
                       <p className="text-xs text-blue-700/80 dark:text-blue-500/80 leading-relaxed">
-                        Temporary password will be sent to the registered email address.
+                        Temporary password will be sent to the registered email
+                        address.
                       </p>
                     </div>
                     <div className="flex gap-2.5 items-start">
                       <FiCheckCircle className="text-blue-500 mt-0.5 shrink-0" />
                       <p className="text-xs text-blue-700/80 dark:text-blue-500/80 leading-relaxed">
-                        Access is restricted to assigned clinics and authorized patient records.
+                        Access is restricted to assigned clinics and authorized
+                        patient records.
                       </p>
                     </div>
                   </div>

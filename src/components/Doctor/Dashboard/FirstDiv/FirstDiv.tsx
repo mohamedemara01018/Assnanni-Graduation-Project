@@ -10,82 +10,16 @@ import Patient from "./Patient";
 import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-
-interface Schedule {
-  appointmentId: number;
-  patientName: string;
-  specialty: string;
-  time: string;
-  status: string;
-}
-
-interface Scan {
-  id: number;
-  patientName: string;
-  scanType: string;
-  uploadedAt: string;
-}
-
-interface RecentPatient {
-  id: number;
-  name: string;
-  imageUrl: string;
-  lastInteractionDate: string;
-}
-
-const dummySchedules: Schedule[] = [
-  {
-    appointmentId: 1,
-    patientName: "Dr. Sarah Johnson",
-    specialty: "Cardiology",
-    time: "10:00",
-    status: "confirmed",
-  },
-  {
-    appointmentId: 2,
-    patientName: "Dr. Emily Rodriguez",
-    specialty: "Pediatrics",
-    time: "14:00",
-    status: "pending",
-  },
-  {
-    appointmentId: 3,
-    patientName: "Dr. Michael Chen",
-    specialty: "Neurology",
-    time: "09:00",
-    status: "completed",
-  },
-];
-
-const dummyScans: Scan[] = [
-  {
-    id: 1,
-    patientName: "5235299259",
-    scanType: "CT Scan",
-    uploadedAt: new Date().toISOString(),
-  },
-];
-
-const dummyPatients: RecentPatient[] = [
-  {
-    id: 1,
-    name: "John Doe",
-    imageUrl: "https://randomuser.me/api/portraits/men/32.jpg",
-    lastInteractionDate: "2026-04-30",
-  },
-  {
-    id: 2,
-    name: "Mary Smith",
-    imageUrl: "https://randomuser.me/api/portraits/women/44.jpg",
-    lastInteractionDate: "2026-04-29",
-  },
-  {
-    id: 3,
-    name: "Robert Brown",
-    imageUrl: "https://randomuser.me/api/portraits/men/46.jpg",
-    lastInteractionDate: "2026-04-28",
-  },
-];
+import {
+  dummySchedules,
+  dummyScans,
+  dummyPatients,
+} from "@/constants/doctorConstants";
+import type {
+  Schedule,
+  Scan,
+  RecentPatient,
+} from "@/interfaces/doctorInterfaces";
 
 const FirstDiv = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);

@@ -3,18 +3,7 @@ import LearningProgress from "./LearningProgress";
 import Patient from "../FirstDiv/Patient";
 import { FaGraduationCap } from "react-icons/fa6";
 import { NavLink } from "react-router";
-
-interface Supervisor {
-  name: string;
-  specialty: string;
-  imageUrl: string;
-}
-
-const dummySupervisor: Supervisor = {
-  name: "Dr. Sarah Miller",
-  specialty: "Senior Cardiologist",
-  imageUrl: "https://randomuser.me/api/portraits/women/65.jpg",
-};
+import { dummySupervisor } from "@/constants/studentConstants";
 
 const SecondDiv = () => {
   return (
@@ -25,7 +14,10 @@ const SecondDiv = () => {
         <h1 className="text-xl font-medium text-(--color-text) pb-3 border-b border-(--color-border)">
           Assigned Supervisor
         </h1>
-        <Patient name={dummySupervisor.name} imageUrl={dummySupervisor.imageUrl}>
+        <Patient
+          name={dummySupervisor.name}
+          imageUrl={dummySupervisor.imageUrl}
+        >
           <p className="text-xs">{dummySupervisor.specialty}</p>
         </Patient>
         <NavLink

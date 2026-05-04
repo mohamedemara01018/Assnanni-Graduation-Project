@@ -4,73 +4,8 @@ import { LuFileSpreadsheet } from "react-icons/lu";
 import { NavLink } from "react-router";
 import Patient from "./Patient";
 import { CiLock } from "react-icons/ci";
-
-const dummyPatients = [
-  {
-    id: 1,
-    name: "John Doe",
-    imageUrl: "https://randomuser.me/api/portraits/men/32.jpg",
-    lastInteractionDate: "2026-04-30",
-  },
-  {
-    id: 2,
-    name: "Mary Smith",
-    imageUrl: "https://randomuser.me/api/portraits/women/44.jpg",
-    lastInteractionDate: "2026-04-29",
-  },
-  {
-    id: 3,
-    name: "Robert Brown",
-    imageUrl: "https://randomuser.me/api/portraits/men/46.jpg",
-    lastInteractionDate: "2026-04-28",
-  },
-];
-
-interface Observation {
-  id: number;
-  doctorName: string;
-  specialty: string;
-  time: string;
-  supervisor: string;
-  status: string;
-}
-
-const dummyObservations: Observation[] = [
-  {
-    id: 1,
-    doctorName: "Dr. Sarah Johnson",
-    specialty: "Cardiology",
-    time: "10:00",
-    supervisor: "Dr. Smith",
-    status: "Observe Only",
-  },
-  {
-    id: 2,
-    doctorName: "Dr. Emily Rodriguez",
-    specialty: "Pediatrics",
-    time: "14:00",
-    supervisor: "Dr. Miller",
-    status: "Observe Only",
-  },
-];
-
-interface Scan {
-  id: number;
-  type: string;
-  caseStudyNum: string;
-  note: string;
-  status: string;
-}
-
-const dummyScans: Scan[] = [
-  {
-    id: 1,
-    type: "CT Scan",
-    caseStudyNum: "#",
-    note: "For educational purposes only",
-    status: "View & Learn",
-  },
-];
+import { dummyPatients } from "@/constants/doctorConstants";
+import { dummyObservations, dummyScans } from "@/constants/studentConstants";
 
 const FirstDiv = () => {
   return (
@@ -90,7 +25,9 @@ const FirstDiv = () => {
             <Card
               key={obs.id}
               title={`Observation: ${obs.doctorName}`}
-              status={obs.status}
+              status={
+                obs.status === "Observe Only" ? "Observe Only" : "View & Learn"
+              }
               color="blue"
               logo={<FaRegClock />}
             >
@@ -117,7 +54,9 @@ const FirstDiv = () => {
             <Card
               key={scan.id}
               title={scan.type}
-              status={scan.status}
+              status={
+                scan.status === "Observe Only" ? "Observe Only" : "View & Learn"
+              }
               color="violet"
               logo={<LuFileSpreadsheet />}
             >

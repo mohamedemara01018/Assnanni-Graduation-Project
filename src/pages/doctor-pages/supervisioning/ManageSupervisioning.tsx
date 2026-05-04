@@ -1,50 +1,8 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
+import { studentDoctors } from "@/constants/doctorConstants";
 import { FaRegAddressCard } from "react-icons/fa6";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { useNavigate } from "react-router";
-
-type StudentDoctor = {
-  id: number;
-  name: string;
-  university: string;
-  year: string;
-  supervisor: string;
-  status: "Active" | "Pending Review";
-  dentalUniversityProofImage: string;
-};
-
-const studentDoctors: StudentDoctor[] = [
-  {
-    id: 1,
-    name: "Ahmed Khaled",
-    university: "Cairo Dental University",
-    year: "Year 5",
-    supervisor: "Dr. John Doe",
-    status: "Active",
-    dentalUniversityProofImage:
-      "https://images.unsplash.com/photo-1582719471384-894fbb16e074?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: 2,
-    name: "Mariam Ali",
-    university: "Alexandria University",
-    year: "Year 4",
-    supervisor: "Dr. John Doe",
-    status: "Pending Review",
-    dentalUniversityProofImage:
-      "https://images.unsplash.com/photo-1598257006458-087169a1f08d?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    id: 3,
-    name: "Youssef Hassan",
-    university: "Ain Shams University",
-    year: "Year 5",
-    supervisor: "Dr. John Doe",
-    status: "Active",
-    dentalUniversityProofImage:
-      "https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1200&q=80",
-  },
-];
 
 const ManageSupervisioning = () => {
   const navigate = useNavigate();
@@ -103,7 +61,7 @@ const ManageSupervisioning = () => {
                   type="button"
                   onClick={() =>
                     navigate(
-                      `/doctor-supervisioning/view-request/${student.id}`,
+                      `/doctor-supervisioning/view-request/${student.id}`
                     )
                   }
                   className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700"
@@ -115,7 +73,7 @@ const ManageSupervisioning = () => {
                   disabled={student.status !== "Active"}
                   onClick={() =>
                     navigate(
-                      `/doctor-supervisioning/assign-student-doctor/${student.id}`,
+                      `/doctor-supervisioning/assign-student-doctor/${student.id}`
                     )
                   }
                   className="rounded-lg border border-(--color-border) px-3 py-1.5 text-xs font-semibold text-(--color-text) transition-opacity hover:bg-(--color-bg) disabled:cursor-not-allowed disabled:opacity-40"

@@ -1,61 +1,13 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import { FiShield } from "react-icons/fi";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
-
 import { NavLink } from "react-router";
-
-interface Receptionist {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  status: string;
-  addedDate: string;
-  lastActive: string;
-  initials: string;
-  color: string;
-}
-
-const receptionists: Receptionist[] = [
-  {
-    id: 1,
-    name: "Emily Rodriguez",
-    email: "emily.r@assnani.com",
-    phone: "555-0201",
-    status: "active",
-    addedDate: "2025-11-01",
-    lastActive: "2 hours ago",
-    initials: "ER",
-    color: "bg-blue-500",
-  },
-  {
-    id: 2,
-    name: "Michael Thompson",
-    email: "michael.t@assnani.com",
-    phone: "555-0202",
-    status: "active",
-    addedDate: "2025-10-15",
-    lastActive: "1 day ago",
-    initials: "MT",
-    color: "bg-teal-500",
-  },
-  {
-    id: 3,
-    name: "Sarah Kim",
-    email: "sarah.k@assnani.com",
-    phone: "555-0203",
-    status: "inactive",
-    addedDate: "2025-09-20",
-    lastActive: "2 weeks ago",
-    initials: "SK",
-    color: "bg-blue-600",
-  },
-];
+import { receptionists } from "@/constants/doctorConstants";
 
 const ReceptionistAccess = () => {
   const totalReceptionists = receptionists.length;
   const activeReceptionists = receptionists.filter(
-    (r) => r.status === "active",
+    (r) => r.status === "active"
   ).length;
   const inactiveReceptionists = totalReceptionists - activeReceptionists;
 

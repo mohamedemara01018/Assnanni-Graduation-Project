@@ -11,7 +11,7 @@ function InComingAppointments() {
     <div className="mt-6">
       <div className="w-full bg-(--color-surface) p-4 rounded-2xl ">
         <div className=" flex items-center justify-between gap-4">
-          <SearchInput width="w-full" />
+          <SearchInput style="w-full" />
           <button
             onClick={() => setFilter(!onFilter)}
             className={`flex items-center gap-2 border-2 border-(--color-border) py-2 px-4 hover:bg-(--color-bg) text-(--color-text)  rounded-lg cursor-pointer ${

@@ -3,76 +3,7 @@ import { FiShield } from "react-icons/fi";
 import { AiOutlineCheckCircle, AiOutlineCloseCircle } from "react-icons/ai";
 import { FaRegClock } from "react-icons/fa6";
 import { NavLink } from "react-router";
-
-interface Receptionist {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  status: string;
-  addedDate: string;
-  lastActive: string;
-  initials: string;
-  color: string;
-}
-
-const receptionists: Receptionist[] = [
-  {
-    id: 1,
-    name: "Emily Rodriguez",
-    email: "emily.r@assnani.com",
-    phone: "555-0201",
-    status: "active",
-    addedDate: "2025-11-01",
-    lastActive: "2 hours ago",
-    initials: "ER",
-    color: "bg-blue-500",
-  },
-  {
-    id: 2,
-    name: "Michael Thompson",
-    email: "michael.t@assnani.com",
-    phone: "555-0202",
-    status: "active",
-    addedDate: "2025-10-15",
-    lastActive: "1 day ago",
-    initials: "MT",
-    color: "bg-teal-500",
-  },
-  {
-    id: 3,
-    name: "Sarah Kim",
-    email: "sarah.k@assnani.com",
-    phone: "555-0203",
-    status: "inactive",
-    addedDate: "2025-09-20",
-    lastActive: "2 weeks ago",
-    initials: "SK",
-    color: "bg-blue-600",
-  },
-  {
-    id: 4,
-    name: "David Chen",
-    email: "david.c@assnani.com",
-    phone: "555-0204",
-    status: "active",
-    addedDate: "2025-12-05",
-    lastActive: "10 minutes ago",
-    initials: "DC",
-    color: "bg-purple-500",
-  },
-  {
-    id: 5,
-    name: "Jessica Williams",
-    email: "jessica.w@assnani.com",
-    phone: "555-0205",
-    status: "inactive",
-    addedDate: "2025-08-12",
-    lastActive: "1 month ago",
-    initials: "JW",
-    color: "bg-orange-500",
-  },
-];
+import { receptionists } from "@/constants/doctorConstants";
 
 const ReceptionistAccess = () => {
   const totalReceptionists = receptionists.length;
@@ -231,7 +162,7 @@ const ReceptionistAccess = () => {
               ].map((activity, idx) => (
                 <div key={idx} className="flex gap-3 relative">
                   <div
-                    className={`w-2 h-2 rounded-full ${activity.color} mt-1.5 shrink-0 z-10 relative left-[0px]`}
+                    className={`w-2 h-2 rounded-full ${activity.color} mt-1.5 shrink-0 z-10 relative left-0`}
                   ></div>
                   <div>
                     <p className="text-sm text-(--color-text)">

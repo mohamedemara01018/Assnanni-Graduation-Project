@@ -13,42 +13,8 @@ import { toast } from "react-toastify";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-
-interface MedicalHistoryItem {
-  title: string;
-  doctorName: string;
-  date: string;
-  type: string;
-  description: string;
-  attachments: string[];
-}
-
-const fallbackHistory: MedicalHistoryItem[] = [
-  {
-    title: "Hypertension",
-    doctorName: "Dr. Sarah Johnson",
-    date: "2025-12-08",
-    type: "Consultation",
-    description: "Blood pressure elevated. Prescribed medication.",
-    attachments: ["blood-test-results.pdf"],
-  },
-  {
-    title: "Annual Checkup",
-    doctorName: "Dr. Emily Rodriguez",
-    date: "2025-11-20",
-    type: "Lab Test",
-    description: "All tests within normal range.",
-    attachments: ["lab-results.pdf", "x-ray.jpg"],
-  },
-  {
-    title: "Chest X-Ray",
-    doctorName: "Dr. Robert Anderson",
-    date: "2025-10-15",
-    type: "Scan",
-    description: "No abnormalities detected.",
-    attachments: ["chest-xray.jpg"],
-  },
-];
+import { fallbackHistory } from "@/constants/doctorConstants";
+import type { MedicalHistoryItem } from "@/interfaces/doctorInterfaces";
 
 const MedicalHistory = () => {
   const role = useSelector((state: RootState) => state.auth.role);
@@ -156,7 +122,7 @@ const MedicalHistory = () => {
                 <div className="flex justify-between items-start">
                   <div className="flex gap-5">
                     {/* Blue Icon Circle */}
-                    <div className="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 flex-shrink-0">
+                    <div className="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
                       <HiOutlineDocumentText className="text-2xl" />
                     </div>
 

@@ -1,34 +1,5 @@
-import React from "react";
+import { reports } from "@/constants/doctorConstants";
 import Card from "./Card";
-
-const reports = [
-  {
-    title: "Raw Data Export",
-    date: "2024-05-02",
-    size: "12.4 MB",
-    type: "File" as const,
-    fileUrl: "/report.pdf",
-  },
-
-  {
-    title: "Patient Satisfaction Survey",
-    date: "2024-01-10",
-    size: "0.8 MB",
-    type: "PDF" as const,
-  },
-  {
-    title: "Quarterly Inventory Audit",
-    date: "2024-01-05",
-    size: "4.1 MB",
-    type: "Excel" as const,
-  },
-  {
-    title: "Staff Performance Review",
-    date: "2024-01-02",
-    size: "2.2 MB",
-    type: "PDF" as const,
-  },
-];
 
 const RecentReports = () => {
   return (

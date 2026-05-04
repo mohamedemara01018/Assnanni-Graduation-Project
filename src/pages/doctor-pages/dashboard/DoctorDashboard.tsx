@@ -13,13 +13,7 @@ import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-
-const defaultDashboardData = {
-  todayAppointments: 12,
-  totalPatients: 128,
-  pendingScans: 1,
-  satisfactionRate: 95,
-};
+import { defaultDashboardData } from "@/constants/doctorConstants";
 
 const DoctorDashboard = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);

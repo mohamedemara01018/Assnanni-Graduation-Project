@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router";
 
 const GenerateReport = () => {
@@ -10,7 +9,9 @@ const GenerateReport = () => {
         <h3 className="text-gray-900 font-bold text-lg mb-1">
           Generate New Report
         </h3>
-        <p className="text-gray-500 text-sm">Create a new comprehensive medical or system report</p>
+        <p className="text-gray-500 text-sm">
+          Create a new comprehensive medical or system report
+        </p>
       </div>
       <button
         onClick={() => navigate("/doctor-reports/generate-new-report")}

@@ -75,7 +75,7 @@ const StudentAppointmentDetails = () => {
                   <BsFillPersonFill size={12} />
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 flex-grow">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 grow">
                 <div>
                   <h3 className="text-xl font-bold text-(--color-text)">
                     {appointment.patient.name}
