@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 import { Link, NavLink } from "react-router";
-import { Brain, Calendar, FileText, LayoutDashboard, Pill, Scan, Settings, Stethoscope, Users, X } from "lucide-react";
+import { Brain, Calendar, FileText, LayoutDashboard, Scan, Settings, Stethoscope, Users, X } from "lucide-react";
 
 
 
