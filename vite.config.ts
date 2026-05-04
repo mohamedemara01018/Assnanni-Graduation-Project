@@ -10,4 +10,13 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  server: {
+    proxy: {
+      "/api": {
+        target: "https://asnani.runasp.net",
+        changeOrigin: true,
+        secure: false, // especially if the backend has SSL issues
+      },
+    },
+  },
 });

@@ -7,10 +7,11 @@ import { IoPersonCircleOutline } from "react-icons/io5";
 import { GrAlert } from "react-icons/gr";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
-// import axios from "axios";
-import { useDispatch } from "react-redux";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
 import { setToken } from "@/store/slices/auth/authSlice";
 import { getEmail } from "@/store/slices/email/emailSlice";
+import type { RootState } from "@/store/store";
 
 interface Inputs {
   image: FileList;
@@ -31,7 +32,8 @@ const RegistrationForm = ({
   isDoctorRegister = false,
   isStudentDoctorRegister = false,
 }: RegistrationFormProps) => {
-  // API base: useSelector((s: RootState) => s.config.backendUrl) + 'Authentications/'
+  const authBase =
+    useSelector((s: RootState) => s.config.backendUrl) + "Authentications/";
   const dispatch = useDispatch();
   const navigator = useNavigate();
   const { pathname } = useLocation();
@@ -86,7 +88,8 @@ const RegistrationForm = ({
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       console.log(data);
-      // await axios.post(authBase + "Register-Doctor", data);
+      const token = await axios.post(authBase + "Register-Doctor", data);
+      console.log(token);
       dispatch(getEmail(data.email));
       if (doctor || studentDoctor) {
         // if (doctor) dispatch(setToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiZG9jdG9yIn0=.dummy"));

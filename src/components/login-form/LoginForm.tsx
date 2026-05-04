@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import { setToken } from "@/store/slices/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
+import axios from "axios";
 // import { updateRole } from "@/features/auth/authSlice";
 
 interface Inputs {
@@ -25,16 +26,12 @@ function LoginForm() {
     formState: { errors },
   } = useForm<Inputs>();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
-      // await axios.post(loginApiBase + "Login", data);
-      // dispatch(setToken(response.data.token)); // Use real token when uncommenting API
-      dispatch(
-        setToken(
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1Njc4OTAiLCJuYW1lIjoiSm9obiBEb2UiLCJyb2xlIjoicGF0aWVudCIsImVtYWlsIjoibW9oYW1lZEBnbWFpbC5jb20iLCJpYXQiOjE1MTYyMzkwMjJ9.Gn8ua6_Su_02zgSbfW_GIq4NOZCCBdpnEOpQE1DwTcA"
-        )
-      );
+      const response = await axios.post(loginApiBase + "Login", data);
+      console.log(response.data.data.token);
+      dispatch(setToken(response.data.data.token)); // Use real token when uncommenting API
+      // dispatch(setToken(response.data.token));
       toast.success("Welcome Back");
       navigator("/");
 

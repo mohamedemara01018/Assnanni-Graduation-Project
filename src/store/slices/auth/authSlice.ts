@@ -16,8 +16,9 @@ const getInitialAuth = () => {
   if (token) {
     try {
       const decoded: any = jwtDecode(token);
+      console.log("tokenDecoded", decoded);
       return {
-        id: decoded.id || null,
+        id: decoded.sud || null,
         role: decoded.role || "guest",
         name: decoded.name || null,
         email: decoded.email || null,

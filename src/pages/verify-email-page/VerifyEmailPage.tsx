@@ -12,31 +12,34 @@ import {
 } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import { useState, type FormEvent } from "react";
+import type { RootState } from "@/store/store";
+import axios from "axios";
 
 function VerifyEmailPage() {
-  // API base: useSelector((s: RootState) => s.config.backendUrl) + 'Authentications/'
+  const authBase =
+    useSelector((s: RootState) => s.config.backendUrl) + "Authentications/";
   const dispatch = useDispatch();
   const navigator = useNavigate();
   const [value, setValue] = useState("");
 
   const email = useSelector(
-    (state: { email: { emailAddress: string } }) => state.email.emailAddress,
+    (state: { email: { emailAddress: string } }) => state.email.emailAddress
   );
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    // const data = {
-    //   email,
-    //   code: value,
-    // };
+    const data = {
+      email,
+      code: value,
+    };
     try {
-      // await axios.post(authBase + "Verify-Email", data);
-
+      const token = await axios.post(authBase + "Verify-Email", data);
+      console.log(token);
       dispatch(
         setToken(
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicGF0aWVudCJ9.dummy",
-        ),
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicGF0aWVudCJ9.dummy"
+        )
       );
       dispatch(clearEmail());
       navigator("/onboarding");
@@ -60,7 +63,9 @@ function VerifyEmailPage() {
           </h1>
           <p className="text-sm text-(--color-text-light) sm:text-base">
             We've sent a 6-digit code to{" "}
-            <span className="font-semibold text-(--color-primary)">{email}</span>
+            <span className="font-semibold text-(--color-primary)">
+              {email}
+            </span>
           </p>
         </div>
         <form onSubmit={onSubmit} className="flex flex-col gap-5">

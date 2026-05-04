@@ -55,13 +55,6 @@ const Registration = () => {
             <LuGraduationCap />
             <span className="max-sm:hidden">Student</span>
           </NavLink>
-          <NavLink
-            to="/registration/receptionist-registration"
-            className={"flex gap-2 text-gray-500 flex-1  h-full items-center"}
-          >
-            <AiOutlineUser />
-            <span className="max-sm:hidden">Receptionist</span>
-          </NavLink>
         </div>
         <div>
           <Outlet />
