@@ -51,6 +51,7 @@ const fallbackHistory: MedicalHistoryItem[] = [
 ];
 
 const MedicalHistory = () => {
+  const role = useSelector((state: RootState) => state.auth.role);
   const { id } = useParams();
   const navigate = useNavigate();
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
@@ -65,7 +66,7 @@ const MedicalHistory = () => {
       if (!id) return fallbackHistory;
       try {
         const response = await axios.get(
-          `${backendUrl}Doctors/patient-medical-history/${id}`,
+          `${backendUrl}Doctors/patient-medical-history/${id}`
         );
         const data = response.data?.value || response.data;
 
@@ -89,7 +90,11 @@ const MedicalHistory = () => {
 
   const handleDownload = (item: MedicalHistoryItem) => {
     // Simulate downloading the record as a text file
-    const content = `Medical Record: ${item.title}\nDoctor: ${item.doctorName}\nDate: ${item.date}\nType: ${item.type}\n\nDescription:\n${item.description}\n\nAttachments: ${item.attachments.join(", ")}`;
+    const content = `Medical Record: ${item.title}\nDoctor: ${
+      item.doctorName
+    }\nDate: ${item.date}\nType: ${item.type}\n\nDescription:\n${
+      item.description
+    }\n\nAttachments: ${item.attachments.join(", ")}`;
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -124,15 +129,17 @@ const MedicalHistory = () => {
               Medical History
             </h1>
           </div>
-          <button
-            onClick={() =>
-              navigate(`/doctor-patients/${id}/medical-history/add`)
-            }
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95 mt-10"
-          >
-            <FiPlus className="text-xl" />
-            <span>Add New Record</span>
-          </button>
+          {role === "doctor" && (
+            <button
+              onClick={() =>
+                navigate(`/doctor-patients/${id}/medical-history/add`)
+              }
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95 mt-10"
+            >
+              <FiPlus className="text-xl" />
+              <span>Add New Record</span>
+            </button>
+          )}
         </div>
 
         {isLoading ? (

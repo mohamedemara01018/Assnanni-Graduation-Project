@@ -26,7 +26,7 @@ interface SideBarProp {
 
 function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
   const role = useSelector(
-    (state: { auth: { role: string } }) => state.auth.role,
+    (state: { auth: { role: string } }) => state.auth.role
   );
 
   // const role = "admin";
@@ -89,7 +89,7 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
                     </NavLink>
                   </li>
                 );
-              },
+              }
             )}
 
           {/* doctor */}
@@ -270,7 +270,7 @@ const sidebarDataRole = {
     { icon: LayoutDashboard, label: "Dashboard", path: "/patient" },
     { icon: Calendar, label: "Appointments", path: "/appointments" },
     { icon: Stethoscope, label: "Doctors", path: "/doctors-list" },
-    { icon: Scan, label: "Scans", path: "/scan/upload" },
+    // { icon: Scan, label: "Scans", path: "/scan/upload" },
     { icon: Users, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ],

@@ -4,7 +4,6 @@ import { Link } from "react-router";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import { MdOutlineStar } from "react-icons/md";
 
-
 function PatientPage() {
   return (
     <DashboardLayout pageTitle={"Patient dashboard"}>
@@ -22,7 +21,7 @@ function PatientPage() {
               <div className="flex items-center justify-between gap-4 w-full">
                 <h2 className="text-xl">Upcoming Appointments</h2>
                 <Link
-                  to={"/"}
+                  to={"/doctors-list"}
                   className="text-(--color-primary) hover:text-(--color-primary-light) transition duration-200"
                 >
                   Book New
@@ -115,7 +114,7 @@ function PatientPage() {
               <div className="flex items-center justify-between gap-4 w-full">
                 <h2 className="text-xl">Available Doctors</h2>
                 <Link
-                  to={"/"}
+                  to={"/doctors-list"}
                   className="text-(--color-primary) hover:text-(--color-primary-light) transition duration-200"
                 >
                   View All
@@ -218,7 +217,7 @@ function PatientPage() {
               <h2 className="text-(--color-text) text-xl">Quich Actions</h2>
               <div className="flex flex-col gap-3 items-center w-full">
                 <Link
-                  to={"/doctors"}
+                  to={"/doctors-list"}
                   className="flex flex-col  items-start justify-between py-1.5 px-3 rounded-lg text-(--color-text-blue) bg-(--color-bg-blue) w-full hover:shadow-sm"
                 >
                   <h3 className="">Find a Doctor</h3>
@@ -226,7 +225,7 @@ function PatientPage() {
                     Search and book
                   </span>
                 </Link>
-                <Link
+                {/* <Link
                   to={"/doctors"}
                   className="flex flex-col  items-start justify-between py-1.5 px-3 rounded-lg text-(--color-text-blue) bg-(--color-bg-blue) w-full hover:shadow-sm"
                 >
@@ -234,9 +233,9 @@ function PatientPage() {
                   <span className="text-[12px] text-(--color-text-light)">
                     AI-assisted analysis
                   </span>
-                </Link>
+                </Link> */}
                 <Link
-                  to={"/doctors"}
+                  to={"/medical-report"}
                   className="flex flex-col  items-start justify-between py-1.5 px-3 rounded-lg text-(--color-text-blue) bg-(--color-bg-blue) w-full hover:shadow-sm"
                 >
                   <h3 className="">My Prescriptions</h3>

@@ -5,7 +5,7 @@ import { IoMdArrowBack } from "react-icons/io";
 
 const Settings = () => {
   return (
-    <DashboardLayout pageTitle={"Doctor Settings"}>
+    <DashboardLayout pageTitle={"Settings"}>
       <div className="p-4  -mt-6 lg:min-h-[85vh] flex flex-col gap-8 bg-(--color-bg) rounded-2xl">
         <h1 className="text-2xl mb-2 font-normal text-(--color-text) mt-2">
           Settings
