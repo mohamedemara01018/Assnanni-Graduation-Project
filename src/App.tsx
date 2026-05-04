@@ -35,7 +35,6 @@ import {
   routeElements,
 } from "./constants/appConstants";
 import AppointmentDetailsPage from "./pages/appointment-details-page/AppointmentDetailsPage";
-import Loading from "./components/loading/Loading";
 
 // Main application component that handles routing and global layouts
 const App = () => {
@@ -51,7 +50,6 @@ const App = () => {
   );
   console.log(role, { id, name, email });
 
-  return <Loading />
   return (
     <div className="min-h-screen w-full flex flex-col">
       <main className="grow">
