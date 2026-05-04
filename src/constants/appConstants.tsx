@@ -27,14 +27,14 @@ import Notifications from "../pages/doctor-pages/notifications/Notifications";
 import StudentAppointments from "../pages/student-doctor-pages/appointments/StudentAppointments";
 import StudentAppointmentDetails from "../pages/student-doctor-pages/appointments/StudentAppointmentDetails";
 import StudentDoctorDashboard from "../pages/student-doctor-pages/dashboard/StudentDoctorDashboard";
-import StudentNotifications from "../pages/student-doctor-pages/notifications/StudentNotifications";
+// import StudentNotifications from "../pages/student-doctor-pages/notifications/StudentNotifications";
 import ContactSupervisor from "../pages/student-doctor-pages/supervisor/ContactSupervisor";
 import ReceptionistDashboard from "../pages/receptionist-pages/dashboard/ReceptionistDashboard";
 import ScheduleAppointment from "../pages/receptionist-pages/appointments/ScheduleAppointment";
 import CheckIn from "../pages/receptionist-pages/appointments/CheckIn";
 import RescheduleAppointment from "../pages/receptionist-pages/appointments/RescheduleAppointment";
 import Settings from "../pages/doctor-pages/settings/Settings";
-import StudentSettings from "../pages/student-doctor-pages/settings/Settings";
+// import StudentSettings from "../pages/student-doctor-pages/settings/Settings";
 import ProfileSettings from "../components/Doctor/Settings/SettingsDetails/ProfileSettings";
 import SecuritySettings from "../components/Doctor/Settings/SettingsDetails/SecuritySettings";
 import NotificationPreferences from "../components/Doctor/Settings/SettingsDetails/NotificationPreferences";
@@ -118,7 +118,7 @@ export const routeElements = {
 
   // Student Doctor routes
   "/student-doctor": <StudentDoctorDashboard />,
-  "student-notification": <StudentNotifications />,
+  // "student-notification": <StudentNotifications />,
   "contact-supervisor": <ContactSupervisor />,
 
   // Receptionist routes
@@ -129,7 +129,7 @@ export const routeElements = {
 
   // Settings routes
   settings: <Settings />,
-  "student-settings": <StudentSettings />,
+  // "student-settings": <StudentSettings />,
   "": <ProfileSettings />,
   security: <SecuritySettings />,
   notifications: <NotificationPreferences />,

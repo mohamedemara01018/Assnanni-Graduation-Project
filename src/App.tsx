@@ -34,6 +34,7 @@ import {
   homePageByRole,
   routeElements,
 } from "./constants/appConstants";
+import AppointmentDetailsPage from "./pages/appointment-details-page/AppointmentDetailsPage";
 
 // Main application component that handles routing and global layouts
 const App = () => {
@@ -48,6 +49,7 @@ const App = () => {
     }) => state.auth
   );
   console.log(role, { id, name, email });
+
   return (
     <div className="min-h-screen w-full flex flex-col">
       <main className="grow">
@@ -114,6 +116,7 @@ const App = () => {
 
           {/* Public routes (accessible without authentication) */}
           <Route path="/appointments" element={<AppointmentsPage />} />
+          <Route path="/appointments/:id" element={<AppointmentDetailsPage />} />
           <Route path="/doctors-list" element={<DoctorsListPage />} />
           <Route path="/doctors-list/:id" element={<DoctorProfilePage />} />
           <Route
