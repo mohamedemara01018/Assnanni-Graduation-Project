@@ -11,19 +11,20 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
-
-const defaultDashboardData = {
-  todayAppointments: 12,
-  totalPatients: 128,
-  pendingScans: 1,
-  satisfactionRate: 95,
-};
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import { defaultDashboardData } from "@/constants/doctorConstants";
 
 const DoctorDashboard = () => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
 
-  const { data: dashboardData = defaultDashboardData, isSuccess, isError, error } = useQuery({
+  const {
+    data: dashboardData = defaultDashboardData,
+    isSuccess,
+    isError,
+    error,
+  } = useQuery({
     queryKey: ["DoctorDashboardOverview"],
     queryFn: async () => {
       const response = await axios.get(backendUrl + "Doctors/dashboard", {
@@ -34,10 +35,13 @@ const DoctorDashboard = () => {
       const data = response.data?.value || response.data;
       if (data) {
         return {
-          todayAppointments: data.todayAppointments ?? defaultDashboardData.todayAppointments,
-          totalPatients: data.totalPatients ?? defaultDashboardData.totalPatients,
+          todayAppointments:
+            data.todayAppointments ?? defaultDashboardData.todayAppointments,
+          totalPatients:
+            data.totalPatients ?? defaultDashboardData.totalPatients,
           pendingScans: data.pendingScans ?? defaultDashboardData.pendingScans,
-          satisfactionRate: data.satisfactionRate ?? defaultDashboardData.satisfactionRate,
+          satisfactionRate:
+            data.satisfactionRate ?? defaultDashboardData.satisfactionRate,
         };
       }
       return defaultDashboardData;
@@ -56,7 +60,7 @@ const DoctorDashboard = () => {
 
   return (
     <DashboardLayout pageTitle={"Doctor Dashboard"}>
-      <div className=" -mt-6 -ml-6    bg-(--color-bg)  rounded-2xl">
+      <div className=" -mt-6     bg-(--color-bg)  rounded-2xl">
         <h1 className="text-2xl text-(--color-text) font-medium p-6 font-sans pb-2">
           Welcome, Dr. John Doe!
         </h1>

@@ -4,43 +4,24 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Days from "./Days";
 import { useQuery } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import { fallbackDays } from "@/constants/doctorConstants";
+import type { Day } from "@/interfaces/doctorInterfaces";
 
-interface Day {
-  day: string;
-  time: string[];
+interface Props {
+  role: string;
 }
 
-const fallbackDays: Day[] = [
-  {
-    day: "Monday",
-    time: [
-      "09:00 AM",
-      "10:00 AM",
-      "11:00 AM",
-      "02:00 PM",
-      "03:00 PM",
-      "04:00 PM",
-    ],
-  },
-  {
-    day: "Tuesday",
-    time: ["09:00 AM", "10:00 AM", "11:00 AM", "02:00 PM", "03:00 PM"],
-  },
-  {
-    day: "Wednesday",
-    time: ["09:00 AM", "10:00 AM", "02:00 PM", "03:00 PM", "04:00 PM"],
-  },
-  { day: "Thursday", time: [] },
-  { day: "Friday", time: ["09:00 AM", "10:00 AM", "11:00 AM", "02:00 PM"] },
-  { day: "Saturday", time: ["09:00 AM", "10:00 AM", "11:00 AM"] },
-  { day: "Sunday", time: [] },
-];
+const WeeklySchedule = ({ role }: Props) => {
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
 
-const WeeklySchedule = () => {
-  const backendUrl =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/";
-
-  const { data: days = fallbackDays, isError, error, isSuccess } = useQuery<Day[]>({
+  const {
+    data: days = fallbackDays,
+    isError,
+    error,
+    isSuccess,
+  } = useQuery<Day[]>({
     queryKey: ["DoctorSchedules"],
     queryFn: async () => {
       const response = await axios.get(`${backendUrl}DoctorSchedules`);
@@ -68,18 +49,20 @@ const WeeklySchedule = () => {
         <h3 className="text-(--color-text) text-lg font-medium">
           Weekly Schedule
         </h3>
-        <NavLink
-          to={"/add-time-slot"}
-          className="bg-blue-600 text-white text-sm font-medium rounded-lg py-2 px-4 cursor-pointer hover:bg-blue-700 transition-colors flex items-center gap-1"
-        >
-          + Add Time Slot
-        </NavLink>
+        {role !== "studentDoctor" && (
+          <NavLink
+            to={"/add-time-slot"}
+            className="bg-blue-600 text-white text-sm font-medium rounded-lg py-2 px-4 cursor-pointer hover:bg-blue-700 transition-colors flex items-center gap-1"
+          >
+            + Add Time Slot
+          </NavLink>
+        )}
       </div>
       <div className="flex flex-col gap-4">
         {days.map((day, index) => {
           return (
             <div key={index}>
-              <Days day={day.day} time={day.time} />
+              <Days day={day.day} time={day.time} role={role} />
             </div>
           );
         })}

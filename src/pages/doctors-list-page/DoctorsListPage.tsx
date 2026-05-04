@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import SearchInput from "@/components/search-input/SearchInput";
 import { selectInputData } from "@/constants/doctorsListConstant";
@@ -9,21 +10,22 @@ import { Link } from "react-router";
 import { useSelector } from "react-redux";
 
 function DoctorsListPage() {
-  const role = useSelector((state) => state.auth.role);
+  const role = useSelector(
+    (state: { auth: { role: string } }) => state.auth.role
+  );
 
-  return role == "guest" ? (
+  return role == "patient" ? (
+    <DashboardLayout pageTitle="Patient ">
+      <DoctorList />
+    </DashboardLayout>
+  ) : (
     <div className="m-6">
       <DoctorList />
     </div>
-  ) : (
-    <DashboardLayout pageTitle="patient ">
-      <DoctorList />
-    </DashboardLayout>
   );
 }
 
 export default DoctorsListPage;
-
 
 function DoctorList() {
   return (
@@ -119,7 +121,10 @@ function DoctorList() {
                         >
                           View Profile
                         </Link>
-                        <Link to={'/appointments/booking/1'} className=" flex items-center justify-center gap-1 w-full p-2 border border-(--color-primary) rounded-lg bg-(--color-primary) text-white cursor-pointer hover:bg-(--color-primary-dark) duration-150 ">
+                        <Link
+                          to={"/appointments/booking/1"}
+                          className=" flex items-center justify-center gap-1 w-full p-2 border border-(--color-primary) rounded-lg bg-(--color-primary) text-white cursor-pointer hover:bg-(--color-primary-dark) duration-150 "
+                        >
                           <CiBookmark className="text-xl text-white" />
                           <span>Book</span>
                         </Link>
@@ -132,5 +137,5 @@ function DoctorList() {
         </div>
       </div>
     </div>
-  )
+  );
 }

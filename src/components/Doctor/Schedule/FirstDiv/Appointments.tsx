@@ -4,44 +4,24 @@ import { toast } from "react-toastify";
 import { FaRegClock } from "react-icons/fa6";
 import { BsCalendarEvent } from "react-icons/bs";
 import { useQuery } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import { fallbackAppointments } from "@/constants/doctorConstants";
+import type { Appointment } from "@/interfaces/doctorInterfaces";
 
-interface Appointment {
-  id: number;
-  name: string;
-  type: string;
-  time: string;
-  status: "Confirmed" | "Pending";
+interface Props {
+  role: string;
 }
 
-const fallbackAppointments: Appointment[] = [
-  {
-    id: 1,
-    name: "John Smith",
-    type: "Consultation",
-    time: "09:00 AM",
-    status: "Confirmed",
-  },
-  {
-    id: 2,
-    name: "Sarah Johnson",
-    type: "Follow-up",
-    time: "10:00 AM",
-    status: "Confirmed",
-  },
-  {
-    id: 3,
-    name: "Michael Brown",
-    type: "Checkup",
-    time: "02:00 PM",
-    status: "Pending",
-  },
-];
+const Appointments = ({ role }: Props) => {
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
 
-const Appointments = () => {
-  const backendUrl =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:5000/";
-
-  const { data: appointments = fallbackAppointments, isError, error, isSuccess } = useQuery<Appointment[]>({
+  const {
+    data: appointments = fallbackAppointments,
+    isError,
+    error,
+    isSuccess,
+  } = useQuery<Appointment[]>({
     queryKey: ["TodayAppointments"],
     queryFn: async () => {
       const response = await axios.get(`${backendUrl}TodayAppointments`);
@@ -89,17 +69,19 @@ const Appointments = () => {
               </div>
             </div>
 
-            <div>
-              <span
-                className={`text-xs font-medium px-2.5 py-1 rounded-full ${
-                  apt.status === "Confirmed"
-                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                    : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-                }`}
-              >
-                {apt.status}
-              </span>
-            </div>
+            {role !== "studentDoctor" && (
+              <div>
+                <span
+                  className={`text-xs font-medium px-2.5 py-1 rounded-full ${
+                    apt.status === "Confirmed"
+                      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                      : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                  }`}
+                >
+                  {apt.status}
+                </span>
+              </div>
+            )}
           </div>
         ))}
       </div>

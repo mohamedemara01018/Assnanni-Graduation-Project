@@ -9,7 +9,7 @@ interface FooterColumnProps {
 function FooterColumn({ title, links }: FooterColumnProps) {
     return (
         <div>
-            <h4 className="mb-4 text-(--color-surface)">{title}</h4>
+            <h4 className="mb-4 text-(--color-text-light)">{title}</h4>
             <ul className="space-y-2 text-sm text-gray-400 dark:text-gray-500">
                 {links.map((item, idx) => (
                     <li key={idx} >

@@ -6,51 +6,21 @@ import {
   HiOutlineCalendar,
   HiOutlineDownload,
 } from "react-icons/hi";
+import { FiPlus } from "react-icons/fi";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
-
-interface MedicalHistoryItem {
-  title: string;
-  doctorName: string;
-  date: string;
-  type: string;
-  description: string;
-  attachments: string[];
-}
-
-const fallbackHistory: MedicalHistoryItem[] = [
-  {
-    title: "Hypertension",
-    doctorName: "Dr. Sarah Johnson",
-    date: "2025-12-08",
-    type: "Consultation",
-    description: "Blood pressure elevated. Prescribed medication.",
-    attachments: ["blood-test-results.pdf"],
-  },
-  {
-    title: "Annual Checkup",
-    doctorName: "Dr. Emily Rodriguez",
-    date: "2025-11-20",
-    type: "Lab Test",
-    description: "All tests within normal range.",
-    attachments: ["lab-results.pdf", "x-ray.jpg"],
-  },
-  {
-    title: "Chest X-Ray",
-    doctorName: "Dr. Robert Anderson",
-    date: "2025-10-15",
-    type: "Scan",
-    description: "No abnormalities detected.",
-    attachments: ["chest-xray.jpg"],
-  },
-];
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import { fallbackHistory } from "@/constants/doctorConstants";
+import type { MedicalHistoryItem } from "@/interfaces/doctorInterfaces";
 
 const MedicalHistory = () => {
+  const role = useSelector((state: RootState) => state.auth.role);
   const { id } = useParams();
   const navigate = useNavigate();
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
 
   const {
     data: history = fallbackHistory,
@@ -62,7 +32,7 @@ const MedicalHistory = () => {
       if (!id) return fallbackHistory;
       try {
         const response = await axios.get(
-          `${backendUrl}Doctors/patient-medical-history/${id}`,
+          `${backendUrl}Doctors/patient-medical-history/${id}`
         );
         const data = response.data?.value || response.data;
 
@@ -86,7 +56,11 @@ const MedicalHistory = () => {
 
   const handleDownload = (item: MedicalHistoryItem) => {
     // Simulate downloading the record as a text file
-    const content = `Medical Record: ${item.title}\nDoctor: ${item.doctorName}\nDate: ${item.date}\nType: ${item.type}\n\nDescription:\n${item.description}\n\nAttachments: ${item.attachments.join(", ")}`;
+    const content = `Medical Record: ${item.title}\nDoctor: ${
+      item.doctorName
+    }\nDate: ${item.date}\nType: ${item.type}\n\nDescription:\n${
+      item.description
+    }\n\nAttachments: ${item.attachments.join(", ")}`;
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -108,17 +82,30 @@ const MedicalHistory = () => {
     <DashboardLayout pageTitle="Medical History">
       <div className="-mt-6 p-8 bg-(--color-bg) min-h-[60vh] rounded-2xl">
         {/* Header */}
-        <div className="mb-8">
-          <button
-            onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-(--color-text-light) hover:text-(--color-text) transition-colors mb-6 cursor-pointer font-medium"
-          >
-            <IoArrowBack />
-            <span>Back</span>
-          </button>
-          <h1 className="text-3xl text-(--color-text) font-semibold tracking-tight">
-            Medical History
-          </h1>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-2 text-(--color-text-light) hover:text-(--color-text) transition-colors mb-6 cursor-pointer font-medium"
+            >
+              <IoArrowBack />
+              <span>Back</span>
+            </button>
+            <h1 className="text-3xl text-(--color-text) font-semibold tracking-tight">
+              Medical History
+            </h1>
+          </div>
+          {role === "doctor" && (
+            <button
+              onClick={() =>
+                navigate(`/doctor-patients/${id}/medical-history/add`)
+              }
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95 mt-10"
+            >
+              <FiPlus className="text-xl" />
+              <span>Add New Record</span>
+            </button>
+          )}
         </div>
 
         {isLoading ? (
@@ -135,7 +122,7 @@ const MedicalHistory = () => {
                 <div className="flex justify-between items-start">
                   <div className="flex gap-5">
                     {/* Blue Icon Circle */}
-                    <div className="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 flex-shrink-0">
+                    <div className="w-14 h-14 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
                       <HiOutlineDocumentText className="text-2xl" />
                     </div>
 

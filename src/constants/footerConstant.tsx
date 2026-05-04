@@ -2,8 +2,8 @@ export const footerLinks = [
   {
     title: "Platform",
     links: [
-      { name: "Find Doctors", path: "/doctors" },
-      { name: "Register", path: "/register/patient-register" },
+      { name: "Find Doctors", path: "/doctors-list" },
+      { name: "Register", path: "/register" },
       { name: "Login", path: "/login" },
     ],
   },

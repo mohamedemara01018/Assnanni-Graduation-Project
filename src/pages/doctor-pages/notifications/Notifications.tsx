@@ -1,38 +1,47 @@
+import { useState } from "react";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import Card from "../../../components/Doctor/Notifications/Card";
-import { SlCalender } from "react-icons/sl";
+import { initialNotifications } from "@/constants/doctorConstants";
 
 const Notifications = () => {
+  const [notifications, setNotifications] = useState(initialNotifications);
+
+  const markAsRead = (id: number) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+    );
+  };
+
+  const markAllAsRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+  };
+
   return (
-    <DashboardLayout pageTitle={"Doctor Notifications"}>
-      <div className=" p-6  -mt-6 h-[85vh] bg-(--color-bg)">
-        <div className="flex justify-between mb-8 items-center border-b-2 border-gray-300 pb-2">
-          <h1 className="text-2xl font-normal text-(--color-text)">
-            Notifications
-          </h1>
-          <span className="text-blue-400 font-semibold text-sm cursor-pointer hover:shadow-2xs shadow-blue-400">
-            Mark all as read
-          </span>
-        </div>
-        <div className="flex flex-col gap-4">
-          <Card
-            icon={<SlCalender />}
-            title="New Appointment"
-            desc="John Doe has booked an appointment for Dec 15, 2025"
-            time="1 hour age"
-            isRead={false}
-            color="text-blue-700"
-            bgColor="bg-blue-200"
-          />
-          <Card
-            icon={<SlCalender />}
-            title="Appointment Reminder"
-            desc="John Doe has booked an appointment for Dec 15, 2025"
-            time="1 hour age"
-            isRead={true}
-            color="text-yellow-700"
-            bgColor="bg-yellow-200"
-          />
+    <DashboardLayout pageTitle={"Notifications"}>
+      <div className="p-10 bg-(--color-bg) min-h-screen">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex justify-between items-center mb-10 pb-6 border-b border-(--color-border)">
+            <h1 className="text-3xl font-bold text-(--color-text)">
+              Notifications
+            </h1>
+            <button
+              onClick={markAllAsRead}
+              className="text-blue-500 font-bold text-sm hover:text-blue-600 transition-colors cursor-pointer"
+            >
+              Mark all as read
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-5">
+            {notifications.map((notification) => (
+              <div
+                key={notification.id}
+                onClick={() => markAsRead(notification.id)}
+              >
+                <Card {...notification} />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </DashboardLayout>

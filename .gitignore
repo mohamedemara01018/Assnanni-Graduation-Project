@@ -30,3 +30,5 @@ dist-ssr
 *.sw?
 *.txt
 mock_tokens.txt
+assnani_patient_heuristic_evaluation.pdf
+public/report.pdf

@@ -2,32 +2,46 @@ import QuickActions from "./QuickActions";
 import LearningProgress from "./LearningProgress";
 import Patient from "../FirstDiv/Patient";
 import { FaGraduationCap } from "react-icons/fa6";
+import { NavLink } from "react-router";
+import { dummySupervisor } from "@/constants/studentConstants";
 
 const SecondDiv = () => {
   return (
-    <div className="flex-1 flex flex-col gap-6">
+    <div className="flex-1 flex flex-col gap-8">
       <LearningProgress />
-      <QuickActions />
-      <div className="mt-6 bg-(--color-surface) p-6 rounded-2xl flex flex-col gap-6 ">
-        <h1 className="text-xl  font-normal text-(--color-text) pb-2 border-b-2 border-gray-300 mb-2">
+
+      <div className="bg-(--color-surface) p-6 rounded-2xl shadow-sm border border-(--color-border) flex flex-col gap-6">
+        <h1 className="text-xl font-medium text-(--color-text) pb-3 border-b border-(--color-border)">
           Assigned Supervisor
         </h1>
-        <Patient name="Dr. Sarah Miller">
-          <p>Senior Cardiologist</p>
+        <Patient
+          name={dummySupervisor.name}
+          imageUrl={dummySupervisor.imageUrl}
+        >
+          <p className="text-xs">{dummySupervisor.specialty}</p>
         </Patient>
-        <button className="bg-blue-600 text-white font-normal text-sm  py-2 rounded-md w-full mb-3 mt-2 cursor-pointer hover:bg-blue-600/90">
+        <NavLink
+          to="/contact-supervisor"
+          className="bg-blue-600 text-white text-center font-bold text-sm py-3 rounded-xl w-full cursor-pointer hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
+        >
           Contact Supervisor
-        </button>
+        </NavLink>
       </div>
-      <div className="flex mb-6 bg-violet-100 px-4 py-2 items-center gap-3 text-violet-500 border border-violet-200 rounded-2xl">
-        <FaGraduationCap className="text-2xl" />
+
+      <div className="flex bg-violet-50 px-6 py-4 items-center gap-4 text-violet-500 border border-violet-100 rounded-2xl shadow-sm">
+        <div className="bg-violet-100 p-2 rounded-lg">
+          <FaGraduationCap size={24} className="text-violet-600" />
+        </div>
         <div>
-          <h3 className=" font-normal text-violet-700">Student Mode Active</h3>
-          <p className="text-xs font-normal">
+          <h3 className="font-bold text-sm text-violet-700">
+            Student Mode Active
+          </h3>
+          <p className="text-[10px] text-violet-500 font-medium">
             Complete your training program to unlock full doctor permissions
           </p>
         </div>
       </div>
+      <QuickActions />
     </div>
   );
 };

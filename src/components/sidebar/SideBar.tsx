@@ -17,7 +17,7 @@ interface SideBarProp {
 
 function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
   const role = useSelector(
-    (state: { auth: { role: string } }) => state.auth.role,
+    (state: { auth: { role: string } }) => state.auth.role
   );
 
   // const role = "admin";
@@ -80,7 +80,7 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
                     </NavLink>
                   </li>
                 );
-              },
+              }
             )}
 
           {/* doctor */}
@@ -141,7 +141,7 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
               </li>
 
               <li>
-                <NavLink to={"/student-appointments"} className={linkStyle}>
+                <NavLink to={"/doctor-appointments"} className={linkStyle}>
                   <SlCalender className="text-xl" />
                   {!toggled && <span>Appointments</span>}
                 </NavLink>
@@ -258,13 +258,12 @@ const sidebarDataRole = {
   ],
 
   patient: [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/patient' },
-    { icon: Calendar, label: 'Appointments', path: '/appointments' },
-    { icon: Stethoscope, label: 'Doctors', path: '/doctors-list' },
-    { icon: Pill, label: 'Prescriptions', path: '/prescriptions' },
-    { icon: Scan, label: 'Scans', path: '/scan/upload' },
-    { icon: Users, label: 'Notifications', path: '/notification' },
-    { icon: Settings, label: 'Settings', path: '/settings' },
+    { icon: LayoutDashboard, label: "Dashboard", path: "/patient" },
+    { icon: Calendar, label: "Appointments", path: "/appointments" },
+    { icon: Stethoscope, label: "Doctors", path: "/doctors-list" },
+    // { icon: Scan, label: "Scans", path: "/scan/upload" },
+    { icon: Users, label: "Notifications", path: "/notification" },
+    { icon: Settings, label: "Settings", path: "/settings" },
   ],
 
   doctor: [
@@ -279,7 +278,7 @@ const sidebarDataRole = {
 
   studentDoctor: [
     { icon: LayoutDashboard, label: "Dashboard", path: "/student-doctor" },
-    { icon: Calendar, label: "Appointments", path: "/student-appointments" },
+    { icon: Calendar, label: "Appointments", path: "/doctor-appointments" },
     { icon: Users, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ],
@@ -287,8 +286,8 @@ const sidebarDataRole = {
   receptionist: [
     { icon: LayoutDashboard, label: "Dashboard", path: "/receptionist" },
     { icon: Users, label: "Patients", path: "/doctor-patients" },
-    { icon: Calendar, label: "Appointments", path: "/appointments" },
-    { icon: Stethoscope, label: "Doctors", path: "/doctors-list" },
+    { icon: Calendar, label: "Appointments", path: "/doctor-appointments" },
+    { icon: Users, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ],
 };

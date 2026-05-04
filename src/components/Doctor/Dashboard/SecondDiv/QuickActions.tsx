@@ -58,6 +58,19 @@ const QuickActions = () => {
           Manage permissions
         </p>
       </NavLink>
+      <NavLink
+        to={"/doctor-supervisioning"}
+        className={
+          "bg-cyan-50 dark:bg-cyan-900/20 hover:bg-cyan-100 dark:hover:bg-cyan-900/40 transition rounded-lg p-4"
+        }
+      >
+        <h3 className="text-cyan-900 dark:text-cyan-300 font-semibold text-sm">
+          Manage Supervisioning
+        </h3>
+        <p className="text-xs font-light text-cyan-700 dark:text-cyan-400 mt-1">
+          Manage student Doctors
+        </p>
+      </NavLink>
     </div>
   );
 };

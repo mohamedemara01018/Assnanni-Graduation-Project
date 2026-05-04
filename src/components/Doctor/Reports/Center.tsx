@@ -3,11 +3,11 @@ import RecentReports from "./RecentReports";
 
 const Center = () => {
   return (
-    <div className="flex max-md:flex-col">
-      <div className="flex-2">
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-8">
+      <div className="xl:col-span-2">
         <PatientGrowth />
       </div>
-      <div className="flex-1">
+      <div className="xl:col-span-1">
         <RecentReports />
       </div>
     </div>

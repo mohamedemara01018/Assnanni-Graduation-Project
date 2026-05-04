@@ -1,26 +1,24 @@
 const Overview = () => {
+  const stats = [
+    { label: "Check-ins", value: "12" },
+    { label: "Scheduled Apps", value: "8" },
+    { label: "Cancellations", value: "2" },
+  ];
+
   return (
-    <div className="flex flex-col gap-3 bg-(--color-surface) p-6 rounded-xl">
-      <h1 className="text-xl font-normal  text-(--color-text) border-b-2 border-gray-300 pb-2">
-        Today's Overview
-      </h1>
-      <div className="flex flex-col">
-        <div className="flex justify-between m-2">
-          <p className="text-sm font-light">Check-in</p>
-          <span className="font-semibold">12</span>
-        </div>
-        <div className="flex justify-between m-2">
-          <p className="text-sm font-light">New Registrations</p>
-          <span className="font-semibold">5</span>
-        </div>
-        <div className="flex justify-between m-2">
-          <p className="text-sm font-light">Scheduled Appointments</p>
-          <span className="font-semibold">8</span>
-        </div>
-        <div className="flex justify-between m-2">
-          <p className="text-sm font-light">Cancellations</p>
-          <span className="font-semibold">2</span>
-        </div>
+    <div className="bg-(--color-surface) p-8 rounded-2xl border border-(--color-border) shadow-sm w-full">
+      <h2 className="text-xl font-bold text-(--color-text) mb-8">Today's Overview</h2>
+      <div className="flex flex-col gap-6">
+        {stats.map((stat, idx) => (
+          <div key={idx} className="flex justify-between items-center group">
+            <span className="text-sm font-medium text-(--color-text-light) group-hover:text-(--color-text) transition-colors">
+              {stat.label}
+            </span>
+            <span className="text-lg font-bold text-(--color-text)">
+              {stat.value}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );

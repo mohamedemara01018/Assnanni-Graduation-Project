@@ -1,7 +1,9 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 
 interface TimeSlot {
   id: number;
@@ -137,6 +139,7 @@ const SCHEDULING_TIPS = [
 
 const WeeklySchedulePanel = () => {
   const queryClient = useQueryClient();
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
 
   const { data: schedule = initialSchedule, isError: isFetchError } = useQuery<
     DaySchedule[]

@@ -4,7 +4,6 @@ import { Link } from "react-router";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import { MdOutlineStar } from "react-icons/md";
 
-
 function PatientPage() {
   return (
     <DashboardLayout pageTitle={"Patient dashboard"}>
@@ -169,17 +168,17 @@ function PatientPage() {
                     Search and book
                   </span>
                 </Link>
-                <Link
-                  to={"/scan/upload"}
+                {/* <Link
+                  to={"/doctors"}
                   className="flex flex-col  items-start justify-between py-1.5 px-3 rounded-lg text-(--color-text-blue) bg-(--color-bg-blue) w-full hover:shadow-sm"
                 >
                   <h3 className="">Upload Scan</h3>
                   <span className="text-[12px] text-(--color-text-light)">
                     AI-assisted analysis
                   </span>
-                </Link>
+                </Link> */}
                 <Link
-                  to={"/prescriptions"}
+                  to={"/medical-report"}
                   className="flex flex-col  items-start justify-between py-1.5 px-3 rounded-lg text-(--color-text-blue) bg-(--color-bg-blue) w-full hover:shadow-sm"
                 >
                   <h3 className="">My Prescriptions</h3>

@@ -182,7 +182,7 @@ const PatientDetails = () => {
                 {patient.medicalHistory.map((item, i) => (
                   <div
                     key={i}
-                    className="p-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl flex justify-between items-center border border-(--color-border)/50"
+                    className="p-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl flex justify-between items-center border border-border/50"
                   >
                     <div>
                       <p className="text-sm font-bold text-(--color-text)">
@@ -212,7 +212,7 @@ const PatientDetails = () => {
                 {patient.prescriptions.map((pill, i) => (
                   <div
                     key={i}
-                    className="p-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-(--color-border)/50"
+                    className="p-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-border/50"
                   >
                     <div className="flex justify-between mb-1">
                       <p className="text-sm font-bold text-(--color-text)">
@@ -246,7 +246,7 @@ const PatientDetails = () => {
                 {patient.appointments.map((app, i) => (
                   <div
                     key={i}
-                    className="p-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl flex justify-between items-center border border-(--color-border)/50"
+                    className="p-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl flex justify-between items-center border border-border/50"
                   >
                     <div>
                       <p className="text-sm font-bold text-(--color-text)">

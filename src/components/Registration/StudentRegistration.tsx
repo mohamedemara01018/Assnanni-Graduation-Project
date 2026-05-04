@@ -3,7 +3,7 @@ import RegistrationForm from "./RegistrationForm";
 const StudentRegistration = () => {
   return (
     <div>
-      <RegistrationForm />
+      <RegistrationForm isStudentDoctorRegister />
     </div>
   );
 };
