@@ -12,7 +12,6 @@ import { useDispatch } from "react-redux";
 import { setToken } from "@/store/slices/auth/authSlice";
 import { getEmail } from "@/store/slices/email/emailSlice";
 
-
 interface Inputs {
   image: FileList;
   firstName: string;
@@ -37,7 +36,8 @@ const RegistrationForm = ({
   const navigator = useNavigate();
   const { pathname } = useLocation();
   const doctor: boolean =
-    isDoctorRegister || (!isStudentDoctorRegister && pathname.includes("doctor-register"));
+    isDoctorRegister ||
+    (!isStudentDoctorRegister && pathname.includes("doctor-register"));
   const studentDoctor: boolean =
     isStudentDoctorRegister || pathname.includes("student-register");
   const isDoctor: boolean =
@@ -60,7 +60,8 @@ const RegistrationForm = ({
   const password = watch("password");
   const imageFile = watch("image");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const labelClass = "mb-1 inline-block text-sm font-medium text-(--color-text)";
+  const labelClass =
+    "mb-1 inline-block text-sm font-medium text-(--color-text)";
   const inputBaseClass =
     "w-full rounded-xl border bg-(--color-bg) py-2.5 pl-12 pr-3 text-(--color-text) placeholder:text-gray-500 placeholder:text-sm transition focus:outline-none focus:ring-2 focus:ring-[#00AFE5]/30";
   const inputBorderClass = "border-(--color-border)";
@@ -98,18 +99,17 @@ const RegistrationForm = ({
         if (isPatient)
           dispatch(
             setToken(
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicGF0aWVudCJ9.dummy",
-            ),
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1Njc4OTAiLCJuYW1lIjoiSm9obiBEb2UiLCJyb2xlIjoicGF0aWVudCIsImVtYWlsIjoibW9oYW1lZEBnbWFpbC5jb20iLCJpYXQiOjE1MTYyMzkwMjJ9.Gn8ua6_Su_02zgSbfW_GIq4NOZCCBdpnEOpQE1DwTcA"
+            )
           );
         if (isReceptionist)
           dispatch(
             setToken(
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicmVjZXB0aW9uaXN0In0=.dummy",
-            ),
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicmVjZXB0aW9uaXN0In0=.dummy"
+            )
           );
         navigator("/verify-email");
       }
-      
     } catch (error: any) {
       console.log(error);
       toast.error(error.message);

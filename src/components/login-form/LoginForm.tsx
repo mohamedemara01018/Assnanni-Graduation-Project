@@ -25,13 +25,14 @@ function LoginForm() {
     formState: { errors },
   } = useForm<Inputs>();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       // await axios.post(loginApiBase + "Login", data);
       // dispatch(setToken(response.data.token)); // Use real token when uncommenting API
       dispatch(
         setToken(
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicGF0aWVudCJ9.dummy"
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1Njc4OTAiLCJuYW1lIjoiSm9obiBEb2UiLCJyb2xlIjoicGF0aWVudCIsImVtYWlsIjoibW9oYW1lZEBnbWFpbC5jb20iLCJpYXQiOjE1MTYyMzkwMjJ9.Gn8ua6_Su_02zgSbfW_GIq4NOZCCBdpnEOpQE1DwTcA"
         )
       );
       toast.success("Welcome Back");
