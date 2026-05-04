@@ -27,6 +27,7 @@ import Notifications from "../pages/doctor-pages/notifications/Notifications";
 import StudentAppointments from "../pages/student-doctor-pages/appointments/StudentAppointments";
 import StudentAppointmentDetails from "../pages/student-doctor-pages/appointments/StudentAppointmentDetails";
 import StudentDoctorDashboard from "../pages/student-doctor-pages/dashboard/StudentDoctorDashboard";
+
 import ContactSupervisor from "../pages/student-doctor-pages/supervisor/ContactSupervisor";
 import ReceptionistDashboard from "../pages/receptionist-pages/dashboard/ReceptionistDashboard";
 import ScheduleAppointment from "../pages/receptionist-pages/appointments/ScheduleAppointment";
@@ -60,7 +61,7 @@ export const ProtectedRoute = ({
         name: string | null;
         email: string | null;
       };
-    }) => state.auth
+    }) => state.auth,
   );
 
   return allowedRoles.includes(role) ? (
