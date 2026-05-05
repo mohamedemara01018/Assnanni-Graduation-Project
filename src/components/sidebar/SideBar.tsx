@@ -16,11 +16,11 @@ interface SideBarProp {
 }
 
 function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
-  const role = useSelector(
-    (state: { auth: { role: string } }) => state.auth.role
-  );
+  // const role = useSelector(
+  //   (state: { auth: { role: string } }) => state.auth.role
+  // );
 
-  // const role = "admin";
+  const role = "admin";
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -28,10 +28,8 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
   };
 
   const linkStyle = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center ${
-      toggled ? "justify-center" : ""
-    } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
-      isActive ? "bg-(--color-bg-blue) text-(--color-text-blue)" : ""
+    `flex items-center ${toggled ? "justify-center" : ""
+    } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${isActive ? "bg-(--color-bg-blue) text-(--color-text-blue)" : ""
     }`;
 
   return (
@@ -82,157 +80,14 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
                 );
               }
             )}
-
-          {/* doctor */}
-          {/* {role == "doctor" && (
-            <>
-              <li>
-                <NavLink to={"/doctor-schedule"} className={linkStyle}>
-                  <SlCalender className="text-xl" />
-                  {!toggled && <span>Schedule</span>}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink to={"/doctor-patients"} className={linkStyle}>
-                  <MdPeopleAlt className="text-xl" />
-                  {!toggled && <span>Patients</span>}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink to={"/scan"} className={linkStyle}>
-                  <IoAnalytics className="text-xl" />
-                  {!toggled && <span>Scans</span>}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink to={"/doctor-reports"} className={linkStyle}>
-                  <LuFileSpreadsheet className="text-xl" />
-                  {!toggled && <span>Reports</span>}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink to={"/notification"} className={linkStyle}>
-                  <FaRegBell className="text-xl" />
-                  {!toggled && <span>Notifications</span>}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink to={"/settings"} className={linkStyle}>
-                  <MdOutlineSettings className="text-xl" />
-                  {!toggled && <span>Settings</span>}
-                </NavLink>
-              </li>
-            </>
-          )} */}
-
-          {/* receptionist */}
-          {/* {role === "receptionist" && (
-            <>
-              <li>
-                <NavLink to={"/doctor-patients"} className={linkStyle}>
-                  <MdPeopleAlt className="text-xl" />
-                  {!toggled && <span>Patients</span>}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink to={"/doctor-appointments"} className={linkStyle}>
-                  <SlCalender className="text-xl" />
-                  {!toggled && <span>Appointments</span>}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink to={"/doctors-list"} className={linkStyle}>
-                  <FaStethoscope className="text-xl" />
-                  {!toggled && <span>Doctors</span>}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink to={"/notification"} className={linkStyle}>
-                  <FaRegBell className="text-xl" />
-                  {!toggled && <span>Notifications</span>}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink to={"/settings"} className={linkStyle}>
-                  <MdOutlineSettings className="text-xl" />
-                  {!toggled && <span>Settings</span>}
-                </NavLink>
-              </li>
-            </>
-          )} */}
-          {/* /*   {/* student doctor */}
-          {/* {role === "studentDoctor" && (
-            <>
-            
-
-              <li>
-                <NavLink to={"/student-notification"} className={linkStyle}>
-                  <FaRegBell className="text-xl" />
-                  {!toggled && <span>Notifications</span>}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink to={"/student-settings"} className={linkStyle}>
-                  <MdOutlineSettings className="text-xl" />
-                  {!toggled && <span>Settings</span>}
-                </NavLink>
-              </li>
-            </>
-          )}  */}
-          {/* patient */}
-          {/* {role === "patient" && (
-            <>
-              <li>
-                <NavLink to={"/appointments"} className={linkStyle}>
-                  <AiOutlineSchedule className="text-xl" />
-                  {!toggled && <span>Appointments</span>}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink to={"/doctors-list"} className={linkStyle}>
-                  <IoPersonAddOutline className="text-xl" />
-                  {!toggled && <span>Doctors</span>}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink to={"/scan"} className={linkStyle}>
-                  <IoAnalytics className="text-xl" />
-                  {!toggled && <span>Scans</span>}
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink
-                  to={"/student-settings/notifications"}
-                  className={linkStyle}
-                >
-                  <IoIosNotificationsOutline className="text-xl" />
-                  {!toggled && <span>Notifications</span>}
-                </NavLink>
-              </li>
-            </>
-          )} */}
         </ul>
       </div>
 
       <div className="p-2 border-t border-border">
         <button
           onClick={handleLogout}
-          className={`flex items-center ${
-            toggled ? "justify-center" : ""
-          } gap-2 px-3 py-2.5 w-full text-start text-sm font-medium bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) rounded-lg`}
+          className={`flex items-center ${toggled ? "justify-center" : ""
+            } gap-2 px-3 py-2.5 w-full text-start text-sm font-medium bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) rounded-lg`}
         >
           <FiLogOut className="w-5 h-5 shrink-0 text-(--color-text)" />
           {!toggled && (
@@ -261,7 +116,7 @@ const sidebarDataRole = {
     { icon: LayoutDashboard, label: "Dashboard", path: "/patient" },
     { icon: Calendar, label: "Appointments", path: "/appointments" },
     { icon: Stethoscope, label: "Doctors", path: "/doctors-list" },
-    // { icon: Scan, label: "Scans", path: "/scan/upload" },
+    { icon: Scan, label: "Scans", path: "/scan/upload" },
     { icon: Users, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ],
