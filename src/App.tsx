@@ -38,8 +38,8 @@ import {
 import AppointmentDetailsPage from "./pages/appointment-details-page/AppointmentDetailsPage";
 import { logout } from "./store/slices/auth/authSlice";
 import Scan from "./pages/doctor-pages/Scan/Scan";
-import AdminPage from "./pages/admin-page/AdminPage";
-import UsersPage from "./pages/users-page/UsersPage";
+// import AdminPage from "./pages/admin-page/AdminPage";
+// import UsersPage from "./pages/users-page/UsersPage";
 
 const sessionWarningTime = 5 * 60 * 1000;
 const sessionWarningToastId = "session-expiry-warning";
@@ -121,19 +121,28 @@ const App = () => {
             {/* Registration System */}
             {role === "guest" && <Route path="/login" element={<Login />} />}
             <Route path="/register">
-
               <Route index element={<RoleSelection />} />
               <Route element={<Registration />}>
-                <Route path="patient-register" element={<PatientRegistration />} />
-                <Route path="doctor-register" element={<DoctorRegistration />} />
-                <Route path="student-register" element={<StudentRegistration />} />
+                <Route
+                  path="patient-register"
+                  element={<PatientRegistration />}
+                />
+                <Route
+                  path="doctor-register"
+                  element={<DoctorRegistration />}
+                />
+                <Route
+                  path="student-register"
+                  element={<StudentRegistration />}
+                />
                 {role === "doctor" && (
-                  <Route path="receptionist-register" element={<ReceptionistRegistration />} />
+                  <Route
+                    path="receptionist-register"
+                    element={<ReceptionistRegistration />}
+                  />
                 )}
-
               </Route>
             </Route>
-
             /////
             {/* <Route path="/register-v2" element={<RegisterPage />} /> */}
             <Route path="/verify-email" element={<VerifyEmailPage />} />
@@ -142,23 +151,41 @@ const App = () => {
             <Route path="/privacy" element={<PrivacyPage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/support" element={<SupportPage />} />
-            <Route path="/password-reset" element={<PasswordResetRequestPage />} />
-            <Route path="/password-reset/new" element={<PasswordResetNewPage />} />
-            <Route path="/password-reset/success" element={<PasswordResetSuccessPage />} />
+            <Route
+              path="/password-reset"
+              element={<PasswordResetRequestPage />}
+            />
+            <Route
+              path="/password-reset/new"
+              element={<PasswordResetNewPage />}
+            />
+            <Route
+              path="/password-reset/success"
+              element={<PasswordResetSuccessPage />}
+            />
             <Route path="/onboarding" element={<OnboardingPage />} />
           </Route>
 
           {/* Public routes (accessible without authentication) */}
           <Route path="/appointments" element={<AppointmentsPage />} />
-          <Route path="/appointments/:id" element={<AppointmentDetailsPage />} />
+          <Route
+            path="/appointments/:id"
+            element={<AppointmentDetailsPage />}
+          />
           <Route path="/doctors-list" element={<DoctorsListPage />} />
           <Route path="/doctors-list/:id" element={<DoctorProfilePage />} />
-          <Route path="/appointments/booking/:id" element={<AppointmentsBookingPage />} />
+          <Route
+            path="/appointments/booking/:id"
+            element={<AppointmentsBookingPage />}
+          />
           <Route path="/patient-profile/:id" element={<PatientProfilePage />} />
-          <Route path="/patient-profile/edit/:id" element={<EditPatientProfilePage />} />
+          <Route
+            path="/patient-profile/edit/:id"
+            element={<EditPatientProfilePage />}
+          />
           <Route path="/scan/upload" element={<Scan />} />
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/users" element={<UsersPage />} />
+          {/* <Route path="/admin" element={<AdminPage />} /> */}
+          {/* <Route path="/users" element={<UsersPage />} /> */}
 
           {/* Protected routes using configurations */}
           {Object.entries(roleRoutePaths).map(([roleName, routes]) =>
