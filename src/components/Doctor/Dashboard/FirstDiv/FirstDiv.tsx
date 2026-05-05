@@ -47,18 +47,16 @@ const FirstDiv = () => {
       ]);
 
       return {
-        schedules: todayRes.data?.value || todayRes.data || [],
-        pendingScans: scansRes.data?.value || scansRes.data || [],
-        recentPatients: patientsRes.data?.value || patientsRes.data || [],
+        schedules: todayRes.data?.data || todayRes.data || [],
+        pendingScans: scansRes.data?.data || scansRes.data || [],
+        recentPatients: patientsRes.data?.data || patientsRes.data || [],
       };
     },
   });
 
-  const schedules = data?.schedules.length ? data.schedules : dummySchedules;
-  const pendingScans = data?.pendingScans.length
-    ? data.pendingScans
-    : dummyScans;
-  const recentPatients = data?.recentPatients.length
+  const schedules = data?.schedules ? data.schedules : dummySchedules;
+  const pendingScans = data?.pendingScans ? data.pendingScans : dummyScans;
+  const recentPatients = data?.recentPatients
     ? data.recentPatients
     : dummyPatients;
 
@@ -88,7 +86,7 @@ const FirstDiv = () => {
             View Calendar
           </NavLink>
         </div>
-        <div className="flex flex-col gap-4 max-h-60 overflow-y-auto">
+        <div className="flex flex-col  gap-4 max-h-60 overflow-y-auto">
           {schedules.length > 0 ? (
             schedules.map((schedule: Schedule) => (
               <Card
@@ -107,7 +105,7 @@ const FirstDiv = () => {
               </Card>
             ))
           ) : (
-            <p className="text-(--color-text-light)">No appointments today.</p>
+            <p className=" text-(--color-text-light)">No appointments today.</p>
           )}
         </div>
       </div>

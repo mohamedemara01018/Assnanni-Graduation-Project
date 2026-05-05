@@ -5,6 +5,7 @@ import { useState } from "react";
 import { CiCalendar, CiClock2, CiFilter, CiLocationOn } from "react-icons/ci";
 import { FaPlus } from "react-icons/fa";
 import { Link } from "react-router";
+import LazyImage from "@/components/ui/LazyImage";
 
 function AppointmentsPage() {
   const [onFilter, setFilter] = useState(false);
@@ -67,11 +68,11 @@ function AppointmentsPage() {
           <CardComp>
             <div className="flex items-start justify-between w-full">
               <div className="flex items-start gap-2">
-                <img
-                  src="https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg"
-                  alt="doctor img"
-                  className="w-14 h-14 rounded-full"
-                />
+<LazyImage
+                          src="https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg"
+                          alt="doctor img"
+                          className="w-14 h-14 rounded-full"
+                        />
                 <div className="space-y-2">
                   <div>
                     <h3 className="text-xl font-semibold">Mohamed gamal</h3>
@@ -113,11 +114,11 @@ function AppointmentsPage() {
           <CardComp>
             <div className="flex items-start justify-between w-full">
               <div className="flex items-start gap-2">
-                <img
-                  src="https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg"
-                  alt="doctor img"
-                  className="w-14 h-14 rounded-full"
-                />
+<LazyImage
+                          src="https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg"
+                          alt="doctor img"
+                          className="w-14 h-14 rounded-full"
+                        />
                 <div className="space-y-2">
                   <div>
                     <h3 className="text-xl font-semibold">Mohamed gamal</h3>
@@ -159,11 +160,11 @@ function AppointmentsPage() {
           <CardComp>
             <div className="flex items-start justify-between w-full">
               <div className="flex items-start gap-2">
-                <img
-                  src="https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg"
-                  alt="doctor img"
-                  className="w-14 h-14 rounded-full"
-                />
+<LazyImage
+                          src="https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg"
+                          alt="doctor img"
+                          className="w-14 h-14 rounded-full"
+                        />
                 <div className="space-y-2">
                   <div>
                     <h3 className="text-xl font-semibold">Mohamed gamal</h3>
@@ -205,11 +206,11 @@ function AppointmentsPage() {
           <CardComp>
             <div className="flex items-start justify-between w-full">
               <div className="flex items-start gap-2">
-                <img
-                  src="https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg"
-                  alt="doctor img"
-                  className="w-14 h-14 rounded-full"
-                />
+<LazyImage
+                          src="https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg"
+                          alt="doctor img"
+                          className="w-14 h-14 rounded-full"
+                        />
                 <div className="space-y-2">
                   <div>
                     <h3 className="text-xl font-semibold">Mohamed gamal</h3>

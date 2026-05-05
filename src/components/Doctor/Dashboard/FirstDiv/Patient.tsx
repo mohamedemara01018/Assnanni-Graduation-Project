@@ -1,4 +1,5 @@
 import { NavLink } from "react-router";
+import LazyImage from "@/components/ui/LazyImage";
 
 interface Props {
   id: number;
@@ -13,7 +14,7 @@ const Patient = ({ id, name, imageUrl, lastInteractionDate }: Props) => {
     <div className="flex justify-between items-center bg-gray-50 dark:bg-slate-700/30 p-4 rounded-xl">
       <div className="flex gap-4 items-center">
         {imageUrl ? (
-          <img
+          <LazyImage
             src={imageUrl}
             alt={name}
             className="w-8 h-8 rounded-full object-cover"

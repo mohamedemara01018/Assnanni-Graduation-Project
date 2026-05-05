@@ -1,3 +1,5 @@
+import LazyImage from "@/components/ui/LazyImage";
+
 export interface DoctorStatus {
   id: string | number;
   name: string;
@@ -29,7 +31,7 @@ const DoctorStatusCard = ({ doctor }: Props) => {
       <div className="flex gap-4 items-center">
         <div className="w-10 h-10 rounded-full bg-linear-to-br from-blue-400 to-emerald-400 flex items-center justify-center text-white font-bold text-xs shadow-sm overflow-hidden border-2 border-white">
           {imageUrl ? (
-            <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
+            <LazyImage src={imageUrl} alt={name} className="w-full h-full object-cover" />
           ) : (
             initials
           )}

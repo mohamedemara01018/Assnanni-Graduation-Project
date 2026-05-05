@@ -1,5 +1,6 @@
 import { Link } from "react-router";
 import img from "../../assets/landing-img.jpg";
+import LazyImage from "@/components/ui/LazyImage";
 
 function Hero() {
   return (
@@ -27,7 +28,7 @@ function Hero() {
           </div>
         </div>
         <div className="flex-3 w-[300px] h-[300px] rounded-lg overflow-hidden max-sm:hidden shadow-2xl">
-          <img src={img} alt="" className="w-full h-full object-cover" />
+          <LazyImage src={img} alt="" className="w-full h-full object-cover" />
         </div>
       </div>
     </section>

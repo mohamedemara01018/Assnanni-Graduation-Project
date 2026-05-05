@@ -8,6 +8,7 @@ import { FaStar } from "react-icons/fa";
 import { IoLocationOutline } from "react-icons/io5";
 import { Link } from "react-router";
 import { useSelector } from "react-redux";
+import LazyImage from "@/components/ui/LazyImage";
 
 function DoctorsListPage() {
   const role = useSelector(
@@ -80,7 +81,7 @@ function DoctorList() {
                   <div className="bg-(--color-surface) p-4 border border-(--color-border) shadow-sm rounded-lg flex items-center justify-center grow">
                     <div className="space-y-4">
                       <div className="flex items-center gap-4">
-                        <img
+                        <LazyImage
                           src="https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg"
                           alt="docotr-img"
                           className="w-16 h-16 rounded-full"

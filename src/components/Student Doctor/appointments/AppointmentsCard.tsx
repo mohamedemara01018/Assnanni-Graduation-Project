@@ -3,6 +3,7 @@ import { FaRegClock, FaPhone, FaVideo } from "react-icons/fa6";
 import { GrLocation } from "react-icons/gr";
 import { IoMdCloseCircle } from "react-icons/io";
 import { NavLink } from "react-router";
+import LazyImage from "@/components/ui/LazyImage";
 
 interface Props {
   appointment: AppointmentData;
@@ -51,7 +52,7 @@ function AppointmentsCard({ appointment }: Props) {
     <div className="bg-(--color-surface) rounded-2xl p-6 flex gap-6 shadow-sm border border-(--color-border) hover:shadow-md transition-shadow">
       <div className="shrink-0 w-12 h-12 bg-linear-to-br from-blue-400 to-emerald-400 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm overflow-hidden">
         {imageUrl ? (
-          <img
+          <LazyImage
             src={imageUrl}
             alt={name}
             className="w-full h-full object-cover"

@@ -1,4 +1,5 @@
 import { FaStar } from "react-icons/fa";
+import LazyImage from "@/components/ui/LazyImage";
 
 type Props = {
   name: string;
@@ -10,7 +11,7 @@ const Doctors = ({ name, rate, img }: Props) => {
   return (
     <div className="bg-gray-50 w-fit flex flex-col  rounded-xl cursor-pointer hover:scale-105 hover:shadow-md shadow-gray-600">
       <div className="  my-2">
-        <img src={img} alt="doctor Image" className="rounded-t-xl w-full " />
+        <LazyImage src={img} alt="doctor Image" className="rounded-t-xl w-full" />
       </div>
       <div className="flex gap-2 py-2 px-4 flex-col">
         <p className="text-lg font-semibold ">Dr. {name}</p>

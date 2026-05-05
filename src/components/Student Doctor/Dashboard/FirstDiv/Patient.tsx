@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { CiLock } from "react-icons/ci";
+import LazyImage from "@/components/ui/LazyImage";
 
 interface Props {
   id?: number | string;
@@ -21,7 +22,7 @@ const Patient = ({ name, imageUrl, children }: Props) => {
     <div className="flex justify-between items-center bg-(--color-bg) border border-(--color-border) p-4 rounded-xl shadow-sm">
       <div className="flex gap-4 items-center">
         {imageUrl ? (
-          <img
+          <LazyImage
             src={imageUrl}
             alt={name}
             className="w-10 h-10 rounded-full object-cover"

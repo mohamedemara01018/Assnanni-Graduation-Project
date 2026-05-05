@@ -88,8 +88,7 @@ const RegistrationForm = ({
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       console.log(data);
-      const token = await axios.post(authBase + "Register-Doctor", data);
-      console.log(token);
+      await axios.post(authBase + "Register-Doctor", data);
       dispatch(getEmail(data.email));
       if (doctor || studentDoctor) {
         // if (doctor) dispatch(setToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiZG9jdG9yIn0=.dummy"));
@@ -102,14 +101,14 @@ const RegistrationForm = ({
         if (isPatient)
           dispatch(
             setToken(
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1Njc4OTAiLCJuYW1lIjoiSm9obiBEb2UiLCJyb2xlIjoicGF0aWVudCIsImVtYWlsIjoibW9oYW1lZEBnbWFpbC5jb20iLCJpYXQiOjE1MTYyMzkwMjJ9.Gn8ua6_Su_02zgSbfW_GIq4NOZCCBdpnEOpQE1DwTcA"
-            )
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1Njc4OTAiLCJuYW1lIjoiSm9obiBEb2UiLCJyb2xlIjoicGF0aWVudCIsImVtYWlsIjoibW9oYW1lZEBnbWFpbC5jb20iLCJpYXQiOjE1MTYyMzkwMjJ9.Gn8ua6_Su_02zgSbfW_GIq4NOZCCBdpnEOpQE1DwTcA",
+            ),
           );
         if (isReceptionist)
           dispatch(
             setToken(
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicmVjZXB0aW9uaXN0In0=.dummy"
-            )
+              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicmVjZXB0aW9uaXN0In0=.dummy",
+            ),
           );
         navigator("/verify-email");
       }
@@ -244,6 +243,7 @@ const RegistrationForm = ({
                 id="phoneNumber"
                 {...register("phoneNumber", {
                   required: "PhonephoneNumber Number is Required",
+                  minLength: 11,
                   pattern: {
                     value: /^01[0-2]\d{1,8}$/i,
                     message: "Please, make sure your number is correct",
