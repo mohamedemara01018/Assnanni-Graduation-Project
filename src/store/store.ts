@@ -2,12 +2,14 @@ import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slices/auth/authSlice";
 import emailReducer from "./slices/email/emailSlice";
 import configReducer from "./slices/config/configSlice";
+import summaryReducer from './slices/admin-slice/summary-slice/SummarySlice'
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     email: emailReducer,
     config: configReducer,
+    summarySlice: summaryReducer,
   },
 });
 
