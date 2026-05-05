@@ -1,8 +1,12 @@
-import logo from '../../assets/logo.png'
+import logo from "../../assets/logo.png";
 
-function Loading() {
+interface LoadingProps {
+    className?: string;
+}
+
+function Loading({ className = "" }: LoadingProps) {
     return (
-        <div className="flex flex-col items-center justify-center h-screen w-full">
+        <div className={`flex flex-col items-center justify-center min-h-screen w-full bg-(--color-bg) ${className}`}>
 
             <div className="relative flex items-center justify-center">
 
@@ -12,12 +16,11 @@ function Loading() {
                     src={logo}
                     alt="logo"
                     className="absolute h-16"
-                    style={{ animation: 'scaleUpDown 1.5s ease-in-out infinite' }}
+                    style={{ animation: "scaleUpDown 1.5s ease-in-out infinite" }}
                 />
             </div>
 
-            {/* text */}
-            <p className="mt-6 text-gray-500 text-sm tracking-wide">
+            <p className="mt-6 text-(--color-text-light) text-sm tracking-wide">
                 loading...
             </p>
 
@@ -30,7 +33,7 @@ function Loading() {
                 `}
             </style>
         </div>
-    )
+    );
 }
 
-export default Loading
+export default Loading;
