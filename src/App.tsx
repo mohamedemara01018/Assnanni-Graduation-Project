@@ -25,9 +25,10 @@ import DoctorsListPage from "./pages/doctors-list-page/DoctorsListPage";
 import DoctorProfilePage from "./pages/doctor-profile-page/DoctorProfilePage";
 import AppointmentsBookingPage from "./pages/appointments-booking-page/AppointmentsBookingPage";
 
-import { Navigate, Route, Routes } from "react-router";
-import { ToastContainer } from "react-toastify";
-import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { Navigate, Route, Routes, useNavigate } from "react-router";
+import { toast, ToastContainer } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
 import { roleRoutePaths, sharedRoutePaths } from "./constants/routeConstants";
 import {
   ProtectedRoute,
@@ -35,20 +36,66 @@ import {
   routeElements,
 } from "./constants/appConstants";
 import AppointmentDetailsPage from "./pages/appointment-details-page/AppointmentDetailsPage";
+import { logout } from "./store/slices/auth/authSlice";
+
+const sessionWarningTime = 5 * 60 * 1000;
+const sessionWarningToastId = "session-expiry-warning";
 
 // Main application component that handles routing and global layouts
 const App = () => {
-  const { role, id, name, email } = useSelector(
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { role, token, expiresAt } = useSelector(
     (state: {
       auth: {
+        token: string | null;
         role: string;
         id: string | null;
         name: string | null;
         email: string | null;
+        expiresAt: number | null;
       };
-    }) => state.auth
+    }) => state.auth,
   );
-  console.log(role, { id, name, email });
+
+  useEffect(() => {
+    if (!token || !expiresAt) {
+      return;
+    }
+
+    const timeUntilExpiration = expiresAt - Date.now();
+    const timeUntilWarning = timeUntilExpiration - sessionWarningTime;
+
+    if (timeUntilExpiration <= 0) {
+      dispatch(logout());
+      toast.info("Your session has expired. Please login again.");
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const warningTimeout = window.setTimeout(
+      () => {
+        toast.warn(
+          "Your session will expire in 5 minutes. Please login again.",
+          {
+            toastId: sessionWarningToastId,
+          },
+        );
+      },
+      Math.max(timeUntilWarning, 0),
+    );
+
+    const expirationTimeout = window.setTimeout(() => {
+      dispatch(logout());
+      toast.info("Your session has expired. Please login again.");
+      navigate("/login", { replace: true });
+    }, timeUntilExpiration);
+
+    return () => {
+      window.clearTimeout(warningTimeout);
+      window.clearTimeout(expirationTimeout);
+    };
+  }, [dispatch, expiresAt, navigate, token]);
 
   return (
     <div className="min-h-screen w-full flex flex-col">
@@ -68,27 +115,39 @@ const App = () => {
           {/* --- Public Routes --- */}
           <Route element={<PublicLayout />}>
             <Route path="/" element={<Landing />} />
-            <Route path="/login" element={<Login />} />
             {/* Registration System */}
+            {role === "guest" && <Route path="/login" element={<Login />} />}
             <Route path="/register">
               <Route index element={<RoleSelection />} />
               <Route element={<Registration />}>
-                <Route
-                  path="patient-register"
-                  element={<PatientRegistration />}
-                />
-                <Route
-                  path="doctor-register"
-                  element={<DoctorRegistration />}
-                />
-                <Route
-                  path="student-register"
-                  element={<StudentRegistration />}
-                />
-                <Route
-                  path="receptionist-register"
-                  element={<ReceptionistRegistration />}
-                />
+                {role === "guest" ||
+                  (role === "doctor" && (
+                    <>
+                      {role === "doctor" ? (
+                        <Route
+                          path="patient-register"
+                          element={<PatientRegistration />}
+                        />
+                      ) : (
+                        <>
+                          <Route
+                            path="doctor-register"
+                            element={<DoctorRegistration />}
+                          />
+                          <Route
+                            path="student-register"
+                            element={<StudentRegistration />}
+                          />
+                        </>
+                      )}
+                    </>
+                  ))}
+                {role === "doctor" && (
+                  <Route
+                    path="receptionist-register"
+                    element={<ReceptionistRegistration />}
+                  />
+                )}
               </Route>
             </Route>
             /////
@@ -116,7 +175,10 @@ const App = () => {
 
           {/* Public routes (accessible without authentication) */}
           <Route path="/appointments" element={<AppointmentsPage />} />
-          <Route path="/appointments/:id" element={<AppointmentDetailsPage />} />
+          <Route
+            path="/appointments/:id"
+            element={<AppointmentDetailsPage />}
+          />
           <Route path="/doctors-list" element={<DoctorsListPage />} />
           <Route path="/doctors-list/:id" element={<DoctorProfilePage />} />
           <Route
@@ -141,7 +203,7 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
-            ))
+            )),
           )}
 
           {/* Shared protected routes */}

@@ -15,7 +15,7 @@ interface Inputs {
 }
 function LoginForm() {
   const loginApiBase = `${useSelector(
-    (state: RootState) => state.config.backendUrl
+    (state: RootState) => state.config.backendUrl,
   )}Authentications/`;
   void loginApiBase;
   const navigator = useNavigate();
@@ -31,11 +31,9 @@ function LoginForm() {
       const response = await axios.post(loginApiBase + "Login", data);
       console.log(response.data.data.token);
       dispatch(setToken(response.data.data.token)); // Use real token when uncommenting API
-      // dispatch(setToken(response.data.token));
+      // dispatch(setToken(response..data.data.token));
       toast.success("Welcome Back");
       navigator("/");
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error);
       toast.error(error.message);

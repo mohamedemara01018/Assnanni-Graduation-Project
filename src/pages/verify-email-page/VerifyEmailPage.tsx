@@ -23,7 +23,7 @@ function VerifyEmailPage() {
   const [value, setValue] = useState("");
 
   const email = useSelector(
-    (state: { email: { emailAddress: string } }) => state.email.emailAddress
+    (state: { email: { emailAddress: string } }) => state.email.emailAddress,
   );
 
   const onSubmit = async (e: FormEvent) => {
@@ -34,17 +34,12 @@ function VerifyEmailPage() {
       code: value,
     };
     try {
-      const token = await axios.post(authBase + "Verify-Email", data);
-      console.log(token);
-      dispatch(
-        setToken(
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicGF0aWVudCJ9.dummy"
-        )
-      );
+      const response = await axios.post(authBase + "Verify-Email", data);
+      console.log(response);
+      dispatch(setToken(response.data?.data?.token));
       dispatch(clearEmail());
       navigator("/onboarding");
       toast.success("You have successfully verified your email address");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log(error);
       toast.error(error.message);

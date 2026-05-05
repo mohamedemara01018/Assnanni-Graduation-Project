@@ -15,16 +15,25 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { defaultDashboardData } from "@/constants/doctorConstants";
 
+type DashboardOverview = typeof defaultDashboardData & {
+  raw?: Record<string, unknown>;
+};
+
+const defaultDashboardOverview: DashboardOverview = {
+  ...defaultDashboardData,
+  raw: defaultDashboardData,
+};
+
 const DoctorDashboard = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
 
   const {
-    data: dashboardData = defaultDashboardData,
+    data: dashboardData = defaultDashboardOverview,
     isSuccess,
     isError,
     error,
-  } = useQuery({
+  } = useQuery<DashboardOverview>({
     queryKey: ["DoctorDashboardOverview"],
     queryFn: async () => {
       const response = await axios.get(backendUrl + "Doctors/dashboard", {
@@ -32,7 +41,8 @@ const DoctorDashboard = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      const data = response.data?.value || response.data;
+      const data = response.data?.data || response.data?.value || response.data;
+
       if (data) {
         return {
           todayAppointments:
@@ -42,9 +52,10 @@ const DoctorDashboard = () => {
           pendingScans: data.pendingScans ?? defaultDashboardData.pendingScans,
           satisfactionRate:
             data.satisfactionRate ?? defaultDashboardData.satisfactionRate,
+          raw: data,
         };
       }
-      return defaultDashboardData;
+      return defaultDashboardOverview;
     },
   });
 
@@ -100,7 +111,7 @@ const DoctorDashboard = () => {
           </div>
           <div className="flex gap-6 max-md:flex-col">
             <FirstDiv />
-            <SecondDiv />
+            <SecondDiv dashboardData={dashboardData.raw} />
           </div>
         </div>
       </div>
