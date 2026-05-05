@@ -11,8 +11,21 @@ import {
   XCircle,
 } from "lucide-react";
 import { Link } from "react-router";
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchAdminSummary, selectSummary } from "@/store/slices/admin-slice/summary-slice/SummarySlice";
+import { useEffect } from "react";
+import type { AppDispatch } from "@/store/store";
 
 function AdminPage() {
+
+  const dispatch: AppDispatch = useDispatch();
+  const summaryData = useSelector(selectSummary);
+  console.log(summaryData)
+
+  useEffect(() => {
+    dispatch(fetchAdminSummary());
+  }, [dispatch]);
+
   return (
     <DashboardLayout pageTitle="Admin page">
       <>

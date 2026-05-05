@@ -1,13 +1,13 @@
 // Route path configurations by role
 export const roleRoutePaths = {
-  admin: [
-    "/admin",
-    "users",
-    "add-user",
-    "verify-doctors",
-    "analytics",
-    "ai-models",
-  ],
+  // admin: [
+  //   "/admin",
+  //   "users",
+  //   "add-user",
+  //   "verify-doctors",
+  //   "analytics",
+  //   "ai-models",
+  // ],
   doctor: [
     "/doctor",
     "add-time-slot",

@@ -33,11 +33,10 @@ function AppointmentsPage() {
               <SearchInput style="w-full" />
               <button
                 onClick={() => setFilter(!onFilter)}
-                className={`flex items-center gap-2 border-2 border-(--color-border) py-2 px-4 hover:bg-(--color-bg)  rounded-lg cursor-pointer ${
-                  onFilter
-                    ? "bg-(--color-bg-blue) text-(--color-text-blue)"
-                    : ""
-                } `}
+                className={`flex items-center gap-2 border-2 border-(--color-border) py-2 px-4 hover:bg-(--color-bg)  rounded-lg cursor-pointer ${onFilter
+                  ? "bg-(--color-bg-blue) text-(--color-text-blue)"
+                  : ""
+                  } `}
               >
                 <CiFilter />
                 Filters
@@ -68,11 +67,11 @@ function AppointmentsPage() {
           <CardComp>
             <div className="flex items-start justify-between w-full">
               <div className="flex items-start gap-2">
-<LazyImage
-                          src="https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg"
-                          alt="doctor img"
-                          className="w-14 h-14 rounded-full"
-                        />
+                <LazyImage
+                  src="https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg"
+                  alt="doctor img"
+                  className="w-14 h-14 rounded-full"
+                />
                 <div className="space-y-2">
                   <div>
                     <h3 className="text-xl font-semibold">Mohamed gamal</h3>
@@ -94,145 +93,7 @@ function AppointmentsPage() {
                   </div>
                   <div className="flex items-center gap-4">
                     <Link
-                      to={"/"}
-                      className="text-(--color-primary) hover:underline"
-                    >
-                      View Details
-                    </Link>
-                    <button className="text-red-500 hover:underline">
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="py-1 px-3 flex items-center gap-2 bg-(--color-bg-blue) text-(--color-text-blue) border border-(--color-primary) rounded-lg">
-                <CiClock2 />
-                <span>Upcoming</span>
-              </div>
-            </div>
-          </CardComp>
-          <CardComp>
-            <div className="flex items-start justify-between w-full">
-              <div className="flex items-start gap-2">
-<LazyImage
-                          src="https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg"
-                          alt="doctor img"
-                          className="w-14 h-14 rounded-full"
-                        />
-                <div className="space-y-2">
-                  <div>
-                    <h3 className="text-xl font-semibold">Mohamed gamal</h3>
-                    <p className="text-sm">Physical Examination</p>
-                  </div>
-                  <div className="flex items-center gap-4 flex-wrap">
-                    <div className="flex items-center gap-2 text-sm">
-                      <CiCalendar className="text-lg" />
-                      <span>Feb 5, 2026</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <CiClock2 className="text-lg" />
-                      <span>10:00 AM</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <CiLocationOn className="text-lg" />
-                      <span>Egy, Cairo</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Link
-                      to={"/"}
-                      className="text-(--color-primary) hover:underline"
-                    >
-                      View Details
-                    </Link>
-                    <button className="text-red-500 hover:underline">
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="py-1 px-3 flex items-center gap-2 bg-(--color-bg-blue) text-(--color-text-blue) border border-(--color-primary) rounded-lg">
-                <CiClock2 />
-                <span>Upcoming</span>
-              </div>
-            </div>
-          </CardComp>
-          <CardComp>
-            <div className="flex items-start justify-between w-full">
-              <div className="flex items-start gap-2">
-<LazyImage
-                          src="https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg"
-                          alt="doctor img"
-                          className="w-14 h-14 rounded-full"
-                        />
-                <div className="space-y-2">
-                  <div>
-                    <h3 className="text-xl font-semibold">Mohamed gamal</h3>
-                    <p className="text-sm">Physical Examination</p>
-                  </div>
-                  <div className="flex items-center gap-4 flex-wrap">
-                    <div className="flex items-center gap-2 text-sm">
-                      <CiCalendar className="text-lg" />
-                      <span>Feb 5, 2026</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <CiClock2 className="text-lg" />
-                      <span>10:00 AM</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <CiLocationOn className="text-lg" />
-                      <span>Egy, Cairo</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Link
-                      to={"/"}
-                      className="text-(--color-primary) hover:underline"
-                    >
-                      View Details
-                    </Link>
-                    <button className="text-red-500 hover:underline">
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="py-1 px-3 flex items-center gap-2 bg-(--color-bg-blue) text-(--color-text-blue) border border-(--color-primary) rounded-lg">
-                <CiClock2 />
-                <span>Upcoming</span>
-              </div>
-            </div>
-          </CardComp>
-          <CardComp>
-            <div className="flex items-start justify-between w-full">
-              <div className="flex items-start gap-2">
-<LazyImage
-                          src="https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg"
-                          alt="doctor img"
-                          className="w-14 h-14 rounded-full"
-                        />
-                <div className="space-y-2">
-                  <div>
-                    <h3 className="text-xl font-semibold">Mohamed gamal</h3>
-                    <p className="text-sm">Physical Examination</p>
-                  </div>
-                  <div className="flex items-center gap-4 flex-wrap">
-                    <div className="flex items-center gap-2 text-sm">
-                      <CiCalendar className="text-lg" />
-                      <span>Feb 5, 2026</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <CiClock2 className="text-lg" />
-                      <span>10:00 AM</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <CiLocationOn className="text-lg" />
-                      <span>Egy, Cairo</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Link
-                      to={"/"}
+                      to={"/appointments/1"}
                       className="text-(--color-primary) hover:underline"
                     >
                       View Details
