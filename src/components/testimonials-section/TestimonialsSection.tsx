@@ -1,5 +1,6 @@
 import { testimonials } from '@/constants/landingPageConstant'
 import Stars from '../stars/Stars'
+import LazyImage from '@/components/ui/LazyImage'
 
 function TestimonialsSection() {
     return (
@@ -15,7 +16,7 @@ function TestimonialsSection() {
                                     <p className='text-(--color-text-light)'>{testimonial.content}</p>
                                     <div className='flex items-center gap-2'>
                                         <div className='w-15 h-15 rounded-full overflow-hidden mr-1'>
-                                            <img src={testimonial.image} className='w-full h-full object-cover' alt="testimonial-image" />
+                                            <LazyImage src={testimonial.image} className='w-full h-full object-cover' alt="testimonial-image" />
                                         </div>
                                         <div>
                                             <h3 className='text-(--color-text)'>{testimonial.name}</h3>
