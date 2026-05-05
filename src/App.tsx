@@ -57,7 +57,7 @@ const App = () => {
       };
     }) => state.auth,
   );
-
+  console.log(role);
   useEffect(() => {
     if (!token || !expiresAt) {
       return;
@@ -120,28 +120,20 @@ const App = () => {
             <Route path="/register">
               <Route index element={<RoleSelection />} />
               <Route element={<Registration />}>
-                {role === "guest" ||
-                  (role === "doctor" && (
-                    <>
-                      {role === "doctor" ? (
-                        <Route
-                          path="patient-register"
-                          element={<PatientRegistration />}
-                        />
-                      ) : (
-                        <>
-                          <Route
-                            path="doctor-register"
-                            element={<DoctorRegistration />}
-                          />
-                          <Route
-                            path="student-register"
-                            element={<StudentRegistration />}
-                          />
-                        </>
-                      )}
-                    </>
-                  ))}
+                <Route
+                  path="patient-register"
+                  element={<PatientRegistration />}
+                />
+
+                <Route
+                  path="doctor-register"
+                  element={<DoctorRegistration />}
+                />
+                <Route
+                  path="student-register"
+                  element={<StudentRegistration />}
+                />
+
                 {role === "doctor" && (
                   <Route
                     path="receptionist-register"
