@@ -16,11 +16,11 @@ interface SideBarProp {
 }
 
 function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
-  const role = useSelector(
-    (state: { auth: { role: string } }) => state.auth.role
-  );
+  // const role = useSelector(
+  //   (state: { auth: { role: string } }) => state.auth.role
+  // );
 
-  // const role = "admin";
+  const role = "admin";
 
   const handleLogout = () => {
     localStorage.removeItem("token");

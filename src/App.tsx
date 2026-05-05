@@ -35,6 +35,8 @@ import {
   routeElements,
 } from "./constants/appConstants";
 import AppointmentDetailsPage from "./pages/appointment-details-page/AppointmentDetailsPage";
+import AdminPage from "./pages/admin-page/AdminPage";
+import AnalyticsPage from "./pages/analytics-page/AnalyticsPage";
 
 // Main application component that handles routing and global layouts
 const App = () => {
@@ -91,9 +93,12 @@ const App = () => {
                 />
               </Route>
             </Route>
-            /////
+
+            <Route path="admin" element={<AdminPage />} />
+            <Route path="analytics" element={<AnalyticsPage />} />
+              /////
             {/* <Route path="/register-v2" element={<RegisterPage />} /> */}
-            <Route path="/verify-email" element={<VerifyEmailPage />} />
+            < Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="/verify-doctor" element={<VerifyDoctorPage />} />
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/privacy" element={<PrivacyPage />} />
