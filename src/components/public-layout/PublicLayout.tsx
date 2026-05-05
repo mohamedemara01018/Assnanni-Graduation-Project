@@ -1,9 +1,18 @@
 
-import { Outlet } from 'react-router'
-import Header from '../header/Header'
-import Footer from '../footer/Footer'
+import { Outlet, useLocation } from "react-router";
+import Footer from "../footer/Footer";
+import Header from "../header/Header";
+import Loading from "../loading/Loading";
+import useMinimumLoading from "@/hooks/useMinimumLoading";
 
 function PublicLayout() {
+    const { pathname } = useLocation();
+    const isLandingLoading = useMinimumLoading();
+
+    if (pathname === "/" && isLandingLoading) {
+        return <Loading />;
+    }
+
     return (
         <>
             <Header />
@@ -12,7 +21,7 @@ function PublicLayout() {
             </main>
             <Footer />
         </>
-    )
+    );
 }
 
-export default PublicLayout
+export default PublicLayout;

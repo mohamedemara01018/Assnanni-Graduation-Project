@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import TobNavbar from "../tob-navbar/TobNavbar";
 import SideBar from "../sidebar/SideBar";
 import useMediaQuery from "@/hooks/useMediaQuery ";
+import DashboardLoadingOverlay from "../loading/DashboardLoadingOverlay";
 
 interface DashboardLayoutProp {
   children: ReactNode;
@@ -25,6 +26,7 @@ function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
 
   return (
     <div>
+      <DashboardLoadingOverlay />
       <div>
         <div className="relative flex">
           {sidebarCollapsed && collapsed && (<div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-10" />)}

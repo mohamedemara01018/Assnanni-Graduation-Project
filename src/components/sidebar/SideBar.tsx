@@ -4,9 +4,17 @@ import { useSelector } from "react-redux";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 import { Link, NavLink } from "react-router";
-import { Brain, Calendar, FileText, LayoutDashboard, Scan, Settings, Stethoscope, Users, X } from "lucide-react";
-
-
+import {
+  Brain,
+  Calendar,
+  FileText,
+  LayoutDashboard,
+  Scan,
+  Settings,
+  Stethoscope,
+  Users,
+  X,
+} from "lucide-react";
 
 interface SideBarProp {
   collapsed: boolean;
@@ -16,11 +24,11 @@ interface SideBarProp {
 }
 
 function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
-  // const role = useSelector(
-  //   (state: { auth: { role: string } }) => state.auth.role
-  // );
+  const role = useSelector(
+    (state: { auth: { role: string } }) => state.auth.role,
+  );
 
-  const role = "admin";
+  // const role = "admin";
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -28,8 +36,10 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
   };
 
   const linkStyle = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center ${toggled ? "justify-center" : ""
-    } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${isActive ? "bg-(--color-bg-blue) text-(--color-text-blue)" : ""
+    `flex items-center ${
+      toggled ? "justify-center" : ""
+    } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
+      isActive ? "bg-(--color-bg-blue) text-(--color-text-blue)" : ""
     }`;
 
   return (
@@ -78,7 +88,7 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
                     </NavLink>
                   </li>
                 );
-              }
+              },
             )}
         </ul>
       </div>
@@ -86,8 +96,9 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
       <div className="p-2 border-t border-border">
         <button
           onClick={handleLogout}
-          className={`flex items-center ${toggled ? "justify-center" : ""
-            } gap-2 px-3 py-2.5 w-full text-start text-sm font-medium bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) rounded-lg`}
+          className={`flex items-center ${
+            toggled ? "justify-center" : ""
+          } gap-2 px-3 py-2.5 w-full text-start text-sm font-medium bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) rounded-lg`}
         >
           <FiLogOut className="w-5 h-5 shrink-0 text-(--color-text)" />
           {!toggled && (
