@@ -37,10 +37,8 @@ import {
 } from "./constants/appConstants";
 import AppointmentDetailsPage from "./pages/appointment-details-page/AppointmentDetailsPage";
 import AdminPage from "./pages/admin-page/AdminPage";
-import AnalyticsPage from "./pages/analytics-page/AnalyticsPage";
 import { logout } from "./store/slices/auth/authSlice";
 import Scan from "./pages/doctor-pages/Scan/Scan";
-import AdminPage from "./pages/admin-page/AdminPage";
 import UsersPage from "./pages/users-page/UsersPage";
 
 const sessionWarningTime = 5 * 60 * 1000;
@@ -136,13 +134,7 @@ const App = () => {
               </Route>
             </Route>
 
-<<<<<<< HEAD
-            <Route path="admin" element={<AdminPage />} />
-            <Route path="analytics" element={<AnalyticsPage />} />
-              /////
-=======
             /////
->>>>>>> 42e88f14c7399776f43c05c714a6b65a8250fe7d
             {/* <Route path="/register-v2" element={<RegisterPage />} /> */}
             < Route path="/verify-email" element={<VerifyEmailPage />} />
             <Route path="/verify-doctor" element={<VerifyDoctorPage />} />
@@ -167,6 +159,7 @@ const App = () => {
           <Route path="/scan/upload" element={<Scan />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/users" element={<UsersPage />} />
+          <Route path="/verify-doctor" element={<VerifyDoctorPage />} />
 
           {/* Protected routes using configurations */}
           {Object.entries(roleRoutePaths).map(([roleName, routes]) =>

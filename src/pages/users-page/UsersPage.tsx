@@ -1,7 +1,10 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout"
+import { selectSummary } from "@/store/slices/admin-slice/summary-slice/SummarySlice";
 import { AlertCircle, Ban, Calendar, CheckCircle, Edit, Eye, Filter, Mail, MapPin, MoreVertical, Phone, Search, Shield, UserPlus, XCircle } from "lucide-react"
 import { useState } from "react";
 import { Link } from "react-router"
+import { useSelector } from 'react-redux'
+import type { SummaryState } from "../admin-page/AdminPage";
 
 interface User {
     id: string;
@@ -18,6 +21,16 @@ interface User {
     avatar?: string;
 }
 
+interface summaryDataInterface {
+    pendingRequests: number
+    totalActionedToday: number
+    totalDoctors: number
+    totalPatients: number
+    totalReceptionists: number
+    totalRejected: number
+    totalStudents: number
+}
+
 
 function UsersPage() {
 
@@ -28,6 +41,16 @@ function UsersPage() {
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [showActionsMenu, setShowActionsMenu] = useState<string | null>(null);
+
+    const { data } = useSelector(selectSummary) as SummaryState
+
+    const totalUser =
+        data
+            ? data.totalDoctors +
+            data.totalPatients +
+            data.totalReceptionists +
+            data.totalStudents
+            : 0;
 
 
     // Mock users data
@@ -241,36 +264,36 @@ function UsersPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-6">
                 <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
                     <p className="text-xs text-(--color-text-light)  mb-1">Total Users</p>
-                    <p className="text-2xl ">1</p>
+                    <p className="text-2xl ">{totalUser}</p>
                 </div>
                 <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
                     <p className="text-xs text-(--color-text-light) mb-1">Patients</p>
-                    <p className="text-2xl ">1</p>
+                    <p className="text-2xl ">{data.totalPatients}</p>
                 </div>
                 <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
                     <p className="text-xs text-(--color-text-light) mb-1">Doctors</p>
-                    <p className="text-2xl ">1</p>
+                    <p className="text-2xl ">{data.totalDoctors}</p>
                 </div>
                 <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
                     <p className="text-xs text-(--color-text-light) mb-1">Students</p>
-                    <p className="text-2xl ">1</p>
+                    <p className="text-2xl ">{data.totalStudents}</p>
                 </div>
                 <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
-                    <p className="text-xs text-(--color-text-light) mb-1">Staff</p>
-                    <p className="text-2xl ">1</p>
+                    <p className="text-xs text-(--color-text-light) mb-1">Receptionists</p>
+                    <p className="text-2xl ">{data.totalReceptionists}</p>
                 </div>
                 <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
                     <p className="text-xs text-(--color-text-light) mb-1">Active</p>
-                    <p className="text-2xl text-green-600 dark:text-green-400">1</p>
+                    <p className="text-2xl text-green-600 dark:text-green-400">{data.totalActionedToday}</p>
                 </div>
-                <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
+                {/* <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
                     <p className="text-xs text-(--color-text-light) mb-1">Suspended</p>
-                    <p className="text-2xl text-red-600 dark:text-red-400">1</p>
+                    <p className="text-2xl text-red-600 dark:text-red-400">{data.}</p>
                 </div>
                 <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
                     <p className="text-xs text-(--color-text-light) mb-1">Pending</p>
                     <p className="text-2xl text-yellow-600 dark:text-yellow-400">1</p>
-                </div>
+                </div> */}
             </div>
 
             {/* Search and Filters */}
