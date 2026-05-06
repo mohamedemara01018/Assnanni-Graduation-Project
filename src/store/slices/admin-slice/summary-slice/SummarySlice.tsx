@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { RootState } from "@/store/store";
+import { token } from "../utils";
 
 export interface SummaryData {
     [key: string]: any;
@@ -22,7 +23,6 @@ export const fetchAdminSummary = createAsyncThunk(
     "summary/fetchAdminSummary",
     async (_, { rejectWithValue }) => {
         try {
-            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1NjE2OTAwOS05MzE5LTQ5ZTgtYjAwOC02YjQ0ZmIwZTY5NzciLCJlbWFpbCI6Im1hcmhqbWFsNkBnbWFpbC5jb20iLCJ1bmlxdWVfbmFtZSI6Im1hcmhqbWFsNkBnbWFpbC5jb20iLCJqdGkiOiI4NDAxMzM3NC00ZTZmLTQ5OGMtOGM3ZC05ODI3MmU5NGMwMzYiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjU2MTY5MDA5LTkzMTktNDllOC1iMDA4LTZiNDRmYjBlNjk3NyIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJtYXJoam1hbDZAZ21haWwuY29tIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjpbIkFkbWluIiwiRG9jdG9yIl0sImV4cCI6MTc3Nzk4NjM3NiwiaXNzIjoiTXlBcHAuQXBpIiwiYXVkIjoiTXlBcHAuQ2xpZW50In0.7mIrGBIv8fuseIrXwDRKBA0TJXn_ww4_bqaj6r-MmO8'
 
             const response = await fetch(
                 "https://asnani.runasp.net/api/Admin/stats/summary",
@@ -39,6 +39,7 @@ export const fetchAdminSummary = createAsyncThunk(
             }
 
             const json = await response.json();
+            console.log('json', json)
             return json;
         } catch (err: any) {
             return rejectWithValue(err.message);
@@ -60,7 +61,7 @@ const summarySlice = createSlice({
 
             .addCase(fetchAdminSummary.fulfilled, (state, action) => {
                 state.loading = false;
-                state.data = action.payload;
+                state.data = action.payload.data;
             })
 
             .addCase(fetchAdminSummary.rejected, (state, action) => {

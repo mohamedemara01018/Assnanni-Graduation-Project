@@ -3,6 +3,7 @@ import authReducer from "./slices/auth/authSlice";
 import emailReducer from "./slices/email/emailSlice";
 import configReducer from "./slices/config/configSlice";
 import summaryReducer from './slices/admin-slice/summary-slice/SummarySlice'
+import usersReducer from './slices/admin-slice/users-slice/UsersSlice'
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     email: emailReducer,
     config: configReducer,
     summarySlice: summaryReducer,
+    usersSlice: usersReducer
   },
 });
 

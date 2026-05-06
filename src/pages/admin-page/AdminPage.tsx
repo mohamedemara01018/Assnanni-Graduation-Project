@@ -13,18 +13,48 @@ import {
 import { Link } from "react-router";
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchAdminSummary, selectSummary } from "@/store/slices/admin-slice/summary-slice/SummarySlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { AppDispatch } from "@/store/store";
+import { ScaleLoader } from 'react-spinners'
+import Error from "@/components/error/Error";
+
+interface summaryDataInterface {
+  pendingRequests: number
+  totalActionedToday: number
+  totalDoctors: number
+  totalPatients: number
+  totalReceptionists: number
+  totalRejected: number
+  totalStudents: number
+}
+
+export interface SummaryState {
+  data: summaryDataInterface;
+  loading: boolean;
+  error: string | null;
+}
 
 function AdminPage() {
 
   const dispatch: AppDispatch = useDispatch();
-  const summaryData = useSelector(selectSummary);
-  console.log(summaryData)
+  const { data, loading, error } = useSelector(selectSummary) as SummaryState
+
+  // const [totalUser, setTotalUser] = useState<number>(0);
 
   useEffect(() => {
     dispatch(fetchAdminSummary());
   }, [dispatch]);
+
+
+  const totalUser =
+    data
+      ? data.totalDoctors +
+      data.totalPatients +
+      data.totalReceptionists +
+      data.totalStudents
+      : 0;
+
+
 
   return (
     <DashboardLayout pageTitle="Admin page">
@@ -41,40 +71,44 @@ function AdminPage() {
             Here's your health dashboard overview
           </p>
         </div>
-        <div className="grid max-sm:grid-cols-2 grid-cols-4 gap-4">
-          <StatCard
-            Icon={Users}
-            TrendIcon={TrendingUp}
-            trendValue="5"
-            label="total user"
-            value={1234}
-            colorClass="text-blue-500 bg-blue-200"
-          />
-          <StatCard
-            Icon={ShieldCheck}
-            TrendIcon={TrendingUp}
-            trendValue="5"
-            label="total user"
-            value={1234}
-            colorClass="text-green-500 bg-green-200"
-          />
-          <StatCard
-            Icon={Calendars}
-            TrendIcon={TrendingUp}
-            trendValue="5"
-            label="total user"
-            value={1234}
-            colorClass="text-purple-500 bg-purple-200"
-          />
-          <StatCard
-            Icon={FileText}
-            TrendIcon={TrendingUp}
-            trendValue="5"
-            label="total user"
-            value={1234}
-            colorClass="text-orange-500 bg-orange-200"
-          />
-        </div>
+        {
+          loading ? <div className="w-full  flex items-center justify-center"><ScaleLoader color="#6d61ff" /> </div> : (
+            error ? <Error message={error} /> :
+              <div className="grid max-sm:grid-cols-2 grid-cols-4 gap-4">
+                <StatCard
+                  Icon={Users}
+                  TrendIcon={TrendingUp}
+                  trendValue="5"
+                  label="Total User"
+                  value={totalUser}
+                  colorClass="text-blue-500 bg-blue-200"
+                />
+                <StatCard
+                  Icon={ShieldCheck}
+                  TrendIcon={TrendingUp}
+                  trendValue="5"
+                  label="total user"
+                  value={1234}
+                  colorClass="text-green-500 bg-green-200"
+                />
+                <StatCard
+                  Icon={Calendars}
+                  TrendIcon={TrendingUp}
+                  trendValue="5"
+                  label="total user"
+                  value={1234}
+                  colorClass="text-purple-500 bg-purple-200"
+                />
+                <StatCard
+                  Icon={FileText}
+                  TrendIcon={TrendingUp}
+                  trendValue="5"
+                  label="total user"
+                  value={1234}
+                  colorClass="text-orange-500 bg-orange-200"
+                />
+              </div>
+          )}
 
         <div className="flex max-md:flex-col gap-6">
           <CardComp classProbs="flex-2">
