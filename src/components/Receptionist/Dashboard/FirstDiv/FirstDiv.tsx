@@ -1,5 +1,14 @@
 import { NavLink } from "react-router";
 import { BsCalendar3 } from "react-icons/bs";
+import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import type { RecentPatient } from "@/interfaces/doctorInterfaces";
+import Patient from "@/components/Doctor/Dashboard/FirstDiv/Patient";
 import PatientQueueCard, { type PatientInQueue } from "./PatientQueueCard";
 
 export interface DashboardAppointment {
@@ -9,6 +18,21 @@ export interface DashboardAppointment {
   time: string;
   status: "confirmed" | "pending" | "completed";
 }
+
+type ReceptionistDashboardData = {
+  patientQueue: PatientInQueue[];
+  todayAppointments: DashboardAppointment[];
+  recentPatients: RecentPatient[];
+};
+
+const getResponseData = <T,>(responseData: unknown): T => {
+  const data = responseData as {
+    data?: T;
+    value?: T;
+  };
+
+  return data?.data || data?.value || (responseData as T);
+};
 
 const AppointmentCard = ({
   appointment,
@@ -50,60 +74,51 @@ const AppointmentCard = ({
 };
 
 const FirstDiv = () => {
-  const patientQueue: PatientInQueue[] = [
-    {
-      id: 1,
-      name: "John Smith",
-      doctorName: "Dr. Chen",
-      arrivalTime: "09:00 AM",
-      status: "Waiting",
-    },
-    {
-      id: 2,
-      name: "Sarah Johnson",
-      doctorName: "Dr. Williams",
-      arrivalTime: "09:15 AM",
-      status: "In Progress",
-    },
-    {
-      id: 3,
-      name: "Mike Brown",
-      doctorName: "Dr. Chen",
-      arrivalTime: "09:30 AM",
-      status: "Waiting",
-    },
-    {
-      id: 4,
-      name: "Emma Davis",
-      doctorName: "Dr. Smith",
-      arrivalTime: "09:45 AM",
-      status: "Checked In",
-    },
-  ];
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
+  const token = Cookies.get("jwtToken");
 
-  const todayAppointments: DashboardAppointment[] = [
-    {
-      id: 1,
-      doctorName: "Sarah Johnson",
-      specialty: "Cardiology",
-      time: "10:00",
-      status: "confirmed",
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
     },
-    {
-      id: 2,
-      doctorName: "Emily Rodriguez",
-      specialty: "Pediatrics",
-      time: "14:00",
-      status: "pending",
+  };
+
+  const { data, isSuccess, isError, error } = useQuery<ReceptionistDashboardData>({
+    queryKey: ["ReceptionistDashboardFirstDiv"],
+    queryFn: async () => {
+      const [queueRes, appointmentsRes, recentPatientsRes] = await Promise.all([
+        axios.get(`${backendUrl}patient-queue`, config),
+        axios.get(`${backendUrl}todays-appointment`, config),
+        axios.get(`${backendUrl}Doctors/recent-patients`, config),
+      ]);
+
+      return {
+        patientQueue: getResponseData<PatientInQueue[]>(queueRes.data),
+        todayAppointments: getResponseData<DashboardAppointment[]>(
+          appointmentsRes.data
+        ),
+        recentPatients: getResponseData<RecentPatient[]>(recentPatientsRes.data),
+      };
     },
-    {
-      id: 3,
-      doctorName: "Michael Chen",
-      specialty: "Neurology",
-      time: "09:00",
-      status: "completed",
-    },
-  ];
+  });
+
+  const patientQueue = data?.patientQueue || [];
+  const todayAppointments = data?.todayAppointments || [];
+  const recentPatients = data?.recentPatients || [];
+  const waitingPatients = patientQueue.filter(
+    (patient) => patient.status === "Waiting"
+  ).length;
+
+  useEffect(() => {
+    if (isSuccess) {
+      toast.success("Receptionist dashboard details loaded");
+    }
+
+    if (isError) {
+      console.error("Failed to fetch receptionist dashboard details:", error);
+      toast.error(error.message || "Failed to load receptionist dashboard");
+    }
+  }, [isSuccess, isError, error]);
 
   return (
     <div className="flex-[2] flex flex-col gap-8 w-full">
@@ -114,13 +129,17 @@ const FirstDiv = () => {
             Patient Queue
           </h2>
           <span className="text-xs font-bold text-(--color-text-light) bg-gray-100 px-3 py-1 rounded-full">
-            2 waiting
+            {waitingPatients} waiting
           </span>
         </div>
         <div className="flex flex-col gap-4">
-          {patientQueue.map((patient) => (
-            <PatientQueueCard key={patient.id} patient={patient} />
-          ))}
+          {patientQueue.length > 0 ? (
+            patientQueue.map((patient) => (
+              <PatientQueueCard key={patient.id} patient={patient} />
+            ))
+          ) : (
+            <p className="text-(--color-text-light)">No patients in queue.</p>
+          )}
         </div>
       </div>
 
@@ -138,9 +157,45 @@ const FirstDiv = () => {
           </NavLink>
         </div>
         <div className="flex flex-col gap-4">
-          {todayAppointments.map((app) => (
-            <AppointmentCard key={app.id} appointment={app} />
-          ))}
+          {todayAppointments.length > 0 ? (
+            todayAppointments.map((app) => (
+              <AppointmentCard key={app.id} appointment={app} />
+            ))
+          ) : (
+            <p className="text-(--color-text-light)">
+              No appointments scheduled today.
+            </p>
+          )}
+        </div>
+      </div>
+
+      {/* Recent Patients */}
+      <div className="bg-(--color-surface) p-8 rounded-2xl border border-(--color-border) shadow-sm">
+        <div className="flex justify-between items-center mb-8">
+          <h2 className="text-xl font-bold text-(--color-text)">
+            Recent Patients
+          </h2>
+          <NavLink
+            to="/doctor-patients"
+            className="text-xs font-bold text-blue-600 hover:text-blue-700 underline-offset-4 hover:underline"
+          >
+            View All
+          </NavLink>
+        </div>
+        <div className="flex flex-col gap-4">
+          {recentPatients.length > 0 ? (
+            recentPatients.map((patient) => (
+              <Patient
+                key={patient.id}
+                id={patient.id}
+                name={patient.name}
+                imageUrl={patient.imageUrl}
+                lastInteractionDate={patient.lastInteractionDate}
+              />
+            ))
+          ) : (
+            <p className="text-(--color-text-light)">No recent patients.</p>
+          )}
         </div>
       </div>
     </div>

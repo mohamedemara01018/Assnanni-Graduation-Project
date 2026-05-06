@@ -43,9 +43,11 @@ const getTokenExpirationDate = (exp: unknown) => {
 };
 
 const getAuthFromToken = (token: string) => {
-  const decoded = normalizeTokenClaims(jwtDecode<Record<string, unknown>>(token));
+  const decoded = normalizeTokenClaims(
+    jwtDecode<Record<string, unknown>>(token),
+  );
   const tokenExpirationDate = getTokenExpirationDate(decoded.exp);
-
+  console.log(decoded);
   if (tokenExpirationDate && tokenExpirationDate.getTime() <= Date.now()) {
     Cookies.remove("jwtToken");
     throw new Error("Token expired");

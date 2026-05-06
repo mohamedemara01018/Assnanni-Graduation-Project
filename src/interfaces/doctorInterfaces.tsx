@@ -82,7 +82,7 @@ export interface ScanFormData {
   notes: string;
 }
 
-export type StudentDoctor = {
+export interface StudentDoctor {
   id: number;
   name: string;
   university: string;
@@ -90,4 +90,15 @@ export type StudentDoctor = {
   supervisor: string;
   status: "Active" | "Pending Review";
   dentalUniversityProofImage: string;
-};
+}
+
+export interface WeeklyScheduleDay {
+  day: string;
+  slots: string[];
+}
+
+export interface WeeklyScheduleStats {
+  totalSlots: number;
+  availableSlots: number;
+  unavailableSlots: number;
+}

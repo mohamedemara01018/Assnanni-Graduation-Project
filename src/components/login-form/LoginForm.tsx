@@ -29,7 +29,7 @@ function LoginForm() {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     try {
       const response = await axios.post(loginApiBase + "Login", data);
-      console.log(response.data.data.token);
+      console.log(response);
       dispatch(setToken(response.data.data.token)); // Use real token when uncommenting API
       // dispatch(setToken(response..data.data.token));
       toast.success("Welcome Back");
@@ -43,26 +43,6 @@ function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <div className="login-form-container flex flex-col gap-3">
-        {/* <div className="flex flex-col gap-1">
-          <label htmlFor="role">IAM a</label>
-          <select
-            id="role"
-            className="border-2 py-3 px-4 w-full rounded-md bg-(--color-bg) focus:ring-2 focus:border-0"
-            {...register("role", { required: "You must choose your role" })}
-          >
-            <option value={"patient"}>Patient</option>
-            <option value={"doctor"}>Doctor</option>
-            <option value={"student doctor"}>Student Doctor</option>
-            <option value={"reciptionist"}>Reciptionist</option>
-            <option value={"admin"}>Admin</option>
-          </select>
-          {errors.role && (
-            <p className="text-xs text-red-600 ml-1 font-light">
-              {errors.role.message}
-            </p>
-          )}
-        </div> */}
-
         <div className="flex flex-col items-start w-full gap-1">
           <label htmlFor={"email"} className="text-(--color-text)">
             Email

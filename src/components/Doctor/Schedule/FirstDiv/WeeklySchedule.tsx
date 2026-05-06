@@ -1,48 +1,13 @@
 import { NavLink } from "react-router";
-import { useEffect } from "react";
-import axios from "axios";
-import { toast } from "react-toastify";
 import Days from "./Days";
-import { useQuery } from "@tanstack/react-query";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/store/store";
-import { fallbackDays } from "@/constants/doctorConstants";
-import type { Day } from "@/interfaces/doctorInterfaces";
+import type { WeeklyScheduleDay } from "@/interfaces/doctorInterfaces";
 
 interface Props {
   role: string;
+  days: WeeklyScheduleDay[];
 }
 
-const WeeklySchedule = ({ role }: Props) => {
-  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
-
-  const {
-    data: days = fallbackDays,
-    isError,
-    error,
-    isSuccess,
-  } = useQuery<Day[]>({
-    queryKey: ["DoctorSchedules"],
-    queryFn: async () => {
-      const response = await axios.get(`${backendUrl}DoctorSchedules`);
-      const data = response.data?.value || response.data;
-      if (Array.isArray(data) && data.length > 0) {
-        return data;
-      }
-      return fallbackDays;
-    },
-  });
-
-  useEffect(() => {
-    if (isSuccess && days !== fallbackDays) {
-      toast.success("Weekly schedules loaded");
-    }
-    if (isError) {
-      console.error("Error fetching schedules:", error);
-      toast.error(error.message || "Failed to load schedules");
-    }
-  }, [isSuccess, isError, error, days]);
-
+const WeeklySchedule = ({ role, days }: Props) => {
   return (
     <div className="bg-(--color-surface) rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm">
       <div className="flex justify-between items-center mb-6">
@@ -62,7 +27,7 @@ const WeeklySchedule = ({ role }: Props) => {
         {days.map((day, index) => {
           return (
             <div key={index}>
-              <Days day={day.day} time={day.time} role={role} />
+              <Days day={day.day} time={day.slots} role={role} />
             </div>
           );
         })}

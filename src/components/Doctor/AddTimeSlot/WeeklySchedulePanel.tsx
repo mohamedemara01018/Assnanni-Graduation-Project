@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-
+import Cookies from "js-cookie";
 interface TimeSlot {
   id: number;
   start: string;
@@ -16,6 +16,23 @@ interface TimeSlot {
 interface DaySchedule {
   name: string;
   slots: TimeSlot[];
+}
+
+interface WeeklyScheduleResponse {
+  totalSlots: number;
+  availableSlots: number;
+  unavailableSlots: number;
+  days: {
+    day: string;
+    slots: string[];
+  }[];
+}
+
+interface WeeklySchedulePanelData {
+  schedule: DaySchedule[];
+  totalSlots: number;
+  availableSlots: number;
+  unavailableSlots: number;
 }
 
 let nextId = 100;
@@ -137,34 +154,60 @@ const SCHEDULING_TIPS = [
   "Thursday & Friday afternoons see the highest booking rate.",
 ];
 
+const initialPanelData: WeeklySchedulePanelData = {
+  schedule: initialSchedule,
+  totalSlots: initialSchedule.reduce((acc, day) => acc + day.slots.length, 0),
+  availableSlots: initialSchedule.reduce(
+    (acc, day) => acc + day.slots.filter((slot) => slot.available).length,
+    0,
+  ),
+  unavailableSlots: initialSchedule.reduce(
+    (acc, day) => acc + day.slots.filter((slot) => !slot.available).length,
+    0,
+  ),
+};
+
 const WeeklySchedulePanel = () => {
   const queryClient = useQueryClient();
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
-
-  const { data: schedule = initialSchedule, isError: isFetchError } = useQuery<
-    DaySchedule[]
-  >({
+  const token = Cookies.get("jwtToken");
+  const {
+    data: weeklySchedule = initialPanelData,
+    isError: isFetchError,
+    isSuccess: isFetchSuccess,
+    error: fetchError,
+  } = useQuery<WeeklySchedulePanelData>({
     queryKey: ["DoctorSchedules"],
     queryFn: async () => {
-      const response = await axios.get(`${backendUrl}DoctorSchedules`);
-      const data = response.data?.value || response.data;
-      if (data && Array.isArray(data) && data.length > 0) {
+      const response = await axios.get(`${backendUrl}Doctors/weekly-schedule`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data: WeeklyScheduleResponse | undefined =
+        response.data?.data || response.data?.value || response.data;
+
+      if (data && Array.isArray(data.days)) {
         let tempId = 1000;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return data.map((d: any) => ({
-          name: d.day,
-          slots: d.time
-            ? d.time.map((t: string) => ({
-                id: tempId++,
-                start: t,
-                end: "TBD",
-                duration: "30 minutes",
-                available: true,
-              }))
-            : [],
-        }));
+
+        return {
+          totalSlots: data.totalSlots ?? 0,
+          availableSlots: data.availableSlots ?? 0,
+          unavailableSlots: data.unavailableSlots ?? 0,
+          schedule: data.days.map((day) => ({
+            name: day.day,
+            slots: day.slots.map((slot) => ({
+              id: tempId++,
+              start: slot,
+              end: "TBD",
+              duration: "30 minutes",
+              available: true,
+            })),
+          })),
+        };
       }
-      return initialSchedule;
+
+      return initialPanelData;
     },
   });
 
@@ -176,16 +219,34 @@ const WeeklySchedulePanel = () => {
       // Optimistically update or just invalidate
       queryClient.setQueryData(
         ["DoctorSchedules"],
-        (oldData: DaySchedule[] | undefined) => {
+        (oldData: WeeklySchedulePanelData | undefined) => {
           if (!oldData) return oldData;
-          return oldData.map((day) =>
-            day.name === variables.dayName
-              ? {
+          const schedule = oldData.schedule.map((day) =>
+            day.name !== variables.dayName
+              ? day
+              : {
                   ...day,
-                  slots: day.slots.filter((s) => s.id !== variables.slotId),
-                }
-              : day,
+                  slots: day.slots.filter(
+                    (slot) => slot.id !== variables.slotId,
+                  ),
+                },
           );
+
+          return {
+            ...oldData,
+            schedule,
+            totalSlots: Math.max(oldData.totalSlots - 1, 0),
+            availableSlots: schedule.reduce(
+              (acc, day) =>
+                acc + day.slots.filter((slot) => slot.available).length,
+              0,
+            ),
+            unavailableSlots: schedule.reduce(
+              (acc, day) =>
+                acc + day.slots.filter((slot) => !slot.available).length,
+              0,
+            ),
+          };
         },
       );
       toast.success("Time slot deleted successfully");
@@ -197,20 +258,22 @@ const WeeklySchedulePanel = () => {
   });
 
   useEffect(() => {
+    if (isFetchSuccess) {
+      toast.success("Weekly schedule loaded");
+    }
+
     if (isFetchError) {
+      console.error("Failed to load schedules:", fetchError);
       toast.error("Failed to load schedules. Showing local data.");
     }
-  }, [isFetchError]);
+  }, [isFetchSuccess, isFetchError, fetchError]);
 
   const deleteSlot = (dayName: string, slotId: number) => {
     deleteMutation.mutate({ dayName, slotId });
   };
 
-  const totalSlots = schedule.reduce((acc, day) => acc + day.slots.length, 0);
-  const availableSlots = schedule.reduce(
-    (acc, day) => acc + day.slots.filter((s) => s.available).length,
-    0,
-  );
+  const { schedule, totalSlots, availableSlots, unavailableSlots } =
+    weeklySchedule;
 
   return (
     <div className="flex flex-col gap-4">
@@ -236,7 +299,7 @@ const WeeklySchedulePanel = () => {
         <div className="w-px h-8 bg-(--color-border)" />
         <div className="flex flex-col">
           <span className="text-2xl font-bold text-red-500">
-            {totalSlots - availableSlots}
+            {unavailableSlots}
           </span>
           <span className="text-xs text-(--color-text-light) mt-0.5">
             Unavailable

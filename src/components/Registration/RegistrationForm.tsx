@@ -9,7 +9,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setToken } from "@/store/slices/auth/authSlice";
+// import { setToken } from "@/store/slices/auth/authSlice";
 import { getEmail } from "@/store/slices/email/emailSlice";
 import type { RootState } from "@/store/store";
 
@@ -45,12 +45,12 @@ const RegistrationForm = ({
   const isDoctor: boolean =
     pathname.includes("/doctor-register") ||
     pathname.includes("/student-register");
-  const isPatient =
-    (!pathname.includes("/doctor-register") ||
-      !pathname.includes("/student-register") ||
-      !pathname.includes("/receptionist-register")) &&
-    pathname.includes("register");
-  const isReceptionist = pathname.includes("receptionist-register");
+  // const isPatient =
+  //   (!pathname.includes("/doctor-register") ||
+  //     pathname.includes("/student-register") ||
+  //     pathname.includes("/receptionist-register")) &&
+  //   pathname.includes("register");
+  // const isReceptionist = pathname.includes("receptionist-register");
 
   const {
     register,
@@ -98,18 +98,6 @@ const RegistrationForm = ({
         });
       } else {
         // Mock JWT tokens for testing. Replace with actual tokens from backend.
-        if (isPatient)
-          dispatch(
-            setToken(
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1Njc4OTAiLCJuYW1lIjoiSm9obiBEb2UiLCJyb2xlIjoicGF0aWVudCIsImVtYWlsIjoibW9oYW1lZEBnbWFpbC5jb20iLCJpYXQiOjE1MTYyMzkwMjJ9.Gn8ua6_Su_02zgSbfW_GIq4NOZCCBdpnEOpQE1DwTcA",
-            ),
-          );
-        if (isReceptionist)
-          dispatch(
-            setToken(
-              "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoicmVjZXB0aW9uaXN0In0=.dummy",
-            ),
-          );
         navigator("/verify-email");
       }
     } catch (error: any) {

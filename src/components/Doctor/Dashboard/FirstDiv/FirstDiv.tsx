@@ -59,7 +59,7 @@ const FirstDiv = () => {
   const recentPatients = data?.recentPatients
     ? data.recentPatients
     : dummyPatients;
-
+  console.log(recentPatients);
   useEffect(() => {
     if (isSuccess && data) {
       toast.success("Dashboard details loaded");
