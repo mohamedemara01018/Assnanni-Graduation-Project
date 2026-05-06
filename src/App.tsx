@@ -38,8 +38,6 @@ import {
 import AppointmentDetailsPage from "./pages/appointment-details-page/AppointmentDetailsPage";
 import { logout } from "./store/slices/auth/authSlice";
 import Scan from "./pages/doctor-pages/Scan/Scan";
-// import AdminPage from "./pages/admin-page/AdminPage";
-// import UsersPage from "./pages/users-page/UsersPage";
 
 const sessionWarningTime = 5 * 60 * 1000;
 const sessionWarningToastId = "session-expiry-warning";
@@ -184,9 +182,6 @@ const App = () => {
             element={<EditPatientProfilePage />}
           />
           <Route path="/scan/upload" element={<Scan />} />
-          {/* <Route path="/admin" element={<AdminPage />} /> */}
-          {/* <Route path="/users" element={<UsersPage />} /> */}
-
           {/* Protected routes using configurations */}
           {Object.entries(roleRoutePaths).map(([roleName, routes]) =>
             routes.map((path) => (
