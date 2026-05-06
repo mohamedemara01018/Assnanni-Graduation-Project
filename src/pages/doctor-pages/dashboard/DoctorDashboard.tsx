@@ -60,9 +60,6 @@ const DoctorDashboard = () => {
   });
 
   useEffect(() => {
-    if (isSuccess && dashboardData !== defaultDashboardData) {
-      toast.success("Dashboard overview loaded");
-    }
     if (isError) {
       console.error("Failed to fetch dashboard data:", error);
       toast.error(error.message || "Failed to load dashboard overview");

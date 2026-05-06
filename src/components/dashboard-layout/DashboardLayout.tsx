@@ -3,6 +3,7 @@ import TobNavbar from "../tob-navbar/TobNavbar";
 import SideBar from "../sidebar/SideBar";
 import useMediaQuery from "@/hooks/useMediaQuery ";
 import DashboardLoadingOverlay from "../loading/DashboardLoadingOverlay";
+import { useMyProfile } from "@/hooks/useMyProfile";
 
 interface DashboardLayoutProp {
   children: ReactNode;
@@ -10,6 +11,7 @@ interface DashboardLayoutProp {
 }
 
 function DashboardLayout({ children, pageTitle }: DashboardLayoutProp) {
+  useMyProfile();
 
   const [toggled, setToggle] = useState(false);
   const sidebarCollapsed = useMediaQuery("(max-width:768px)")

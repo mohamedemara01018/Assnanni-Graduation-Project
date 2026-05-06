@@ -111,7 +111,7 @@ function LoginForm() {
             <input type="checkbox" name="check" id="check" />
             <label htmlFor="check">Remember me</label>
           </div>
-          <NavLink to={"/"} className={"text-(--color-primary)"}>
+          <NavLink to={"/password-reset"} className={"text-(--color-primary)"}>
             Forgot password?
           </NavLink>
         </div>
