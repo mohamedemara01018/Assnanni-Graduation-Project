@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
@@ -14,18 +14,9 @@ interface TimeSlot {
 }
 
 interface DaySchedule {
+  id: number;
   name: string;
   slots: TimeSlot[];
-}
-
-interface WeeklyScheduleResponse {
-  totalSlots: number;
-  availableSlots: number;
-  unavailableSlots: number;
-  days: {
-    day: string;
-    slots: string[];
-  }[];
 }
 
 interface WeeklySchedulePanelData {
@@ -112,6 +103,24 @@ const TrashIcon = () => (
   </svg>
 );
 
+// Restore icon
+const RestoreIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    className="w-4 h-4"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    strokeWidth={2}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+    />
+  </svg>
+);
+
 // Clock icon
 const ClockIcon = () => (
   <svg
@@ -171,52 +180,141 @@ const WeeklySchedulePanel = () => {
   const queryClient = useQueryClient();
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
+
+  // Range blocking/unblocking state
+  const [activeRangeDay, setActiveRangeDay] = useState<number | null>(null);
+  const [rangeMode, setRangeMode] = useState<"block" | "unblock">("block");
+  const [rangeStart, setRangeStart] = useState("09:00:00");
+  const [rangeEnd, setRangeEnd] = useState("17:00:00");
+
+  const blockRangeMutation = useMutation({
+    mutationFn: async (payload: { id: number; start: string; end: string }) => {
+      return await axios.patch(
+        `${backendUrl}DoctorSchedules/schedule/block-range`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+    },
+    onSuccess: () => {
+      toast.success("Time range blocked successfully");
+      queryClient.invalidateQueries({ queryKey: ["DoctorSchedules"] });
+      setActiveRangeDay(null);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to block range");
+    },
+  });
+
+  const unblockRangeMutation = useMutation({
+    mutationFn: async (payload: { id: number; start: string; end: string }) => {
+      return await axios.patch(
+        `${backendUrl}DoctorSchedules/schedule/unblock-range`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+    },
+    onSuccess: () => {
+      toast.success("Time range restored successfully");
+      queryClient.invalidateQueries({ queryKey: ["DoctorSchedules"] });
+      setActiveRangeDay(null);
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to restore range");
+    },
+  });
   const {
     data: weeklySchedule = initialPanelData,
     isError: isFetchError,
     isSuccess: isFetchSuccess,
     error: fetchError,
+    isLoading: isFetching,
   } = useQuery<WeeklySchedulePanelData>({
     queryKey: ["DoctorSchedules"],
     queryFn: async () => {
-      const response = await axios.get(`${backendUrl}Doctors/weekly-schedule`, {
+      const response = await axios.get(`${backendUrl}DoctorSchedules`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      const data: WeeklyScheduleResponse | undefined =
-        response.data?.data || response.data?.value || response.data;
+      const data = response.data?.data || [];
 
-      if (data && Array.isArray(data.days)) {
-        let tempId = 1000;
+      let totalSlotsCount = 0;
+      let availableSlotsCount = 0;
+      let unavailableSlotsCount = 0;
+
+      const mappedSchedule = data.map((dayObj: any, index: number) => {
+        const slotsCount = Array.isArray(dayObj.slots)
+          ? dayObj.slots.length
+          : 0;
+        totalSlotsCount += slotsCount;
+
+        const mappedSlots = Array.isArray(dayObj.slots)
+          ? dayObj.slots.map((s: any) => {
+              const isAvailable = s.status === "Available";
+              if (isAvailable) {
+                availableSlotsCount++;
+              } else {
+                unavailableSlotsCount++;
+              }
+
+              // Try to calculate duration from start and end times
+              let durationStr = "30 minutes";
+              if (s.start && s.end) {
+                const [h1, m1] = s.start.split(":").map(Number);
+                const [h2, m2] = s.end.split(":").map(Number);
+                const diffMinutes = h2 * 60 + m2 - (h1 * 60 + m1);
+                if (diffMinutes > 0) {
+                  durationStr = `${diffMinutes} minutes`;
+                }
+              }
+
+              return {
+                id: s.id,
+                start: s.start || "N/A",
+                end: s.end || "N/A",
+                duration: durationStr,
+                available: isAvailable,
+              };
+            })
+          : [];
 
         return {
-          totalSlots: data.totalSlots ?? 0,
-          availableSlots: data.availableSlots ?? 0,
-          unavailableSlots: data.unavailableSlots ?? 0,
-          schedule: data.days.map((day) => ({
-            name: day.day,
-            slots: day.slots.map((slot) => ({
-              id: tempId++,
-              start: slot,
-              end: "TBD",
-              duration: "30 minutes",
-              available: true,
-            })),
-          })),
+          id: index,
+          name: dayObj.day,
+          slots: mappedSlots,
         };
-      }
+      });
 
-      return initialPanelData;
+      return {
+        totalSlots: totalSlotsCount,
+        availableSlots: availableSlotsCount,
+        unavailableSlots: unavailableSlotsCount,
+        schedule: mappedSchedule,
+      };
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async ({ slotId }: { dayName: string; slotId: number }) => {
-      return await axios.delete(`${backendUrl}DoctorScheduled/${slotId}`);
+      return await axios.delete(
+        `${backendUrl}DoctorSchedules/schedule-slot/${slotId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
     },
     onSuccess: (_, variables) => {
-      // Optimistically update or just invalidate
+      // Update locally to show as unavailable immediately
       queryClient.setQueryData(
         ["DoctorSchedules"],
         (oldData: WeeklySchedulePanelData | undefined) => {
@@ -226,8 +324,10 @@ const WeeklySchedulePanel = () => {
               ? day
               : {
                   ...day,
-                  slots: day.slots.filter(
-                    (slot) => slot.id !== variables.slotId,
+                  slots: day.slots.map((slot) =>
+                    slot.id === variables.slotId
+                      ? { ...slot, available: false }
+                      : slot,
                   ),
                 },
           );
@@ -235,7 +335,6 @@ const WeeklySchedulePanel = () => {
           return {
             ...oldData,
             schedule,
-            totalSlots: Math.max(oldData.totalSlots - 1, 0),
             availableSlots: schedule.reduce(
               (acc, day) =>
                 acc + day.slots.filter((slot) => slot.available).length,
@@ -250,10 +349,67 @@ const WeeklySchedulePanel = () => {
         },
       );
       toast.success("Time slot deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["DoctorSchedules"] });
     },
     onError: (error: any) => {
       console.error("Error deleting slot:", error);
       toast.error(error.response?.data?.message || "Failed to delete slot");
+    },
+  });
+
+  const restoreMutation = useMutation({
+    mutationFn: async ({ slotId }: { dayName: string; slotId: number }) => {
+      return await axios.patch(
+        `${backendUrl}DoctorSchedules/schedule-slot/${slotId}/restore`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+    },
+    onSuccess: (_, variables) => {
+      // Update locally to show as available immediately
+      queryClient.setQueryData(
+        ["DoctorSchedules"],
+        (oldData: WeeklySchedulePanelData | undefined) => {
+          if (!oldData) return oldData;
+          const schedule = oldData.schedule.map((day) =>
+            day.name !== variables.dayName
+              ? day
+              : {
+                  ...day,
+                  slots: day.slots.map((slot) =>
+                    slot.id === variables.slotId
+                      ? { ...slot, available: true }
+                      : slot,
+                  ),
+                },
+          );
+
+          return {
+            ...oldData,
+            schedule,
+            availableSlots: schedule.reduce(
+              (acc, day) =>
+                acc + day.slots.filter((slot) => slot.available).length,
+              0,
+            ),
+            unavailableSlots: schedule.reduce(
+              (acc, day) =>
+                acc + day.slots.filter((slot) => !slot.available).length,
+              0,
+            ),
+          };
+        },
+      );
+      toast.success("Time slot restored successfully");
+      queryClient.invalidateQueries({ queryKey: ["DoctorSchedules"] });
+    },
+    onError: (error: any) => {
+      console.error("Error restoring slot:", error);
+      toast.error(error.response?.data?.message || "Failed to restore slot");
     },
   });
 
@@ -274,6 +430,25 @@ const WeeklySchedulePanel = () => {
 
   const { schedule, totalSlots, availableSlots, unavailableSlots } =
     weeklySchedule;
+
+  if (isFetching) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 gap-4 bg-(--color-surface) rounded-2xl border border-(--color-border) shadow-sm">
+        <div className="relative">
+          <div className="w-12 h-12 border-4 border-(--color-primary)/10 rounded-full" />
+          <div className="absolute top-0 left-0 w-12 h-12 border-4 border-transparent border-t-(--color-primary) rounded-full animate-spin" />
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <p className="text-sm font-semibold text-(--color-text) animate-pulse">
+            Fetching Schedule
+          </p>
+          <p className="text-xs text-(--color-text-light)">
+            Please wait a moment...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -329,7 +504,111 @@ const WeeklySchedulePanel = () => {
                     {day.slots.length} slot{day.slots.length !== 1 ? "s" : ""}
                   </span>
                 </div>
+
+                <div className="flex items-center gap-4">
+                  {day.slots.length > 0 && (
+                    <div className="flex gap-4">
+                      <button
+                        onClick={() => {
+                          setActiveRangeDay(day.id);
+                          setRangeMode("block");
+                        }}
+                        disabled={!day.slots.some((s) => s.available)}
+                        className={`text-xs font-medium transition-colors ${
+                          !day.slots.some((s) => s.available)
+                            ? "text-gray-300 dark:text-gray-700 cursor-not-allowed"
+                            : "text-red-500 hover:text-red-600 hover:underline cursor-pointer"
+                        }`}
+                      >
+                        Delete Range of time
+                      </button>
+                      <button
+                        onClick={() => {
+                          setActiveRangeDay(day.id);
+                          setRangeMode("unblock");
+                        }}
+                        disabled={!day.slots.some((s) => !s.available)}
+                        className={`text-xs font-medium transition-colors ${
+                          !day.slots.some((s) => !s.available)
+                            ? "text-gray-300 dark:text-gray-700 cursor-not-allowed"
+                            : "text-green-500 hover:text-green-600 hover:underline cursor-pointer"
+                        }`}
+                      >
+                        Restore Range of time
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
+
+              {/* Range form */}
+              {activeRangeDay === day.id && (
+                <div className="mb-4 p-3 bg-(--color-bg) rounded-xl border border-(--color-border) flex flex-wrap items-end gap-3 shadow-sm animate-in fade-in slide-in-from-top-2">
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] uppercase font-bold text-(--color-text-light)">
+                      Start Time
+                    </label>
+                    <input
+                      type="time"
+                      step="1"
+                      value={rangeStart}
+                      onChange={(e) => setRangeStart(e.target.value)}
+                      className="text-xs border border-(--color-border) rounded-lg px-2 py-1.5 bg-(--color-bg) text-(--color-text) focus:ring-2 focus:ring-(--color-primary)/20 outline-none"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] uppercase font-bold text-(--color-text-light)">
+                      End Time
+                    </label>
+                    <input
+                      type="time"
+                      step="1"
+                      value={rangeEnd}
+                      onChange={(e) => setRangeEnd(e.target.value)}
+                      className="text-xs border border-(--color-border) rounded-lg px-2 py-1.5 bg-(--color-bg) text-(--color-text) focus:ring-2 focus:ring-(--color-primary)/20 outline-none"
+                    />
+                  </div>
+                  <button
+                    onClick={() => {
+                      const formatTime = (time: string) => {
+                        return time.split(":").length === 2
+                          ? `${time}:00`
+                          : time;
+                      };
+                      const payload = {
+                        id: schedule.indexOf(day) + 1,
+                        start: formatTime(rangeStart),
+                        end: formatTime(rangeEnd),
+                      };
+                      if (rangeMode === "block")
+                        blockRangeMutation.mutate(payload);
+                      else unblockRangeMutation.mutate(payload);
+                    }}
+                    disabled={
+                      blockRangeMutation.isPending ||
+                      unblockRangeMutation.isPending
+                    }
+                    className={`text-xs font-semibold px-4 py-1.5 rounded-lg text-white shadow-sm transition-all active:scale-[0.98] ${
+                      rangeMode === "block"
+                        ? "bg-red-500 hover:bg-red-600"
+                        : "bg-green-500 hover:bg-green-600"
+                    }`}
+                  >
+                    {blockRangeMutation.isPending ||
+                    unblockRangeMutation.isPending
+                      ? "Processing..."
+                      : rangeMode === "block"
+                        ? "Delete Range"
+                        : "Restore Range"}
+                  </button>
+                  <button
+                    onClick={() => setActiveRangeDay(null)}
+                    className="text-xs font-medium text-(--color-text-light) hover:text-(--color-text) px-2 py-1.5 transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
 
               {/* Slots */}
               {day.slots.length === 0 ? (
@@ -366,11 +645,24 @@ const WeeklySchedulePanel = () => {
                           {slot.available ? "Available" : "Unavailable"}
                         </span>
                         <button
-                          onClick={() => deleteSlot(day.name, slot.id)}
-                          className="text-(--color-text-light) hover:text-red-500 transition-colors duration-150 cursor-pointer p-1 rounded opacity-0 group-hover:opacity-100"
-                          aria-label="Delete slot"
+                          onClick={() =>
+                            slot.available
+                              ? deleteSlot(day.name, slot.id)
+                              : restoreMutation.mutate({
+                                  dayName: day.name,
+                                  slotId: slot.id,
+                                })
+                          }
+                          className={`text-(--color-text-light) transition-colors duration-150 cursor-pointer p-1 rounded opacity-0 group-hover:opacity-100 ${
+                            slot.available
+                              ? "hover:text-red-500"
+                              : "hover:text-green-500"
+                          }`}
+                          aria-label={
+                            slot.available ? "Delete slot" : "Restore slot"
+                          }
                         >
-                          <TrashIcon />
+                          {slot.available ? <TrashIcon /> : <RestoreIcon />}
                         </button>
                       </div>
                     </div>

@@ -5,9 +5,10 @@ import type { WeeklyScheduleDay } from "@/interfaces/doctorInterfaces";
 interface Props {
   role: string;
   days: WeeklyScheduleDay[];
+  onDeleteSlot: (slotId: number) => void;
 }
 
-const WeeklySchedule = ({ role, days }: Props) => {
+const WeeklySchedule = ({ role, days, onDeleteSlot }: Props) => {
   return (
     <div className="bg-(--color-surface) rounded-2xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm">
       <div className="flex justify-between items-center mb-6">
@@ -25,9 +26,17 @@ const WeeklySchedule = ({ role, days }: Props) => {
       </div>
       <div className="flex flex-col gap-4">
         {days.map((day, index) => {
+          const availableSlots = day.slots.filter(
+            (slot) => slot.status === "Available",
+          );
           return (
             <div key={index}>
-              <Days day={day.day} time={day.slots} role={role} />
+              <Days
+                day={day.day}
+                time={availableSlots}
+                role={role}
+                onDeleteSlot={onDeleteSlot}
+              />
             </div>
           );
         })}

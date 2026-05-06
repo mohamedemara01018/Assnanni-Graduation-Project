@@ -2,7 +2,7 @@ import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import FirstDiv from "../../../components/Doctor/Schedule/FirstDiv/FirstDiv";
 import SecondDiv from "../../../components/Doctor/Schedule/SecondDiv/SecondDiv";
 import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
@@ -25,14 +25,58 @@ const defaultWeeklyScheduleData: WeeklyScheduleData = {
   unavailableSlots: 0,
   days: fallbackDays.map((day) => ({
     day: day.day,
-    slots: day.time,
+    slots: day.time.map((t, index) => ({
+      id: index,
+      time: t,
+      status: "Available",
+    })),
   })),
 };
 
 const Schedule = () => {
+  const queryClient = useQueryClient();
   const role = useSelector((state: RootState) => state.auth.role);
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
+
+  const deleteMutation = useMutation({
+    mutationFn: async (slotId: number) => {
+      return await axios.delete(
+        `${backendUrl}DoctorSchedules/schedule-slot/${slotId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+    },
+    onSuccess: (_, slotId) => {
+      toast.success("Time slot deleted successfully");
+      queryClient.setQueryData(
+        ["DoctorWeeklySchedule"],
+        (oldData: WeeklyScheduleData | undefined) => {
+          if (!oldData) return oldData;
+          return {
+            ...oldData,
+            days: oldData.days.map((day) => ({
+              ...day,
+              slots: day.slots.map((slot) =>
+                slot.id === slotId ? { ...slot, status: "Unavailable" } : slot,
+              ),
+            })),
+          };
+        },
+      );
+      queryClient.invalidateQueries({ queryKey: ["DoctorWeeklySchedule"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to delete slot");
+    },
+  });
+
+  const handleDeleteSlot = (slotId: number) => {
+    deleteMutation.mutate(slotId);
+  };
 
   const {
     data: weeklySchedule = defaultWeeklyScheduleData,
@@ -42,21 +86,50 @@ const Schedule = () => {
   } = useQuery<WeeklyScheduleData>({
     queryKey: ["DoctorWeeklySchedule"],
     queryFn: async () => {
-      const response = await axios.get(`${backendUrl}Doctors/weekly-schedule`, {
+      const response = await axios.get(`${backendUrl}DoctorSchedules`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      const data =
-        response.data?.data || response.data?.value || response.data || {};
+      const data = response.data?.data || [];
+
+      let totalSlotsCount = 0;
+      let availableSlotsCount = 0;
+      let unavailableSlotsCount = 0;
+
+      const mappedDays = data.map((dayObj: any) => {
+        const slotsCount = Array.isArray(dayObj.slots)
+          ? dayObj.slots.length
+          : 0;
+        totalSlotsCount += slotsCount;
+
+        if (Array.isArray(dayObj.slots)) {
+          dayObj.slots.forEach((slot: any) => {
+            if (slot.status === "Available") {
+              availableSlotsCount++;
+            } else {
+              unavailableSlotsCount++;
+            }
+          });
+        }
+
+        return {
+          day: dayObj.day,
+          slots: Array.isArray(dayObj.slots)
+            ? dayObj.slots.map((s: any) => ({
+                id: s.id,
+                time: s.start || "N/A",
+                status: s.status || "Available",
+              }))
+            : [],
+        };
+      });
 
       return {
-        totalSlots: data.totalSlots ?? 0,
-        availableSlots: data.availableSlots ?? 0,
-        unavailableSlots: data.unavailableSlots ?? 0,
-        days: Array.isArray(data.days)
-          ? data.days
-          : defaultWeeklyScheduleData.days,
+        totalSlots: totalSlotsCount,
+        availableSlots: availableSlotsCount,
+        unavailableSlots: unavailableSlotsCount,
+        days: mappedDays,
       };
     },
   });
@@ -137,6 +210,7 @@ const Schedule = () => {
               role={role}
               days={weeklySchedule.days}
               appointments={appointments}
+              onDeleteSlot={handleDeleteSlot}
             />
           </div>
         ) : (
@@ -146,6 +220,7 @@ const Schedule = () => {
                 role={role}
                 days={weeklySchedule.days}
                 appointments={appointments}
+                onDeleteSlot={handleDeleteSlot}
               />
             </div>
             <div className="flex-1">

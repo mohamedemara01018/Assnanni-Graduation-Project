@@ -94,7 +94,7 @@ export interface StudentDoctor {
 
 export interface WeeklyScheduleDay {
   day: string;
-  slots: string[];
+  slots: { id: number; time: string; status: string }[];
 }
 
 export interface WeeklyScheduleStats {

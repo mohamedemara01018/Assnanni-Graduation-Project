@@ -1,20 +1,11 @@
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { forwardRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import type { ReactNode } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-
-const DAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
 
 const TIMES = [
   "12:00 AM",
@@ -67,12 +58,35 @@ const TIMES = [
   "11:30 PM",
 ];
 
+const convertTo24Hour = (timeStr: string) => {
+  const [time, modifier] = timeStr.split(" ");
+  // eslint-disable-next-line prefer-const
+  let [hours, minutes] = time.split(":");
+  if (hours === "12") {
+    hours = "00";
+  }
+  if (modifier === "PM") {
+    hours = (parseInt(hours, 10) + 12).toString();
+  }
+  return `${hours.padStart(2, "0")}:${minutes}:00`;
+};
+
 const DURATIONS = [
   "15 minutes",
   "30 minutes",
   "45 minutes",
   "60 minutes",
   "90 minutes",
+];
+
+const LOCATIONS = [
+  "Benha",
+  "Cairo",
+  "Alexandria",
+  "Giza",
+  "Tanta",
+  "Zagazig",
+  // Add more locations as needed
 ];
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
@@ -190,60 +204,79 @@ const Field = ({ label, icon, children }: FieldProps) => (
   </div>
 );
 
-interface SelectFieldProps {
-  value: string;
-  onChange: (v: string) => void;
+interface SelectFieldProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   options: string[];
-  name?: string;
 }
 
-const SelectField = ({ value, onChange, options, name }: SelectFieldProps) => (
-  <div className="relative">
-    <select
-      name={name}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full appearance-none border border-(--color-border) bg-(--color-bg) text-(--color-text) rounded-xl px-4 py-2.5 text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-(--color-primary)/25 focus:border-(--color-primary) transition-all duration-150 cursor-pointer"
-    >
-      {options.map((opt) => (
-        <option key={opt} value={opt}>
-          {opt}
-        </option>
-      ))}
-    </select>
-    <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-      <ChevronDown />
+const SelectField = forwardRef<HTMLSelectElement, SelectFieldProps>(
+  ({ options, className, ...props }, ref) => (
+    <div className="relative">
+      <select
+        ref={ref}
+        {...props}
+        className={`w-full appearance-none border border-(--color-border) bg-(--color-bg) text-(--color-text) rounded-xl px-4 py-2.5 text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-(--color-primary)/25 focus:border-(--color-primary) transition-all duration-150 cursor-pointer ${className}`}
+      >
+        {options.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
+      <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+        <ChevronDown />
+      </div>
     </div>
-  </div>
+  ),
 );
+
+SelectField.displayName = "SelectField";
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
 interface SlotInputs {
-  day: string;
+  date: string;
   startTime: string;
   endTime: string;
   duration: string;
-  status: "available" | "unavailable";
+  location: string;
 }
 
 const AddNewSlotPanel = () => {
   const queryClient = useQueryClient();
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
+  const token = useSelector((state: RootState) => state.auth.token);
 
-  const { handleSubmit, control, watch, reset } = useForm<SlotInputs>({
+  const {
+    handleSubmit,
+    register,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<SlotInputs>({
     defaultValues: {
-      day: "Monday",
+      date: new Date().toISOString().split("T")[0],
       startTime: "09:00 AM",
       endTime: "09:30 AM",
       duration: "30 minutes",
-      status: "available",
+      location: "Benha",
     },
   });
 
   const mutation = useMutation({
-    mutationFn: (newSlot: SlotInputs) => {
-      return axios.post(`${backendUrl}DoctorSchedules`, newSlot);
+    mutationFn: (data: SlotInputs) => {
+      const payload = {
+        date: data.date,
+        startTime: convertTo24Hour(data.startTime),
+        endTime: convertTo24Hour(data.endTime),
+        location: data.location,
+        slotDurationInMinutes: parseInt(data.duration.split(" ")[0]),
+      };
+      console.log(payload);
+      return axios.post(`${backendUrl}DoctorSchedules`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
     },
     onSuccess: () => {
       toast.success("New slot added successfully!");
@@ -283,19 +316,20 @@ const AddNewSlotPanel = () => {
         onSubmit={handleSubmit(onSubmit)}
         className="p-5 flex flex-col gap-5"
       >
-        {/* Day of Week */}
-        <Field label="Day of Week" icon={<CalendarIcon />}>
-          <Controller
-            name="day"
-            control={control}
-            render={({ field }) => (
-              <SelectField
-                value={field.value}
-                onChange={field.onChange}
-                options={DAYS}
-              />
-            )}
+        {/* Slot Date */}
+        <Field label="Slot Date" icon={<CalendarIcon />}>
+          <input
+            type="date"
+            {...register("date", { required: "Date is required" })}
+            className={`w-full border border-(--color-border) bg-(--color-bg) text-(--color-text) rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-(--color-primary)/25 focus:border-(--color-primary) transition-all duration-150 cursor-pointer ${
+              errors.date ? "border-red-500" : ""
+            }`}
           />
+          {errors.date && (
+            <span className="text-xs text-red-500 mt-1">
+              {errors.date.message}
+            </span>
+          )}
         </Field>
 
         {/* Divider */}
@@ -304,30 +338,28 @@ const AddNewSlotPanel = () => {
         {/* Start / End time row */}
         <div className="flex flex-col gap-4">
           <Field label="Start Time" icon={<ClockIcon />}>
-            <Controller
-              name="startTime"
-              control={control}
-              render={({ field }) => (
-                <SelectField
-                  value={field.value}
-                  onChange={field.onChange}
-                  options={TIMES}
-                />
-              )}
+            <SelectField
+              {...register("startTime", { required: "Start time is required" })}
+              options={TIMES}
+              className={errors.startTime ? "border-red-500" : ""}
             />
+            {errors.startTime && (
+              <span className="text-xs text-red-500 mt-1">
+                {errors.startTime.message}
+              </span>
+            )}
           </Field>
           <Field label="End Time" icon={<ClockIcon />}>
-            <Controller
-              name="endTime"
-              control={control}
-              render={({ field }) => (
-                <SelectField
-                  value={field.value}
-                  onChange={field.onChange}
-                  options={TIMES}
-                />
-              )}
+            <SelectField
+              {...register("endTime", { required: "End time is required" })}
+              options={TIMES}
+              className={errors.endTime ? "border-red-500" : ""}
             />
+            {errors.endTime && (
+              <span className="text-xs text-red-500 mt-1">
+                {errors.endTime.message}
+              </span>
+            )}
           </Field>
         </div>
 
@@ -336,62 +368,33 @@ const AddNewSlotPanel = () => {
 
         {/* Slot Duration */}
         <Field label="Slot Duration" icon={<TimerIcon />}>
-          <Controller
-            name="duration"
-            control={control}
-            render={({ field }) => (
-              <SelectField
-                value={field.value}
-                onChange={field.onChange}
-                options={DURATIONS}
-              />
-            )}
+          <SelectField
+            {...register("duration", { required: "Duration is required" })}
+            options={DURATIONS}
+            className={errors.duration ? "border-red-500" : ""}
           />
+          {errors.duration && (
+            <span className="text-xs text-red-500 mt-1">
+              {errors.duration.message}
+            </span>
+          )}
         </Field>
 
         {/* Divider */}
         <div className="h-px bg-(--color-border)" />
 
-        {/* Availability Status */}
-        <Field label="Availability Status" icon={<CheckCircleIcon />}>
-          <Controller
-            name="status"
-            control={control}
-            render={({ field }) => (
-              <div className="flex gap-3 mt-0.5">
-                {(["available", "unavailable"] as const).map((opt) => {
-                  const isSelected = field.value === opt;
-                  const isAvailable = opt === "available";
-                  return (
-                    <button
-                      key={opt}
-                      type="button"
-                      onClick={() => field.onChange(opt)}
-                      className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border text-sm font-medium transition-all duration-150 cursor-pointer ${
-                        isSelected
-                          ? isAvailable
-                            ? "bg-green-50 border-green-400 text-green-700"
-                            : "bg-red-50 border-red-400 text-red-600"
-                          : "border-(--color-border) text-(--color-text-light) hover:border-(--color-primary)/40"
-                      }`}
-                    >
-                      {/* Dot indicator */}
-                      <span
-                        className={`w-2 h-2 rounded-full ${
-                          isSelected
-                            ? isAvailable
-                              ? "bg-green-500"
-                              : "bg-red-500"
-                            : "bg-gray-300"
-                        }`}
-                      />
-                      {opt.charAt(0).toUpperCase() + opt.slice(1)}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
+        {/* Clinic Location */}
+        <Field label="Clinic Location" icon={<CheckCircleIcon />}>
+          <SelectField
+            {...register("location", { required: "Location is required" })}
+            options={LOCATIONS}
+            className={errors.location ? "border-red-500" : ""}
           />
+          {errors.location && (
+            <span className="text-xs text-red-500 mt-1">
+              {errors.location.message}
+            </span>
+          )}
         </Field>
 
         {/* ── Slot preview pill ── */}
@@ -417,11 +420,11 @@ const AddNewSlotPanel = () => {
               {formValues.startTime} – {formValues.endTime}
             </span>
             <span className="text-xs text-(--color-text-light)">
-              {formValues.duration} &bull; {formValues.status}
+              {formValues.duration} &bull; {formValues.location}
             </span>
           </div>
           <span className="ml-auto shrink-0 text-xs font-medium px-2.5 py-1 rounded-full bg-blue-50 text-(--color-primary) border border-(--color-primary)/20">
-            {formValues.day}
+            {formValues.date}
           </span>
         </div>
 

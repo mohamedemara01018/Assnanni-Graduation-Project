@@ -7,12 +7,13 @@ interface Props {
   role: string;
   days: WeeklyScheduleDay[];
   appointments: Schedule[];
+  onDeleteSlot: (slotId: number) => void;
 }
 
-const FirstDiv = ({ role, days, appointments }: Props) => {
+const FirstDiv = ({ role, days, appointments, onDeleteSlot }: Props) => {
   return (
     <div className="flex flex-col gap-6">
-      <WeeklySchedule role={role} days={days} />
+      <WeeklySchedule role={role} days={days} onDeleteSlot={onDeleteSlot} />
       <Appointments role={role} appointments={appointments} />
     </div>
   );
