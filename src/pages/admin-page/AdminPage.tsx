@@ -11,21 +11,24 @@ import {
   XCircle,
 } from "lucide-react";
 import { Link } from "react-router";
-import { useSelector, useDispatch } from 'react-redux'
-import { fetchAdminSummary, selectSummary } from "@/store/slices/admin-slice/summary-slice/SummarySlice";
-import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  fetchAdminSummary,
+  selectSummary,
+} from "@/store/slices/admin-slice/summary-slice/SummarySlice";
+import { useEffect } from "react";
 import type { AppDispatch } from "@/store/store";
-import { ScaleLoader } from 'react-spinners'
+import { ScaleLoader } from "react-spinners";
 import Error from "@/components/error/Error";
 
 interface summaryDataInterface {
-  pendingRequests: number
-  totalActionedToday: number
-  totalDoctors: number
-  totalPatients: number
-  totalReceptionists: number
-  totalRejected: number
-  totalStudents: number
+  pendingRequests: number;
+  totalActionedToday: number;
+  totalDoctors: number;
+  totalPatients: number;
+  totalReceptionists: number;
+  totalRejected: number;
+  totalStudents: number;
 }
 
 export interface SummaryState {
@@ -35,9 +38,8 @@ export interface SummaryState {
 }
 
 function AdminPage() {
-
   const dispatch: AppDispatch = useDispatch();
-  const { data, loading, error } = useSelector(selectSummary) as SummaryState
+  const { data, loading, error } = useSelector(selectSummary) as SummaryState;
 
   // const [totalUser, setTotalUser] = useState<number>(0);
 
@@ -45,16 +47,12 @@ function AdminPage() {
     dispatch(fetchAdminSummary());
   }, [dispatch]);
 
-
-  const totalUser =
-    data
-      ? data.totalDoctors +
+  const totalUser = data
+    ? data.totalDoctors +
       data.totalPatients +
       data.totalReceptionists +
       data.totalStudents
-      : 0;
-
-
+    : 0;
 
   return (
     <DashboardLayout pageTitle="Admin page">
@@ -71,50 +69,57 @@ function AdminPage() {
             Here's your health dashboard overview
           </p>
         </div>
-        {
-          loading ? <div className="w-full  flex items-center justify-center"><ScaleLoader color="#6d61ff" /> </div> : (
-            error ? <Error message={error} /> :
-              <div className="grid max-sm:grid-cols-2 grid-cols-4 gap-4">
-                <StatCard
-                  Icon={Users}
-                  TrendIcon={TrendingUp}
-                  trendValue="5"
-                  label="Total User"
-                  value={totalUser}
-                  colorClass="text-blue-500 bg-blue-200"
-                />
-                <StatCard
-                  Icon={ShieldCheck}
-                  TrendIcon={TrendingUp}
-                  trendValue="5"
-                  label="total user"
-                  value={1234}
-                  colorClass="text-green-500 bg-green-200"
-                />
-                <StatCard
-                  Icon={Calendars}
-                  TrendIcon={TrendingUp}
-                  trendValue="5"
-                  label="total user"
-                  value={1234}
-                  colorClass="text-purple-500 bg-purple-200"
-                />
-                <StatCard
-                  Icon={FileText}
-                  TrendIcon={TrendingUp}
-                  trendValue="5"
-                  label="total user"
-                  value={1234}
-                  colorClass="text-orange-500 bg-orange-200"
-                />
-              </div>
-          )}
+        {loading ? (
+          <div className="w-full  flex items-center justify-center">
+            <ScaleLoader color="#6d61ff" />{" "}
+          </div>
+        ) : error ? (
+          <Error message={error} />
+        ) : (
+          <div className="grid max-sm:grid-cols-2 grid-cols-4 gap-4">
+            <StatCard
+              Icon={Users}
+              TrendIcon={TrendingUp}
+              trendValue="5"
+              label="Total User"
+              value={totalUser}
+              colorClass="text-blue-500 bg-blue-200"
+            />
+            <StatCard
+              Icon={ShieldCheck}
+              TrendIcon={TrendingUp}
+              trendValue="5"
+              label="total user"
+              value={1234}
+              colorClass="text-green-500 bg-green-200"
+            />
+            <StatCard
+              Icon={Calendars}
+              TrendIcon={TrendingUp}
+              trendValue="5"
+              label="total user"
+              value={1234}
+              colorClass="text-purple-500 bg-purple-200"
+            />
+            <StatCard
+              Icon={FileText}
+              TrendIcon={TrendingUp}
+              trendValue="5"
+              label="total user"
+              value={1234}
+              colorClass="text-orange-500 bg-orange-200"
+            />
+          </div>
+        )}
 
         <div className="flex max-md:flex-col gap-6">
           <CardComp classProbs="flex-2">
             <div className="flex justify-between w-full">
               <h2 className="text-lg">Pending Doctor Verifications</h2>
-              <Link to={'/verify-doctors'} className="text-(--color-text-blue) hover:scale-110 transition duration-150">
+              <Link
+                to={"/verify-doctors"}
+                className="text-(--color-text-blue) hover:scale-110 transition duration-150"
+              >
                 View all
               </Link>
             </div>
@@ -124,12 +129,18 @@ function AdminPage() {
               <div className="flex justify-between items-center bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) p-4 rounded-lg">
                 <div className="flex items-center gap-4">
                   <div className="w-15 h-15 rounded-full overflow-hidden">
-                    <img src="src/assets/doctor.jpg" alt="" className="w-full h-full object-cover" />
+                    <img
+                      src="src/assets/doctor.jpg"
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div>
                     <h1 className="text-lg font-medium">mohamed gamal</h1>
                     <span className="block text-sm -mt-1">Software Eng</span>
-                    <span className=" text-xs">5 documents . Submitted 2 days ago</span>
+                    <span className=" text-xs">
+                      5 documents . Submitted 2 days ago
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -145,12 +156,18 @@ function AdminPage() {
               <div className="flex justify-between items-center bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) p-4 rounded-lg">
                 <div className="flex items-center gap-4">
                   <div className="w-15 h-15 rounded-full overflow-hidden">
-                    <img src="src/assets/doctor.jpg" alt="" className="w-full h-full object-cover" />
+                    <img
+                      src="src/assets/doctor.jpg"
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div>
                     <h1 className="text-lg font-medium">mohamed gamal</h1>
                     <span className="block text-sm -mt-1">Software Eng</span>
-                    <span className=" text-xs">5 documents . Submitted 2 days ago</span>
+                    <span className=" text-xs">
+                      5 documents . Submitted 2 days ago
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -161,18 +178,23 @@ function AdminPage() {
                     <XCircle className="w-4 h-4" />
                   </button>
                 </div>
-
               </div>
 
               <div className="flex justify-between items-center bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) p-4 rounded-lg">
                 <div className="flex items-center gap-4">
                   <div className="w-15 h-15 rounded-full overflow-hidden">
-                    <img src="src/assets/doctor.jpg" alt="" className="w-full h-full object-cover" />
+                    <img
+                      src="src/assets/doctor.jpg"
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div>
                     <h1 className="text-lg font-medium">mohamed gamal</h1>
                     <span className="block text-sm -mt-1">Software Eng</span>
-                    <span className=" text-xs">5 documents . Submitted 2 days ago</span>
+                    <span className=" text-xs">
+                      5 documents . Submitted 2 days ago
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -183,18 +205,23 @@ function AdminPage() {
                     <XCircle className="w-4 h-4" />
                   </button>
                 </div>
-
               </div>
 
               <div className="flex justify-between items-center bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) p-4 rounded-lg">
                 <div className="flex items-center gap-4">
                   <div className="w-15 h-15 rounded-full overflow-hidden">
-                    <img src="src/assets/doctor.jpg" alt="" className="w-full h-full object-cover" />
+                    <img
+                      src="src/assets/doctor.jpg"
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <div>
                     <h1 className="text-lg font-medium">mohamed gamal</h1>
                     <span className="block text-sm -mt-1">Software Eng</span>
-                    <span className=" text-xs">5 documents . Submitted 2 days ago</span>
+                    <span className=" text-xs">
+                      5 documents . Submitted 2 days ago
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -205,53 +232,71 @@ function AdminPage() {
                     <XCircle className="w-4 h-4" />
                   </button>
                 </div>
-
               </div>
-
-
-
-
-
             </div>
           </CardComp>
 
           <div className="space-y-4 flex-1">
-            <CardComp >
-              <h2>
-                Quick Actions
-              </h2>
+            <CardComp>
+              <h2>Quick Actions</h2>
               <div className="w-full space-y-4">
-                <QuickActionComps title="Verify Doctors" subTitle="3 pending" classProbs="blue" path="/verify-doctors" />
-                <QuickActionComps title="System Analtics" subTitle="Analytics & insights" classProbs="green" path="/analytics" />
+                <QuickActionComps
+                  title="Verify Doctors"
+                  subTitle="3 pending"
+                  classProbs="blue"
+                  path="/verify-doctors"
+                />
+                <QuickActionComps
+                  title="System Analtics"
+                  subTitle="Analytics & insights"
+                  classProbs="green"
+                  path="/analytics"
+                />
                 {/* <QuickActionComps title="Verify Doctors" subTitle="3 pending" classProbs="red" path="/" /> */}
-                <QuickActionComps title="AI Models" subTitle="Manage models" classProbs="orange" path="/ai-models" />
+                <QuickActionComps
+                  title="AI Models"
+                  subTitle="Manage models"
+                  classProbs="orange"
+                  path="/ai-models"
+                />
               </div>
             </CardComp>
             <CardComp>
               <div className="flex items-center justify-between w-full">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Total Patients</span>
-                <span className="text-sm text-gray-900 dark:text-white font-medium">1,147</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Total Patients
+                </span>
+                <span className="text-sm text-gray-900 dark:text-white font-medium">
+                  1,147
+                </span>
               </div>
               <div className="flex items-center justify-between w-full">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Active Sessions</span>
-                <span className="text-sm text-gray-900 dark:text-white font-medium">234</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Active Sessions
+                </span>
+                <span className="text-sm text-gray-900 dark:text-white font-medium">
+                  234
+                </span>
               </div>
               <div className="flex items-center justify-between w-full">
-                <span className="text-sm text-gray-600 dark:text-gray-400">API Calls Today</span>
-                <span className="text-sm text-gray-900 dark:text-white font-medium">45.2K</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  API Calls Today
+                </span>
+                <span className="text-sm text-gray-900 dark:text-white font-medium">
+                  45.2K
+                </span>
               </div>
               <div className="flex items-center justify-between w-full">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Storage Used</span>
-                <span className="text-sm text-gray-900 dark:text-white font-medium">756 GB</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  Storage Used
+                </span>
+                <span className="text-sm text-gray-900 dark:text-white font-medium">
+                  756 GB
+                </span>
               </div>
             </CardComp>
           </div>
-
         </div>
-
-
-
-
       </>
     </DashboardLayout>
   );
@@ -259,11 +304,10 @@ function AdminPage() {
 
 export default AdminPage;
 
-
 interface QuickActionCompsProbs {
   title: string;
   subTitle: string;
-  classProbs: 'blue' | 'green' | 'red' | 'orange';
+  classProbs: "blue" | "green" | "red" | "orange";
   path?: string;
 }
 
@@ -294,7 +338,7 @@ const QuickActionComps = ({
   title,
   subTitle,
   classProbs,
-  path = '/',
+  path = "/",
 }: QuickActionCompsProbs) => {
   const colors = colorVariants[classProbs];
 
@@ -303,12 +347,8 @@ const QuickActionComps = ({
       to={path}
       className={`block p-3 rounded-lg transition-colors ${colors.bg}`}
     >
-      <p className={`text-sm font-medium ${colors.title}`}>
-        {title}
-      </p>
-      <p className={`text-xs mt-1 ${colors.sub}`}>
-        {subTitle}
-      </p>
+      <p className={`text-sm font-medium ${colors.title}`}>{title}</p>
+      <p className={`text-xs mt-1 ${colors.sub}`}>{subTitle}</p>
     </Link>
   );
 };

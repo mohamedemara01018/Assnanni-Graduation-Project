@@ -5,7 +5,7 @@ interface ConfigState {
 }
 
 const initialState: ConfigState = {
-  backendUrl: import.meta.env.VITE_BACKEND_URL || "https://asnani.runasp.net/api/",
+  backendUrl: import.meta.env.VITE_BACKEND_URL,
 };
 
 export const configSlice = createSlice({
