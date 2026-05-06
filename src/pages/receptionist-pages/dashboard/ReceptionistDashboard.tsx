@@ -31,16 +31,21 @@ const ReceptionistDashboard = () => {
     useQuery<ReceptionistDashboardCards>({
       queryKey: ["ReceptionistDashboardCards"],
       queryFn: async () => {
-        const response = await axios.get(`${backendUrl}dashboard/card`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
+        const response = await axios.get(
+          `${backendUrl}Receptionist/dashboard`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           },
-        });
+        );
 
-        const data = response.data?.data || response.data?.value || response.data;
+        const data =
+          response.data?.data || response.data?.value || response.data;
 
         return {
-          appointments: data?.appointments ?? defaultDashboardCards.appointments,
+          appointments:
+            data?.appointments ?? defaultDashboardCards.appointments,
           inQueue: data?.inQueue ?? defaultDashboardCards.inQueue,
           totalPatients:
             data?.totalPatients ?? defaultDashboardCards.totalPatients,

@@ -41,26 +41,23 @@ const Scan = () => {
   const { data: recentPatientsData, isLoading: isLoadingPatients } = useQuery({
     queryKey: ["RecentPatients"],
     queryFn: async () => {
-      const response = await axios.get(
-        `${backendUrl}Doctors/recent-patients?count=10`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+      const response = await axios.get(`${backendUrl}Doctors/recent-patients`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
-      );
+      });
+      console.log(response.data.data);
       return response.data;
     },
   });
 
-  const recentPatients = Array.isArray(recentPatientsData?.value)
-    ? recentPatientsData.value
+  const recentPatients = Array.isArray(recentPatientsData?.data)
+    ? recentPatientsData.data
     : [];
-
+  console.log(recentPatients);
   // Post Scan Mutation
   const scanMutation = useMutation({
     mutationFn: async (formData: FormData) => {
-      formData.id = 1;
       return await axios.post(`${backendUrl}Scans`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -242,12 +239,9 @@ const Scan = () => {
                   </option>
                   {recentPatients.map((p: any) => (
                     <option key={p.id} value={p.id}>
-                      {p.name}
+                      {p.name} - {p.id}
                     </option>
                   ))}
-                  <option key="1" value={1}>
-                    Mohamed
-                  </option>
                 </select>
                 <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
                   <svg

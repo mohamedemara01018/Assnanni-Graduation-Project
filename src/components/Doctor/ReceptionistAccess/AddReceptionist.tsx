@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import {
   FiArrowLeft,
   FiUser,
@@ -8,6 +8,7 @@ import {
   FiLock,
   FiCamera,
   FiCheckCircle,
+  FiClock,
 } from "react-icons/fi";
 import { BsBuilding } from "react-icons/bs";
 import { BiInfoCircle } from "react-icons/bi";
@@ -15,9 +16,18 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import type { ReceptionistFormInput } from "@/interfaces/receptionistInterfaces";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import Cookies from "js-cookie";
+import axios from "axios";
 
 const AddReceptionist = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
+  const token = Cookies.get("jwtToken");
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -28,6 +38,7 @@ const AddReceptionist = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfileImage(reader.result as string);
@@ -37,12 +48,49 @@ const AddReceptionist = () => {
   };
 
   const onSubmit = async (data: ReceptionistFormInput) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    console.log("Form Data:", { ...data, profileImage });
-    toast.success("Receptionist account created successfully!");
-    reset();
-    setProfileImage(null);
+    try {
+      const formData = new FormData();
+      if (selectedFile) {
+        formData.append("Image", selectedFile);
+      }
+      formData.append("FullName", data.fullName);
+      formData.append("Email", data.email);
+      formData.append("Phone", data.phone);
+      formData.append("Clinic", data.clinic);
+      formData.append("Username", data.username);
+      formData.append("Password", data.password || "");
+      formData.append("Shift", data.shift);
+
+      const response = await axios.post(
+        `${backendUrl}Doctors/add-receptionist`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.data.succeeded) {
+        toast.success(
+          response.data.message || "Receptionist account created successfully!"
+        );
+        reset();
+        setProfileImage(null);
+        setSelectedFile(null);
+        navigate("/receptionist-access");
+      } else {
+        toast.error(
+          response.data.message || "Failed to create receptionist profile"
+        );
+      }
+    } catch (err: any) {
+      console.error("Error creating receptionist:", err);
+      toast.error(
+        err.response?.data?.message || "An error occurred during submission"
+      );
+    }
   };
 
   return (
@@ -122,7 +170,7 @@ const AddReceptionist = () => {
                         placeholder="Jane Smith"
                         className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${
                           errors.fullName
-                            ? "border-red-400"
+                            ? "border-red-400 ring-2 ring-red-500/10"
                             : "border-gray-200 dark:border-gray-700"
                         } rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}
                       />
@@ -153,7 +201,7 @@ const AddReceptionist = () => {
                         placeholder="jane.smith@assnani.com"
                         className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${
                           errors.email
-                            ? "border-red-400"
+                            ? "border-red-400 ring-2 ring-red-500/10"
                             : "border-gray-200 dark:border-gray-700"
                         } rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}
                       />
@@ -173,12 +221,23 @@ const AddReceptionist = () => {
                     <div className="relative">
                       <FiPhone className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                       <input
-                        {...register("phone")}
+                        {...register("phone", {
+                          required: "Phone number is required",
+                        })}
                         type="tel"
                         placeholder="+1 234-567-8900"
-                        className="w-full bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                        className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${
+                          errors.phone
+                            ? "border-red-400 ring-2 ring-red-500/10"
+                            : "border-gray-200 dark:border-gray-700"
+                        } rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}
                       />
                     </div>
+                    {errors.phone && (
+                      <span className="text-[11px] text-red-500 mt-1">
+                        {errors.phone.message as string}
+                      </span>
+                    )}
                   </div>
 
                   {/* Clinic Assignment */}
@@ -189,8 +248,14 @@ const AddReceptionist = () => {
                     <div className="relative">
                       <BsBuilding className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                       <select
-                        {...register("clinic")}
-                        className="w-full bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 appearance-none transition-all cursor-pointer"
+                        {...register("clinic", {
+                          required: "Clinic assignment is required",
+                        })}
+                        className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${
+                          errors.clinic
+                            ? "border-red-400 ring-2 ring-red-500/10"
+                            : "border-gray-200 dark:border-gray-700"
+                        } rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 appearance-none transition-all cursor-pointer`}
                       >
                         <option value="">Select a clinic</option>
                         <option value="main">Assnani Main Clinic</option>
@@ -213,6 +278,55 @@ const AddReceptionist = () => {
                         </svg>
                       </div>
                     </div>
+                    {errors.clinic && (
+                      <span className="text-[11px] text-red-500 mt-1">
+                        {errors.clinic.message as string}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Shift Selection */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-medium text-(--color-text)">
+                      Shift
+                    </label>
+                    <div className="relative">
+                      <FiClock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <select
+                        {...register("shift", {
+                          required: "Shift selection is required",
+                        })}
+                        className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${
+                          errors.shift
+                            ? "border-red-400 ring-2 ring-red-500/10"
+                            : "border-gray-200 dark:border-gray-700"
+                        } rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 appearance-none transition-all cursor-pointer`}
+                      >
+                        <option value="">Select a shift</option>
+                        <option value="Morning">Morning Shift</option>
+                        <option value="Night">Night Shift</option>
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </div>
+                    </div>
+                    {errors.shift && (
+                      <span className="text-[11px] text-red-500 mt-1">
+                        {errors.shift.message as string}
+                      </span>
+                    )}
                   </div>
 
                   {/* Username */}
@@ -230,7 +344,7 @@ const AddReceptionist = () => {
                         placeholder="janesmith"
                         className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${
                           errors.username
-                            ? "border-red-400"
+                            ? "border-red-400 ring-2 ring-red-500/10"
                             : "border-gray-200 dark:border-gray-700"
                         } rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}
                       />
@@ -258,7 +372,7 @@ const AddReceptionist = () => {
                         placeholder="Min. 8 characters"
                         className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${
                           errors.password
-                            ? "border-red-400"
+                            ? "border-red-400 ring-2 ring-red-500/10"
                             : "border-gray-200 dark:border-gray-700"
                         } rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}
                       />
@@ -301,8 +415,9 @@ const AddReceptionist = () => {
                 {/* Action Buttons */}
                 <div className="flex gap-4 pt-4 border-t border-gray-100 dark:border-gray-800 mt-8">
                   <button
+                    type="submit"
                     disabled={isSubmitting}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-6 py-3.5 rounded-xl text-sm font-semibold transition-all shadow-md shadow-blue-500/20 active:scale-[0.98] flex items-center justify-center gap-2"
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-6 py-3.5 rounded-xl text-sm font-semibold transition-all shadow-md shadow-blue-500/20 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
                   >
                     {isSubmitting ? (
                       <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
@@ -312,7 +427,7 @@ const AddReceptionist = () => {
                   </button>
                   <NavLink
                     to="/receptionist-access"
-                    className="flex-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center border border-transparent hover:border-gray-300 dark:hover:border-gray-600"
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center border border-transparent hover:border-gray-300 dark:hover:border-gray-600 cursor-pointer"
                   >
                     Discard Changes
                   </NavLink>
@@ -327,3 +442,4 @@ const AddReceptionist = () => {
 };
 
 export default AddReceptionist;
+

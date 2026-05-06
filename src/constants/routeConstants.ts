@@ -31,6 +31,7 @@ export const roleRoutePaths = {
     "/receptionist/schedule-appointment",
     "/receptionist/check-in",
     "/receptionist/reschedule/:id",
+    "/receptionist/register-patient",
   ],
   patient: [
     "/patient",

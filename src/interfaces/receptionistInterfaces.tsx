@@ -37,4 +37,5 @@ export interface ReceptionistFormInput {
   clinic: string;
   username: string;
   password?: string;
+  shift: string;
 }

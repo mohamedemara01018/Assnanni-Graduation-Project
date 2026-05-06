@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-import { fallbackHistory } from "@/constants/doctorConstants";
+import Cookies from "js-cookie";
 import type { MedicalHistoryItem } from "@/interfaces/doctorInterfaces";
 
 const MedicalHistory = () => {
@@ -21,38 +21,38 @@ const MedicalHistory = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
+  const token = Cookies.get("jwtToken");
 
-  const {
-    data: history = fallbackHistory,
-    isError,
-    isLoading,
-  } = useQuery<MedicalHistoryItem[]>({
+  const { data, isLoading, isError, error, isSuccess } = useQuery({
     queryKey: ["PatientMedicalHistory", id],
     queryFn: async () => {
-      if (!id) return fallbackHistory;
-      try {
-        const response = await axios.get(
-          `${backendUrl}Doctors/patient-medical-history/${id}`
-        );
-        const data = response.data?.value || response.data;
-
-        if (Array.isArray(data) && data.length > 0) {
-          return data;
+      const response = await axios.get(
+        `${backendUrl}Doctors/patient-medical-history/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-        return fallbackHistory;
-      } catch (err) {
-        console.error("Error fetching medical history:", err);
-        return fallbackHistory;
-      }
+      );
+      return response.data;
     },
-    enabled: !!id,
+    enabled: !!id && !!token,
   });
 
   useEffect(() => {
-    if (isError) {
-      toast.error("Failed to load medical history. Showing default data.");
+    if (isSuccess && data?.succeeded) {
+      toast.success(data?.message || "Medical history loaded successfully");
     }
-  }, [isError]);
+    if (isError) {
+      console.error("Error fetching medical history:", error);
+      toast.error(
+        (error as any)?.response?.data?.message ||
+          "Failed to load medical history"
+      );
+    }
+  }, [isSuccess, isError, error, data]);
+
+  const history: MedicalHistoryItem[] = data?.data || [];
 
   const handleDownload = (item: MedicalHistoryItem) => {
     // Simulate downloading the record as a text file

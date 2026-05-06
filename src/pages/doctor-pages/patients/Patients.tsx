@@ -12,7 +12,6 @@ import { NavLink } from "react-router";
 import Cookies from "js-cookie";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-// import { fallbackPatients } from "@/constants/doctorConstants";
 import type { Patient } from "@/interfaces/doctorInterfaces";
 
 const Patients = () => {
@@ -87,6 +86,7 @@ const Patients = () => {
 
   // Reset page number when filters change
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPageNumber(1);
   }, [search, patientStatus, otherStatus]);
 
@@ -152,7 +152,7 @@ const Patients = () => {
             </button>
             {role === "receptionist" && (
               <NavLink
-                to="/register/patient-register"
+                to="/receptionist/register-patient"
                 className="text-white font-semibold px-5 py-2.5 bg-blue-600 hover:bg-blue-700 rounded-xl cursor-pointer flex gap-2 items-center transition-all shadow-md shadow-blue-500/20"
               >
                 <MdOutlinePersonAddAlt1 className="text-xl" />

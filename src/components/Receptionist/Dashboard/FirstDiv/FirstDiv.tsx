@@ -83,30 +83,34 @@ const FirstDiv = () => {
     },
   };
 
-  const { data, isSuccess, isError, error } = useQuery<ReceptionistDashboardData>({
-    queryKey: ["ReceptionistDashboardFirstDiv"],
-    queryFn: async () => {
-      const [queueRes, appointmentsRes, recentPatientsRes] = await Promise.all([
-        axios.get(`${backendUrl}patient-queue`, config),
-        axios.get(`${backendUrl}todays-appointment`, config),
-        axios.get(`${backendUrl}Doctors/recent-patients`, config),
-      ]);
+  const { data, isSuccess, isError, error } =
+    useQuery<ReceptionistDashboardData>({
+      queryKey: ["ReceptionistDashboardFirstDiv"],
+      queryFn: async () => {
+        const [queueRes, appointmentsRes, recentPatientsRes] =
+          await Promise.all([
+            axios.get(`${backendUrl}Receptionist/patient-queue`, config),
+            axios.get(`${backendUrl}Receptionist/today-appointments`, config),
+            axios.get(`${backendUrl}Doctors/recent-patients`, config),
+          ]);
 
-      return {
-        patientQueue: getResponseData<PatientInQueue[]>(queueRes.data),
-        todayAppointments: getResponseData<DashboardAppointment[]>(
-          appointmentsRes.data
-        ),
-        recentPatients: getResponseData<RecentPatient[]>(recentPatientsRes.data),
-      };
-    },
-  });
+        return {
+          patientQueue: getResponseData<PatientInQueue[]>(queueRes.data),
+          todayAppointments: getResponseData<DashboardAppointment[]>(
+            appointmentsRes.data,
+          ),
+          recentPatients: getResponseData<RecentPatient[]>(
+            recentPatientsRes.data,
+          ),
+        };
+      },
+    });
 
   const patientQueue = data?.patientQueue || [];
   const todayAppointments = data?.todayAppointments || [];
   const recentPatients = data?.recentPatients || [];
   const waitingPatients = patientQueue.filter(
-    (patient) => patient.status === "Waiting"
+    (patient) => patient.status === "Waiting",
   ).length;
 
   useEffect(() => {

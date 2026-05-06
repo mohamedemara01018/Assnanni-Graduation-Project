@@ -33,6 +33,7 @@ import ReceptionistDashboard from "../pages/receptionist-pages/dashboard/Recepti
 import ScheduleAppointment from "../pages/receptionist-pages/appointments/ScheduleAppointment";
 import CheckIn from "../pages/receptionist-pages/appointments/CheckIn";
 import RescheduleAppointment from "../pages/receptionist-pages/appointments/RescheduleAppointment";
+import RegisterPatient from "../pages/receptionist-pages/patients/RegisterPatient";
 import Settings from "../pages/doctor-pages/settings/Settings";
 import ProfileSettings from "../components/Doctor/Settings/SettingsDetails/ProfileSettings";
 import SecuritySettings from "../components/Doctor/Settings/SettingsDetails/SecuritySettings";
@@ -125,6 +126,7 @@ export const routeElements = {
   "/receptionist/schedule-appointment": <ScheduleAppointment />,
   "/receptionist/check-in": <CheckIn />,
   "/receptionist/reschedule/:id": <RescheduleAppointment />,
+  "/receptionist/register-patient": <RegisterPatient />,
 
   // Settings routes
   settings: <Settings />,

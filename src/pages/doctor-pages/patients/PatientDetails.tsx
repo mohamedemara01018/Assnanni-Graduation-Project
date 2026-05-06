@@ -13,60 +13,103 @@ import {
   IoPinOutline,
   IoTimeOutline,
 } from "react-icons/io5";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import Cookies from "js-cookie";
+import { useEffect } from "react";
+
+interface PersonalInfo {
+  fullName: string;
+  age: number;
+  gender: string;
+  phone: string;
+  email: string;
+  address: string;
+  bloodType: string;
+}
+
+interface Appointment {
+  title: string;
+  doctorName: string;
+  date: string;
+  status: string;
+}
+
+interface PatientData {
+  personalInfo: PersonalInfo;
+  allergies: string[];
+  medicalHistories: any[];
+  prescriptions: any[];
+  appointments: Appointment[];
+}
 
 const PatientDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
+  const token = Cookies.get("jwtToken");
 
-  // Mock data based on images
-  const patient = {
-    id: id || "1",
-    name: "Sarah Johnson",
-    age: 34,
-    gender: "Female",
-    phone: "+1 (555) 123-4567",
-    email: "sarah.johnson@email.com",
-    address: "123 Main Street, New York, NY 10001",
-    bloodType: "O+",
-    emergencyContact: {
-      name: "John Johnson",
-      relationship: "Spouse",
-      phone: "+1 (555) 987-6543",
+  const { data, isLoading, isError, error, isSuccess } = useQuery({
+    queryKey: ["PatientInfo", id],
+    queryFn: async () => {
+      const response = await axios.get(`${backendUrl}Doctors/patient-info/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
     },
-    allergies: ["Penicillin", "Peanuts"],
-    medicalHistory: [
-      { condition: "Hypertension", date: "2022-03-15", status: "Ongoing" },
-      { condition: "Type 2 Diabetes", date: "2023-06-20", status: "Ongoing" },
-    ],
-    prescriptions: [
-      {
-        name: "Lisinopril 10mg",
-        frequency: "Once daily",
-        prescribedBy: "Dr. Michael Chen",
-        date: "2024-01-15",
-      },
-      {
-        name: "Metformin 500mg",
-        frequency: "Twice daily",
-        prescribedBy: "Dr. Sarah Williams",
-        date: "2024-01-10",
-      },
-    ],
-    appointments: [
-      {
-        type: "General Checkup",
-        doctor: "Dr. Michael Chen",
-        date: "2024-01-15",
-        status: "Completed",
-      },
-      {
-        type: "Follow-up",
-        doctor: "Dr. Sarah Williams",
-        date: "2024-01-20",
-        status: "Completed",
-      },
-    ],
-  };
+    enabled: !!id && !!token,
+  });
+
+  useEffect(() => {
+    if (isSuccess && data?.succeeded) {
+      toast.success(data?.message || "Patient information loaded successfully");
+    }
+    if (isError) {
+      console.error("Error fetching patient info:", error);
+      toast.error(
+        (error as any)?.response?.data?.message || "Failed to load patient information"
+      );
+    }
+  }, [isSuccess, isError, error, data]);
+
+  const patient = data?.data as PatientData;
+
+  if (isLoading) {
+    return (
+      <DashboardLayout pageTitle="Patient Information">
+        <div className="-mt-6 p-6 bg-(--color-bg) min-h-[85vh] rounded-2xl flex justify-center items-center">
+          <div className="w-10 h-10 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (isError || !patient) {
+    return (
+      <DashboardLayout pageTitle="Patient Information">
+        <div className="-mt-6 p-6 bg-(--color-bg) min-h-[85vh] rounded-2xl flex flex-col justify-center items-center gap-4">
+          <div className="text-red-500 text-5xl mb-2">
+            <IoAlertCircleOutline />
+          </div>
+          <h2 className="text-xl font-bold text-(--color-text)">Error Loading Data</h2>
+          <p className="text-(--color-text-light)">
+            {(error as any)?.response?.data?.message || "Something went wrong while fetching patient details."}
+          </p>
+          <button
+            onClick={() => navigate(-1)}
+            className="px-6 py-2 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition-colors"
+          >
+            Go Back
+          </button>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout pageTitle="Patient Information">
@@ -84,7 +127,7 @@ const PatientDetails = () => {
             Patient Information
           </h1>
           <p className="text-sm text-(--color-text-light) mt-1 font-medium">
-            Patient ID: {patient.id}
+            Patient ID: {id}
           </p>
         </div>
 
@@ -100,50 +143,36 @@ const PatientDetails = () => {
                 <DetailItem
                   icon={<IoPersonOutline />}
                   label="Full Name"
-                  value={patient.name}
+                  value={patient.personalInfo.fullName}
                 />
                 <DetailItem
                   icon={<IoCalendarOutline />}
                   label="Age / Gender"
-                  value={`${patient.age} years / ${patient.gender}`}
+                  value={`${patient.personalInfo.age} years / ${patient.personalInfo.gender}`}
                 />
                 <DetailItem
                   icon={<IoCallOutline />}
                   label="Phone"
-                  value={patient.phone}
+                  value={patient.personalInfo.phone}
                 />
                 <DetailItem
                   icon={<IoMailOutline />}
                   label="Email"
-                  value={patient.email}
+                  value={patient.personalInfo.email}
                 />
                 <DetailItem
                   icon={<IoLocationOutline />}
                   label="Address"
-                  value={patient.address}
+                  value={patient.personalInfo.address}
                 />
                 <DetailItem
                   icon={<IoWaterOutline />}
                   label="Blood Type"
-                  value={patient.bloodType}
+                  value={patient.personalInfo.bloodType.replace("_", " ")}
                 />
 
-                <div className="pt-4 border-t border-(--color-border)">
-                  <h3 className="text-xs font-bold text-(--color-text-light) uppercase tracking-wider mb-4">
-                    Emergency Contact
-                  </h3>
-                  <div className="space-y-2">
-                    <p className="text-sm font-bold text-(--color-text)">
-                      {patient.emergencyContact.name}
-                    </p>
-                    <p className="text-xs text-(--color-text-light)">
-                      {patient.emergencyContact.relationship}
-                    </p>
-                    <p className="text-xs text-(--color-text-light)">
-                      {patient.emergencyContact.phone}
-                    </p>
-                  </div>
-                </div>
+                {/* Emergency Contact section removed or kept if available in real data */}
+                {/* Based on the provided response, it's not there, so I'll hide it if not present */}
               </div>
             </div>
           </div>
@@ -159,14 +188,18 @@ const PatientDetails = () => {
                 </h2>
               </div>
               <div className="flex flex-wrap gap-2">
-                {patient.allergies.map((allergy, i) => (
-                  <span
-                    key={i}
-                    className="px-4 py-1.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-full text-xs font-bold"
-                  >
-                    {allergy}
-                  </span>
-                ))}
+                {patient.allergies.length > 0 ? (
+                  patient.allergies.map((allergy, i) => (
+                    <span
+                      key={i}
+                      className="px-4 py-1.5 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-full text-xs font-bold"
+                    >
+                      {allergy}
+                    </span>
+                  ))
+                ) : (
+                  <p className="text-xs text-(--color-text-light) italic">No allergies recorded.</p>
+                )}
               </div>
             </div>
 
@@ -179,24 +212,28 @@ const PatientDetails = () => {
                 </h2>
               </div>
               <div className="space-y-3">
-                {patient.medicalHistory.map((item, i) => (
-                  <div
-                    key={i}
-                    className="p-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl flex justify-between items-center border border-border/50"
-                  >
-                    <div>
-                      <p className="text-sm font-bold text-(--color-text)">
-                        {item.condition}
-                      </p>
-                      <p className="text-xs text-(--color-text-light) mt-1">
-                        Diagnosed: {item.date}
-                      </p>
+                {patient.medicalHistories.length > 0 ? (
+                  patient.medicalHistories.map((item, i) => (
+                    <div
+                      key={i}
+                      className="p-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl flex justify-between items-center border border-border/50"
+                    >
+                      <div>
+                        <p className="text-sm font-bold text-(--color-text)">
+                          {item.condition || item.title || "Medical Record"}
+                        </p>
+                        <p className="text-xs text-(--color-text-light) mt-1">
+                          Date: {item.date}
+                        </p>
+                      </div>
+                      <span className="px-3 py-1 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                        {item.status || "Recorded"}
+                      </span>
                     </div>
-                    <span className="px-3 py-1 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                      {item.status}
-                    </span>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-xs text-(--color-text-light) italic px-2">No medical history found.</p>
+                )}
               </div>
             </div>
 
@@ -209,28 +246,32 @@ const PatientDetails = () => {
                 </h2>
               </div>
               <div className="space-y-3">
-                {patient.prescriptions.map((pill, i) => (
-                  <div
-                    key={i}
-                    className="p-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-border/50"
-                  >
-                    <div className="flex justify-between mb-1">
-                      <p className="text-sm font-bold text-(--color-text)">
-                        {pill.name}
+                {patient.prescriptions.length > 0 ? (
+                  patient.prescriptions.map((pill, i) => (
+                    <div
+                      key={i}
+                      className="p-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl border border-border/50"
+                    >
+                      <div className="flex justify-between mb-1">
+                        <p className="text-sm font-bold text-(--color-text)">
+                          {pill.name || pill.medicineName}
+                        </p>
+                        <span className="text-xs font-medium text-(--color-text-light)">
+                          {pill.frequency}
+                        </span>
+                      </div>
+                      <p className="text-xs text-(--color-text-light)">
+                        Prescribed by{" "}
+                        <span className="text-(--color-text) font-semibold">
+                          {pill.prescribedBy || pill.doctorName}
+                        </span>{" "}
+                        on {pill.date}
                       </p>
-                      <span className="text-xs font-medium text-(--color-text-light)">
-                        {pill.frequency}
-                      </span>
                     </div>
-                    <p className="text-xs text-(--color-text-light)">
-                      Prescribed by{" "}
-                      <span className="text-(--color-text) font-semibold">
-                        {pill.prescribedBy}
-                      </span>{" "}
-                      on {pill.date}
-                    </p>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-xs text-(--color-text-light) italic px-2">No active prescriptions.</p>
+                )}
               </div>
             </div>
 
@@ -243,24 +284,32 @@ const PatientDetails = () => {
                 </h2>
               </div>
               <div className="space-y-3">
-                {patient.appointments.map((app, i) => (
-                  <div
-                    key={i}
-                    className="p-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl flex justify-between items-center border border-border/50"
-                  >
-                    <div>
-                      <p className="text-sm font-bold text-(--color-text)">
-                        {app.type}
-                      </p>
-                      <p className="text-xs text-(--color-text-light) mt-1">
-                        {app.doctor} • {app.date}
-                      </p>
+                {patient.appointments.length > 0 ? (
+                  patient.appointments.map((app, i) => (
+                    <div
+                      key={i}
+                      className="p-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl flex justify-between items-center border border-border/50"
+                    >
+                      <div>
+                        <p className="text-sm font-bold text-(--color-text)">
+                          {app.title}
+                        </p>
+                        <p className="text-xs text-(--color-text-light) mt-1">
+                          {app.doctorName} • {app.date}
+                        </p>
+                      </div>
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                        app.status === "Confirmed" 
+                          ? "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400"
+                          : "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                      }`}>
+                        {app.status}
+                      </span>
                     </div>
-                    <span className="px-3 py-1 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                      {app.status}
-                    </span>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-xs text-(--color-text-light) italic px-2">No recent appointments.</p>
+                )}
               </div>
             </div>
           </div>
@@ -277,7 +326,7 @@ const DetailItem = ({
 }: {
   icon: React.ReactNode;
   label: string;
-  value: string;
+  value: string | number;
 }) => (
   <div className="flex gap-4 items-start">
     <div className="mt-1 text-gray-400 text-lg">{icon}</div>
@@ -291,3 +340,4 @@ const DetailItem = ({
 );
 
 export default PatientDetails;
+
