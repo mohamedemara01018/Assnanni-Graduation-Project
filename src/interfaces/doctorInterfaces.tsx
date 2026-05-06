@@ -79,6 +79,8 @@ export interface Receptionist {
 
 export interface ScanFormData {
   patientId: number;
+  scanType: string;
+  priority: string;
   notes: string;
 }
 

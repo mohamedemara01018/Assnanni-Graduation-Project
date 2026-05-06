@@ -7,22 +7,29 @@ import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import type { ScanFormData } from "@/interfaces/doctorInterfaces";
-import { fallbackPatientsScan } from "@/constants/doctorConstants";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import Cookies from "js-cookie";
 
 const Scan = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
-  } = useForm<ScanFormData>();
+  } = useForm<ScanFormData>({
+    defaultValues: {
+      scanType: "X-ray",
+      priority: "Normal",
+    },
+  });
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [patients, setPatients] = useState<any[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
   const inputFileRef = useRef<HTMLInputElement | null>(null);
 
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
+  const token = Cookies.get("jwtToken");
 
   useEffect(() => {
     return () => {
@@ -30,23 +37,51 @@ const Scan = () => {
     };
   }, [previewUrl]);
 
-  useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        const response = await axios.get(`${backendUrl}Doctors/patients`);
-        const data = response.data?.value || response.data;
-        if (Array.isArray(data) && data.length > 0) {
-          setPatients(data);
-        } else {
-          setPatients(fallbackPatientsScan);
-        }
-      } catch (error) {
-        console.error("Error fetching patients:", error);
-        setPatients(fallbackPatientsScan);
-      }
-    };
-    fetchPatients();
-  }, [backendUrl]);
+  // Fetch recent patients
+  const { data: recentPatientsData, isLoading: isLoadingPatients } = useQuery({
+    queryKey: ["RecentPatients"],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${backendUrl}Doctors/recent-patients?count=10`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      return response.data;
+    },
+  });
+
+  const recentPatients = Array.isArray(recentPatientsData?.value)
+    ? recentPatientsData.value
+    : [];
+
+  // Post Scan Mutation
+  const scanMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      formData.id = 1;
+      return await axios.post(`${backendUrl}Scans`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success("Medical scan uploaded successfully!");
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      setFormSubmitted(false);
+      reset();
+    },
+    onError: (error: any) => {
+      console.error("Upload error:", error);
+      toast.error(
+        error.response?.data?.message || "Failed to upload scan. Try again.",
+      );
+    },
+  });
 
   const handleFile = (file: File) => {
     setSelectedFile(file);
@@ -83,36 +118,21 @@ const Scan = () => {
     }
   };
 
-  const onSubmit = async (data: ScanFormData) => {
+  const onSubmit = (data: ScanFormData) => {
+    setFormSubmitted(true);
     if (!selectedFile) {
       toast.error("Please select a medical scan file to upload");
       return;
     }
 
-    setIsSubmitting(true);
     const formData = new FormData();
     formData.append("File", selectedFile);
     formData.append("PatientId", data.patientId.toString());
+    formData.append("ScanType", data.scanType);
+    formData.append("Priority", data.priority);
     formData.append("Notes", data.notes || "");
 
-    try {
-      await axios.post(`${backendUrl}Scans`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      toast.success("Medical scan uploaded and analysis initiated!");
-      setSelectedFile(null);
-      setPreviewUrl(null);
-    } catch (error: any) {
-      console.error("Upload error:", error);
-      toast.error(
-        error.response?.data?.message ||
-          "Failed to upload scan. Please try again."
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+    scanMutation.mutate(formData);
   };
 
   return (
@@ -136,7 +156,9 @@ const Scan = () => {
               className={`relative flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-2xl transition-all cursor-pointer group ${
                 dragActive
                   ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/10"
-                  : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/10"
+                  : !selectedFile && formSubmitted
+                    ? "border-red-500 bg-red-50/10 dark:bg-red-900/10"
+                    : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800/10"
               }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
@@ -195,46 +217,119 @@ const Scan = () => {
             </div>
           </div>
 
-          {/* Patient Selection */}
+          <div className="grid grid-cols-2 gap-6 mb-8 max-md:grid-cols-1">
+            {/* Patient Selection */}
+            <div>
+              <label className="block text-sm font-medium text-(--color-text-light) mb-3">
+                Select Patient
+              </label>
+              <div className="relative">
+                <select
+                  {...register("patientId", {
+                    required: "Patient selection is required",
+                  })}
+                  className={`w-full px-5 py-4 bg-gray-50/50 dark:bg-gray-800/30 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-(--color-text) appearance-none cursor-pointer font-medium disabled:opacity-50 ${
+                    errors.patientId
+                      ? "border-red-500"
+                      : "border-(--color-border)"
+                  }`}
+                  disabled={isLoadingPatients}
+                >
+                  <option value="">
+                    {isLoadingPatients
+                      ? "Loading patients..."
+                      : "Choose a patient..."}
+                  </option>
+                  {recentPatients.map((p: any) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}
+                    </option>
+                  ))}
+                  <option key="1" value={1}>
+                    Mohamed
+                  </option>
+                </select>
+                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <svg
+                    className="w-5 h-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+              {errors.patientId && (
+                <p className="text-red-500 text-xs mt-2 font-medium px-1">
+                  {errors.patientId.message}
+                </p>
+              )}
+            </div>
+
+            {/* Priority Selection */}
+            <div>
+              <label className="block text-sm font-medium text-(--color-text-light) mb-3">
+                Priority Level
+              </label>
+              <div className="relative">
+                <select
+                  {...register("priority", {
+                    required: "Priority is required",
+                  })}
+                  className={`w-full px-5 py-4 bg-gray-50/50 dark:bg-gray-800/30 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-(--color-text) appearance-none cursor-pointer font-medium ${
+                    errors.priority
+                      ? "border-red-500"
+                      : "border-(--color-border)"
+                  }`}
+                >
+                  <option value="Normal">Normal</option>
+                  <option value="Urgent">Urgent</option>
+                  <option value="Emergency">Emergency</option>
+                </select>
+                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
+                  <svg
+                    className="w-5 h-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </div>
+              </div>
+              {errors.priority && (
+                <p className="text-red-500 text-xs mt-2 font-medium px-1">
+                  {errors.priority.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Scan Type (Fixed as X-ray) */}
           <div className="mb-8">
             <label className="block text-sm font-medium text-(--color-text-light) mb-3">
-              Select Patient
+              Scan Type
             </label>
-            <div className="relative">
-              <select
-                {...register("patientId", {
-                  required: "Patient selection is required",
-                })}
-                className="w-full px-5 py-4 bg-gray-50/50 dark:bg-gray-800/30 border border-(--color-border) rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-(--color-text) appearance-none cursor-pointer font-medium"
-              >
-                <option value="">Choose a patient...</option>
-                {patients.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} (ID: {p.id})
-                  </option>
-                ))}
-              </select>
-              <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none">
-                <svg
-                  className="w-5 h-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
-            </div>
-            {errors.patientId && (
-              <p className="text-red-500 text-xs mt-2 font-medium px-1">
-                {errors.patientId.message}
-              </p>
-            )}
+            <input
+              type="text"
+              {...register("scanType")}
+              readOnly
+              className="w-full px-5 py-4 bg-gray-100 dark:bg-gray-800/50 border border-(--color-border) rounded-2xl text-(--color-text) font-medium cursor-not-allowed opacity-80 focus:outline-none"
+            />
+            <p className="text-[10px] text-gray-400 mt-2 px-1">
+              * The current system only supports X-ray analysis.
+            </p>
           </div>
 
           {/* Additional Notes */}
@@ -253,10 +348,10 @@ const Scan = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={scanMutation.isPending}
             className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-2xl transition-all shadow-lg shadow-blue-500/30 flex justify-center items-center gap-3 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? (
+            {scanMutation.isPending ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                 <span>Uploading...</span>
