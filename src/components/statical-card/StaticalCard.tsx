@@ -5,7 +5,7 @@ interface StatCardProps {
   Icon: LucideIcon;
   TrendIcon: LucideIcon;
   label: string;
-  value: string | number;
+  value: number;
   trendValue: string;
   colorClass?: string; // To handle different colors like blue, green, etc.
 }
