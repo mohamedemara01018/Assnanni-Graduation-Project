@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { RootState } from "@/store/store";
-import { token } from "../utils";
+// import { token } from "../utils";
+import Cookies from "js-cookie";
 
 /* ================= TYPES ================= */
 
@@ -28,6 +29,7 @@ interface UsersResponse {
 interface FetchUsersParams {
     SearchTerm?: string;
     Role?: string;
+    gender?: "" | "male" | "female"
     PageNumber?: number;
     PageSize?: number;
 }
@@ -46,8 +48,9 @@ const initialState: UsersState = {
     error: null,
 };
 
-/* ================= THUNK ================= */
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
+/* ================= THUNK ================= */
 export const fetchAdminUsers = createAsyncThunk<
     UsersResponse,
     FetchUsersParams,
@@ -55,21 +58,28 @@ export const fetchAdminUsers = createAsyncThunk<
 >(
     "users/fetchAdminUsers",
     async (
-        { SearchTerm = "", Role = "", PageNumber = 1, PageSize = 10 },
+        { SearchTerm = "", Role = "", gender = "", PageNumber = 1, PageSize = 10 },
         { rejectWithValue }
     ) => {
+        const cookieToken = Cookies.get("jwtToken");
+        console.log(cookieToken)
         try {
 
-            const url = `https://asnani.runasp.net/api/Admin/users?SearchTerm=${SearchTerm}&Role=${Role}&PageNumber=${PageNumber}&PageSize=${PageSize}`;
-
-            const response = await fetch(url, {
+            const response = await fetch(`${backendUrl}Admin/users/all`, {
+                method: "POST",
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${cookieToken}`,
+                    "Content-Type": "application/json",
                 },
+                body: JSON.stringify(
+                    {
+                        SearchTerm, gender, Role, PageNumber, PageSize
+                    }
+                )
             });
 
             const json: UsersResponse = await response.json();
-
+            console.log('json', json)
             if (!response.ok || !json.succeeded) {
                 return rejectWithValue(json.message || "Request failed");
             }

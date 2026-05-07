@@ -1,13 +1,20 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { RootState } from "@/store/store";
-import { token } from "../utils";
 import Cookies from "js-cookie";
 
 export interface SummaryData {
-  [key: string]: any;
+  totalDoctors: number,
+  totalPatients: number,
+  totalStudents: number,
+  totalReceptionists: number,
+  pendingRequests: number,
+  totalVerified: number,
+  totalRejected: number,
+  totalActionedToday: number,
+  appointmentsToday: number,
 }
 
-interface SummaryState {
+export interface SummaryState {
   data: SummaryData | null;
   loading: boolean;
   error: string | null;
@@ -18,17 +25,18 @@ const initialState: SummaryState = {
   loading: false,
   error: null,
 };
-const cookieToken = Cookies.get("jwtToken");
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
-console.log(backendUrl);
-// 🔥 THUNK
+
+// THUNK
 export const fetchAdminSummary = createAsyncThunk(
   "summary/fetchAdminSummary",
   async (_, { rejectWithValue }) => {
+    const cookieToken = Cookies.get("jwtToken");
     try {
       const response = await fetch(`${backendUrl}Admin/stats/summary`, {
         headers: {
-          Authorization: `Bearer ${cookieToken ?? token}`,
+          Authorization: `Bearer ${cookieToken}`,
         },
       });
 
@@ -36,40 +44,17 @@ export const fetchAdminSummary = createAsyncThunk(
         const error = await response.json();
         return rejectWithValue(error.message || "Request failed");
       }
-      console.log(response);
+
       const json = await response.json();
-      console.log("json", json);
       return json;
     } catch (err: any) {
       return rejectWithValue(err.message);
     }
   },
 );
-//TODO use axios like this
-//export const fetchAdminSummary = createAsyncThunk(
-//   "summary/fetchAdminSummary",
-//   async (_, { rejectWithValue }) => {
-//     try {
-//       const response = await axios.get(`${backendUrl}Admin/stats/summary`, {
-//         headers: {
-//           Authorization: `Bearer ${cookieToken ?? token}`,
-//         },
-//       });
 
-//       if (!response.data.succeeded) {
-//         return rejectWithValue(response.data?.message || "Request failed");
-//       }
-//       console.log(response);
-//       //   const json = await response.json();
-//       console.log("response", response);
-//       return response;
-//     } catch (err: any) {
-//       return rejectWithValue(err.message);
-//     }
-//   },
-// );
 
-// 🔥 SLICE
+// SLICE
 const summarySlice = createSlice({
   name: "summarySlice",
   initialState,

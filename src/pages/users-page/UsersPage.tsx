@@ -1,5 +1,5 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import { selectSummary } from "@/store/slices/admin-slice/summary-slice/SummarySlice";
+import { fetchAdminSummary, selectSummary, type SummaryState } from "@/store/slices/admin-slice/summary-slice/SummarySlice";
 import {
   AlertCircle,
   Calendar,
@@ -17,7 +17,6 @@ import {
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
-import type { SummaryState } from "../admin-page/AdminPage";
 import {
   fetchAdminUsers,
   selectUsers,
@@ -26,6 +25,7 @@ import {
 import type { AppDispatch } from "@/store/store";
 import { ScaleLoader } from "react-spinners";
 import Error from "@/components/error/Error";
+import { toast } from "react-toastify";
 
 type UserRole =
   | ""
@@ -35,35 +35,63 @@ type UserRole =
   | "Student"
   | "Admin";
 
+type UserGender =
+  ""
+  | "male"
+  | "female"
+
 function UsersPage() {
   const dispatch: AppDispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterRole, setFilterRole] = useState<UserRole>("");
+  const [filterGender, setFilterGender] = useState<UserGender>("");
   // const [selectedUser, setSelectedUser] = useState<User | null>(null);
   // const [showDetailModal, setShowDetailModal] = useState(false);
   // const [showActionsMenu, setShowActionsMenu] = useState<string | null>(null);
 
-  useEffect(() => {
-    dispatch(
-      fetchAdminUsers({
-        SearchTerm: searchQuery,
-        Role: filterRole,
-        PageNumber: 1,
-        PageSize: 10,
-      }),
-    );
-  }, [dispatch, searchQuery, filterRole]);
+  const {
+    data,
+    loading,
+    error,
+  } = useSelector(selectSummary) as SummaryState;
 
-  const { data } = useSelector(selectSummary) as SummaryState;
+  const {
+    usersData,
+  } = useSelector(selectUsers) as UsersState;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await Promise.all([
+          dispatch(fetchAdminSummary()),
+          dispatch(
+            fetchAdminUsers({
+              SearchTerm: searchQuery,
+              Role: filterRole,
+              gender: filterGender,
+              PageNumber: 1,
+              PageSize: 10,
+            })
+          ),
+        ]);
+      } catch (error: any) {
+        console.log(error);
+        const errorMessage = typeof error == 'string' ? String(error) : error.message
+        toast.error(errorMessage)
+      }
+    };
+
+    fetchData();
+  }, [dispatch, searchQuery, filterRole, filterGender])
+
   const totalUser = data
     ? data.totalDoctors +
-      data.totalPatients +
-      data.totalReceptionists +
-      data.totalStudents
+    data.totalPatients +
+    data.totalReceptionists +
+    data.totalStudents
     : 0;
 
-  const { usersData, loading, error } = useSelector(selectUsers) as UsersState;
-  console.log(usersData);
+
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -141,36 +169,36 @@ function UsersPage() {
         </div>
         <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
           <p className="text-xs text-(--color-text-light) mb-1">Patients</p>
-          <p className="text-2xl ">{data.totalPatients}</p>
+          <p className="text-2xl ">{data?.totalPatients}</p>
         </div>
         <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
           <p className="text-xs text-(--color-text-light) mb-1">Doctors</p>
-          <p className="text-2xl ">{data.totalDoctors}</p>
+          <p className="text-2xl ">{data?.totalDoctors}</p>
         </div>
         <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
           <p className="text-xs text-(--color-text-light) mb-1">Students</p>
-          <p className="text-2xl ">{data.totalStudents}</p>
+          <p className="text-2xl ">{data?.totalStudents}</p>
         </div>
         <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
           <p className="text-xs text-(--color-text-light) mb-1">
             Receptionists
           </p>
-          <p className="text-2xl ">{data.totalReceptionists}</p>
+          <p className="text-2xl ">{data?.totalReceptionists}</p>
         </div>
         <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
           <p className="text-xs text-(--color-text-light) mb-1">Active</p>
           <p className="text-2xl text-green-600 dark:text-green-400">
-            {data.totalActionedToday}
+            {data?.totalActionedToday}
           </p>
         </div>
-        {/* <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
-                    <p className="text-xs text-(--color-text-light) mb-1">Suspended</p>
-                    <p className="text-2xl text-red-600 dark:text-red-400">{data.}</p>
-                </div>
-                <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
-                    <p className="text-xs text-(--color-text-light) mb-1">Pending</p>
-                    <p className="text-2xl text-yellow-600 dark:text-yellow-400">1</p>
-                </div> */}
+        <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
+          <p className="text-xs text-(--color-text-light) mb-1">Suspended</p>
+          <p className="text-2xl text-red-600 dark:text-red-400">{data?.totalRejected}</p>
+        </div>
+        <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
+          <p className="text-xs text-(--color-text-light) mb-1">Pending</p>
+          <p className="text-2xl text-yellow-600 dark:text-yellow-400">{data?.pendingRequests}</p>
+        </div>
       </div>
 
       {/* Search and Filters */}
@@ -201,7 +229,10 @@ function UsersPage() {
               <option value="Receptionist">Receptionist</option>
               <option value="Admin">Admin</option>
             </select>
-            <select className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-(--color-border) rounded-lg focus:outline-none focus:ring-2 focus:ring-(--color-text-blue)">
+            <select
+              onChange={(e) => setFilterGender(e.target.value as UserGender)}
+              className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-(--color-border) rounded-lg focus:outline-none focus:ring-2 focus:ring-(--color-text-blue)"
+            >
               <option value="">All Gender</option>
               <option value="male">Male</option>
               <option value="female">Female</option>
@@ -238,7 +269,7 @@ function UsersPage() {
                     Role
                   </th>
                   <th className="px-6 py-3 text-left text-xs text-(--color-text-light) uppercase tracking-wider">
-                    Role
+                    Gender
                   </th>
 
                   <th className="px-6 py-3 text-left text-xs text-(--color-text-light) uppercase tracking-wider">

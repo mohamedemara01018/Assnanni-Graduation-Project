@@ -2,6 +2,7 @@ import CardComp from "@/components/card-comp/CardComp";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import StatCard from "@/components/statical-card/StaticalCard";
 import {
+  AlertCircle,
   Calendars,
   CheckCircle,
   FileText,
@@ -15,44 +16,62 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   fetchAdminSummary,
   selectSummary,
+  type SummaryState,
 } from "@/store/slices/admin-slice/summary-slice/SummarySlice";
 import { useEffect } from "react";
 import type { AppDispatch } from "@/store/store";
 import { ScaleLoader } from "react-spinners";
 import Error from "@/components/error/Error";
+import { fetchPendingDoctor, selectPendingDoctor, type pendingDoctorInterface } from "@/store/slices/admin-slice/pending-doctor-slice/pendingDoctorSlice";
+import { toast } from "react-toastify";
+import { getTimeAgo } from "@/lib/utils";
 
-interface summaryDataInterface {
-  pendingRequests: number;
-  totalActionedToday: number;
-  totalDoctors: number;
-  totalPatients: number;
-  totalReceptionists: number;
-  totalRejected: number;
-  totalStudents: number;
-}
-
-export interface SummaryState {
-  data: summaryDataInterface;
-  loading: boolean;
-  error: string | null;
-}
 
 function AdminPage() {
   const dispatch: AppDispatch = useDispatch();
-  const { data, loading, error } = useSelector(selectSummary) as SummaryState;
+  const { data, loading, error } =
+    useSelector(selectSummary) as SummaryState;
 
-  // const [totalUser, setTotalUser] = useState<number>(0);
+  const { pendingDoctor } =
+    useSelector(selectPendingDoctor) as pendingDoctorInterface;
+
+  console.log("pending doctor", pendingDoctor);
 
   useEffect(() => {
-    dispatch(fetchAdminSummary());
+    const fetchData = async () => {
+      try {
+        await Promise.all([
+          dispatch(fetchAdminSummary()),
+          dispatch(fetchPendingDoctor()),
+        ]);
+      } catch (error: any) {
+        console.error(error);
+
+        const errorMessage =
+          (typeof error === "string"
+            ? error
+            : error.message) ||
+          "Failed to fetch summary & pending doctors";
+
+        toast.error(errorMessage);
+      }
+    };
+
+    fetchData();
   }, [dispatch]);
 
   const totalUser = data
     ? data.totalDoctors +
-      data.totalPatients +
-      data.totalReceptionists +
-      data.totalStudents
+    data.totalPatients +
+    data.totalReceptionists +
+    data.totalStudents
     : 0;
+
+  // const now = new Date().;
+
+  // console.log(now);
+
+
 
   return (
     <DashboardLayout pageTitle="Admin page">
@@ -89,23 +108,23 @@ function AdminPage() {
               Icon={ShieldCheck}
               TrendIcon={TrendingUp}
               trendValue="5"
-              label="total user"
-              value={1234}
+              label="Active Doctors"
+              value={Number(data?.totalVerified)}
               colorClass="text-green-500 bg-green-200"
             />
             <StatCard
               Icon={Calendars}
               TrendIcon={TrendingUp}
               trendValue="5"
-              label="total user"
-              value={1234}
+              label="Appointments Today"
+              value={Number(data?.appointmentsToday)}
               colorClass="text-purple-500 bg-purple-200"
             />
             <StatCard
               Icon={FileText}
               TrendIcon={TrendingUp}
               trendValue="5"
-              label="total user"
+              label="Total Scans"
               value={1234}
               colorClass="text-orange-500 bg-orange-200"
             />
@@ -124,116 +143,57 @@ function AdminPage() {
               </Link>
             </div>
             <hr className="w-full" />
-            <div className="w-full space-y-4">
-              {/* doctor */}
-              <div className="flex justify-between items-center bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) p-4 rounded-lg">
-                <div className="flex items-center gap-4">
-                  <div className="w-15 h-15 rounded-full overflow-hidden">
-                    <img
-                      src="src/assets/doctor.jpg"
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h1 className="text-lg font-medium">mohamed gamal</h1>
-                    <span className="block text-sm -mt-1">Software Eng</span>
-                    <span className=" text-xs">
-                      5 documents . Submitted 2 days ago
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
-                    <CheckCircle className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
-                    <XCircle className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
 
-              <div className="flex justify-between items-center bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) p-4 rounded-lg">
-                <div className="flex items-center gap-4">
-                  <div className="w-15 h-15 rounded-full overflow-hidden">
-                    <img
-                      src="src/assets/doctor.jpg"
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h1 className="text-lg font-medium">mohamed gamal</h1>
-                    <span className="block text-sm -mt-1">Software Eng</span>
-                    <span className=" text-xs">
-                      5 documents . Submitted 2 days ago
-                    </span>
-                  </div>
+            {
+              loading ?
+                <div className="w-full  flex items-center justify-center">
+                  <ScaleLoader color="#6d61ff" />{" "}
                 </div>
-                <div className="flex items-center space-x-2">
-                  <button className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
-                    <CheckCircle className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
-                    <XCircle className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+                : error ? <Error message={error} /> :
+                  (<div className="w-full space-y-4">
 
-              <div className="flex justify-between items-center bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) p-4 rounded-lg">
-                <div className="flex items-center gap-4">
-                  <div className="w-15 h-15 rounded-full overflow-hidden">
-                    <img
-                      src="src/assets/doctor.jpg"
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h1 className="text-lg font-medium">mohamed gamal</h1>
-                    <span className="block text-sm -mt-1">Software Eng</span>
-                    <span className=" text-xs">
-                      5 documents . Submitted 2 days ago
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
-                    <CheckCircle className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
-                    <XCircle className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+                    {
+                      pendingDoctor && pendingDoctor.length == 0 ? <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
+                        <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-600 dark:text-gray-400">No verifications found</p>
+                      </div> :
+                        pendingDoctor && pendingDoctor.map((doctor) => {
+                          return <div key={doctor.id} className="flex justify-between items-center bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) p-4 rounded-lg">
+                            <div className="flex items-center gap-4">
+                              <div className="w-15 h-15 rounded-full overflow-hidden flex justify-center items-center bg-(--color-primary) text-white">
+                                {
+                                  doctor.imageUrl ?
+                                    <img
+                                      src={doctor.imageUrl}
+                                      alt=""
+                                      className="w-full h-full object-cover"
+                                    /> : <span className="text-3xl font-bold">{doctor.fullName.charAt(0).toUpperCase()}</span>
+                                }
+                              </div>
+                              <div>
+                                <h1 className="text-lg font-medium">{doctor.fullName}</h1>
+                                <span className="block text-sm -mt-1">{doctor.specialization}</span>
+                                <span className=" text-xs">
+                                  {`1 documents . Submitted ${getTimeAgo(doctor.createdAt)}`}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <button className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
+                                <CheckCircle className="w-4 h-4" />
+                              </button>
+                              <button className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
+                                <XCircle className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        })
+                    }
 
-              <div className="flex justify-between items-center bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) p-4 rounded-lg">
-                <div className="flex items-center gap-4">
-                  <div className="w-15 h-15 rounded-full overflow-hidden">
-                    <img
-                      src="src/assets/doctor.jpg"
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div>
-                    <h1 className="text-lg font-medium">mohamed gamal</h1>
-                    <span className="block text-sm -mt-1">Software Eng</span>
-                    <span className=" text-xs">
-                      5 documents . Submitted 2 days ago
-                    </span>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <button className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
-                    <CheckCircle className="w-4 h-4" />
-                  </button>
-                  <button className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
-                    <XCircle className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
+
+                  </div>)
+            }
+
           </CardComp>
 
           <div className="space-y-4 flex-1">

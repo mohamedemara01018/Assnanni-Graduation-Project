@@ -4,14 +4,17 @@ import emailReducer from "./slices/email/emailSlice";
 import configReducer from "./slices/config/configSlice";
 import summaryReducer from './slices/admin-slice/summary-slice/SummarySlice'
 import usersReducer from './slices/admin-slice/users-slice/UsersSlice'
+import pendingDoctorReducer from './slices/admin-slice/pending-doctor-slice/pendingDoctorSlice'
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     email: emailReducer,
     config: configReducer,
+    // admin dashboard
     summarySlice: summaryReducer,
-    usersSlice: usersReducer
+    usersSlice: usersReducer,
+    pendingDoctorsSlice: pendingDoctorReducer
   },
 });
 

@@ -1,7 +1,13 @@
 import CardComp from '@/components/card-comp/CardComp';
 import DashboardLayout from '@/components/dashboard-layout/DashboardLayout'
+import Error from '@/components/error/Error';
 import StatCard from '@/components/statical-card/StaticalCard'
+import { fetchAdminSummary, selectSummary, type SummaryState } from '@/store/slices/admin-slice/summary-slice/SummarySlice';
+import type { AppDispatch } from '@/store/store';
 import { Calendars, FileText, ShieldCheck, TrendingUp, Users } from 'lucide-react'
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from "react-redux";
+import { ScaleLoader } from 'react-spinners';
 
 
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Line, Legend, LineChart, BarChart, Bar } from 'recharts';
@@ -9,7 +15,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Line, Legend, Li
 // import { RechartsDevtools } from '@recharts/devtools';
 
 
-const data = [
+const analticsData = [
     {
         name: 'Page A',
         uv: 4000,
@@ -55,7 +61,26 @@ const data = [
 ];
 
 
+
+
 function AnalyticsPage() {
+
+    const dispatch: AppDispatch = useDispatch();
+    const { data, loading, error } =
+        useSelector(selectSummary) as SummaryState;
+
+
+
+    useEffect(() => {
+        dispatch(fetchAdminSummary())
+    }, [dispatch]);
+
+    const totalUser = data
+        ? data.totalDoctors +
+        data.totalPatients +
+        data.totalReceptionists +
+        data.totalStudents
+        : 0;
     return (
         <DashboardLayout pageTitle='Analytics Data'>
             <div className="mb-6">
@@ -63,40 +88,48 @@ function AnalyticsPage() {
                 <p className="text-gray-600 dark:text-gray-400">View system insights and generate reports</p>
             </div>
 
-            <div className="grid max-sm:grid-cols-2 grid-cols-4 gap-4">
-                <StatCard
-                    Icon={Users}
-                    TrendIcon={TrendingUp}
-                    trendValue="5"
-                    label="total user"
-                    value={1234}
-                    colorClass="text-blue-500 bg-blue-200"
-                />
-                <StatCard
-                    Icon={ShieldCheck}
-                    TrendIcon={TrendingUp}
-                    trendValue="5"
-                    label="total user"
-                    value={1234}
-                    colorClass="text-green-500 bg-green-200"
-                />
-                <StatCard
-                    Icon={Calendars}
-                    TrendIcon={TrendingUp}
-                    trendValue="5"
-                    label="total user"
-                    value={1234}
-                    colorClass="text-purple-500 bg-purple-200"
-                />
-                <StatCard
-                    Icon={FileText}
-                    TrendIcon={TrendingUp}
-                    trendValue="5"
-                    label="total user"
-                    value={1234}
-                    colorClass="text-orange-500 bg-orange-200"
-                />
-            </div>
+            {loading ? (
+                <div className="w-full  flex items-center justify-center">
+                    <ScaleLoader color="#6d61ff" />{" "}
+                </div>
+            ) : error ? (
+                <Error message={error} />
+            ) : (
+                <div className="grid max-sm:grid-cols-2 grid-cols-4 gap-4">
+                    <StatCard
+                        Icon={Users}
+                        TrendIcon={TrendingUp}
+                        trendValue="5"
+                        label="Total User"
+                        value={totalUser}
+                        colorClass="text-blue-500 bg-blue-200"
+                    />
+                    <StatCard
+                        Icon={ShieldCheck}
+                        TrendIcon={TrendingUp}
+                        trendValue="5"
+                        label="Active Doctors"
+                        value={Number(data?.totalVerified)}
+                        colorClass="text-green-500 bg-green-200"
+                    />
+                    <StatCard
+                        Icon={Calendars}
+                        TrendIcon={TrendingUp}
+                        trendValue="5"
+                        label="Appointments Today"
+                        value={Number(data?.appointmentsToday)}
+                        colorClass="text-purple-500 bg-purple-200"
+                    />
+                    <StatCard
+                        Icon={FileText}
+                        TrendIcon={TrendingUp}
+                        trendValue="5"
+                        label="Total Scans"
+                        value={1234}
+                        colorClass="text-orange-500 bg-orange-200"
+                    />
+                </div>
+            )}
 
 
             {/* analtics */}
@@ -117,7 +150,7 @@ function AnalyticsPage() {
                         <AreaChart
                             style={{ width: '100%', maxWidth: '700px', maxHeight: '70vh', aspectRatio: 1.618 }}
                             responsive
-                            data={data}
+                            data={analticsData}
                             margin={{
                                 top: 20,
                                 right: 0,
@@ -144,7 +177,7 @@ function AnalyticsPage() {
                         <LineChart
                             style={{ width: '100%', maxWidth: '700px', height: '100%', maxHeight: '70vh', aspectRatio: 1.618 }}
                             responsive
-                            data={data}
+                            data={analticsData}
                             margin={{
                                 top: 5,
                                 right: 0,
@@ -183,7 +216,7 @@ function AnalyticsPage() {
                         <BarChart
                             style={{ width: '100%', maxWidth: '700px', maxHeight: '70vh', aspectRatio: 1.618 }}
                             responsive
-                            data={data}
+                            data={analticsData}
                             margin={{
                                 top: 20,
                                 right: 0,
@@ -210,7 +243,7 @@ function AnalyticsPage() {
                         <AreaChart
                             style={{ width: '100%', maxWidth: '700px', maxHeight: '70vh', aspectRatio: 1.618 }}
                             responsive
-                            data={data}
+                            data={analticsData}
                             margin={{
                                 top: 20,
                                 right: 0,
