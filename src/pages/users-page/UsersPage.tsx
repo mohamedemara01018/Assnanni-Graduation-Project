@@ -1,5 +1,9 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import { fetchAdminSummary, selectSummary, type SummaryState } from "@/store/slices/admin-slice/summary-slice/SummarySlice";
+import {
+  fetchAdminSummary,
+  selectSummary,
+  type SummaryState,
+} from "@/store/slices/admin-slice/summary-slice/SummarySlice";
 import {
   AlertCircle,
   Calendar,
@@ -13,6 +17,8 @@ import {
   Search,
   Shield,
   UserPlus,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
@@ -35,29 +41,28 @@ type UserRole =
   | "Student"
   | "Admin";
 
-type UserGender =
-  ""
-  | "male"
-  | "female"
+type UserGender = "" | "male" | "female";
 
 function UsersPage() {
   const dispatch: AppDispatch = useDispatch();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterRole, setFilterRole] = useState<UserRole>("");
   const [filterGender, setFilterGender] = useState<UserGender>("");
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   // const [selectedUser, setSelectedUser] = useState<User | null>(null);
   // const [showDetailModal, setShowDetailModal] = useState(false);
   // const [showActionsMenu, setShowActionsMenu] = useState<string | null>(null);
 
-  const {
-    data,
-    loading,
-    error,
-  } = useSelector(selectSummary) as SummaryState;
+  const { data, loading, error } = useSelector(selectSummary) as SummaryState;
 
   const {
     usersData,
+    totalCount = 0,
+    loading: usersLoading,
   } = useSelector(selectUsers) as UsersState;
+
+  const totalPages = Math.ceil(totalCount / pageSize);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,29 +74,34 @@ function UsersPage() {
               SearchTerm: searchQuery,
               Role: filterRole,
               gender: filterGender,
-              PageNumber: 1,
-              PageSize: 10,
-            })
+              PageNumber: pageNumber,
+              PageSize: pageSize,
+            }),
           ),
         ]);
       } catch (error: any) {
         console.log(error);
-        const errorMessage = typeof error == 'string' ? String(error) : error.message
-        toast.error(errorMessage)
+        const errorMessage =
+          typeof error == "string" ? String(error) : error.message;
+        toast.error(errorMessage);
       }
     };
 
     fetchData();
-  }, [dispatch, searchQuery, filterRole, filterGender])
+  }, [dispatch, searchQuery, filterRole, filterGender, pageNumber, pageSize]);
+
+  // Reset page number when filters change
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPageNumber(1);
+  }, [searchQuery, filterRole, filterGender]);
 
   const totalUser = data
     ? data.totalDoctors +
-    data.totalPatients +
-    data.totalReceptionists +
-    data.totalStudents
+      data.totalPatients +
+      data.totalReceptionists +
+      data.totalStudents
     : 0;
-
-
 
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
@@ -193,11 +203,15 @@ function UsersPage() {
         </div>
         <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
           <p className="text-xs text-(--color-text-light) mb-1">Suspended</p>
-          <p className="text-2xl text-red-600 dark:text-red-400">{data?.totalRejected}</p>
+          <p className="text-2xl text-red-600 dark:text-red-400">
+            {data?.totalRejected}
+          </p>
         </div>
         <div className="bg-(--color-surface) rounded-xl p-4 border border-(--color-border)">
           <p className="text-xs text-(--color-text-light) mb-1">Pending</p>
-          <p className="text-2xl text-yellow-600 dark:text-yellow-400">{data?.pendingRequests}</p>
+          <p className="text-2xl text-yellow-600 dark:text-yellow-400">
+            {data?.pendingRequests}
+          </p>
         </div>
       </div>
 
@@ -245,7 +259,7 @@ function UsersPage() {
       <div className="bg-(--color-surface) rounded-xl border border-(--color-border) overflow-hidden">
         {error ? (
           <Error message={error} />
-        ) : loading ? (
+        ) : loading || usersLoading ? (
           <div className="w-full py-10  flex items-center justify-center">
             <ScaleLoader color="#6d61ff" />{" "}
           </div>
@@ -400,6 +414,89 @@ function UsersPage() {
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {!error && !loading && !usersLoading && usersData.length > 0 && (
+        <div className="mt-6 flex flex-wrap justify-between items-center bg-(--color-surface) p-4 rounded-xl border border-(--color-border) shadow-sm gap-4">
+          <div className="flex items-center gap-6">
+            <span className="text-sm text-(--color-text-light) font-medium">
+              Showing {(pageNumber - 1) * pageSize + 1} to{" "}
+              {Math.min(pageNumber * pageSize, totalCount)} of {totalCount}{" "}
+              users
+            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-(--color-text-light) font-semibold uppercase tracking-wider">
+                Show:
+              </span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setPageNumber(1);
+                }}
+                className="bg-gray-50 dark:bg-gray-700 border border-(--color-border) rounded-lg px-2 py-1 text-xs font-bold text-(--color-text) focus:outline-none focus:ring-2 focus:ring-(--color-text-blue) cursor-pointer"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex gap-2 items-center">
+            <button
+              onClick={() => setPageNumber((prev) => Math.max(prev - 1, 1))}
+              disabled={pageNumber === 1 || usersLoading}
+              className={`p-2 rounded-lg border border-(--color-border) transition-all ${
+                pageNumber === 1 || usersLoading
+                  ? "bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed"
+                  : "bg-gray-50 dark:bg-gray-700 text-(--color-text) hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer"
+              }`}
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+
+            {/* Page numbers */}
+            <div className="flex gap-1">
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                // Simple logic for showing pages around current page
+                // For now just show first 5 pages or all if totalPages <= 5
+                return (
+                  <button
+                    key={i + 1}
+                    onClick={() => setPageNumber(i + 1)}
+                    className={`w-9 h-9 rounded-lg text-sm font-bold transition-all cursor-pointer ${
+                      pageNumber === i + 1
+                        ? "bg-(--color-primary) text-white shadow-md shadow-(--color-primary)/20"
+                        : "bg-gray-50 dark:bg-gray-700 text-(--color-text) border border-(--color-border) hover:bg-gray-200 dark:hover:bg-gray-600"
+                    }`}
+                  >
+                    {i + 1}
+                  </button>
+                );
+              })}
+              {totalPages > 5 && (
+                <span className="px-2 self-center text-gray-400">...</span>
+              )}
+            </div>
+
+            <button
+              onClick={() =>
+                setPageNumber((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={pageNumber >= totalPages || usersLoading}
+              className={`p-2 rounded-lg border border-(--color-border) transition-all ${
+                pageNumber >= totalPages || usersLoading
+                  ? "bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed"
+                  : "bg-gray-50 dark:bg-gray-700 text-(--color-text) hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer"
+              }`}
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }
