@@ -23,7 +23,7 @@ function LoginForm() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<Inputs>();
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
@@ -36,7 +36,7 @@ function LoginForm() {
       navigator("/");
     } catch (error: any) {
       console.log(error);
-      toast.error(error.message);
+      toast.error(error.message || "Something went wrong");
     }
   };
 
@@ -96,8 +96,15 @@ function LoginForm() {
           </NavLink>
         </div>
         <div>
-          <Button className="bg-(--color-primary) hover:bg-(--color-primary-dark) p-4cursor-pointer w-full">
-            Sign In
+          <Button
+            disabled={isSubmitting}
+            className={`w-full p-4 cursor-pointer transition-all duration-200 ${
+              isSubmitting
+                ? "bg-gray-400 cursor-not-allowed opacity-70"
+                : "bg-(--color-primary) hover:bg-(--color-primary-dark)"
+            }`}
+          >
+            {isSubmitting ? "Signing In..." : "Sign In"}
           </Button>
         </div>
       </div>
