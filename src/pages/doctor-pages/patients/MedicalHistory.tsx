@@ -55,7 +55,6 @@ const MedicalHistory = () => {
     (app: any) => app.doctorName === doctorName && app.status === "Confirmed",
   );
 
-  const hasAppointment = !!doctorAppointment;
   const appointmentId = doctorAppointment?.appointmentId;
 
   const { data, isLoading, isError, error, isSuccess } = useQuery({
@@ -154,14 +153,19 @@ const MedicalHistory = () => {
     toast.success(`Downloading ${item.title} record...`);
   };
 
-  const handleDownloadAttachment = async (file: { fileName: string; url: string }) => {
+  const handleDownloadAttachment = async (file: {
+    fileName: string;
+    url: string;
+  }) => {
     toast.info(`Downloading attachment: ${file.fileName}`);
-    
+
     let fullUrl = file.url;
     if (!file.url.startsWith("http")) {
-      const cleanBackendUrl = backendUrl.endsWith("/") ? backendUrl.slice(0, -1) : backendUrl;
+      const cleanBackendUrl = backendUrl.endsWith("/")
+        ? backendUrl.slice(0, -1)
+        : backendUrl;
       const cleanFileUrl = file.url.startsWith("/") ? file.url : `/${file.url}`;
-      
+
       if (cleanFileUrl.startsWith(cleanBackendUrl)) {
         fullUrl = cleanFileUrl;
       } else {
@@ -172,20 +176,23 @@ const MedicalHistory = () => {
     // Extract extension from URL
     const urlParts = file.url.split(".");
     const extension = urlParts.length > 1 ? `.${urlParts.pop()}` : "";
-    
+
     // Ensure filename has the extension
     let downloadName = file.fileName;
-    if (extension && !downloadName.toLowerCase().endsWith(extension.toLowerCase())) {
+    if (
+      extension &&
+      !downloadName.toLowerCase().endsWith(extension.toLowerCase())
+    ) {
       downloadName += extension;
     }
 
     try {
       const response = await fetch(fullUrl);
       if (!response.ok) throw new Error("Network response was not ok");
-      
+
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
-      
+
       const link = document.createElement("a");
       link.href = blobUrl;
       link.download = downloadName;
@@ -230,7 +237,7 @@ const MedicalHistory = () => {
               Medical History
             </h1>
           </div>
-          {role === "doctor" && hasAppointment && (
+          {role === "doctor" && (
             <button
               onClick={() =>
                 navigate(
@@ -324,7 +331,8 @@ const MedicalHistory = () => {
                     </p>
                     <div className="flex flex-wrap gap-3">
                       {item.attachments.map((file, i) => {
-                        const extension = file.url.split(".").pop()?.toUpperCase() || "FILE";
+                        const extension =
+                          file.url.split(".").pop()?.toUpperCase() || "FILE";
                         return (
                           <button
                             key={i}

@@ -8,6 +8,7 @@ export interface Schedule {
 
 export interface Scan {
   id: number;
+  patientId: number;
   patientName: string;
   scanType: string;
   uploadedAt: string;

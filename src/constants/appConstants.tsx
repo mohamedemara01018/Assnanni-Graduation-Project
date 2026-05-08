@@ -23,6 +23,7 @@ import MedicalReportForm from "../components/Doctor/Reports/MedicalReportForm";
 import ReceptionistAccess from "../components/Doctor/ReceptionistAccess/ReceptionistAccess";
 import AddReceptionist from "../components/Doctor/ReceptionistAccess/AddReceptionist";
 import Scan from "../pages/doctor-pages/Scan/Scan";
+import ScanDetails from "../pages/doctor-pages/scans/ScanDetails";
 import Notifications from "../pages/doctor-pages/notifications/Notifications";
 import StudentAppointments from "../pages/student-doctor-pages/appointments/StudentAppointments";
 import StudentAppointmentDetails from "../pages/student-doctor-pages/appointments/StudentAppointmentDetails";
@@ -113,6 +114,7 @@ export const routeElements = {
   "receptionist-access": <ReceptionistAccess />,
   "receptionist-access/add": <AddReceptionist />,
   "scan/upload": <Scan />,
+  "scan/analysis/:patientId": <ScanDetails />,
   notification: <Notifications />,
   "doctor-appointments": <StudentAppointments />,
   "doctor-appointments/:id": <StudentAppointmentDetails />,
