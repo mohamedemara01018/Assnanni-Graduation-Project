@@ -25,13 +25,13 @@ export const appointmentSummary: AppointmentSummary = {
 };
 
 export const appointmentFormData: AppointmentFormData = {
-  patientId: "1",
-  patientName: "Sarah Johnson",
-  doctorId: "",
-  doctorName: "",
+  patientId: "",
+  patientName: "",
   date: "",
-  time: "",
+  slotId: "",
   reason: "",
   paymentMethod: "cash",
   fee: 180,
+  appointmentType: "Consultation",
+  bookingType: "Online",
 };

@@ -10,7 +10,6 @@ interface Props {
   gender: "Male" | "Female";
   status: "Active" | "Inactive" | "Pending";
   lastVisit: string;
-  doctor: string;
 }
 
 const PatientsCard = ({
@@ -21,7 +20,6 @@ const PatientsCard = ({
   gender,
   status,
   lastVisit,
-  doctor,
 }: Props) => {
   const firstChar = title.charAt(0);
 
@@ -72,15 +70,9 @@ const PatientsCard = ({
             {lastVisit}
           </span>
         </div>
-        <div className="flex justify-between items-center">
-          <span className="text-xs text-(--color-text-light)">Doctor:</span>
-          <span className="text-xs font-semibold text-(--color-text)">
-            {doctor}
-          </span>
-        </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2">
         <NavLink
           to={`/doctor-patients/${id}`}
           className="flex flex-col items-center justify-center gap-1 py-2 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors cursor-pointer group"
@@ -88,13 +80,23 @@ const PatientsCard = ({
           <IoEyeOutline className="text-lg group-hover:scale-110 transition-transform" />
           <span className="text-[10px] font-bold">View</span>
         </NavLink>
-        <NavLink
-          to={`/doctor-patients/${id}/medical-history`}
-          className="flex flex-col items-center justify-center gap-1 py-2 rounded-xl bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors cursor-pointer group"
-        >
-          <BsFileMedical className="text-lg group-hover:scale-110 transition-transform" />
-          <span className="text-[10px] font-bold">History</span>
-        </NavLink>
+        {lastVisit ? (
+          <NavLink
+            to={`/doctor-patients/${id}/medical-history`}
+            className="flex flex-col items-center justify-center gap-1 py-2 rounded-xl bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors cursor-pointer group"
+          >
+            <BsFileMedical className="text-lg group-hover:scale-110 transition-transform" />
+            <span className="text-[10px] font-bold">History</span>
+          </NavLink>
+        ) : (
+          <div
+            className="flex flex-col items-center justify-center gap-1 py-2 rounded-xl bg-gray-50 text-gray-300 cursor-not-allowed"
+            title="Access Restricted: No visit history for this patient"
+          >
+            <BsFileMedical className="text-lg" />
+            <span className="text-[10px] font-bold">History</span>
+          </div>
+        )}
       </div>
     </div>
   );

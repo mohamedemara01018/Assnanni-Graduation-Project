@@ -29,7 +29,7 @@ export const roleRoutePaths = {
   receptionist: [
     "/receptionist",
     "/receptionist/schedule-appointment",
-    "/receptionist/check-in",
+    "/receptionist/:id/check-in",
     "/receptionist/reschedule/:id",
     "/receptionist/register-patient",
   ],
@@ -56,11 +56,23 @@ export const sharedRoutePaths = [
   },
   {
     path: "notification",
-    allowedRoles: ["doctor", "patient", "receptionist", "studentDoctor"],
+    allowedRoles: [
+      "doctor",
+      "patient",
+      "receptionist",
+      "studentDoctor",
+      "admin",
+    ],
   },
   {
     path: "profile",
-    allowedRoles: ["doctor", "patient", "receptionist", "studentDoctor", "admin"],
+    allowedRoles: [
+      "doctor",
+      "patient",
+      "receptionist",
+      "studentDoctor",
+      "admin",
+    ],
   },
   {
     path: "student-settings",

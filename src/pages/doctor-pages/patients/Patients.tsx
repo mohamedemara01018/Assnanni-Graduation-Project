@@ -40,6 +40,7 @@ const Patients = () => {
   const { data, isLoading, isError, error, isSuccess } = useQuery({
     queryKey: [
       "DoctorPatients",
+      role,
       search,
       pageNumber,
       pageSize,
@@ -47,7 +48,12 @@ const Patients = () => {
       otherStatus,
     ],
     queryFn: async () => {
-      const response = await axios.get(`${backendUrl}Doctors/patients`, {
+      const endpoint =
+        role === "receptionist"
+          ? "Receptionist/doctor-patients"
+          : "Doctors/patients";
+
+      const response = await axios.get(`${backendUrl}${endpoint}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -95,15 +101,7 @@ const Patients = () => {
       toast.warning("No data to export");
       return;
     }
-    const headers = [
-      "Name",
-      "Phone",
-      "Age",
-      "Gender",
-      "Status",
-      "Last Visit",
-      "Doctor",
-    ];
+    const headers = ["Name", "Phone", "Age", "Gender", "Status", "Last Visit"];
     const rows = items.map((p) => [
       p.name,
       p.phone,
@@ -111,7 +109,6 @@ const Patients = () => {
       p.gender,
       p.status,
       p.lastVisit,
-      p.doctor,
     ]);
 
     const csvContent =
@@ -242,9 +239,6 @@ const Patients = () => {
                         <th className="px-4 py-4 text-left font-semibold">
                           LAST VISIT
                         </th>
-                        <th className="px-4 py-4 text-left font-semibold">
-                          ASSIGNED DOCTOR
-                        </th>
                         <th className="px-8 py-4 text-right font-semibold">
                           ACTIONS
                         </th>
@@ -261,7 +255,6 @@ const Patients = () => {
                           gender={patient.gender}
                           status={patient.status}
                           lastVisit={patient.lastVisit}
-                          doctor={patient.doctor}
                         />
                       ))}
                     </tbody>
@@ -279,7 +272,6 @@ const Patients = () => {
                       gender={patient.gender}
                       status={patient.status}
                       lastVisit={patient.lastVisit}
-                      doctor={patient.doctor}
                     />
                   ))}
                 </div>

@@ -10,6 +10,10 @@ import type { RootState } from "@/store/store";
 import type { RecentPatient } from "@/interfaces/doctorInterfaces";
 import Patient from "@/components/Doctor/Dashboard/FirstDiv/Patient";
 import PatientQueueCard, { type PatientInQueue } from "./PatientQueueCard";
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { HiPlus } from "react-icons/hi";
+import { X } from "lucide-react";
 
 export interface DashboardAppointment {
   id: string | number;
@@ -36,39 +40,69 @@ const getResponseData = <T,>(responseData: unknown): T => {
 
 const AppointmentCard = ({
   appointment,
+  onConfirm,
+  isConfirming,
 }: {
   appointment: DashboardAppointment;
+  onConfirm: (id: string | number) => void;
+  isConfirming: boolean;
 }) => {
   const { doctorName, specialty, time, status } = appointment;
   const statusStyles = {
     confirmed: "bg-emerald-50 text-emerald-600 border-emerald-100",
+    Confirmed: "bg-emerald-50 text-emerald-600 border-emerald-100",
     pending: "bg-yellow-50 text-yellow-600 border-yellow-100",
+    Pending: "bg-yellow-50 text-yellow-600 border-yellow-100",
     completed: "bg-gray-100 text-gray-600 border-gray-200",
+    Completed: "bg-gray-100 text-gray-600 border-gray-200",
   };
 
   return (
-    <div className="flex bg-gray-50/50 dark:bg-gray-800/20 items-center justify-between p-4 rounded-2xl border border-(--color-border) hover:bg-gray-50 transition-colors group">
-      <div className="flex gap-4 items-center">
-        <div className="w-12 h-12 flex items-center justify-center bg-blue-50 text-blue-500 rounded-xl border border-blue-100 shadow-sm group-hover:bg-blue-500 group-hover:text-white transition-colors">
-          <BsCalendar3 size={18} />
-        </div>
-        <div>
-          <h3 className="text-sm font-bold text-(--color-text)">
-            Dr. {doctorName}
-          </h3>
-          <p className="text-xs text-(--color-text-light) font-medium">
-            {specialty}
-          </p>
-          <p className="text-[10px] text-(--color-text-light) font-medium mt-0.5">
-            {time}
-          </p>
-        </div>
-      </div>
-      <div
-        className={`px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${statusStyles[status]}`}
+    <div className="relative group">
+      <NavLink
+        to={`/receptionist/${appointment.id}/check-in`}
+        className="flex bg-gray-50/50 dark:bg-gray-800/20 items-center justify-between p-4 rounded-2xl border border-(--color-border) hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors cursor-pointer"
       >
-        {status}
-      </div>
+        <div className="flex gap-4 items-center">
+          <div className="w-12 h-12 flex items-center justify-center bg-blue-50 text-blue-500 rounded-xl border border-blue-100 shadow-sm group-hover:bg-blue-500 group-hover:text-white transition-colors">
+            <BsCalendar3 size={18} />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-(--color-text)">
+              Dr. {doctorName}
+            </h3>
+            <p className="text-xs text-(--color-text-light) font-medium">
+              {specialty}
+            </p>
+            <p className="text-[10px] text-(--color-text-light) font-medium mt-0.5">
+              {time}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          {status.toLowerCase() === "pending" && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onConfirm(appointment.id);
+              }}
+              disabled={isConfirming}
+              className="px-3 py-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-sm font-bold rounded-full transition-all shadow-sm shadow-green-100 cursor-pointer"
+            >
+              Confirm
+            </button>
+          )}
+          <div
+            className={`px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${
+              statusStyles[status as keyof typeof statusStyles] ||
+              statusStyles.pending
+            }`}
+          >
+            {status}
+          </div>
+        </div>
+      </NavLink>
     </div>
   );
 };
@@ -91,7 +125,7 @@ const FirstDiv = () => {
           await Promise.all([
             axios.get(`${backendUrl}Receptionist/patient-queue`, config),
             axios.get(`${backendUrl}Receptionist/today-appointments`, config),
-            axios.get(`${backendUrl}Doctors/recent-patients`, config),
+            axios.get(`${backendUrl}Receptionist/recent-patients`, config),
           ]);
 
         return {
@@ -105,6 +139,95 @@ const FirstDiv = () => {
         };
       },
     });
+  const queryClient = useQueryClient();
+
+  const [isQueueModalOpen, setIsQueueModalOpen] = useState(false);
+  const [appointmentIdInput, setAppointmentIdInput] = useState("");
+
+  const addToQueueMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await axios.post(
+        `${backendUrl}Receptionist/add-to-queue/${id}`,
+        {},
+        config,
+      );
+    },
+    onSuccess: () => {
+      toast.success("Patient added to queue successfully");
+      setIsQueueModalOpen(false);
+      setAppointmentIdInput("");
+      queryClient.invalidateQueries({
+        queryKey: ["ReceptionistDashboardFirstDiv"],
+      });
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || "Failed to add to queue");
+    },
+  });
+
+  const handleQueueSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!appointmentIdInput) {
+      toast.warning("Please enter an Appointment ID");
+      return;
+    }
+    addToQueueMutation.mutate(appointmentIdInput);
+  };
+
+  const confirmAppointmentMutation = useMutation({
+    mutationFn: async (id: string | number) => {
+      await axios.post(`${backendUrl}Receptionist/${id}/confirm`, {}, config);
+    },
+    onSuccess: () => {
+      toast.success("Appointment confirmed successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["ReceptionistDashboardFirstDiv"],
+      });
+    },
+    onError: (err: any) => {
+      toast.error(
+        err.response?.data?.message || "Failed to confirm appointment",
+      );
+    },
+  });
+
+  const startConsultationMutation = useMutation({
+    mutationFn: async (id: string | number) => {
+      await axios.post(`${backendUrl}Receptionist/start/${id}`, {}, config);
+    },
+    onSuccess: () => {
+      toast.success("Consultation started");
+      queryClient.invalidateQueries({
+        queryKey: ["ReceptionistDashboardFirstDiv"],
+      });
+    },
+    onError: (err: any) => {
+      toast.error(
+        err.response?.data?.message || "Failed to start consultation",
+      );
+    },
+  });
+
+  const completeConsultationMutation = useMutation({
+    mutationFn: async (id: string | number) => {
+      await axios.post(
+        `${backendUrl}Receptionist/complete`,
+        { appointmentId: Number(id) },
+        config,
+      );
+    },
+    onSuccess: () => {
+      toast.success("Consultation completed");
+      queryClient.invalidateQueries({
+        queryKey: ["ReceptionistDashboardFirstDiv"],
+      });
+    },
+    onError: (err: any) => {
+      toast.error(
+        err.response?.data?.message || "Failed to complete consultation",
+      );
+    },
+  });
 
   const patientQueue = data?.patientQueue || [];
   const todayAppointments = data?.todayAppointments || [];
@@ -132,14 +255,30 @@ const FirstDiv = () => {
           <h2 className="text-xl font-bold text-(--color-text)">
             Patient Queue
           </h2>
-          <span className="text-xs font-bold text-(--color-text-light) bg-gray-100 px-3 py-1 rounded-full">
-            {waitingPatients} waiting
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-bold text-(--color-text-light) bg-gray-100 px-3 py-1 rounded-full">
+              {waitingPatients} waiting
+            </span>
+            <button
+              onClick={() => setIsQueueModalOpen(true)}
+              className="p-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-md shadow-blue-100 active:scale-95 cursor-pointer"
+              title="Add to Queue"
+            >
+              <HiPlus size={18} />
+            </button>
+          </div>
         </div>
         <div className="flex flex-col gap-4">
           {patientQueue.length > 0 ? (
             patientQueue.map((patient) => (
-              <PatientQueueCard key={patient.id} patient={patient} />
+              <PatientQueueCard
+                key={patient.id}
+                patient={patient}
+                onStart={(id) => startConsultationMutation.mutate(id)}
+                isStarting={startConsultationMutation.isPending}
+                onComplete={(id) => completeConsultationMutation.mutate(id)}
+                isCompleting={completeConsultationMutation.isPending}
+              />
             ))
           ) : (
             <p className="text-(--color-text-light)">No patients in queue.</p>
@@ -163,7 +302,12 @@ const FirstDiv = () => {
         <div className="flex flex-col gap-4">
           {todayAppointments.length > 0 ? (
             todayAppointments.map((app) => (
-              <AppointmentCard key={app.id} appointment={app} />
+              <AppointmentCard
+                key={app.id}
+                appointment={app}
+                onConfirm={(id) => confirmAppointmentMutation.mutate(id)}
+                isConfirming={confirmAppointmentMutation.isPending}
+              />
             ))
           ) : (
             <p className="text-(--color-text-light)">
@@ -202,6 +346,52 @@ const FirstDiv = () => {
           )}
         </div>
       </div>
+      {/* Add to Queue Modal */}
+      {isQueueModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-(--color-surface) w-full max-w-sm rounded-2xl shadow-2xl border border-(--color-border) overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center p-6 border-b border-(--color-border)">
+              <h2 className="text-lg font-bold text-(--color-text)">
+                Add to Queue
+              </h2>
+              <button
+                onClick={() => setIsQueueModalOpen(false)}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+              >
+                <X size={20} className="text-(--color-text-light)" />
+              </button>
+            </div>
+
+            <form onSubmit={handleQueueSubmit} className="p-6 space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-(--color-text-light)">
+                  Select Patient <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={appointmentIdInput}
+                  onChange={(e) => setAppointmentIdInput(e.target.value)}
+                  className="w-full bg-gray-50/50 dark:bg-gray-800/20 border border-(--color-border) rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-(--color-text) appearance-none"
+                >
+                  <option value="">Choose a patient...</option>
+                  {recentPatients.map((patient) => (
+                    <option key={patient.id} value={patient.id}>
+                      {patient.name} (ID: {patient.id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <button
+                type="submit"
+                disabled={addToQueueMutation.isPending}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white py-3 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-[0.98] cursor-pointer"
+              >
+                {addToQueueMutation.isPending ? "Adding..." : "Add Patient"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

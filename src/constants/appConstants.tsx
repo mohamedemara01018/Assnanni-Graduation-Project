@@ -125,7 +125,7 @@ export const routeElements = {
   // Receptionist routes
   "/receptionist": <ReceptionistDashboard />,
   "/receptionist/schedule-appointment": <ScheduleAppointment />,
-  "/receptionist/check-in": <CheckIn />,
+  "/receptionist/:id/check-in": <CheckIn />,
   "/receptionist/reschedule/:id": <RescheduleAppointment />,
   "/receptionist/register-patient": <RegisterPatient />,
 

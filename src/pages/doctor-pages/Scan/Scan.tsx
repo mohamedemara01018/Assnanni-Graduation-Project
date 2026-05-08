@@ -41,20 +41,20 @@ const Scan = () => {
   const { data: recentPatientsData, isLoading: isLoadingPatients } = useQuery({
     queryKey: ["RecentPatients"],
     queryFn: async () => {
-      const response = await axios.get(`${backendUrl}Doctors/recent-patients`, {
+      const response = await axios.get(`${backendUrl}Doctors/patients`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response.data.data);
+
       return response.data;
     },
   });
 
-  const recentPatients = Array.isArray(recentPatientsData?.data)
-    ? recentPatientsData.data
+  const recentPatients = Array.isArray(recentPatientsData?.data.items)
+    ? recentPatientsData?.data.items
     : [];
-  console.log(recentPatients);
+
   // Post Scan Mutation
   const scanMutation = useMutation({
     mutationFn: async (formData: FormData) => {

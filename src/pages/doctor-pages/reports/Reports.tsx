@@ -1,7 +1,6 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import Center from "../../../components/Doctor/Reports/Center";
 import Insights from "../../../components/Doctor/Reports/Insights";
-import GenerateReport from "../../../components/Doctor/Reports/GenerateReport";
 
 const Reports = () => {
   return (
@@ -15,10 +14,9 @@ const Reports = () => {
             View system insights and generate reports
           </p>
         </div>
-        
+
         <Insights />
         <Center />
-        <GenerateReport />
       </div>
     </DashboardLayout>
   );

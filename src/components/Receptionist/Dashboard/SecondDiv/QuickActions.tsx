@@ -9,7 +9,7 @@ const QuickActions = () => {
       subTitle: "Add to system",
       icon: <IoMdPersonAdd />,
       color: "blue",
-      path: "/register/patient-register",
+      path: "receptionist/register-patient",
       bg: "bg-blue-50/50",
       iconBg: "bg-blue-600",
       textColor: "text-blue-800",

@@ -86,13 +86,9 @@ function LoginForm() {
           )}
         </div>
 
-        <div className="flex justify-between">
-          <div className="flex gap-2">
-            <input type="checkbox" name="check" id="check" />
-            <label htmlFor="check">Remember me</label>
-          </div>
+        <div className="flex justify-center my-1">
           <NavLink to={"/password-reset"} className={"text-(--color-primary)"}>
-            Forgot password?
+            Forgot Password?
           </NavLink>
         </div>
         <div>

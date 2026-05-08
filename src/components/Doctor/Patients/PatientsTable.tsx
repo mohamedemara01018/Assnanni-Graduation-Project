@@ -10,7 +10,6 @@ interface Props {
   gender: "Male" | "Female";
   status: "Active" | "Inactive" | "Pending";
   lastVisit: string;
-  doctor: string;
 }
 
 const PatientsTable = ({
@@ -21,7 +20,6 @@ const PatientsTable = ({
   gender,
   status,
   lastVisit,
-  doctor,
 }: Props) => {
   return (
     <tr className="group hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-colors">
@@ -65,12 +63,6 @@ const PatientsTable = ({
         </span>
       </td>
 
-      <td className="px-4 py-5">
-        <span className="text-sm font-medium text-(--color-text)">
-          {doctor}
-        </span>
-      </td>
-
       <td className="px-8 py-5">
         <div className="flex justify-end gap-4 items-center">
           <NavLink
@@ -80,13 +72,22 @@ const PatientsTable = ({
           >
             <IoEyeOutline className="text-xl" />
           </NavLink>
-          <NavLink
-            to={`/doctor-patients/${id}/medical-history`}
-            className="p-1.5 text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors cursor-pointer"
-            title="Medical History"
-          >
-            <BsFileMedical className="text-xl" />
-          </NavLink>
+          {lastVisit ? (
+            <NavLink
+              to={`/doctor-patients/${id}/medical-history`}
+              className="p-1.5 text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors cursor-pointer"
+              title="Medical History"
+            >
+              <BsFileMedical className="text-xl" />
+            </NavLink>
+          ) : (
+            <div
+              className="p-1.5 text-gray-300 cursor-not-allowed"
+              title="Access Restricted: No visit history for this patient"
+            >
+              <BsFileMedical className="text-xl" />
+            </div>
+          )}
         </div>
       </td>
     </tr>
