@@ -59,6 +59,10 @@ export const sharedRoutePaths = [
     allowedRoles: ["doctor", "patient", "receptionist", "studentDoctor"],
   },
   {
+    path: "profile",
+    allowedRoles: ["doctor", "patient", "receptionist", "studentDoctor", "admin"],
+  },
+  {
     path: "student-settings",
     allowedRoles: ["studentDoctor"],
     children: ["", "security", "notifications"],

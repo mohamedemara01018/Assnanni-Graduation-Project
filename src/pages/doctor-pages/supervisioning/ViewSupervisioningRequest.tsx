@@ -1,14 +1,57 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import { studentDoctors } from "@/constants/doctorConstants";
 import { FiFileText } from "react-icons/fi";
 import { LuUpload } from "react-icons/lu";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import Cookies from "js-cookie";
+import { ScaleLoader } from "react-spinners";
+
+interface StudentDoctorRequest {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  university: string;
+  year: string;
+  supervisor: string | null;
+  status: string;
+  dentalUniversityProofImage: string | null;
+}
+
+interface RequestResponse {
+  succeeded: boolean;
+  message: string;
+  data: StudentDoctorRequest;
+}
 
 const ViewSupervisioningRequest = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const student = studentDoctors.find((s) => s.id === parseInt(id || "0"));
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
+  const token = Cookies.get("jwtToken");
+
+  const { data: responseData, isLoading, error } = useQuery<RequestResponse>({
+    queryKey: ["supervising-request", id],
+    queryFn: async () => {
+      const response = await axios.get(`${backendUrl}Doctors/supervising-requests/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    },
+    enabled: !!id && !!token && !!backendUrl,
+  });
+
+  if (error) {
+    toast.error("Failed to load request details");
+  }
+
+  const student = responseData?.data;
 
   return (
     <DashboardLayout pageTitle="View Supervisioning Request">
@@ -26,10 +69,15 @@ const ViewSupervisioningRequest = () => {
             </p>
           </div>
 
-          {!student ? (
+          {isLoading ? (
+            <div className="py-20 flex flex-col items-center justify-center gap-4">
+              <ScaleLoader color="#00AFE5" />
+              <p className="text-(--color-text-light) font-medium">Loading request details...</p>
+            </div>
+          ) : !student ? (
             <div className="rounded-xl border border-(--color-border) bg-(--color-bg) p-5">
               <p className="text-sm text-(--color-text-light)">
-                No student doctor selected. Please go back and choose a request.
+                No student doctor found or request details unavailable.
               </p>
             </div>
           ) : (
@@ -63,12 +111,24 @@ const ViewSupervisioningRequest = () => {
                     {student.year}
                   </p>
                 </div>
+                <div className="rounded-xl border border-(--color-border) bg-(--color-bg) p-4">
+                  <p className="text-xs text-(--color-text-light)">Email</p>
+                  <p className="text-sm font-medium text-(--color-text)">
+                    {student.email}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-(--color-border) bg-(--color-bg) p-4">
+                  <p className="text-xs text-(--color-text-light)">Phone Number</p>
+                  <p className="text-sm font-medium text-(--color-text)">
+                    {student.phoneNumber}
+                  </p>
+                </div>
                 <div className="rounded-xl border border-(--color-border) bg-(--color-bg) p-4 sm:col-span-2">
                   <p className="text-xs text-(--color-text-light)">
                     Current Supervisor
                   </p>
                   <p className="text-sm font-medium text-(--color-text)">
-                    {student.supervisor}
+                    {student.supervisor || "None"}
                   </p>
                 </div>
               </div>
@@ -109,30 +169,32 @@ const ViewSupervisioningRequest = () => {
             </div>
           )}
 
-          <div className="mt-6 flex flex-col gap-3 rounded-xl border border-(--color-border) bg-(--color-bg) p-4 sm:flex-row sm:items-center sm:justify-end">
-            <button
-              type="button"
-              disabled={!student}
-              onClick={() => {
-                toast.success("Supervisioning request approved");
-                navigate("/doctor-supervisioning");
-              }}
-              className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-600/20 transition-all hover:-translate-y-0.5 hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Approve
-            </button>
-            <button
-              type="button"
-              disabled={!student}
-              onClick={() => {
-                toast.info("Supervisioning request declined");
-                navigate("/doctor-supervisioning");
-              }}
-              className="rounded-xl border border-red-300 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700 transition-all hover:-translate-y-0.5 hover:bg-red-100 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              Decline
-            </button>
-          </div>
+          {student && (
+            <div className="mt-6 flex flex-col gap-3 rounded-xl border border-(--color-border) bg-(--color-bg) p-4 sm:flex-row sm:items-center sm:justify-end">
+              <button
+                type="button"
+                disabled={isLoading}
+                onClick={() => {
+                  toast.success("Supervisioning request approved");
+                  navigate("/doctor-supervisioning");
+                }}
+                className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-600/20 transition-all hover:-translate-y-0.5 hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Approve
+              </button>
+              <button
+                type="button"
+                disabled={isLoading}
+                onClick={() => {
+                  toast.info("Supervisioning request declined");
+                  navigate("/doctor-supervisioning");
+                }}
+                className="rounded-xl border border-red-300 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700 transition-all hover:-translate-y-0.5 hover:bg-red-100 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Decline
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>
@@ -140,3 +202,4 @@ const ViewSupervisioningRequest = () => {
 };
 
 export default ViewSupervisioningRequest;
+

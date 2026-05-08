@@ -42,7 +42,7 @@ function UserComp() {
                     ></div>
                     <div className="absolute z-40 right-0 mt-3 py-1 bg-(--color-surface) shadow-lg  w-48 rounded-sm border-2 border-(--color-border)">
                         <Link
-                            to={"/patient-profile/1"}
+                            to={"/profile"}
                             className="flex items-center gap-2 hover:bg-(--color-bg-link-hover) px-4 py-2 text-md font-medium text-(--color-text)  cursor-pointer "
                         >
                             <CiUser className="w-4 h-4 text-(--color-text)" />

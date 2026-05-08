@@ -13,15 +13,24 @@ import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-import { defaultDashboardData } from "@/constants/doctorConstants";
+import { MdOutlineVpnKey } from "react-icons/md";
 
-type DashboardOverview = typeof defaultDashboardData & {
-  raw?: Record<string, unknown>;
+type DashboardOverview = {
+  todayAppointments: number;
+  totalPatients: number;
+  pendingScans: number;
+  superVisingNumber: string;
+  satisfactionRate: number;
+  raw?: any;
 };
 
 const defaultDashboardOverview: DashboardOverview = {
-  ...defaultDashboardData,
-  raw: defaultDashboardData,
+  todayAppointments: 0,
+  totalPatients: 0,
+  pendingScans: 0,
+  superVisingNumber: "N/A",
+  satisfactionRate: 0,
+  raw: null,
 };
 
 const DoctorDashboard = () => {
@@ -41,17 +50,15 @@ const DoctorDashboard = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      const data = response.data?.data || response.data?.value || response.data;
+      const data = response.data?.data || response.data;
 
       if (data) {
         return {
-          todayAppointments:
-            data.todayAppointments ?? defaultDashboardData.todayAppointments,
-          totalPatients:
-            data.totalPatients ?? defaultDashboardData.totalPatients,
-          pendingScans: data.pendingScans ?? defaultDashboardData.pendingScans,
-          satisfactionRate:
-            data.satisfactionRate ?? defaultDashboardData.satisfactionRate,
+          todayAppointments: data.todayAppointments ?? 0,
+          totalPatients: data.totalPatients ?? 0,
+          pendingScans: data.pendingScans ?? 0,
+          superVisingNumber: data.superVisingNumber ?? "N/A",
+          satisfactionRate: data.satisfactionRate ?? 0,
           raw: data,
         };
       }
@@ -76,7 +83,7 @@ const DoctorDashboard = () => {
           Here's your practice overview for today
         </p>
         <div className=" dark:bg-(--color-bg) rounded-2xl py-4 pt-0 px-6 flex flex-col gap-6">
-          <div className="grid grid-rows-1 grid-cols-4 max-lg:grid-rows-2 max-lg:grid-cols-2 max-sm:grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
             <DashboardCard
               title="Appointments"
               subTitle="Today"
@@ -86,24 +93,31 @@ const DoctorDashboard = () => {
             />
             <DashboardCard
               title="Total Patients"
-              subTitle="+12%"
+              subTitle="Growth"
               num={dashboardData.totalPatients.toString()}
               logo={<MdPeople />}
               color="green"
             />
             <DashboardCard
               title="Pending Scans"
-              subTitle="Pending"
+              subTitle="Action Required"
               num={dashboardData.pendingScans.toString()}
               logo={<LuFileSpreadsheet />}
               color="yellow"
             />
             <DashboardCard
-              title="Satisfaction Rate"
-              subTitle={`${dashboardData.satisfactionRate}%`}
+              title="Satisfaction"
+              subTitle="Rate"
               num={`${dashboardData.satisfactionRate}%`}
               logo={<GoPulse />}
               color="violet"
+            />
+            <DashboardCard
+              title="Supervising ID"
+              subTitle="Identity"
+              num={dashboardData.superVisingNumber}
+              logo={<MdOutlineVpnKey />}
+              color="orange"
             />
           </div>
           <div className="flex gap-6 max-md:flex-col">

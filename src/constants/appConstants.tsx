@@ -45,6 +45,7 @@ import DoctorProfilePage from "../pages/doctor-profile-page/DoctorProfilePage";
 import AppointmentsBookingPage from "../pages/appointments-booking-page/AppointmentsBookingPage";
 import PatientProfilePage from "../pages/patient-profile-page/PatientProfilePage";
 import EditPatientProfilePage from "../pages/edit-patient-profile-page/EditPatientProfilePage";
+import ProfilePage from "../pages/profile-page/ProfilePage";
 
 // ProtectedRoute component for role-based access control
 export const ProtectedRoute = ({
@@ -142,4 +143,5 @@ export const routeElements = {
   "/appointments/booking/:id": <AppointmentsBookingPage />,
   "/patient-profile/:id": <PatientProfilePage />,
   "/patient-profile/edit/:id": <EditPatientProfilePage />,
+  profile: <ProfilePage />,
 };
