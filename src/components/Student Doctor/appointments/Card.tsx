@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 interface Props {
   title: "Total Appointments" | "Upcoming" | "Completed" | "Cancelled";
-  num: number;
+  num: string | number;
   logo: ReactNode;
   color: "blue" | "violet" | "green" | "red";
 }
