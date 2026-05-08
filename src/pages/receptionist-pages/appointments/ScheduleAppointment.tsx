@@ -308,7 +308,7 @@ const ScheduleAppointment = () => {
               <button
                 type="button"
                 onClick={() => handlePaymentChange("cash")}
-                className={`flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all ${
+                className={`flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all  cursor-pointer ${
                   formValues.paymentMethod === "cash"
                     ? "border-blue-500 bg-blue-50/30 text-blue-600 shadow-md"
                     : "border-(--color-border) hover:border-gray-300 bg-gray-50/30"
@@ -320,13 +320,13 @@ const ScheduleAppointment = () => {
               <button
                 type="button"
                 onClick={() => handlePaymentChange("online")}
-                className={`flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all ${
+                className={`flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all  cursor-pointer ${
                   formValues.paymentMethod === "online"
                     ? "border-blue-500 bg-blue-50/30 text-blue-600 shadow-md"
                     : "border-(--color-border) hover:border-gray-300 bg-gray-50/30"
                 }`}
               >
-                <BsCreditCard className="text-2xl mb-2" />
+                <BsCreditCard className="text-2xl mb-2 " />
                 <span className="font-bold">Online Payment</span>
               </button>
             </div>
@@ -341,24 +341,6 @@ const ScheduleAppointment = () => {
                 Payment will be collected at the clinic
               </p>
             )}
-
-            <div className="mt-6">
-              <label className="block text-sm font-bold text-(--color-text) mb-2">
-                Consultation Fee <span className="text-red-500">*</span>
-              </label>
-              <input
-                {...register("fee", {
-                  required: "Consultation fee is required",
-                  min: { value: 0, message: "Fee cannot be negative" },
-                  valueAsNumber: true,
-                })}
-                type="number"
-                min="0"
-                placeholder="180"
-                className={inputClass(!!errors.fee)}
-              />
-              {errors.fee && <p className={errorClass}>{errors.fee.message}</p>}
-            </div>
           </div>
 
           <div className="bg-blue-50/50 dark:bg-blue-900/10 p-8 rounded-2xl border border-blue-100 dark:border-blue-900/30">
@@ -419,18 +401,10 @@ const ScheduleAppointment = () => {
                 <span className="text-blue-700/70 dark:text-blue-400/70">
                   Payment Method:
                 </span>
-                <span className="font-bold text-blue-900 dark:text-blue-300">
+                <span className="font-bold text-blue-900 dark:text-blue-300 ">
                   {formValues.paymentMethod === "cash"
                     ? "Cash"
                     : "Online Payment"}
-                </span>
-              </div>
-              <div className="pt-3 mt-3 border-t border-blue-200 dark:border-blue-800 flex justify-between text-sm">
-                <span className="text-blue-700 dark:text-blue-400 font-bold">
-                  Consultation Fee:
-                </span>
-                <span className="font-bold text-blue-900 dark:text-blue-300">
-                  ${formValues.fee || 0}
                 </span>
               </div>
             </div>

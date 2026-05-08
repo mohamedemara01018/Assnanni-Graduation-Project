@@ -176,6 +176,19 @@ const initialPanelData: WeeklySchedulePanelData = {
   ),
 };
 
+const formatTimeTo12Hour = (time: string) => {
+  if (!time || time === "N/A") return "N/A";
+  try {
+    const [hours, minutes] = time.split(":").map(Number);
+    if (isNaN(hours) || isNaN(minutes)) return time;
+    const ampm = hours >= 12 ? "PM" : "AM";
+    const formattedHours = hours % 12 || 12;
+    return `${formattedHours}:${minutes.toString().padStart(2, "0")} ${ampm}`;
+  } catch {
+    return time;
+  }
+};
+
 const WeeklySchedulePanel = () => {
   const queryClient = useQueryClient();
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
@@ -616,34 +629,28 @@ const WeeklySchedulePanel = () => {
                   No slots added yet — use the form to add one.
                 </p>
               ) : (
-                <div className="flex flex-col gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                   {day.slots.map((slot) => (
                     <div
                       key={slot.id}
-                      className="flex items-center justify-between rounded-lg border border-(--color-border) px-3 py-2.5 bg-(--color-bg) group hover:border-(--color-primary)/40 transition-colors duration-150"
+                      className="flex flex-col gap-3 rounded-xl border border-(--color-border) p-4 bg-(--color-bg) group hover:border-(--color-primary)/40 transition-all duration-200 hover:shadow-md"
                     >
                       {/* Time range */}
-                      <div className="flex items-center gap-2">
-                        <ClockIcon />
-                        <span className="text-sm font-medium text-(--color-text)">
-                          {slot.start} – {slot.end}
-                        </span>
-                        <span className="text-xs text-(--color-text-light)">
-                          ({slot.duration})
-                        </span>
-                      </div>
-
-                      {/* Status badge + delete */}
-                      <div className="flex items-center gap-3">
-                        <span
-                          className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
-                            slot.available
-                              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400"
-                          }`}
-                        >
-                          {slot.available ? "Available" : "Unavailable"}
-                        </span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-lg bg-(--color-primary-lighter) text-(--color-primary)">
+                            <ClockIcon />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-(--color-text)">
+                              {formatTimeTo12Hour(slot.start)} –{" "}
+                              {formatTimeTo12Hour(slot.end)}
+                            </span>
+                            <span className="text-[10px] text-(--color-text-light) font-medium">
+                              {slot.duration} session
+                            </span>
+                          </div>
+                        </div>
                         <button
                           onClick={() =>
                             slot.available
@@ -653,10 +660,10 @@ const WeeklySchedulePanel = () => {
                                   slotId: slot.id,
                                 })
                           }
-                          className={`text-(--color-text-light) transition-colors duration-150 cursor-pointer p-1 rounded opacity-0 group-hover:opacity-100 ${
+                          className={`text-(--color-text-light) transition-all duration-150 cursor-pointer p-2 rounded-lg ${
                             slot.available
-                              ? "hover:text-red-500"
-                              : "hover:text-green-500"
+                              ? "hover:bg-red-50 hover:text-red-500"
+                              : "hover:bg-green-50 hover:text-green-500"
                           }`}
                           aria-label={
                             slot.available ? "Delete slot" : "Restore slot"
@@ -664,6 +671,17 @@ const WeeklySchedulePanel = () => {
                         >
                           {slot.available ? <TrashIcon /> : <RestoreIcon />}
                         </button>
+                      </div>
+
+                      {/* Status badge */}
+                      <div
+                        className={`text-center py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${
+                          slot.available
+                            ? "bg-green-50 text-green-600 border-green-100 dark:bg-green-900/10"
+                            : "bg-red-50 text-red-600 border-red-100 dark:bg-red-900/10"
+                        }`}
+                      >
+                        {slot.available ? "Available" : "Unavailable"}
                       </div>
                     </div>
                   ))}
