@@ -2,10 +2,14 @@ import { useEffect, useState, type ChangeEvent } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { FiFileText } from "react-icons/fi";
 import { LuUpload } from "react-icons/lu";
+import { IoPersonCircleOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
 
-// import axios from "axios";
+import axios from "axios";
 import { useLocation, useNavigate } from "react-router";
+import { useSelector } from "react-redux";
+import { useMutation } from "@tanstack/react-query";
+import type { RootState } from "@/store/store";
 
 interface Inputs {
   MedicalLicenseNumber: string;
@@ -15,17 +19,16 @@ interface Inputs {
   ClinicAddress: string;
   ClinicPhone: string;
   Certificate: FileList;
-  nationalIdNumber: string;
-  yearsOfStudy: number;
-  supervisorDoctor: string;
-  supervisorDoctorClinicName: string;
-  supervisorDoctorClinicAddress: string;
-  supervisorDoctorClinicPhone: string;
-  DentalUniversityProof: FileList;
+  Email: string;
+  YearsOfStudy: number;
+  University: string;
+  SupervisingNumber: string;
+  CertificateFile: FileList;
+  Image: FileList;
 }
 
 function VerifyDoctorPage() {
-  // API base: useSelector((s: RootState) => s.config.backendUrl) + 'Authentications/'
+  const authBase = useSelector((s: RootState) => s.config.backendUrl);
 
   const navigator = useNavigate();
   const { state } = useLocation();
@@ -37,8 +40,27 @@ function VerifyDoctorPage() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<Inputs>();
+
+  const profileImageFile = watch("Image");
+  const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
+    null,
+  );
+
+  useEffect(() => {
+    const selectedImage = profileImageFile?.[0];
+    if (!selectedImage) {
+      setProfileImagePreview(null);
+      return;
+    }
+
+    const imageUrl = URL.createObjectURL(selectedImage);
+    setProfileImagePreview(imageUrl);
+
+    return () => URL.revokeObjectURL(imageUrl);
+  }, [profileImageFile]);
 
   const labelClass =
     "mb-1 inline-block text-sm font-medium text-(--color-text)";
@@ -66,23 +88,79 @@ function VerifyDoctorPage() {
     };
   }, [imagePreviewUrl]);
 
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    if (isStudentDoctor) {
-      data.yearsOfStudy = Number(data.yearsOfStudy);
-    } else {
-      data.YearsOfExperience = Number(data.YearsOfExperience);
-    }
-    try {
-      // await axios.post(authBase + "Submit-Doctor-Verification", data);
+  const verifyMutation = useMutation({
+    mutationFn: async (data: Inputs) => {
+      if (isStudentDoctor) {
+        data.YearsOfStudy = Number(data.YearsOfStudy);
+
+        const formData = new FormData();
+        formData.append("Email", data.Email);
+        formData.append("NationalId", data.NationalId);
+        formData.append("YearsOfStudy", data.YearsOfStudy.toString());
+        formData.append("University", data.University);
+        formData.append("SupervisingNumber", data.SupervisingNumber);
+
+        if (data.CertificateFile?.[0]) {
+          formData.append("CertificateFile", data.CertificateFile[0]);
+        }
+        if (data.Image?.[0]) {
+          formData.append("Image", data.Image[0]);
+        }
+        console.log(data);
+        return axios.post(
+          authBase + "StudentDoctor/complete-profile",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          },
+        );
+      } else {
+        const formData = new FormData();
+        formData.append("MedicalLicenseNumber", data.MedicalLicenseNumber);
+        formData.append("NationalId", data.NationalId);
+        formData.append("YearsOfExperience", Number(data.YearsOfExperience).toString());
+        formData.append("ClinicName", data.ClinicName);
+        formData.append("ClinicAddress", data.ClinicAddress);
+        formData.append("ClinicPhone", data.ClinicPhone);
+
+        if (data.Certificate?.[0]) {
+          formData.append("Certificate", data.Certificate[0]);
+        }
+
+        return axios.post(
+          authBase + "Authentications/Submit-Doctor-Verification",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          },
+        );
+      }
+    },
+    onSuccess: () => {
       navigator("/verify-email");
       toast.success(
         "You have successfully send the request wait until the admin accept it",
       );
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
+    },
+    onError: (error: any) => {
       console.log(error);
-      toast.error(error.message);
-    }
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data ||
+        error.message ||
+        "Verification failed";
+      toast.error(
+        typeof errorMessage === "string" ? errorMessage : "Verification failed",
+      );
+    },
+  });
+
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    verifyMutation.mutate(data);
   };
 
   return (
@@ -236,31 +314,89 @@ function VerifyDoctorPage() {
             </>
           ) : (
             <>
+              <div className="flex flex-col items-center gap-3 py-4">
+                <label htmlFor="studentImage" className="cursor-pointer">
+                  {profileImagePreview ? (
+                    <img
+                      src={profileImagePreview}
+                      alt="Selected profile preview"
+                      className="h-28 w-28 rounded-full object-cover ring-2 ring-[#00AFE5]/40"
+                    />
+                  ) : (
+                    <div className="flex h-28 w-28 items-center justify-center rounded-full border-2 border-dashed border-[#00AFE5]/50 bg-[#00AFE5]/10">
+                      <IoPersonCircleOutline className="text-6xl text-[#00AFE5]" />
+                    </div>
+                  )}
+                </label>
+                <input
+                  id="studentImage"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  {...register("Image", {
+                    required: "Profile image is required",
+                  })}
+                />
+                <label
+                  htmlFor="studentImage"
+                  className="cursor-pointer rounded-full bg-[#00AFE5] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
+                >
+                  {profileImagePreview
+                    ? "Change profile image"
+                    : "Upload profile image"}
+                </label>
+                {!errors.Image && (
+                  <p className="text-xs text-gray-500">
+                    JPG, PNG, WEBP supported
+                  </p>
+                )}
+                {errors.Image && (
+                  <p className="text-xs text-red-600">
+                    {errors.Image.message as string}
+                  </p>
+                )}
+              </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label
-                    htmlFor="studentNationalIdNumber"
-                    className={labelClass}
-                  >
+                  <label htmlFor="email" className={labelClass}>
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    placeholder="john@example.com"
+                    className={`${inputClass} ${
+                      errors.Email && "border-red-500"
+                    }`}
+                    {...register("Email", {
+                      required: "You must provide your email",
+                    })}
+                  />
+                  {errors.Email && (
+                    <p className={errorClass}>{errors.Email.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="nationalId" className={labelClass}>
                     National ID Number
                   </label>
                   <input
-                    id="studentNationalIdNumber"
+                    id="nationalId"
                     type="text"
                     placeholder="123-45-6789"
                     className={`${inputClass} ${
-                      errors.nationalIdNumber && "border-red-500"
+                      errors.NationalId && "border-red-500"
                     }`}
-                    {...register("nationalIdNumber", {
+                    {...register("NationalId", {
                       required: "You must provide your National ID Number",
                     })}
                   />
-                  {errors.nationalIdNumber && (
-                    <p className={errorClass}>
-                      {errors.nationalIdNumber.message}
-                    </p>
+                  {errors.NationalId && (
+                    <p className={errorClass}>{errors.NationalId.message}</p>
                   )}
                 </div>
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="yearsOfStudy" className={labelClass}>
                     Years of Study
@@ -270,113 +406,55 @@ function VerifyDoctorPage() {
                     type="number"
                     placeholder="4"
                     className={`${inputClass} ${
-                      errors.yearsOfStudy && "border-red-500"
+                      errors.YearsOfStudy && "border-red-500"
                     }`}
-                    {...register("yearsOfStudy", {
+                    {...register("YearsOfStudy", {
                       required: "You must provide your years of study",
                     })}
                   />
-                  {errors.yearsOfStudy && (
-                    <p className={errorClass}>{errors.yearsOfStudy.message}</p>
+                  {errors.YearsOfStudy && (
+                    <p className={errorClass}>{errors.YearsOfStudy.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="university" className={labelClass}>
+                    University
+                  </label>
+                  <input
+                    id="university"
+                    type="text"
+                    placeholder="Cairo University"
+                    className={`${inputClass} ${
+                      errors.University && "border-red-500"
+                    }`}
+                    {...register("University", {
+                      required: "You must provide your university",
+                    })}
+                  />
+                  {errors.University && (
+                    <p className={errorClass}>{errors.University.message}</p>
                   )}
                 </div>
               </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="supervisorDoctor" className={labelClass}>
-                    Supervisor Doctor
+                  <label htmlFor="supervisingNumber" className={labelClass}>
+                    Supervising Number
                   </label>
                   <input
-                    id="supervisorDoctor"
+                    id="supervisingNumber"
                     type="text"
-                    placeholder="Dr. Ahmed Ali"
+                    placeholder="SUP-12345"
                     className={`${inputClass} ${
-                      errors.supervisorDoctor && "border-red-500"
+                      errors.SupervisingNumber && "border-red-500"
                     }`}
-                    {...register("supervisorDoctor", {
-                      required: "You must provide the supervisor doctor",
+                    {...register("SupervisingNumber", {
+                      required: "You must provide the supervising number",
                     })}
                   />
-                  {errors.supervisorDoctor && (
+                  {errors.SupervisingNumber && (
                     <p className={errorClass}>
-                      {errors.supervisorDoctor.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label
-                    htmlFor="supervisorDoctorClinicName"
-                    className={labelClass}
-                  >
-                    Supervisor Doctor Clinic Name
-                  </label>
-                  <input
-                    id="supervisorDoctorClinicName"
-                    type="text"
-                    placeholder="Assnani Clinic"
-                    className={`${inputClass} ${
-                      errors.supervisorDoctorClinicName && "border-red-500"
-                    }`}
-                    {...register("supervisorDoctorClinicName", {
-                      required:
-                        "You must provide supervisor doctor clinic name",
-                    })}
-                  />
-                  {errors.supervisorDoctorClinicName && (
-                    <p className={errorClass}>
-                      {errors.supervisorDoctorClinicName.message}
-                    </p>
-                  )}
-                </div>
-              </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="supervisorDoctorClinicAddress"
-                    className={labelClass}
-                  >
-                    Supervisor Doctor Clinic Address
-                  </label>
-                  <input
-                    id="supervisorDoctorClinicAddress"
-                    type="text"
-                    placeholder="Street, City, Area"
-                    className={`${inputClass} ${
-                      errors.supervisorDoctorClinicAddress && "border-red-500"
-                    }`}
-                    {...register("supervisorDoctorClinicAddress", {
-                      required:
-                        "You must provide supervisor doctor clinic address",
-                    })}
-                  />
-                  {errors.supervisorDoctorClinicAddress && (
-                    <p className={errorClass}>
-                      {errors.supervisorDoctorClinicAddress.message}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label
-                    htmlFor="supervisorDoctorClinicPhone"
-                    className={labelClass}
-                  >
-                    Supervisor Doctor Clinic Phone
-                  </label>
-                  <input
-                    id="supervisorDoctorClinicPhone"
-                    type="text"
-                    placeholder="01003010"
-                    className={`${inputClass} ${
-                      errors.supervisorDoctorClinicPhone && "border-red-500"
-                    }`}
-                    {...register("supervisorDoctorClinicPhone", {
-                      required:
-                        "You must provide supervisor doctor clinic phone",
-                    })}
-                  />
-                  {errors.supervisorDoctorClinicPhone && (
-                    <p className={errorClass}>
-                      {errors.supervisorDoctorClinicPhone.message}
+                      {errors.SupervisingNumber.message}
                     </p>
                   )}
                 </div>
@@ -396,7 +474,7 @@ function VerifyDoctorPage() {
                 id="file"
                 className="hidden"
                 {...register(
-                  isStudentDoctor ? "DentalUniversityProof" : "Certificate",
+                  isStudentDoctor ? "CertificateFile" : "Certificate",
                   {
                     required: isStudentDoctor
                       ? "You must provide your dental university proof"
@@ -449,10 +527,9 @@ function VerifyDoctorPage() {
                 </div>
               )}
             </div>
-            {(errors.Certificate || errors.DentalUniversityProof) && (
+            {(errors.Certificate || errors.CertificateFile) && (
               <p className={errorClass}>
-                {errors.Certificate?.message ||
-                  errors.DentalUniversityProof?.message}
+                {errors.Certificate?.message || errors.CertificateFile?.message}
               </p>
             )}
           </div>
@@ -464,8 +541,13 @@ function VerifyDoctorPage() {
             </p>
           </div>
           <div className="w-full">
-            <button className="w-full cursor-pointer rounded-xl bg-[#00AFE5] p-3.5 text-base font-semibold text-white transition-colors hover:bg-blue-500">
-              Submit for Verification
+            <button
+              disabled={verifyMutation.isPending}
+              className="w-full cursor-pointer rounded-xl bg-[#00AFE5] p-3.5 text-base font-semibold text-white transition-colors hover:bg-blue-500 disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {verifyMutation.isPending
+                ? "Submitting..."
+                : "Submit for Verification"}
             </button>
           </div>
         </form>

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import { MdOutlineManageAccounts } from "react-icons/md";
 import { useNavigate } from "react-router";
@@ -10,11 +11,11 @@ import { toast } from "react-toastify";
 import { ScaleLoader } from "react-spinners";
 
 interface StudentDoctor {
-  id: number;
-  name: string;
+  studentDoctorId: number;
+  studentName: string;
   university: string;
-  year: string;
-  supervisor: string;
+  yearsOfStudy: number;
+  nationalId: string;
   status: string;
 }
 
@@ -46,9 +47,11 @@ const ManageSupervisioning = () => {
     enabled: !!token && !!backendUrl,
   });
 
-  if (error) {
-    toast.error("Failed to load student doctors");
-  }
+  useEffect(() => {
+    if (error) {
+      toast.error("Failed to load student doctors");
+    }
+  }, [error]);
 
   const studentDoctors = responseData?.data || [];
 
@@ -74,7 +77,7 @@ const ManageSupervisioning = () => {
             <p className="col-span-3">Student Doctor</p>
             <p className="col-span-3">University</p>
             <p className="col-span-2">Academic Year</p>
-            <p className="col-span-2">Supervisor</p>
+            <p className="col-span-2">National ID</p>
             <p className="col-span-2 text-right">Actions</p>
           </div>
 
@@ -89,12 +92,12 @@ const ManageSupervisioning = () => {
           ) : (
             studentDoctors.map((student) => (
               <div
-                key={student.id}
+                key={student.studentDoctorId}
                 className="grid grid-cols-12 items-center gap-2 border-b border-(--color-border) px-4 py-4 last:border-b-0"
               >
                 <div className="col-span-3">
                   <p className="font-medium text-(--color-text)">
-                    {student.name}
+                    {student.studentName}
                   </p>
                   <p className="text-xs text-(--color-text-light)">
                     {student.status}
@@ -104,10 +107,10 @@ const ManageSupervisioning = () => {
                   {student.university}
                 </p>
                 <p className="col-span-2 text-sm text-(--color-text-light)">
-                  {student.year}
+                  {student.yearsOfStudy}
                 </p>
                 <p className="col-span-2 text-sm text-(--color-text-light)">
-                  {student.supervisor || "N/A"}
+                  {student.nationalId}
                 </p>
 
                 <div className="col-span-2 flex justify-end gap-2">
@@ -115,7 +118,7 @@ const ManageSupervisioning = () => {
                     type="button"
                     onClick={() =>
                       navigate(
-                        `/doctor-supervisioning/view-request/${student.id}`,
+                        `/doctor-supervisioning/view-request/${student.studentDoctorId}`,
                       )
                     }
                     className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 transition-colors"
@@ -124,15 +127,15 @@ const ManageSupervisioning = () => {
                   </button>
                   <button
                     type="button"
-                    disabled={student.status !== "Active"}
+                    // disabled={student.status !== "Active"}
                     onClick={() =>
                       navigate(
-                        `/doctor-supervisioning/assign-student-doctor/${student.id}`,
+                        `/doctor-supervisioning/assign-student-doctor/${student.studentDoctorId}`,
                         {
                           state: {
-                            studentName: student.name,
+                            studentName: student.studentName,
                             university: student.university,
-                            academicYear: student.year,
+                            academicYear: student.yearsOfStudy,
                           },
                         },
                       )

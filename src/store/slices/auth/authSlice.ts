@@ -53,10 +53,9 @@ const getAuthFromToken = (token: string) => {
     throw new Error("Token expired");
   }
 
-  decoded.role = (decoded.role as string)
-    ?.toLowerCase()
-    .replace(/student doctor/g, "studentDoctor");
-
+  decoded.role = (decoded.role as string)?.toLowerCase();
+  decoded.role =
+    (decoded.role === "studentdoctor" && "studentDoctor") || decoded.role;
   return {
     id: (decoded.sub as string) || (decoded.nameidentifier as string) || null,
     role: (decoded.role as string) || "guest",

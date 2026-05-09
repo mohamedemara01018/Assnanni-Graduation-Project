@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import { FiFileText } from "react-icons/fi";
 import { LuUpload } from "react-icons/lu";
@@ -11,15 +12,13 @@ import Cookies from "js-cookie";
 import { ScaleLoader } from "react-spinners";
 
 interface StudentDoctorRequest {
-  id: string;
-  name: string;
-  email: string;
-  phoneNumber: string;
-  university: string;
-  year: string;
-  supervisor: string | null;
+  id: number;
+  fullName: string;
   status: string;
-  dentalUniversityProofImage: string | null;
+  university: string;
+  academicYear: string;
+  nationalId: string;
+  proofImageUrl: string | null;
 }
 
 interface RequestResponse {
@@ -47,9 +46,11 @@ const ViewSupervisioningRequest = () => {
     enabled: !!id && !!token && !!backendUrl,
   });
 
-  if (error) {
-    toast.error("Failed to load request details");
-  }
+  useEffect(() => {
+    if (error) {
+      toast.error("Failed to load request details");
+    }
+  }, [error]);
 
   const student = responseData?.data;
 
@@ -86,7 +87,7 @@ const ViewSupervisioningRequest = () => {
                 <div className="rounded-xl border border-(--color-border) bg-(--color-bg) p-4">
                   <p className="text-xs text-(--color-text-light)">Full Name</p>
                   <p className="text-sm font-medium text-(--color-text)">
-                    {student.name}
+                    {student.fullName}
                   </p>
                 </div>
                 <div className="rounded-xl border border-(--color-border) bg-(--color-bg) p-4">
@@ -108,27 +109,15 @@ const ViewSupervisioningRequest = () => {
                     Academic Year
                   </p>
                   <p className="text-sm font-medium text-(--color-text)">
-                    {student.year}
-                  </p>
-                </div>
-                <div className="rounded-xl border border-(--color-border) bg-(--color-bg) p-4">
-                  <p className="text-xs text-(--color-text-light)">Email</p>
-                  <p className="text-sm font-medium text-(--color-text)">
-                    {student.email}
-                  </p>
-                </div>
-                <div className="rounded-xl border border-(--color-border) bg-(--color-bg) p-4">
-                  <p className="text-xs text-(--color-text-light)">Phone Number</p>
-                  <p className="text-sm font-medium text-(--color-text)">
-                    {student.phoneNumber}
+                    {student.academicYear}
                   </p>
                 </div>
                 <div className="rounded-xl border border-(--color-border) bg-(--color-bg) p-4 sm:col-span-2">
                   <p className="text-xs text-(--color-text-light)">
-                    Current Supervisor
+                    National ID
                   </p>
                   <p className="text-sm font-medium text-(--color-text)">
-                    {student.supervisor || "None"}
+                    {student.nationalId}
                   </p>
                 </div>
               </div>
@@ -138,10 +127,14 @@ const ViewSupervisioningRequest = () => {
                   Dental University Proof
                 </label>
                 <div className="w-full rounded-2xl border border-[#00AFE5]/25 bg-linear-to-br from-[#00AFE5]/8 via-transparent to-[#00AFE5]/4 p-6 sm:p-8">
-                  {student.dentalUniversityProofImage ? (
+                  {student.proofImageUrl ? (
                     <div className="flex flex-col items-center gap-4">
                       <img
-                        src={student.dentalUniversityProofImage}
+                        src={
+                          student.proofImageUrl.startsWith("http")
+                            ? student.proofImageUrl
+                            : backendUrl.replace("/api/", "/") + student.proofImageUrl
+                        }
                         alt="Dental university proof"
                         className="max-h-80 w-full rounded-xl border border-(--color-border) bg-(--color-surface) object-contain p-2"
                       />

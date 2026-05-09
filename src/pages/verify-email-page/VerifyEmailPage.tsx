@@ -3,7 +3,7 @@ import { clearEmail } from "@/store/slices/email/emailSlice";
 // import axios from "axios";
 import { MdOutlineMail } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { toast } from "react-toastify";
 import {
   InputOTP,
@@ -20,6 +20,7 @@ function VerifyEmailPage() {
     useSelector((s: RootState) => s.config.backendUrl) + "Authentications/";
   const dispatch = useDispatch();
   const navigator = useNavigate();
+  const location = useLocation();
   const [value, setValue] = useState("");
 
   const email = useSelector(
@@ -36,9 +37,24 @@ function VerifyEmailPage() {
     try {
       const response = await axios.post(authBase + "Verify-Email", data);
       console.log(response);
-      dispatch(setToken(response.data?.data?.token));
+
+      const state = location.state as { isDoctor?: boolean; isStudentDoctor?: boolean } | null;
+      const isDoctor = state?.isDoctor;
+      const isStudentDoctor = state?.isStudentDoctor;
+
+      if (!isDoctor && !isStudentDoctor) {
+        dispatch(setToken(response.data?.data?.token));
+      }
       dispatch(clearEmail());
-      navigator("/onboarding");
+
+      if (isDoctor || isStudentDoctor) {
+        navigator("/verify-doctor", {
+          state: { isStudentDoctor },
+        });
+      } else {
+        navigator("/onboarding");
+      }
+
       toast.success("You have successfully verified your email address");
     } catch (error: any) {
       console.log(error);
