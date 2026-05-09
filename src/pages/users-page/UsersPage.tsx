@@ -17,8 +17,6 @@ import {
   Search,
   Shield,
   UserPlus,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
@@ -59,11 +57,9 @@ function UsersPage() {
 
   const {
     usersData,
-    totalCount = 0,
     loading: usersLoading,
   } = useSelector(selectUsers) as UsersState;
 
-  const totalPages = Math.ceil(totalCount / pageSize);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -412,98 +408,24 @@ function UsersPage() {
                 ))}
               </tbody>
             </table>
-            <Pagination
-              pageNumber={pageNumber}
-              pageSize={pageSize}
-              totalItems={usersData.length + 20}
-              onPageChange={(page) => setPageNumber(page)}
-              onPageSizeChange={(size) => {
-                setPageSize(size);
-                setPageNumber(1);
-              }}
-            />
+
           </div>
         )}
       </div>
 
+
       {/* Pagination */}
       {!error && !loading && !usersLoading && usersData.length > 0 && (
-        <div className="mt-6 flex flex-wrap justify-between items-center bg-(--color-surface) p-4 rounded-xl border border-(--color-border) shadow-sm gap-4">
-          <div className="flex items-center gap-6">
-            <span className="text-sm text-(--color-text-light) font-medium">
-              Showing {(pageNumber - 1) * pageSize + 1} to{" "}
-              {Math.min(pageNumber * pageSize, totalCount)} of {totalCount}{" "}
-              users
-            </span>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-(--color-text-light) font-semibold uppercase tracking-wider">
-                Show:
-              </span>
-              <select
-                value={pageSize}
-                onChange={(e) => {
-                  setPageSize(Number(e.target.value));
-                  setPageNumber(1);
-                }}
-                className="bg-gray-50 dark:bg-gray-700 border border-(--color-border) rounded-lg px-2 py-1 text-xs font-bold text-(--color-text) focus:outline-none focus:ring-2 focus:ring-(--color-text-blue) cursor-pointer"
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-                <option value={50}>50</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="flex gap-2 items-center">
-            <button
-              onClick={() => setPageNumber((prev) => Math.max(prev - 1, 1))}
-              disabled={pageNumber === 1 || usersLoading}
-              className={`p-2 rounded-lg border border-(--color-border) transition-all ${pageNumber === 1 || usersLoading
-                ? "bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed"
-                : "bg-gray-50 dark:bg-gray-700 text-(--color-text) hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer"
-                }`}
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-
-            {/* Page numbers */}
-            <div className="flex gap-1">
-              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                // Simple logic for showing pages around current page
-                // For now just show first 5 pages or all if totalPages <= 5
-                return (
-                  <button
-                    key={i + 1}
-                    onClick={() => setPageNumber(i + 1)}
-                    className={`w-9 h-9 rounded-lg text-sm font-bold transition-all cursor-pointer ${pageNumber === i + 1
-                      ? "bg-(--color-primary) text-white shadow-md shadow-(--color-primary)/20"
-                      : "bg-gray-50 dark:bg-gray-700 text-(--color-text) border border-(--color-border) hover:bg-gray-200 dark:hover:bg-gray-600"
-                      }`}
-                  >
-                    {i + 1}
-                  </button>
-                );
-              })}
-              {totalPages > 5 && (
-                <span className="px-2 self-center text-gray-400">...</span>
-              )}
-            </div>
-
-            <button
-              onClick={() =>
-                setPageNumber((prev) => Math.min(prev + 1, totalPages))
-              }
-              disabled={pageNumber >= totalPages || usersLoading}
-              className={`p-2 rounded-lg border border-(--color-border) transition-all ${pageNumber >= totalPages || usersLoading
-                ? "bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed"
-                : "bg-gray-50 dark:bg-gray-700 text-(--color-text) hover:bg-gray-200 dark:hover:bg-gray-600 cursor-pointer"
-                }`}
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+        <Pagination
+          pageNumber={pageNumber}
+          pageSize={pageSize}
+          totalItems={usersData.length + 20}
+          onPageChange={(page) => setPageNumber(page)}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setPageNumber(1);
+          }}
+        />
       )}
     </DashboardLayout>
   );

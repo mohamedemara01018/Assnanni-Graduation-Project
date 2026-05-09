@@ -44,7 +44,7 @@ export default function Pagination({
     if (totalPages <= 1) return null;
 
     return (
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mt-6 p-6">
+        <div className="mt-6 flex flex-wrap justify-between items-center bg-(--color-surface) p-4 rounded-xl border border-(--color-border) shadow-sm gap-4">
             {/* Page Size */}
             {onPageSizeChange && (
                 <div className="flex items-center gap-2">
