@@ -26,6 +26,7 @@ import type { AppDispatch } from "@/store/store";
 import { ScaleLoader } from "react-spinners";
 import Error from "@/components/error/Error";
 import { toast } from "react-toastify";
+import Pagination from "@/components/pagination/Pagination";
 
 type UserRole =
   | ""
@@ -45,6 +46,8 @@ function UsersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterRole, setFilterRole] = useState<UserRole>("");
   const [filterGender, setFilterGender] = useState<UserGender>("");
+  const [pageNumber, setPageNumber] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   // const [selectedUser, setSelectedUser] = useState<User | null>(null);
   // const [showDetailModal, setShowDetailModal] = useState(false);
   // const [showActionsMenu, setShowActionsMenu] = useState<string | null>(null);
@@ -69,8 +72,8 @@ function UsersPage() {
               SearchTerm: searchQuery,
               Role: filterRole,
               gender: filterGender,
-              PageNumber: 1,
-              PageSize: 10,
+              PageNumber: pageNumber,
+              PageSize: pageSize,
             })
           ),
         ]);
@@ -82,7 +85,7 @@ function UsersPage() {
     };
 
     fetchData();
-  }, [dispatch, searchQuery, filterRole, filterGender])
+  }, [dispatch, searchQuery, filterRole, filterGender, pageNumber, pageSize])
 
   const totalUser = data
     ? data.totalDoctors +
@@ -397,6 +400,16 @@ function UsersPage() {
                 ))}
               </tbody>
             </table>
+            <Pagination
+              pageNumber={pageNumber}
+              pageSize={pageSize}
+              totalItems={usersData.length + 20}
+              onPageChange={(page) => setPageNumber(page)}
+              onPageSizeChange={(size) => {
+                setPageSize(size);
+                setPageNumber(1);
+              }}
+            />
           </div>
         )}
       </div>

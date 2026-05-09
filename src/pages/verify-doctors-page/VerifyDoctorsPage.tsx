@@ -1,22 +1,44 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, Filter, CheckCircle, XCircle, Eye, Download, FileText, Award, Briefcase, Calendar, MapPin, Mail, Phone, AlertCircle } from 'lucide-react';
 import DashboardLayout from '@/components/dashboard-layout/DashboardLayout';
 import { useSelector, useDispatch } from "react-redux";
-import { selectPendingDoctor, type pendingDoctor, type pendingDoctorInterface } from '@/store/slices/admin-slice/pending-doctor-slice/pendingDoctorSlice';
 import { getTimeAgo } from '@/lib/utils';
+import { fetchSearchPendingDoctor, selectSearchPendingDoctor, type SearchPendingDoctor, type SearchPendingDoctorState } from '@/store/slices/admin-slice/search-pending-doctors-slice/searchPendingDoctorSlice';
+import type { AppDispatch } from '@/store/store';
+import Error from '@/components/error/Error';
+import { ScaleLoader } from 'react-spinners';
+import { fetchApprovePendingDoctor, selectApprovePendingDoctor, type ApprovePendingDoctorState } from '@/store/slices/admin-slice/approve-pending-doctor-slice/approvePendingDoctorSlice';
+import { toast } from 'react-toastify';
+import { fetchRejectPendingDoctor, selectRejectPendingDoctor, type RejectPendingDoctorState } from '@/store/slices/admin-slice/reject-pending-doctor-slice/rejectPendingDoctorSlice';
 
 
 
 export default function VerifyDoctorsPage() {
+    const dispatch: AppDispatch = useDispatch();
     const [searchQuery, setSearchQuery] = useState('');
     const [filterStatus, setFilterStatus] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
-    const [selectedDoctor, setSelectedDoctor] = useState<pendingDoctor | null>(null);
+    const [selectedDoctor, setSelectedDoctor] = useState<SearchPendingDoctor | null>(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
+    const [selectButton, setSelectButton] = useState<string>("")
+    // const [selectedRejectButton, setSelectedRejectButton] = useState<string>("")
 
-    const { pendingDoctor } =
-        useSelector(selectPendingDoctor) as pendingDoctorInterface;
 
-    console.log(pendingDoctor)
+    useEffect(() => {
+        dispatch(
+            fetchSearchPendingDoctor({
+                searchTerm: searchQuery,
+                pageNumber: 1,
+                pageSize: 10,
+            })
+        );
+    }, [dispatch, searchQuery]);
+
+
+
+    const { doctors, error, loading } = useSelector(selectSearchPendingDoctor) as SearchPendingDoctorState;
+    const approvedDoctor = useSelector(selectApprovePendingDoctor) as ApprovePendingDoctorState
+    const rejectedDoctor = useSelector(selectRejectPendingDoctor) as RejectPendingDoctorState
+
     // Mock data for pending verifications
     // const verifications: DoctorVerification[] = [
     //     {
@@ -119,29 +141,61 @@ export default function VerifyDoctorsPage() {
     //         ]
     //     },
     // ];
+    const handleApprove = async (doctorId: string) => {
+        setSelectButton(doctorId)
+        try {
+            const response = await dispatch(
+                fetchApprovePendingDoctor({
+                    note: "",
+                    id: doctorId,
+                })
+            ).unwrap();
 
-    const handleApprove = (doctorId: string) => {
-        console.log('Approving doctor:', doctorId);
-        // Handle approval logic
+            toast.success(response.message || "Doctor approved successfully");
+            dispatch(
+                fetchSearchPendingDoctor({
+                    searchTerm: searchQuery,
+                    pageNumber: 1,
+                    pageSize: 10,
+                })
+            );
+        } catch (error: any) {
+            toast.error(error || "Failed To Approve");
+        } finally {
+            setSelectButton("")
+        }
     };
+    const handleReject = async (doctorId: string) => {
+        setSelectButton(doctorId)
+        try {
+            const response = await dispatch(
+                fetchRejectPendingDoctor({
+                    reason: "",
+                    id: doctorId,
+                })
+            ).unwrap();
 
-    const handleReject = (doctorId: string) => {
-        console.log('Rejecting doctor:', doctorId);
+            toast.success(response.message || "Doctor approved successfully");
+            dispatch(
+                fetchSearchPendingDoctor({
+                    searchTerm: searchQuery,
+                    pageNumber: 1,
+                    pageSize: 10,
+                })
+            );
+        } catch (error: any) {
+            toast.error(error || "Failed To Approve");
+        } finally {
+            setSelectButton("")
+        }
         // Handle rejection logic
     };
 
-    const handleViewDetails = (doctor: pendingDoctor) => {
+    const handleViewDetails = (doctor: SearchPendingDoctor) => {
         setSelectedDoctor(doctor);
         setShowDetailModal(true);
     };
 
-    // const filteredVerifications = verifications.filter(verification => {
-    //     const matchesSearch = verification.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    //         verification.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    //         verification.email.toLowerCase().includes(searchQuery.toLowerCase());
-    //     const matchesFilter = filterStatus === 'all' || verification.status === filterStatus;
-    //     return matchesSearch && matchesFilter;
-    // });
 
     return (
         <DashboardLayout pageTitle="Verify Doctors">
@@ -236,161 +290,172 @@ export default function VerifyDoctorsPage() {
 
             {/* Verifications List */}
             <div className="space-y-4">
-                {pendingDoctor.length === 0 ? (
+                {doctors.length === 0 ? (
                     <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
                         <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                         <p className="text-gray-600 dark:text-gray-400">No verifications found</p>
                     </div>
                 ) : (
-                    pendingDoctor.map((doctor) => (
-                        <div
-                            key={doctor.id}
-                            className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow"
-                        >
-                            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                                {/* Doctor Info */}
-                                <div className="flex items-start space-x-4 flex-1">
-                                    <div className="w-16 h-16 bg-linear-to-br from-blue-600 to-green-500 rounded-full flex items-center justify-center text-white text-xl shrink-0">
-                                        {doctor.fullName ? doctor.fullName.split(' ')[1].charAt(0) : 'D'}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        {doctor.specialization && <div className="flex items-center space-x-2 mb-1">
-                                            <h3 className="text-lg text-gray-900 dark:text-white font-medium">{doctor.fullName}</h3>
-                                            <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-full text-xs">
-                                                {doctor.specialization}
-                                            </span>
-                                        </div>}
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-                                            {doctor.email && <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                                                <Mail className="w-4 h-4 shrink-0" />
-                                                <span className="truncate">{doctor.email}</span>
-                                            </div>}
-                                            {/* <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                                                <Phone className="w-4 h-4 shrink-0" />
-                                                <span>{doctor.}</span>
-                                            </div> */}
-                                            {/* <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                                                <MapPin className="w-4 h-4 shrink-0" />
-                                                <span>{doctor.}</span>
-                                            </div> */}
-                                            {/* <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                                                <Briefcase className="w-4 h-4 shrink-0" />
-                                                <span>{doctor.} experience</span>
-                                            </div> */}
-                                            {doctor.university && <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
-                                                <Award className="w-4 h-4 shrink-0" />
-                                                <span className="truncate">{doctor.university}</span>
-                                            </div>}
-                                            {/* <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                    loading ?
+                        <div className="w-full  flex items-center justify-center">
+                            <ScaleLoader color="#6d61ff" />{" "}
+                        </div> :
+                        error ?
+                            <Error message={error} /> :
+                            doctors.map((doctor) => (
+                                <div
+                                    key={doctor.doctorId}
+                                    className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 hover:shadow-lg transition-shadow"
+                                >
+                                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                                        {/* Doctor Info */}
+                                        <div className="flex items-start space-x-4 flex-1">
+                                            <div className="w-16 h-16 bg-linear-to-br from-blue-600 to-green-500 rounded-full flex items-center justify-center text-white text-xl shrink-0">
+                                                {/* {doctor.fullProfileImageUrl && <img src={doctor.fullProfileImageUrl} alt="" />} */}
+                                                {doctor.fullName ? doctor.fullName.charAt(0) : 'D'}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                {doctor.fullName && <div className="flex items-center space-x-2 mb-1">
+                                                    <h3 className="text-lg text-gray-900 dark:text-white font-medium">{doctor.fullName}</h3>
+
+                                                </div>}
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
+                                                    {doctor.email && <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                                                        <Mail className="w-4 h-4 shrink-0" />
+                                                        <span className="truncate">{doctor.email}</span>
+                                                    </div>}
+                                                    {doctor.phoneNumber && <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                                                        <Phone className="w-4 h-4 shrink-0" />
+                                                        <span>{doctor.phoneNumber}</span>
+                                                    </div>}
+                                                    {doctor.clinicLocation && <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                                                        <MapPin className="w-4 h-4 shrink-0" />
+                                                        <span>{doctor.clinicLocation}</span>
+                                                    </div>}
+                                                    {doctor.yearsOfExperience && <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                                                        <Briefcase className="w-4 h-4 shrink-0" />
+                                                        <span>{doctor.yearsOfExperience} experience</span>
+                                                    </div>}
+                                                    {doctor.education && <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                                                        <Award className="w-4 h-4 shrink-0" />
+                                                        <span className="truncate">{doctor.education}</span>
+                                                    </div>}
+                                                    {/* <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
                                                 <FileText className="w-4 h-4 shrink-0" />
                                                 <span>{doctor.documents.length} documents</span>
                                             </div> */}
+                                                </div>
+
+                                                {doctor.createdAt && <div className="mt-3 flex items-center space-x-2">
+                                                    <Calendar className="w-4 h-4 text-gray-400" />
+                                                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                                                        Submitted {getTimeAgo(doctor.createdAt)}
+                                                    </span>
+                                                </div>}
+                                            </div>
                                         </div>
 
-                                        {doctor.createdAt && <div className="mt-3 flex items-center space-x-2">
-                                            <Calendar className="w-4 h-4 text-gray-400" />
-                                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                                                Submitted {getTimeAgo(doctor.createdAt)}
-                                            </span>
-                                        </div>}
+                                        {/* Actions */}
+                                        <div className="flex flex-row lg:flex-col gap-2 justify-end lg:justify-start">
+                                            <button
+                                                onClick={() => handleViewDetails(doctor)}
+                                                className="flex-1 lg:flex-none px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center space-x-2"
+                                            >
+                                                <Eye className="w-4 h-4" />
+                                                <span>View Details</span>
+                                            </button>
+                                            <button
+                                                disabled={selectButton == doctor.doctorId && approvedDoctor.loading}
+                                                onClick={() => handleApprove(doctor.doctorId)}
+                                                className="flex-1 lg:flex-none px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
+                                            >
+                                                {selectButton == doctor.doctorId && approvedDoctor.loading ? ' approving...' : <><CheckCircle className="w-4 h-4" />
+                                                    <span>Approve</span></>}
+                                            </button>
+                                            <button
+                                                disabled={selectButton == doctor.doctorId && rejectedDoctor.loading}
+                                                onClick={() => handleReject(doctor.doctorId)}
+                                                className="flex-1 lg:flex-none px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-2"
+                                            >
+                                                <XCircle className="w-4 h-4" />
+                                                <span>Reject</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-
-                                {/* Actions */}
-                                <div className="flex flex-row lg:flex-col gap-2 justify-end lg:justify-start">
-                                    <button
-                                        onClick={() => handleViewDetails(doctor)}
-                                        className="flex-1 lg:flex-none px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center justify-center space-x-2"
-                                    >
-                                        <Eye className="w-4 h-4" />
-                                        <span>View Details</span>
-                                    </button>
-                                    <button
-                                        onClick={() => handleApprove(doctor.id)}
-                                        className="flex-1 lg:flex-none px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
-                                    >
-                                        <CheckCircle className="w-4 h-4" />
-                                        <span>Approve</span>
-                                    </button>
-                                    <button
-                                        onClick={() => handleReject(doctor.id)}
-                                        className="flex-1 lg:flex-none px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-2"
-                                    >
-                                        <XCircle className="w-4 h-4" />
-                                        <span>Reject</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))
+                            ))
                 )}
             </div>
 
             {/* Detail Modal */}
             {
                 showDetailModal && selectedDoctor && (
-                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-                            {/* Modal Header */}
-                            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between">
-                                <div className="flex items-center space-x-4">
-                                    <div className="w-16 h-16 bg-linear-to-br from-blue-600 to-green-500 rounded-full flex items-center justify-center text-white text-xl">
-                                        {selectedDoctor.fullName ? selectedDoctor.fullName.split(' ')[1].charAt(0) : 'D'}
+                    <>
+                        <div className="fixed inset-0 bg-black/25 backdrop-blur-sm z-10" />
+
+                        <div className="fixed  inset-0 bg-opacity-50 flex items-center justify-center p-4 z-50">
+                            <div className="bg-white dark:bg-gray-800 rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                                {/* Modal Header */}
+                                <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex items-center justify-between">
+                                    <div className="flex items-center space-x-4">
+                                        <div className="w-16 h-16 bg-linear-to-br from-blue-600 to-green-500 rounded-full flex items-center justify-center text-white text-xl">
+                                            {selectedDoctor.fullName ? selectedDoctor.fullName.charAt(0) : 'D'}
+                                        </div>
+                                        {selectedDoctor.fullName && <div className="flex items-center space-x-2 mb-1">
+                                            <h3 className="text-lg text-gray-900 dark:text-white font-medium">{selectedDoctor.fullName}</h3>
+
+                                        </div>}
+
                                     </div>
+                                    <button
+                                        onClick={() => setShowDetailModal(false)}
+                                        className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                                    >
+                                        <XCircle className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                                    </button>
+                                </div>
+
+                                {/* Modal Content */}
+                                <div className="p-6 space-y-6">
+                                    {/* Personal Information */}
                                     <div>
-                                        <h2 className="text-xl text-gray-900 dark:text-white font-medium">{selectedDoctor.fullName}</h2>
-                                        <p className="text-gray-600 dark:text-gray-400">{selectedDoctor.specialization}</p>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => setShowDetailModal(false)}
-                                    className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                                >
-                                    <XCircle className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-                                </button>
-                            </div>
-
-                            {/* Modal Content */}
-                            <div className="p-6 space-y-6">
-                                {/* Personal Information */}
-                                <div>
-                                    <h3 className="text-lg text-gray-900 dark:text-white mb-4">Personal Information</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Email</p>
-                                            <p className="text-gray-900 dark:text-white">{selectedDoctor.email}</p>
+                                        <h3 className="text-lg text-gray-900 dark:text-white mb-4">Personal Information</h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {selectedDoctor.email && <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Email</p>
+                                                <p className="text-gray-900 dark:text-white">{selectedDoctor.email}</p>
+                                            </div>}
+                                            {selectedDoctor.phoneNumber && <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Phone</p>
+                                                <p className="text-gray-900 dark:text-white">{selectedDoctor.phoneNumber}</p>
+                                            </div>}
+                                            {selectedDoctor.medicalLicenseNumber && <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">License Number</p>
+                                                <p className="text-gray-900 dark:text-white">{selectedDoctor.medicalLicenseNumber}</p>
+                                            </div>}
+                                            {selectedDoctor.clinicLocation && <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Location</p>
+                                                <p className="text-gray-900 dark:text-white">{selectedDoctor.clinicLocation}</p>
+                                            </div>}
+                                            {selectedDoctor.yearsOfExperience && <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Experience</p>
+                                                <p className="text-gray-900 dark:text-white">{selectedDoctor.yearsOfExperience}</p>
+                                            </div>}
+                                            {selectedDoctor.education && <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Education</p>
+                                                <p className="text-gray-900 dark:text-white">{selectedDoctor.education}</p>
+                                            </div>}
                                         </div>
-                                        {/* <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Phone</p>
-                                            <p className="text-gray-900 dark:text-white">{selectedDoctor.phone}</p>
-                                        </div> */}
-                                        <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">License Number</p>
-                                            <p className="text-gray-900 dark:text-white">{selectedDoctor.medicalLicenseNumber}</p>
-                                        </div>
-                                        {/* <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Location</p>
-                                            <p className="text-gray-900 dark:text-white">{selectedDoctor.}</p>
-                                        </div> */}
-                                        {/* <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Experience</p>
-                                            <p className="text-gray-900 dark:text-white">{selectedDoctor.experience}</p>
-                                        </div> */}
-                                        {/* <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Education</p>
-                                            <p className="text-gray-900 dark:text-white">{selectedDoctor.education}</p>
-                                        </div> */}
                                     </div>
-                                </div>
 
-                                {/* Documents */}
-                                {/* <div>
-                                    <h3 className="text-lg text-gray-900 dark:text-white mb-4">Submitted Documents</h3>
-                                    <div className="space-y-2">
-                                        {selectedDoctor.documents.map((doc) => (
+                                    {/* Documents */}
+                                    <div>
+                                        <h3 className="text-lg text-gray-900 dark:text-white mb-4">Submitted Documents</h3>
+                                        <div className="space-y-2">
+
                                             <div
-                                                key={doc.id}
                                                 className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                                             >
                                                 <div className="flex items-center space-x-3">
@@ -398,10 +463,10 @@ export default function VerifyDoctorsPage() {
                                                         <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                                                     </div>
                                                     <div>
-                                                        <p className="text-gray-900 dark:text-white font-medium">{doc.name}</p>
-                                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                        <p className="text-gray-900 dark:text-white font-medium">Board Certification</p>
+                                                        {/* <p className="text-xs text-gray-500 dark:text-gray-400">
                                                             {doc.type} • {doc.size}
-                                                        </p>
+                                                        </p> */}
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center space-x-2">
@@ -413,36 +478,36 @@ export default function VerifyDoctorsPage() {
                                                     </button>
                                                 </div>
                                             </div>
-                                        ))}
+                                        </div>
                                     </div>
-                                </div> */}
 
-                                {/* Actions */}
-                                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                    <button
-                                        onClick={() => {
-                                            handleReject(selectedDoctor.id);
-                                            setShowDetailModal(false);
-                                        }}
-                                        className="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-2"
-                                    >
-                                        <XCircle className="w-5 h-5" />
-                                        <span>Reject Application</span>
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            handleApprove(selectedDoctor.id);
-                                            setShowDetailModal(false);
-                                        }}
-                                        className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
-                                    >
-                                        <CheckCircle className="w-5 h-5" />
-                                        <span>Approve & Activate</span>
-                                    </button>
+                                    {/* Actions */}
+                                    <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                        <button
+                                            onClick={() => {
+                                                handleReject(selectedDoctor.doctorId);
+                                                setShowDetailModal(false);
+                                            }}
+                                            className="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center space-x-2"
+                                        >
+                                            <XCircle className="w-5 h-5" />
+                                            <span>Reject Application</span>
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                handleApprove(selectedDoctor.doctorId);
+                                                setShowDetailModal(false);
+                                            }}
+                                            className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
+                                        >
+                                            <CheckCircle className="w-5 h-5" />
+                                            <span>Approve & Activate</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </>
                 )
             }
         </DashboardLayout >

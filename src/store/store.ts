@@ -5,16 +5,23 @@ import configReducer from "./slices/config/configSlice";
 import summaryReducer from './slices/admin-slice/summary-slice/SummarySlice'
 import usersReducer from './slices/admin-slice/users-slice/UsersSlice'
 import pendingDoctorReducer from './slices/admin-slice/pending-doctor-slice/pendingDoctorSlice'
+import searchPendingDoctorReducer from './slices/admin-slice/search-pending-doctors-slice/searchPendingDoctorSlice'
+import approvePendingDoctorReducer from './slices/admin-slice/approve-pending-doctor-slice/approvePendingDoctorSlice'
+import rejectPendingDoctorReducer from './slices/admin-slice/reject-pending-doctor-slice/rejectPendingDoctorSlice'
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     email: emailReducer,
     config: configReducer,
+
     // admin dashboard
     summarySlice: summaryReducer,
     usersSlice: usersReducer,
-    pendingDoctorsSlice: pendingDoctorReducer
+    pendingDoctorsSlice: pendingDoctorReducer,
+    searchPendingDoctorSlice: searchPendingDoctorReducer,
+    approvePendingDoctorSlice: approvePendingDoctorReducer,
+    rejectPendingDoctorSlice: rejectPendingDoctorReducer
   },
 });
 

@@ -179,12 +179,12 @@ function AdminPage() {
                               </div>
                             </div>
                             <div className="flex items-center space-x-2">
-                              <button className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
+                              <Link to={'/verify-doctors'} className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
                                 <CheckCircle className="w-4 h-4" />
-                              </button>
-                              <button className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
+                              </Link>
+                              <Link to={'/verify-doctors'} className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
                                 <XCircle className="w-4 h-4" />
-                              </button>
+                              </Link>
                             </div>
                           </div>
                         })

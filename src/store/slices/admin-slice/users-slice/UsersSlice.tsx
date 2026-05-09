@@ -71,11 +71,13 @@ export const fetchAdminUsers = createAsyncThunk<
                     Authorization: `Bearer ${cookieToken}`,
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(
-                    {
-                        SearchTerm, gender, Role, PageNumber, PageSize
-                    }
-                )
+                body: JSON.stringify({
+                    SearchTerm,
+                    gender,
+                    Role,
+                    PageNumber,
+                    PageSize
+                })
             });
 
             const json: UsersResponse = await response.json();
