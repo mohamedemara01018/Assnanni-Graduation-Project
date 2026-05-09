@@ -117,6 +117,7 @@ const sidebarDataRole = {
     { icon: Users, label: "Users", path: "/users" },
     { icon: FileText, label: "Analytics", path: "/analytics" },
     { icon: Brain, label: "AI Models", path: "/ai-models" },
+    { icon: Users, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ],
 

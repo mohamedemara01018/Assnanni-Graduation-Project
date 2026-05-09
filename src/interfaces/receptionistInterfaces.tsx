@@ -21,13 +21,13 @@ export interface AppointmentSummary {
 export interface AppointmentFormData {
   patientId: string | number;
   patientName: string;
-  doctorId: string | number;
-  doctorName: string;
   date: string;
-  time: string;
+  slotId: string | number;
   reason: string;
   paymentMethod: "cash" | "online";
   fee: number;
+  appointmentType: "Consultation" | "FollowUp" | "Checkup" | "Emergency";
+  bookingType: "Online" | "In-Person";
 }
 
 export interface ReceptionistFormInput {

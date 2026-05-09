@@ -8,6 +8,7 @@ export interface Schedule {
 
 export interface Scan {
   id: number;
+  patientId: number;
   patientName: string;
   scanType: string;
   uploadedAt: string;
@@ -46,12 +47,13 @@ export interface Day {
 }
 
 export interface MedicalHistoryItem {
+  id: number;
   title: string;
   doctorName: string;
   date: string;
   type: string;
   description: string;
-  attachments: string[];
+  attachments: { fileName: string; url: string }[];
 }
 
 export interface Patient {
@@ -62,7 +64,6 @@ export interface Patient {
   gender: "Male" | "Female";
   status: "Active" | "Inactive" | "Pending";
   lastVisit: string;
-  doctor: string;
 }
 
 export interface Receptionist {

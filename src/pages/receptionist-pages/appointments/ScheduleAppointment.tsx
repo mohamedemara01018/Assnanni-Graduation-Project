@@ -1,5 +1,5 @@
-import { NavLink } from "react-router";
-import { BsCalendar3, BsSearch, BsCash, BsCreditCard } from "react-icons/bs";
+import { NavLink, useNavigate } from "react-router";
+import { BsCalendar3, BsCash, BsCreditCard } from "react-icons/bs";
 import { LuUser } from "react-icons/lu";
 import { HiOutlineClock } from "react-icons/hi2";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
@@ -11,11 +11,8 @@ import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-
-const doctors = [
-  { id: "1", name: "Michael Chen" },
-  { id: "2", name: "Sarah Johnson" },
-];
+import { useQuery } from "@tanstack/react-query";
+import type { Patient } from "@/interfaces/doctorInterfaces";
 
 const inputClass = (hasError?: boolean, hasIcon = false) =>
   `w-full ${
@@ -31,6 +28,7 @@ const errorClass = "text-xs text-red-500 font-medium mt-2";
 const ScheduleAppointment = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -43,9 +41,44 @@ const ScheduleAppointment = () => {
   });
 
   const formValues = watch();
-  const doctorRegister = register("doctorId", {
-    required: "Doctor is required",
+
+  const { data: patientsData, isLoading: isLoadingPatients } = useQuery({
+    queryKey: ["ReceptionistPatients"],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${backendUrl}Receptionist/doctor-patients`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      return response.data;
+    },
   });
+
+  const patients: Patient[] = patientsData?.data?.items || [];
+
+  const { data: slotsData, isLoading: isLoadingSlots } = useQuery({
+    queryKey: ["AvailableSlots", formValues.date],
+    queryFn: async () => {
+      if (!formValues.date) return null;
+      const [year, month, day] = formValues.date.split("-");
+      const formattedDate = `${month}/${day}/${year}`;
+      const response = await axios.get(
+        `${backendUrl}Receptionist/available-slots?date=${formattedDate}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      return response.data;
+    },
+    enabled: !!formValues.date,
+  });
+
+  const slots = slotsData?.data || [];
 
   const handlePaymentChange = (method: "cash" | "online") => {
     setValue("paymentMethod", method, { shouldDirty: true });
@@ -53,14 +86,31 @@ const ScheduleAppointment = () => {
 
   const onSubmit: SubmitHandler<AppointmentFormData> = async (data) => {
     try {
-      await axios.post(`${backendUrl}schedule-appointment`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const payload = {
+        patientId: Number(data.patientId),
+        date: data.date,
+        slotId: Number(data.slotId),
+        reason: data.reason || "No reason",
+        paymentMethod:
+          data.paymentMethod.charAt(0).toUpperCase() +
+          data.paymentMethod.slice(1),
+        bookingType: data.bookingType,
+      };
+      console.log(payload);
+
+      await axios.post(
+        `${backendUrl}Receptionist/schedule-appointment?appointmentType=${data.appointmentType}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       toast.success("Appointment scheduled successfully");
       reset(appointmentFormData);
+      navigate("/");
     } catch (error) {
       const message = axios.isAxiosError(error)
         ? error.response?.data?.message || "Failed to schedule appointment"
@@ -102,44 +152,46 @@ const ScheduleAppointment = () => {
             <h2 className="text-lg font-bold text-(--color-text) mb-6">
               Select Patient
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               <div>
                 <label className="block text-sm font-bold text-(--color-text) mb-2">
-                  Patient ID <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <BsSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    {...register("patientId", {
-                      required: "Patient ID is required",
-                    })}
-                    type="text"
-                    placeholder="Patient ID"
-                    className={inputClass(!!errors.patientId, true)}
-                  />
-                </div>
-                {errors.patientId && (
-                  <p className={errorClass}>{errors.patientId.message}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-(--color-text) mb-2">
-                  Patient Name <span className="text-red-500">*</span>
+                  Patient <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <LuUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    {...register("patientName", {
-                      required: "Patient name is required",
+                  <select
+                    {...register("patientId", {
+                      required: "Patient is required",
                     })}
-                    type="text"
-                    placeholder="Patient name"
-                    className={inputClass(!!errors.patientName, true)}
-                  />
+                    onChange={(e) => {
+                      const selectedId = e.target.value;
+                      const patient = patients.find(
+                        (p) => p.id.toString() === selectedId,
+                      );
+                      setValue("patientId", selectedId);
+                      setValue("patientName", patient?.name || "");
+                    }}
+                    disabled={isLoadingPatients}
+                    className={`${inputClass(
+                      !!errors.patientId,
+                      true,
+                    )} appearance-none`}
+                  >
+                    <option value="">
+                      {isLoadingPatients
+                        ? "Loading patients..."
+                        : "Select a patient"}
+                    </option>
+                    {patients.map((patient) => (
+                      <option key={patient.id} value={patient.id}>
+                        {patient.name} (ID: {patient.id})
+                      </option>
+                    ))}
+                  </select>
+                  <input type="hidden" {...register("patientName")} />
                 </div>
-                {errors.patientName && (
-                  <p className={errorClass}>{errors.patientName.message}</p>
+                {errors.patientId && (
+                  <p className={errorClass}>{errors.patientId.message}</p>
                 )}
               </div>
             </div>
@@ -153,42 +205,28 @@ const ScheduleAppointment = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="md:col-span-2">
                 <label className="block text-sm font-bold text-(--color-text) mb-2">
-                  Select Doctor <span className="text-red-500">*</span>
+                  Appointment Type <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <LuUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                   <select
-                    {...doctorRegister}
-                    onChange={(event) => {
-                      doctorRegister.onChange(event);
-                      const selectedDoctor = doctors.find(
-                        (doctor) => doctor.id === event.target.value,
-                      );
-                      setValue("doctorName", selectedDoctor?.name || "", {
-                        shouldValidate: true,
-                      });
-                    }}
+                    {...register("appointmentType", {
+                      required: "Appointment type is required",
+                    })}
                     className={`${inputClass(
-                      !!errors.doctorId,
+                      !!errors.appointmentType,
                       true,
                     )} appearance-none`}
                   >
-                    <option value="">Select a doctor</option>
-                    {doctors.map((doctor) => (
-                      <option key={doctor.id} value={doctor.id}>
-                        Dr. {doctor.name}
-                      </option>
-                    ))}
+                    <option value="">Select type</option>
+                    <option value="Consultation">Consultation</option>
+                    <option value="FollowUp">FollowUp</option>
+                    <option value="Checkup">Checkup</option>
+                    <option value="Emergency">Emergency</option>
                   </select>
-                  <input
-                    type="hidden"
-                    {...register("doctorName", {
-                      required: "Doctor name is required",
-                    })}
-                  />
                 </div>
-                {errors.doctorId && (
-                  <p className={errorClass}>{errors.doctorId.message}</p>
+                {errors.appointmentType && (
+                  <p className={errorClass}>{errors.appointmentType.message}</p>
                 )}
               </div>
 
@@ -218,39 +256,46 @@ const ScheduleAppointment = () => {
                 <div className="relative">
                   <HiOutlineClock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
                   <select
-                    {...register("time", {
+                    {...register("slotId", {
                       required: "Appointment time is required",
                     })}
+                    disabled={!formValues.date || isLoadingSlots}
                     className={`${inputClass(
-                      !!errors.time,
+                      !!errors.slotId,
                       true,
                     )} appearance-none`}
                   >
-                    <option value="">Select time</option>
-                    <option value="09:00">09:00 AM</option>
-                    <option value="10:00">10:00 AM</option>
+                    <option value="">
+                      {!formValues.date
+                        ? "Choose a date first"
+                        : isLoadingSlots
+                          ? "Loading slots..."
+                          : slots.length === 0
+                            ? "No slots available"
+                            : "Select time"}
+                    </option>
+                    {slots.map((slot: any) => (
+                      <option key={slot.id} value={slot.id}>
+                        {slot.startTime} - {slot.endTime}
+                      </option>
+                    ))}
                   </select>
                 </div>
-                {errors.time && (
-                  <p className={errorClass}>{errors.time.message}</p>
+                {errors.slotId && (
+                  <p className={errorClass}>{errors.slotId.message}</p>
                 )}
               </div>
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-bold text-(--color-text) mb-2">
-                  Reason for Visit <span className="text-red-500">*</span>
+                  Reason for Visit
                 </label>
                 <textarea
-                  {...register("reason", {
-                    required: "Reason for visit is required",
-                  })}
-                  placeholder="Describe symptoms or reason for consultation..."
+                  {...register("reason")}
+                  placeholder="Describe symptoms or reason for consultation (optional)..."
                   rows={4}
                   className={`${inputClass(!!errors.reason)} resize-none`}
                 />
-                {errors.reason && (
-                  <p className={errorClass}>{errors.reason.message}</p>
-                )}
               </div>
             </div>
           </div>
@@ -263,7 +308,7 @@ const ScheduleAppointment = () => {
               <button
                 type="button"
                 onClick={() => handlePaymentChange("cash")}
-                className={`flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all ${
+                className={`flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all  cursor-pointer ${
                   formValues.paymentMethod === "cash"
                     ? "border-blue-500 bg-blue-50/30 text-blue-600 shadow-md"
                     : "border-(--color-border) hover:border-gray-300 bg-gray-50/30"
@@ -275,13 +320,13 @@ const ScheduleAppointment = () => {
               <button
                 type="button"
                 onClick={() => handlePaymentChange("online")}
-                className={`flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all ${
+                className={`flex flex-col items-center justify-center p-6 rounded-2xl border-2 transition-all  cursor-pointer ${
                   formValues.paymentMethod === "online"
                     ? "border-blue-500 bg-blue-50/30 text-blue-600 shadow-md"
                     : "border-(--color-border) hover:border-gray-300 bg-gray-50/30"
                 }`}
               >
-                <BsCreditCard className="text-2xl mb-2" />
+                <BsCreditCard className="text-2xl mb-2 " />
                 <span className="font-bold">Online Payment</span>
               </button>
             </div>
@@ -296,24 +341,6 @@ const ScheduleAppointment = () => {
                 Payment will be collected at the clinic
               </p>
             )}
-
-            <div className="mt-6">
-              <label className="block text-sm font-bold text-(--color-text) mb-2">
-                Consultation Fee <span className="text-red-500">*</span>
-              </label>
-              <input
-                {...register("fee", {
-                  required: "Consultation fee is required",
-                  min: { value: 0, message: "Fee cannot be negative" },
-                  valueAsNumber: true,
-                })}
-                type="number"
-                min="0"
-                placeholder="180"
-                className={inputClass(!!errors.fee)}
-              />
-              {errors.fee && <p className={errorClass}>{errors.fee.message}</p>}
-            </div>
           </div>
 
           <div className="bg-blue-50/50 dark:bg-blue-900/10 p-8 rounded-2xl border border-blue-100 dark:border-blue-900/30">
@@ -331,10 +358,10 @@ const ScheduleAppointment = () => {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-blue-700/70 dark:text-blue-400/70">
-                  Doctor:
+                  Type:
                 </span>
                 <span className="font-bold text-blue-900 dark:text-blue-300">
-                  {formValues.doctorName ? `Dr. ${formValues.doctorName}` : "-"}
+                  {formValues.appointmentType || "-"}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
@@ -347,28 +374,37 @@ const ScheduleAppointment = () => {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-blue-700/70 dark:text-blue-400/70">
-                  Time:
+                  Time Slot:
                 </span>
                 <span className="font-bold text-blue-900 dark:text-blue-300">
-                  {formValues.time || "-"}
+                  {formValues.slotId
+                    ? slots.find(
+                        (s: any) =>
+                          s.id.toString() === formValues.slotId.toString(),
+                      )
+                      ? `${
+                          slots.find(
+                            (s: any) =>
+                              s.id.toString() === formValues.slotId.toString(),
+                          ).startTime
+                        } - ${
+                          slots.find(
+                            (s: any) =>
+                              s.id.toString() === formValues.slotId.toString(),
+                          ).endTime
+                        }`
+                      : "-"
+                    : "-"}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-blue-700/70 dark:text-blue-400/70">
                   Payment Method:
                 </span>
-                <span className="font-bold text-blue-900 dark:text-blue-300">
+                <span className="font-bold text-blue-900 dark:text-blue-300 ">
                   {formValues.paymentMethod === "cash"
                     ? "Cash"
                     : "Online Payment"}
-                </span>
-              </div>
-              <div className="pt-3 mt-3 border-t border-blue-200 dark:border-blue-800 flex justify-between text-sm">
-                <span className="text-blue-700 dark:text-blue-400 font-bold">
-                  Consultation Fee:
-                </span>
-                <span className="font-bold text-blue-900 dark:text-blue-300">
-                  ${formValues.fee || 0}
                 </span>
               </div>
             </div>

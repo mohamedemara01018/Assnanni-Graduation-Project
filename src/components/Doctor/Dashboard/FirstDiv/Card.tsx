@@ -20,7 +20,7 @@ const Card = ({ logo, title, color, status, children }: Props) => {
   };
 
   return (
-    <div className="flex bg-gray-50 dark:bg-slate-700/30 justify-between p-4 items-center rounded-xl">
+    <div className="flex bg-gray-50 dark:bg-slate-700/30 justify-between p-4 items-center rounded-xl cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors duration-200">
       <div className="flex gap-4 items-center">
         <div
           className={

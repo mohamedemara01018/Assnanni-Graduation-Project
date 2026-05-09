@@ -32,20 +32,20 @@ const Card = ({ title, date, size, type, fileUrl }: Props) => {
   };
 
   return (
-    <div className="flex justify-between items-center bg-gray-50/50 hover:bg-gray-50 p-4 rounded-xl transition-colors duration-200 cursor-pointer mb-3 last:mb-0 group">
+    <div className="flex justify-between items-center bg-(--color-bg) hover:bg-(--color-bg-link-hover) p-4 rounded-xl transition-colors duration-200 cursor-pointer mb-3 last:mb-0 group border border-(--color-border)">
       <div className="flex gap-4 items-center">
         <div className={`${getIconBg()} p-3 rounded-lg`}>
           {getIcon()}
         </div>
         <div className="flex flex-col">
-          <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
-          <p className="text-xs text-gray-500 font-medium">
-            {date} <span className="mx-1">•</span> {size}
+          <h3 className="text-sm font-semibold text-(--color-text)">{title}</h3>
+          <p className="text-xs text-(--color-text-light) font-medium">
+            {date} <span className="mx-1 text-(--color-border)">•</span> {size}
           </p>
         </div>
       </div>
       <div className="flex items-center gap-3">
-        <span className="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider">
+        <span className="bg-(--color-surface) text-(--color-text-light) border border-(--color-border) text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow-sm">
           {type}
         </span>
         {fileUrl ? (
@@ -53,7 +53,7 @@ const Card = ({ title, date, size, type, fileUrl }: Props) => {
             href={fileUrl}
             download
             title="Download Report"
-            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+            className="p-2 text-(--color-text-light) hover:text-(--color-primary) hover:bg-(--color-primary-lighter)/20 rounded-lg transition-all duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             <FiDownload className="text-lg" />
@@ -61,7 +61,7 @@ const Card = ({ title, date, size, type, fileUrl }: Props) => {
         ) : (
           <button 
             title="Download Report"
-            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200"
+            className="p-2 text-(--color-text-light) hover:text-(--color-primary) hover:bg-(--color-primary-lighter)/20 rounded-lg transition-all duration-200"
             onClick={(e) => {
               e.stopPropagation();
               alert(`Downloading ${title}...`);

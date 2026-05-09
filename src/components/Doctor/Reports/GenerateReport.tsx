@@ -1,6 +1,12 @@
 import { useNavigate } from "react-router";
 
-const GenerateReport = () => {
+const GenerateReport = ({
+  patientId,
+  appointmentId,
+}: {
+  patientId?: number;
+  appointmentId?: number;
+}) => {
   const navigate = useNavigate();
 
   return (
@@ -14,8 +20,12 @@ const GenerateReport = () => {
         </p>
       </div>
       <button
-        onClick={() => navigate("/doctor-reports/generate-new-report")}
-        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-10 rounded-xl transition-all duration-200 shadow-lg shadow-blue-200 active:scale-95"
+        onClick={() =>
+          navigate(
+            `/doctor-reports/generate-new-report?patientId=${patientId || 0}&appointmentId=${appointmentId || 0}`,
+          )
+        }
+        className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-10 rounded-xl transition-all duration-200 shadow-lg shadow-blue-200 active:scale-95 cursor-pointer"
       >
         Generate Report
       </button>

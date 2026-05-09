@@ -40,7 +40,8 @@ function VerifyDoctorPage() {
     formState: { errors },
   } = useForm<Inputs>();
 
-  const labelClass = "mb-1 inline-block text-sm font-medium text-(--color-text)";
+  const labelClass =
+    "mb-1 inline-block text-sm font-medium text-(--color-text)";
   const inputClass =
     "w-full rounded-xl border border-(--color-border) bg-(--color-bg) px-4 py-3 text-(--color-text) placeholder:text-gray-500 placeholder:text-sm transition focus:border-[#00AFE5] focus:outline-none focus:ring-2 focus:ring-[#00AFE5]/25";
   const errorClass = "ml-1 mt-1 text-xs font-light text-red-600";
@@ -92,7 +93,9 @@ function VerifyDoctorPage() {
             <FiFileText className="text-3xl text-[#00AFE5]" />
           </div>
           <h1 className="text-2xl font-semibold text-(--color-text) sm:text-3xl">
-            {isStudentDoctor ? "Student Doctor Verification" : "Doctor Verification"}
+            {isStudentDoctor
+              ? "Student Doctor Verification"
+              : "Doctor Verification"}
           </h1>
           <p className="max-w-2xl text-sm text-(--color-text-light) sm:text-base">
             {isStudentDoctor
@@ -165,7 +168,9 @@ function VerifyDoctorPage() {
                     })}
                   />
                   {errors.YearsOfExperience && (
-                    <p className={errorClass}>{errors.YearsOfExperience.message}</p>
+                    <p className={errorClass}>
+                      {errors.YearsOfExperience.message}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -233,7 +238,10 @@ function VerifyDoctorPage() {
             <>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="studentNationalIdNumber" className={labelClass}>
+                  <label
+                    htmlFor="studentNationalIdNumber"
+                    className={labelClass}
+                  >
                     National ID Number
                   </label>
                   <input
@@ -248,7 +256,9 @@ function VerifyDoctorPage() {
                     })}
                   />
                   {errors.nationalIdNumber && (
-                    <p className={errorClass}>{errors.nationalIdNumber.message}</p>
+                    <p className={errorClass}>
+                      {errors.nationalIdNumber.message}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -288,7 +298,9 @@ function VerifyDoctorPage() {
                     })}
                   />
                   {errors.supervisorDoctor && (
-                    <p className={errorClass}>{errors.supervisorDoctor.message}</p>
+                    <p className={errorClass}>
+                      {errors.supervisorDoctor.message}
+                    </p>
                   )}
                 </div>
                 <div>

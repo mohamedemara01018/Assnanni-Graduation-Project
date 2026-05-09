@@ -1,19 +1,91 @@
-import { useState } from "react";
-import { NavLink } from "react-router";
+import { useParams, useNavigate, NavLink } from "react-router";
 import { BsCalendar3, BsCash, BsCheckCircleFill } from "react-icons/bs";
 import { LuUser, LuFileText } from "react-icons/lu";
 import { HiOutlineClock } from "react-icons/hi2";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import type { CheckInDetails } from "@/interfaces/receptionistInterfaces";
-import { checkInDetails } from "@/constants/receptionistConstants";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import Cookies from "js-cookie";
+import { toast } from "react-toastify";
+import { useState } from "react";
+
+interface AppointmentInfo {
+  id: number;
+  status: string;
+  date: string;
+  time: string;
+  location: string | null;
+  duration: number;
+  type: string;
+  notes: string;
+  patientName: string;
+  doctorName: string | null;
+  mode: string;
+  paymentStatus: string;
+}
 
 const CheckIn = () => {
-  const [data] = useState<CheckInDetails>(checkInDetails);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
+  const token = Cookies.get("jwtToken");
 
   const [cashReceived, setCashReceived] = useState(false);
   const [notes, setNotes] = useState("");
 
-  const initials = data.patientName
+  const { data: appointmentData, isLoading } = useQuery({
+    queryKey: ["AppointmentDetails", id],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${backendUrl}Receptionist/dashboard/appointments/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      return response.data;
+    },
+    enabled: !!id,
+  });
+
+  const checkInMutation = useMutation({
+    mutationFn: async () => {
+      await axios.post(
+        `${backendUrl}Receptionist/checkin/${id}`,
+        {
+          paymentStatus: cashReceived ? "Paid" : "Pending",
+          notes: notes,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+    },
+    onSuccess: () => {
+      toast.success("Check-in successful");
+      navigate("/");
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || "Check-in failed");
+    },
+  });
+
+  const appointment = appointmentData?.data as AppointmentInfo;
+
+  if (isLoading) {
+    return (
+      <DashboardLayout pageTitle="Check-In">
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <div className="w-10 h-10 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!appointment) return null;
+
+  const initials = appointment.patientName
     .split(" ")
     .map((n) => n[0])
     .join("")
@@ -59,14 +131,14 @@ const CheckIn = () => {
               <div className="text-center sm:text-left">
                 <div className="flex flex-wrap items-center gap-3 justify-center sm:justify-start mb-1">
                   <h3 className="text-xl font-bold text-(--color-text)">
-                    {data.patientName}
+                    {appointment.patientName}
                   </h3>
                   <span className="px-3 py-1 rounded-full bg-yellow-50 text-yellow-600 border border-yellow-100 text-[10px] font-bold uppercase tracking-wider">
-                    {data.status}
+                    {appointment.status}
                   </span>
                 </div>
                 <p className="text-sm text-(--color-text-light) font-medium">
-                  Patient ID: {data.patientId}
+                  Appointment ID: {appointment.id}
                 </p>
               </div>
             </div>
@@ -81,10 +153,10 @@ const CheckIn = () => {
                     Doctor
                   </p>
                   <p className="text-sm font-bold text-(--color-text)">
-                    {data.doctorName}
+                    {appointment.doctorName || "Pending Assignment"}
                   </p>
                   <p className="text-xs text-(--color-text-light) font-medium">
-                    {data.specialty}
+                    {appointment.mode} Mode
                   </p>
                 </div>
               </div>
@@ -98,7 +170,7 @@ const CheckIn = () => {
                     Time
                   </p>
                   <p className="text-sm font-bold text-(--color-text)">
-                    {data.time}
+                    {appointment.time}
                   </p>
                 </div>
               </div>
@@ -112,7 +184,7 @@ const CheckIn = () => {
                     Date
                   </p>
                   <p className="text-sm font-bold text-(--color-text)">
-                    {data.date}
+                    {appointment.date}
                   </p>
                 </div>
               </div>
@@ -126,7 +198,7 @@ const CheckIn = () => {
                     Type
                   </p>
                   <p className="text-sm font-bold text-(--color-text)">
-                    {data.appointmentType}
+                    {appointment.type}
                   </p>
                 </div>
               </div>
@@ -137,10 +209,16 @@ const CheckIn = () => {
                 </div>
                 <div>
                   <p className="text-xs text-(--color-text-light) font-medium mb-1">
-                    Payment Method
+                    Status
                   </p>
-                  <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-bold">
-                    $ {data.paymentMethod}
+                  <span
+                    className={`px-3 py-1 rounded-full border text-[10px] font-bold ${
+                      appointment.paymentStatus === "Paid"
+                        ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                        : "bg-red-50 text-red-600 border-red-100"
+                    }`}
+                  >
+                    {appointment.paymentStatus}
                   </span>
                 </div>
               </div>
@@ -170,11 +248,9 @@ const CheckIn = () => {
                 {cashReceived && <BsCheckCircleFill size={14} />}
               </div>
               <div>
-                <p className="font-bold text-(--color-text)">
-                  Cash Received (${data.amount})
-                </p>
+                <p className="font-bold text-(--color-text)">Confirm Arrival</p>
                 <p className="text-xs text-(--color-text-light) font-medium mt-0.5">
-                  Payment will be collected at the clinic
+                  Mark patient as arrived and ready for queue
                 </p>
               </div>
             </div>
@@ -197,14 +273,15 @@ const CheckIn = () => {
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-4 mb-20">
             <button
-              disabled={!cashReceived}
+              onClick={() => checkInMutation.mutate()}
+              disabled={!cashReceived || checkInMutation.isPending}
               className={`flex-1 py-4 rounded-xl font-bold transition-all shadow-lg ${
                 cashReceived
                   ? "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20 hover:-translate-y-0.5"
                   : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
             >
-              Confirm Check-In
+              {checkInMutation.isPending ? "Processing..." : "Confirm Check-In"}
             </button>
             <NavLink
               to="/receptionist"

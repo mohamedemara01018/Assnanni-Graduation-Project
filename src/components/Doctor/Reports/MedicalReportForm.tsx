@@ -8,11 +8,19 @@ import {
   FiPhone,
   FiArrowLeft,
 } from "react-icons/fi";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import Cookies from "js-cookie";
+import { toast } from "react-toastify";
 
 const MedicalReportForm = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const patientId = searchParams.get("patientId");
+
   const [allergies, setAllergies] = useState<string[]>([]);
   const [newAllergy, setNewAllergy] = useState("");
 
@@ -25,19 +33,22 @@ const MedicalReportForm = () => {
     status: "Ongoing",
   });
 
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
+  const token = Cookies.get("jwtToken");
+
   const [prescriptions, setPrescriptions] = useState<
     {
-      medication: string;
-      prescribedBy: string;
-      date: string;
+      medicationName: string;
+      dosage: string;
       frequency: string;
+      durationInDays: number;
     }[]
   >([]);
   const [newPrescription, setNewPrescription] = useState({
-    medication: "",
-    prescribedBy: "",
-    date: "",
+    medicationName: "",
+    dosage: "",
     frequency: "",
+    durationInDays: 0,
   });
 
   const [emergencyContact, setEmergencyContact] = useState({
@@ -65,14 +76,59 @@ const MedicalReportForm = () => {
   };
 
   const addPrescription = () => {
-    if (newPrescription.medication && newPrescription.prescribedBy) {
+    if (newPrescription.medicationName && newPrescription.dosage) {
       setPrescriptions([...prescriptions, newPrescription]);
       setNewPrescription({
-        medication: "",
-        prescribedBy: "",
-        date: "",
+        medicationName: "",
+        dosage: "",
         frequency: "",
+        durationInDays: 0,
       });
+    }
+  };
+
+  const handleGenerateReport = async () => {
+    try {
+      if (!patientId) {
+        toast.error("Patient ID is missing");
+        return;
+      }
+
+      if (prescriptions.length === 0) {
+        toast.warning("Please add at least one prescription");
+        return;
+      }
+
+      const requestBody = {
+        patientId: Number(patientId),
+        items: prescriptions,
+      };
+
+      const response = await axios.post(
+        `${backendUrl}Prescriptions`,
+        requestBody,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      console.log(response);
+      if (response.data.succeeded) {
+        toast.success(
+          "Medical report and prescriptions generated successfully",
+        );
+        navigate(-1);
+      } else {
+        toast.error(
+          response.data.message || "Failed to generate prescriptions",
+        );
+      }
+    } catch (error) {
+      console.error("Error generating report:", error);
+      toast.error(
+        (error as any)?.response?.data?.message || "Failed to generate report",
+      );
     }
   };
 
@@ -144,77 +200,6 @@ const MedicalReportForm = () => {
                 </div>
               </section>
 
-              {/* Medical History Section */}
-              <section>
-                <div className="flex items-center gap-2 mb-6 text-blue-600">
-                  <FiActivity className="text-xl" />
-                  <h3 className="font-bold text-lg">Medical History</h3>
-                </div>
-                <div className="space-y-4 mb-6">
-                  {history.map((item, index) => (
-                    <div
-                      key={index}
-                      className="bg-gray-50 border border-gray-100 p-4 rounded-2xl flex justify-between items-center group animate-in slide-in-from-left duration-200"
-                    >
-                      <div>
-                        <h4 className="font-bold text-gray-900">
-                          {item.condition}
-                        </h4>
-                        <p className="text-xs text-gray-500 mt-1 font-medium italic">
-                          Diagnosed: {item.date}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <span className="bg-yellow-50 text-yellow-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                          {item.status}
-                        </span>
-                        <button
-                          onClick={() =>
-                            setHistory(history.filter((_, i) => i !== index))
-                          }
-                          className="text-gray-300 hover:text-red-500 transition-colors"
-                        >
-                          <FiTrash2 />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="bg-gray-50/50 p-6 rounded-2xl border border-dashed border-gray-200">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <input
-                      type="text"
-                      placeholder="Condition name..."
-                      className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-400"
-                      value={newCondition.condition}
-                      onChange={(e) =>
-                        setNewCondition({
-                          ...newCondition,
-                          condition: e.target.value,
-                        })
-                      }
-                    />
-                    <input
-                      type="date"
-                      className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-400"
-                      value={newCondition.date}
-                      onChange={(e) =>
-                        setNewCondition({
-                          ...newCondition,
-                          date: e.target.value,
-                        })
-                      }
-                    />
-                    <button
-                      onClick={addCondition}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors"
-                    >
-                      Add Condition
-                    </button>
-                  </div>
-                </div>
-              </section>
-
               {/* Prescriptions Section */}
               <section>
                 <div className="flex items-center gap-2 mb-6 text-green-600">
@@ -229,14 +214,14 @@ const MedicalReportForm = () => {
                     >
                       <div>
                         <h4 className="font-bold text-gray-900">
-                          {p.medication}
+                          {p.medicationName}
                         </h4>
                         <p className="text-xs text-gray-500 mt-1 font-medium">
-                          Prescribed by{" "}
+                          Dosage:{" "}
                           <span className="text-blue-600 font-bold">
-                            {p.prescribedBy}
+                            {p.dosage}
                           </span>{" "}
-                          on {p.date}
+                          • Duration: {p.durationInDays} days
                         </p>
                       </div>
                       <div className="flex items-center gap-4">
@@ -246,7 +231,7 @@ const MedicalReportForm = () => {
                         <button
                           onClick={() =>
                             setPrescriptions(
-                              prescriptions.filter((_, i) => i !== index)
+                              prescriptions.filter((_, i) => i !== index),
                             )
                           }
                           className="text-gray-300 hover:text-red-500 transition-colors"
@@ -263,36 +248,37 @@ const MedicalReportForm = () => {
                       type="text"
                       placeholder="Medication name..."
                       className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:border-green-400"
-                      value={newPrescription.medication}
+                      value={newPrescription.medicationName}
                       onChange={(e) =>
                         setNewPrescription({
                           ...newPrescription,
-                          medication: e.target.value,
+                          medicationName: e.target.value,
                         })
                       }
                     />
                     <input
                       type="text"
-                      placeholder="Prescribed by..."
+                      placeholder="Dosage (e.g. 500mg)..."
                       className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:border-green-400"
-                      value={newPrescription.prescribedBy}
+                      value={newPrescription.dosage}
                       onChange={(e) =>
                         setNewPrescription({
                           ...newPrescription,
-                          prescribedBy: e.target.value,
+                          dosage: e.target.value,
                         })
                       }
                     />
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <input
-                      type="date"
+                      type="number"
+                      placeholder="Duration in days..."
                       className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-sm outline-none focus:border-green-400"
-                      value={newPrescription.date}
+                      value={newPrescription.durationInDays || ""}
                       onChange={(e) =>
                         setNewPrescription({
                           ...newPrescription,
-                          date: e.target.value,
+                          durationInDays: Number(e.target.value),
                         })
                       }
                     />
@@ -389,7 +375,10 @@ const MedicalReportForm = () => {
               >
                 Cancel
               </button>
-              <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-12 rounded-2xl transition-all shadow-xl shadow-blue-100 active:scale-95 text-lg">
+              <button
+                onClick={handleGenerateReport}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-12 rounded-2xl transition-all shadow-xl shadow-blue-100 active:scale-95 text-lg"
+              >
                 Generate Report
               </button>
             </div>

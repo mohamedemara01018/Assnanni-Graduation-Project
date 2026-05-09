@@ -37,10 +37,7 @@ function Login() {
 
           <div className="text-center text-(--color-text-light)">
             <span>Don't have an account?</span>
-            <NavLink
-              to={"/register/patient-register"}
-              className={"text-(--color-primary)"}
-            >
+            <NavLink to={"/register"} className={"text-(--color-primary)"}>
               Register now
             </NavLink>
           </div>

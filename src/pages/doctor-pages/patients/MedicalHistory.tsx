@@ -13,8 +13,12 @@ import { toast } from "react-toastify";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
-import Cookies from "js-cookie";
+import { useRef, useState } from "react";
 import type { MedicalHistoryItem } from "@/interfaces/doctorInterfaces";
+import { useMyProfile } from "@/hooks/useMyProfile";
+import { HiOutlinePaperClip } from "react-icons/hi";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Cookies from "js-cookie";
 
 const MedicalHistory = () => {
   const role = useSelector((state: RootState) => state.auth.role);
@@ -22,22 +26,98 @@ const MedicalHistory = () => {
   const navigate = useNavigate();
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [activeRecordId, setActiveRecordId] = useState<number | null>(null);
 
-  const { data, isLoading, isError, error, isSuccess } = useQuery({
-    queryKey: ["PatientMedicalHistory", id],
+  const { data: profileData } = useMyProfile();
+  const doctorName = profileData?.fullName;
+
+  const { data: appointmentData } = useQuery({
+    queryKey: ["CheckAppointment", id],
     queryFn: async () => {
       const response = await axios.get(
-        `${backendUrl}Doctors/patient-medical-history/${id}`,
+        `${backendUrl}Patient/appointments?patientId=${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
+      return response.data;
+    },
+    enabled: !!id && !!token && role === "doctor",
+  });
+
+  const appointments = appointmentData?.data?.appointments?.items || [];
+
+  const doctorAppointment = appointments.find(
+    (app: any) => app.doctorName === doctorName && app.status === "Confirmed",
+  );
+
+  const appointmentId = doctorAppointment?.appointmentId;
+
+  const { data, isLoading, isError, error, isSuccess } = useQuery({
+    queryKey: ["PatientMedicalHistory", id, role],
+    queryFn: async () => {
+      const endpoint =
+        role === "receptionist"
+          ? `Receptionist/${id}/medical-history`
+          : `Doctors/patient-medical-history/${id}`;
+
+      const response = await axios.get(`${backendUrl}${endpoint}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     },
     enabled: !!id && !!token,
   });
+
+  const uploadAttachmentMutation = useMutation({
+    mutationFn: async ({
+      recordId,
+      file,
+    }: {
+      recordId: number;
+      file: File;
+    }) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      await axios.post(
+        `${backendUrl}MedicalRecords/${recordId}/attachments`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+    },
+    onSuccess: () => {
+      toast.success("Attachment uploaded successfully");
+      queryClient.invalidateQueries({
+        queryKey: ["PatientMedicalHistory", id],
+      });
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || "Failed to upload attachment");
+    },
+  });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && activeRecordId) {
+      uploadAttachmentMutation.mutate({ recordId: activeRecordId, file });
+    }
+  };
+
+  const triggerUpload = (recordId: number) => {
+    setActiveRecordId(recordId);
+    fileInputRef.current?.click();
+  };
 
   useEffect(() => {
     if (isSuccess && data?.succeeded) {
@@ -47,7 +127,7 @@ const MedicalHistory = () => {
       console.error("Error fetching medical history:", error);
       toast.error(
         (error as any)?.response?.data?.message ||
-          "Failed to load medical history"
+          "Failed to load medical history",
       );
     }
   }, [isSuccess, isError, error, data]);
@@ -60,7 +140,7 @@ const MedicalHistory = () => {
       item.doctorName
     }\nDate: ${item.date}\nType: ${item.type}\n\nDescription:\n${
       item.description
-    }\n\nAttachments: ${item.attachments.join(", ")}`;
+    }\n\nAttachments: ${item.attachments.map((a) => a.fileName).join(", ")}`;
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -73,14 +153,76 @@ const MedicalHistory = () => {
     toast.success(`Downloading ${item.title} record...`);
   };
 
-  const handleDownloadAttachment = (fileName: string) => {
-    toast.info(`Downloading attachment: ${fileName}`);
-    // In a real app, this would be a link to the actual file
+  const handleDownloadAttachment = async (file: {
+    fileName: string;
+    url: string;
+  }) => {
+    toast.info(`Downloading attachment: ${file.fileName}`);
+
+    let fullUrl = file.url;
+    if (!file.url.startsWith("http")) {
+      const cleanBackendUrl = backendUrl.endsWith("/")
+        ? backendUrl.slice(0, -1)
+        : backendUrl;
+      const cleanFileUrl = file.url.startsWith("/") ? file.url : `/${file.url}`;
+
+      if (cleanFileUrl.startsWith(cleanBackendUrl)) {
+        fullUrl = cleanFileUrl;
+      } else {
+        fullUrl = `${cleanBackendUrl}${cleanFileUrl}`;
+      }
+    }
+
+    // Extract extension from URL
+    const urlParts = file.url.split(".");
+    const extension = urlParts.length > 1 ? `.${urlParts.pop()}` : "";
+
+    // Ensure filename has the extension
+    let downloadName = file.fileName;
+    if (
+      extension &&
+      !downloadName.toLowerCase().endsWith(extension.toLowerCase())
+    ) {
+      downloadName += extension;
+    }
+
+    try {
+      const response = await fetch(fullUrl);
+      if (!response.ok) throw new Error("Network response was not ok");
+
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = downloadName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Download failed:", error);
+      const link = document.createElement("a");
+      link.href = fullUrl;
+      link.download = downloadName;
+      link.target = "_blank";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
   };
 
   return (
     <DashboardLayout pageTitle="Medical History">
       <div className="-mt-6 p-8 bg-(--color-bg) min-h-[60vh] rounded-2xl">
+        {/* Hidden File Input */}
+        <input
+          type="file"
+          className="hidden"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+        />
+
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           <div>
@@ -98,9 +240,11 @@ const MedicalHistory = () => {
           {role === "doctor" && (
             <button
               onClick={() =>
-                navigate(`/doctor-patients/${id}/medical-history/add`)
+                navigate(
+                  `/doctor-patients/${id}/medical-history/add?appointmentId=${appointmentId}`,
+                )
               }
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95 mt-10"
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95 mt-10 cursor-pointer"
             >
               <FiPlus className="text-xl" />
               <span>Add New Record</span>
@@ -142,14 +286,36 @@ const MedicalHistory = () => {
                     </div>
                   </div>
 
-                  {/* Download Button */}
-                  <button
-                    onClick={() => handleDownload(item)}
-                    className="p-2 text-(--color-text-light) hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all cursor-pointer"
-                    title="Download Record"
-                  >
-                    <HiOutlineDownload className="text-2xl" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    {/* Add Attachment Button */}
+                    {role === "doctor" && (
+                      <button
+                        onClick={() => triggerUpload(item.id)}
+                        disabled={
+                          uploadAttachmentMutation.isPending &&
+                          activeRecordId === item.id
+                        }
+                        className="p-2 text-(--color-text-light) hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all cursor-pointer disabled:opacity-50"
+                        title="Add Attachment"
+                      >
+                        {uploadAttachmentMutation.isPending &&
+                        activeRecordId === item.id ? (
+                          <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <HiOutlinePaperClip className="text-2xl" />
+                        )}
+                      </button>
+                    )}
+
+                    {/* Download Button */}
+                    <button
+                      onClick={() => handleDownload(item)}
+                      className="p-2 text-(--color-text-light) hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-all cursor-pointer"
+                      title="Download Record"
+                    >
+                      <HiOutlineDownload className="text-2xl" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="mt-6">
@@ -164,15 +330,24 @@ const MedicalHistory = () => {
                       Attachments:
                     </p>
                     <div className="flex flex-wrap gap-3">
-                      {item.attachments.map((file, i) => (
-                        <button
-                          key={i}
-                          onClick={() => handleDownloadAttachment(file)}
-                          className="px-5 py-2 bg-gray-50 dark:bg-gray-800/40 border border-(--color-border) rounded-2xl text-sm font-medium text-(--color-text) hover:border-blue-500/50 hover:bg-blue-50/30 transition-all cursor-pointer flex items-center gap-2"
-                        >
-                          <span className="truncate max-w-[250px]">{file}</span>
-                        </button>
-                      ))}
+                      {item.attachments.map((file, i) => {
+                        const extension =
+                          file.url.split(".").pop()?.toUpperCase() || "FILE";
+                        return (
+                          <button
+                            key={i}
+                            onClick={() => handleDownloadAttachment(file)}
+                            className="px-4 py-2 bg-gray-50 dark:bg-gray-800/40 border border-(--color-border) rounded-2xl text-sm font-medium text-(--color-text) hover:border-blue-500/50 hover:bg-blue-50/30 transition-all cursor-pointer flex items-center gap-3 group"
+                          >
+                            <span className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-bold rounded-md">
+                              {extension}
+                            </span>
+                            <span className="truncate max-w-[200px]">
+                              {file.fileName}
+                            </span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

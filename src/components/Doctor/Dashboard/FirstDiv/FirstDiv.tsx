@@ -125,20 +125,25 @@ const FirstDiv = () => {
         <div className="flex flex-col gap-4 max-h-60 overflow-y-auto">
           {pendingScans.length > 0 ? (
             pendingScans.map((scan: Scan) => (
-              <Card
+              <NavLink
                 key={scan.id}
-                title={scan.scanType}
-                status="Pending"
-                color="violet"
-                logo={<LuFileSpreadsheet />}
+                to={`/scan/analysis/${scan.patientId}`}
+                className="block hover:opacity-90 transition-opacity"
               >
-                <p className="text-(--color-text-light) text-sm">
-                  Patient: {scan.patientName}
-                </p>
-                <p className="text-(--color-text-light) text-sm">
-                  Uploaded: {new Date(scan.uploadedAt).toLocaleDateString()}
-                </p>
-              </Card>
+                <Card
+                  title={scan.scanType}
+                  status="Pending"
+                  color="violet"
+                  logo={<LuFileSpreadsheet />}
+                >
+                  <p className="text-(--color-text-light) text-sm">
+                    Patient: {scan.patientName}
+                  </p>
+                  <p className="text-(--color-text-light) text-sm">
+                    Uploaded: {new Date(scan.uploadedAt).toLocaleDateString()}
+                  </p>
+                </Card>
+              </NavLink>
             ))
           ) : (
             <p className="text-(--color-text-light)">No pending scans.</p>

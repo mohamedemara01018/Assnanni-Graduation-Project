@@ -20,6 +20,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import Cookies from "js-cookie";
 import { useEffect } from "react";
+import GenerateReport from "@/components/Doctor/Reports/GenerateReport";
 
 interface PersonalInfo {
   fullName: string;
@@ -32,6 +33,7 @@ interface PersonalInfo {
 }
 
 interface Appointment {
+  appointmentId: number;
   title: string;
   doctorName: string;
   date: string;
@@ -52,10 +54,23 @@ const PatientDetails = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
 
+  const { role } = useSelector(
+    (state: {
+      auth: {
+        role: string;
+      };
+    }) => state.auth,
+  );
+
   const { data, isLoading, isError, error, isSuccess } = useQuery({
-    queryKey: ["PatientInfo", id],
+    queryKey: ["PatientInfo", id, role],
     queryFn: async () => {
-      const response = await axios.get(`${backendUrl}Doctors/patient-info/${id}`, {
+      const endpoint =
+        role === "receptionist"
+          ? `Receptionist/${id}/doctor-info`
+          : `Doctors/patient-info/${id}`;
+
+      const response = await axios.get(`${backendUrl}${endpoint}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -72,12 +87,17 @@ const PatientDetails = () => {
     if (isError) {
       console.error("Error fetching patient info:", error);
       toast.error(
-        (error as any)?.response?.data?.message || "Failed to load patient information"
+        (error as any)?.response?.data?.message ||
+          "Failed to load patient information",
       );
     }
   }, [isSuccess, isError, error, data]);
 
   const patient = data?.data as PatientData;
+  const confirmedAppointment = patient?.appointments?.find(
+    (app) => app.status === "Confirmed",
+  );
+  const appointmentId = confirmedAppointment?.appointmentId;
 
   if (isLoading) {
     return (
@@ -96,9 +116,12 @@ const PatientDetails = () => {
           <div className="text-red-500 text-5xl mb-2">
             <IoAlertCircleOutline />
           </div>
-          <h2 className="text-xl font-bold text-(--color-text)">Error Loading Data</h2>
+          <h2 className="text-xl font-bold text-(--color-text)">
+            Error Loading Data
+          </h2>
           <p className="text-(--color-text-light)">
-            {(error as any)?.response?.data?.message || "Something went wrong while fetching patient details."}
+            {(error as any)?.response?.data?.message ||
+              "Something went wrong while fetching patient details."}
           </p>
           <button
             onClick={() => navigate(-1)}
@@ -130,7 +153,14 @@ const PatientDetails = () => {
             Patient ID: {id}
           </p>
         </div>
-
+        {patient.appointments.length > 0 && (
+          <div className=" mb-6 bg-(--color-surface) rounded-2xl border border-(--color-border)   ">
+            <GenerateReport
+              patientId={id ? Number(id) : undefined}
+              appointmentId={appointmentId}
+            />
+          </div>
+        )}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Personal Details */}
           <div className="lg:col-span-1">
@@ -198,7 +228,9 @@ const PatientDetails = () => {
                     </span>
                   ))
                 ) : (
-                  <p className="text-xs text-(--color-text-light) italic">No allergies recorded.</p>
+                  <p className="text-xs text-(--color-text-light) italic">
+                    No allergies recorded.
+                  </p>
                 )}
               </div>
             </div>
@@ -232,7 +264,9 @@ const PatientDetails = () => {
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs text-(--color-text-light) italic px-2">No medical history found.</p>
+                  <p className="text-xs text-(--color-text-light) italic px-2">
+                    No medical history found.
+                  </p>
                 )}
               </div>
             </div>
@@ -270,7 +304,9 @@ const PatientDetails = () => {
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs text-(--color-text-light) italic px-2">No active prescriptions.</p>
+                  <p className="text-xs text-(--color-text-light) italic px-2">
+                    No active prescriptions.
+                  </p>
                 )}
               </div>
             </div>
@@ -298,17 +334,21 @@ const PatientDetails = () => {
                           {app.doctorName} • {app.date}
                         </p>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                        app.status === "Confirmed" 
-                          ? "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400"
-                          : "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                      }`}>
+                      <span
+                        className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          app.status === "Confirmed"
+                            ? "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400"
+                            : "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
+                        }`}
+                      >
                         {app.status}
                       </span>
                     </div>
                   ))
                 ) : (
-                  <p className="text-xs text-(--color-text-light) italic px-2">No recent appointments.</p>
+                  <p className="text-xs text-(--color-text-light) italic px-2">
+                    No recent appointments.
+                  </p>
                 )}
               </div>
             </div>
@@ -340,4 +380,3 @@ const DetailItem = ({
 );
 
 export default PatientDetails;
-

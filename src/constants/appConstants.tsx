@@ -23,6 +23,7 @@ import MedicalReportForm from "../components/Doctor/Reports/MedicalReportForm";
 import ReceptionistAccess from "../components/Doctor/ReceptionistAccess/ReceptionistAccess";
 import AddReceptionist from "../components/Doctor/ReceptionistAccess/AddReceptionist";
 import Scan from "../pages/doctor-pages/Scan/Scan";
+import ScanDetails from "../pages/doctor-pages/scans/ScanDetails";
 import Notifications from "../pages/doctor-pages/notifications/Notifications";
 import StudentAppointments from "../pages/student-doctor-pages/appointments/StudentAppointments";
 import StudentAppointmentDetails from "../pages/student-doctor-pages/appointments/StudentAppointmentDetails";
@@ -45,6 +46,7 @@ import DoctorProfilePage from "../pages/doctor-profile-page/DoctorProfilePage";
 import AppointmentsBookingPage from "../pages/appointments-booking-page/AppointmentsBookingPage";
 import PatientProfilePage from "../pages/patient-profile-page/PatientProfilePage";
 import EditPatientProfilePage from "../pages/edit-patient-profile-page/EditPatientProfilePage";
+import ProfilePage from "../pages/profile-page/ProfilePage";
 
 // ProtectedRoute component for role-based access control
 export const ProtectedRoute = ({
@@ -112,6 +114,7 @@ export const routeElements = {
   "receptionist-access": <ReceptionistAccess />,
   "receptionist-access/add": <AddReceptionist />,
   "scan/upload": <Scan />,
+  "scan/analysis/:patientId": <ScanDetails />,
   notification: <Notifications />,
   "doctor-appointments": <StudentAppointments />,
   "doctor-appointments/:id": <StudentAppointmentDetails />,
@@ -124,7 +127,7 @@ export const routeElements = {
   // Receptionist routes
   "/receptionist": <ReceptionistDashboard />,
   "/receptionist/schedule-appointment": <ScheduleAppointment />,
-  "/receptionist/check-in": <CheckIn />,
+  "/receptionist/:id/check-in": <CheckIn />,
   "/receptionist/reschedule/:id": <RescheduleAppointment />,
   "/receptionist/register-patient": <RegisterPatient />,
 
@@ -142,4 +145,5 @@ export const routeElements = {
   "/appointments/booking/:id": <AppointmentsBookingPage />,
   "/patient-profile/:id": <PatientProfilePage />,
   "/patient-profile/edit/:id": <EditPatientProfilePage />,
+  profile: <ProfilePage />,
 };

@@ -1,6 +1,6 @@
 import { NavLink } from "react-router";
 import { IoMdPersonAdd } from "react-icons/io";
-import { BsCalendar3, BsCheckCircleFill } from "react-icons/bs";
+import { BsCalendar3 } from "react-icons/bs";
 
 const QuickActions = () => {
   const actions = [
@@ -9,7 +9,7 @@ const QuickActions = () => {
       subTitle: "Add to system",
       icon: <IoMdPersonAdd />,
       color: "blue",
-      path: "/register/patient-register",
+      path: "receptionist/register-patient",
       bg: "bg-blue-50/50",
       iconBg: "bg-blue-600",
       textColor: "text-blue-800",
@@ -25,17 +25,6 @@ const QuickActions = () => {
       iconBg: "bg-emerald-600",
       textColor: "text-emerald-800",
       subColor: "text-emerald-600",
-    },
-    {
-      title: "Check-In Patient",
-      subTitle: "Mark as arrived",
-      icon: <BsCheckCircleFill />,
-      color: "purple",
-      path: "/receptionist/check-in",
-      bg: "bg-purple-50/50",
-      iconBg: "bg-purple-600",
-      textColor: "text-purple-800",
-      subColor: "text-purple-600",
     },
   ];
 

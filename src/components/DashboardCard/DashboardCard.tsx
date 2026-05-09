@@ -26,26 +26,26 @@ const DashboardCard = ({ title, subTitle, num, logo, color }: Props) => {
   };
 
   return (
-    <div className="flex flex-col bg-(--color-surface) border border-(--color-border) shadow-sm w-full p-6 rounded-2xl gap-6 hover:shadow-md transition-shadow">
+    <div className="flex flex-col bg-(--color-surface) border border-(--color-border) shadow-sm w-full p-6 rounded-2xl gap-3 hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start">
         <div
-          className={`${colorMap[color]} w-12 h-12 flex items-center justify-center rounded-xl border shadow-xs`}
+          className={`${colorMap[color]} w-12 h-12 flex items-center justify-center rounded-2xl border shadow-xs`}
         >
           <div className="text-xl">{logo}</div>
         </div>
         {subTitle && (
           <div
-            className={`h-fit py-1 px-3 rounded-full text-[10px] font-bold uppercase tracking-wider ${badgeColorMap[color]}`}
+            className={`h-fit py-1 px-3 rounded-full text-[10px] font-semibold uppercase tracking-wider ${badgeColorMap[color]}`}
           >
             {subTitle}
           </div>
         )}
       </div>
       <div>
-        <p className="text-3xl text-(--color-text) font-bold tracking-tight">
+        <p className="text-2xl text-(--color-text) font-bold tracking-tight">
           {num}
         </p>
-        <p className="text-(--color-text-light) text-xs font-bold uppercase tracking-widest mt-1">
+        <p className="text-(--color-text-light) text-xs font-semibold uppercase tracking-widest mt-1">
           {title}
         </p>
       </div>
