@@ -104,7 +104,7 @@ const RegistrationForm = ({
         formData.append("Password", data.password);
         formData.append("ConfirmPassword", data.confirmPassword);
         formData.append("PhoneNumber", data.phoneNumber);
-        
+
         if (data.image?.[0]) {
           formData.append("ProfileImage", data.image[0]);
         }
@@ -115,20 +115,18 @@ const RegistrationForm = ({
           },
         });
       } else {
-        console.log(
-          data.dateOfBirth
-            ? new Date(data.dateOfBirth).toISOString()
-            : new Date().toISOString(),
-        );
+        const formattedDate = data.dateOfBirth
+          ? `${data.dateOfBirth}T00:00:00Z`
+          : new Date().toISOString();
+
+        console.log(formattedDate);
         return axios.post(authBase + "Patient/register", {
           firstName: data.firstName,
           lastName: data.lastName,
           email: data.email,
           password: data.password,
           phoneNumber: data.phoneNumber,
-          dateOfBirth: data.dateOfBirth
-            ? new Date(data.dateOfBirth).toISOString()
-            : new Date().toISOString(),
+          dateOfBirth: formattedDate,
           address: data.address,
           gender: data.gender,
           bloodType: data.bloodType,
@@ -161,42 +159,46 @@ const RegistrationForm = ({
     <div className="register-container flex flex-col justify-center gap-4">
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col items-center gap-3 py-2">
-            <label htmlFor="image" className="cursor-pointer">
-              {imagePreview ? (
-                <img
-                  src={imagePreview}
-                  alt="Selected profile preview"
-                  className="h-28 w-28 rounded-full object-cover ring-2 ring-[#00AFE5]/40"
-                />
-              ) : (
-                <div className="flex h-28 w-28 items-center justify-center rounded-full border-2 border-dashed border-[#00AFE5]/50 bg-[#00AFE5]/10">
-                  <IoPersonCircleOutline className="text-6xl text-[#00AFE5]" />
-                </div>
+          {!isPatient && (
+            <div className="flex flex-col items-center gap-3 py-2">
+              <label htmlFor="image" className="cursor-pointer">
+                {imagePreview ? (
+                  <img
+                    src={imagePreview}
+                    alt="Selected profile preview"
+                    className="h-28 w-28 rounded-full object-cover ring-2 ring-[#00AFE5]/40"
+                  />
+                ) : (
+                  <div className="flex h-28 w-28 items-center justify-center rounded-full border-2 border-dashed border-[#00AFE5]/50 bg-[#00AFE5]/10">
+                    <IoPersonCircleOutline className="text-6xl text-[#00AFE5]" />
+                  </div>
+                )}
+              </label>
+              <input
+                id="image"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                {...register("image", {
+                  required: "Profile image is required",
+                })}
+              />
+              <label
+                htmlFor="image"
+                className="cursor-pointer rounded-full bg-[#00AFE5] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
+              >
+                {imagePreview ? "Change profile image" : "Upload profile image"}
+              </label>
+              {!errors.image && (
+                <p className="text-xs text-gray-500">
+                  JPG, PNG, WEBP supported
+                </p>
               )}
-            </label>
-            <input
-              id="image"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              {...register("image", {
-                required: "Profile image is required",
-              })}
-            />
-            <label
-              htmlFor="image"
-              className="cursor-pointer rounded-full bg-[#00AFE5] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
-            >
-              {imagePreview ? "Change profile image" : "Upload profile image"}
-            </label>
-            {!errors.image && (
-              <p className="text-xs text-gray-500">JPG, PNG, WEBP supported</p>
-            )}
-            {errors.image?.message && (
-              <p className="text-xs text-red-600">{errors.image.message}</p>
-            )}
-          </div>
+              {errors.image?.message && (
+                <p className="text-xs text-red-600">{errors.image.message}</p>
+              )}
+            </div>
+          )}
           <div className="name grid grid-cols-2 gap-3 max-sm:grid-cols-1">
             <div>
               <label htmlFor="firstName" className={labelClass}>
@@ -310,6 +312,10 @@ const RegistrationForm = ({
                 }`}
                 {...register("password", {
                   required: "Password is Required",
+                  minLength: {
+                    value: 8,
+                    message: "Password must be at least 8 characters",
+                  },
                   pattern: {
                     value:
                       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/,

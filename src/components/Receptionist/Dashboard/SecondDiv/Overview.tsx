@@ -43,7 +43,9 @@ const Overview = () => {
 
   return (
     <div className="bg-(--color-surface) p-8 rounded-2xl border border-(--color-border) shadow-sm w-full">
-      <h2 className="text-xl font-bold text-(--color-text) mb-8">Today's Overview</h2>
+      <h2 className="text-xl font-bold text-(--color-text) mb-8">
+        Today's Overview
+      </h2>
       <div className="flex flex-col gap-6">
         {isLoading ? (
           <div className="flex flex-col gap-6 animate-pulse">
@@ -72,4 +74,3 @@ const Overview = () => {
 };
 
 export default Overview;
-

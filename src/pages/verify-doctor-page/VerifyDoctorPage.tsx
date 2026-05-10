@@ -25,10 +25,14 @@ interface Inputs {
   SupervisingNumber: string;
   CertificateFile: FileList;
   Image: FileList;
+  SpecializationId: number;
+  ConsultationPrice: number;
+  Languages: string;
 }
 
 function VerifyDoctorPage() {
   const authBase = useSelector((s: RootState) => s.config.backendUrl);
+  const authId = useSelector((s: RootState) => s.auth.id);
 
   const navigator = useNavigate();
   const { state } = useLocation();
@@ -118,12 +122,22 @@ function VerifyDoctorPage() {
         );
       } else {
         const formData = new FormData();
+        formData.append("DoctorId", authId || "");
         formData.append("MedicalLicenseNumber", data.MedicalLicenseNumber);
         formData.append("NationalId", data.NationalId);
+        formData.append("SpecializationId", Number(data.SpecializationId).toString());
         formData.append("YearsOfExperience", Number(data.YearsOfExperience).toString());
         formData.append("ClinicName", data.ClinicName);
         formData.append("ClinicAddress", data.ClinicAddress);
         formData.append("ClinicPhone", data.ClinicPhone);
+        formData.append("ConsultationPrice", Number(data.ConsultationPrice).toString());
+
+        const langs = data.Languages ? data.Languages.split(",").map((l) => l.trim()) : [];
+        langs.forEach((lang) => {
+          if (lang) {
+            formData.append("Languages", lang);
+          }
+        });
 
         if (data.Certificate?.[0]) {
           formData.append("Certificate", data.Certificate[0]);
@@ -308,6 +322,68 @@ function VerifyDoctorPage() {
                   />
                   {errors.ClinicPhone && (
                     <p className={errorClass}>{errors.ClinicPhone.message}</p>
+                  )}
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="specializationId" className={labelClass}>
+                    Specialization ID
+                  </label>
+                  <input
+                    id="specializationId"
+                    type="number"
+                    placeholder="1"
+                    className={`${inputClass} ${
+                      errors.SpecializationId && "border-red-500"
+                    }`}
+                    {...register("SpecializationId", {
+                      required: "You must provide your Specialization ID",
+                    })}
+                  />
+                  {errors.SpecializationId && (
+                    <p className={errorClass}>{errors.SpecializationId.message}</p>
+                  )}
+                </div>
+                <div>
+                  <label htmlFor="consultationPrice" className={labelClass}>
+                    Consultation Price
+                  </label>
+                  <input
+                    id="consultationPrice"
+                    type="number"
+                    step="0.01"
+                    placeholder="100.00"
+                    className={`${inputClass} ${
+                      errors.ConsultationPrice && "border-red-500"
+                    }`}
+                    {...register("ConsultationPrice", {
+                      required: "You must provide your Consultation Price",
+                    })}
+                  />
+                  {errors.ConsultationPrice && (
+                    <p className={errorClass}>{errors.ConsultationPrice.message}</p>
+                  )}
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-1">
+                <div>
+                  <label htmlFor="languages" className={labelClass}>
+                    Languages (comma separated)
+                  </label>
+                  <input
+                    id="languages"
+                    type="text"
+                    placeholder="English, Arabic"
+                    className={`${inputClass} ${
+                      errors.Languages && "border-red-500"
+                    }`}
+                    {...register("Languages", {
+                      required: "You must provide at least one language",
+                    })}
+                  />
+                  {errors.Languages && (
+                    <p className={errorClass}>{errors.Languages.message}</p>
                   )}
                 </div>
               </div>
