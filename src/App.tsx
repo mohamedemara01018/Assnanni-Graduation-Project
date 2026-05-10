@@ -38,6 +38,8 @@ import {
 import AppointmentDetailsPage from "./pages/appointment-details-page/AppointmentDetailsPage";
 import { logout } from "./store/slices/auth/authSlice";
 import Scan from "./pages/doctor-pages/Scan/Scan";
+import Cookies from "js-cookie";
+import { useLocation } from "react-router";
 
 const sessionWarningTime = 5 * 60 * 1000;
 const sessionWarningToastId = "session-expiry-warning";
@@ -46,6 +48,7 @@ const sessionWarningToastId = "session-expiry-warning";
 const App = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { role, token, expiresAt } = useSelector(
     (state: {
       auth: {
@@ -59,6 +62,13 @@ const App = () => {
     }) => state.auth,
   );
   console.log(role);
+
+  useEffect(() => {
+    const needsVerification = Cookies.get("needsVerification");
+    if (needsVerification === "true" && location.pathname !== "/verify-email") {
+      navigate("/verify-email", { replace: true });
+    }
+  }, [location.pathname, navigate]);
   useEffect(() => {
     if (!token || !expiresAt) {
       return;

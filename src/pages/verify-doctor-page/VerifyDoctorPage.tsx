@@ -39,6 +39,7 @@ function VerifyDoctorPage() {
   const isStudentDoctor = Boolean(
     (state as { isStudentDoctor?: boolean } | null)?.isStudentDoctor,
   );
+  const stateDoctorId = (state as { doctorId?: string } | null)?.doctorId;
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
   const [certificateName, setCertificateName] = useState<string>("");
   const {
@@ -72,25 +73,22 @@ function VerifyDoctorPage() {
     "w-full rounded-xl border border-(--color-border) bg-(--color-bg) px-4 py-3 text-(--color-text) placeholder:text-gray-500 placeholder:text-sm transition focus:border-[#00AFE5] focus:outline-none focus:ring-2 focus:ring-[#00AFE5]/25";
   const errorClass = "ml-1 mt-1 text-xs font-light text-red-600";
 
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
+  const certificateFile = watch(
+    isStudentDoctor ? "CertificateFile" : "Certificate",
+  );
+
+  useEffect(() => {
+    const file = certificateFile?.[0];
+    if (file) {
       setCertificateName(file.name);
-      setImagePreviewUrl(URL.createObjectURL(file));
+      const url = URL.createObjectURL(file);
+      setImagePreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
     } else {
       setCertificateName("");
       setImagePreviewUrl(null);
     }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (imagePreviewUrl) {
-        URL.revokeObjectURL(imagePreviewUrl);
-      }
-    };
-  }, [imagePreviewUrl]);
+  }, [certificateFile]);
 
   const verifyMutation = useMutation({
     mutationFn: async (data: Inputs) => {
@@ -110,7 +108,7 @@ function VerifyDoctorPage() {
         if (data.Image?.[0]) {
           formData.append("Image", data.Image[0]);
         }
-        console.log(data);
+
         return axios.post(
           authBase + "StudentDoctor/complete-profile",
           formData,
@@ -122,27 +120,48 @@ function VerifyDoctorPage() {
         );
       } else {
         const formData = new FormData();
-        formData.append("DoctorId", authId || "");
+        formData.append("DoctorId", stateDoctorId || authId || "");
         formData.append("MedicalLicenseNumber", data.MedicalLicenseNumber);
         formData.append("NationalId", data.NationalId);
-        formData.append("SpecializationId", Number(data.SpecializationId).toString());
-        formData.append("YearsOfExperience", Number(data.YearsOfExperience).toString());
+        formData.append(
+          "SpecializationId",
+          Number(data.SpecializationId).toString(),
+        );
+        formData.append(
+          "YearsOfExperience",
+          Number(data.YearsOfExperience).toString(),
+        );
         formData.append("ClinicName", data.ClinicName);
         formData.append("ClinicAddress", data.ClinicAddress);
         formData.append("ClinicPhone", data.ClinicPhone);
-        formData.append("ConsultationPrice", Number(data.ConsultationPrice).toString());
+        formData.append(
+          "ConsultationPrice",
+          Number(data.ConsultationPrice).toString(),
+        );
 
-        const langs = data.Languages ? data.Languages.split(",").map((l) => l.trim()) : [];
+        const langs = data.Languages
+          ? data.Languages.split(",").map((l) => l.trim())
+          : [];
         langs.forEach((lang) => {
           if (lang) {
             formData.append("Languages", lang);
           }
         });
-
         if (data.Certificate?.[0]) {
           formData.append("Certificate", data.Certificate[0]);
         }
-
+        console.log(
+          formData.get("DoctorId"),
+          formData.get("NationalId"),
+          formData.get("SpecializationId"),
+          formData.get("YearsOfExperience"),
+          formData.get("ClinicName"),
+          formData.get("ClinicAddress"),
+          formData.get("ClinicPhone"),
+          formData.get("ConsultationPrice"),
+          formData.getAll("Languages"),
+          formData.get("Certificate"),
+        );
         return axios.post(
           authBase + "Authentications/Submit-Doctor-Verification",
           formData,
@@ -154,6 +173,7 @@ function VerifyDoctorPage() {
         );
       }
     },
+
     onSuccess: () => {
       navigator("/verify-email");
       toast.success(
@@ -342,7 +362,9 @@ function VerifyDoctorPage() {
                     })}
                   />
                   {errors.SpecializationId && (
-                    <p className={errorClass}>{errors.SpecializationId.message}</p>
+                    <p className={errorClass}>
+                      {errors.SpecializationId.message}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -362,7 +384,9 @@ function VerifyDoctorPage() {
                     })}
                   />
                   {errors.ConsultationPrice && (
-                    <p className={errorClass}>{errors.ConsultationPrice.message}</p>
+                    <p className={errorClass}>
+                      {errors.ConsultationPrice.message}
+                    </p>
                   )}
                 </div>
               </div>
@@ -557,7 +581,6 @@ function VerifyDoctorPage() {
                       : "You must provide your certificate",
                   },
                 )}
-                onChange={handleImageChange}
               />
               {!imagePreviewUrl && (
                 <div className="flex flex-col items-center justify-center gap-4 text-center">

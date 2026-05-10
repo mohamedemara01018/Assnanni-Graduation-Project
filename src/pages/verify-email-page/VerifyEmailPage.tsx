@@ -11,9 +11,10 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import type { RootState } from "@/store/store";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 function VerifyEmailPage() {
   const authBase =
@@ -27,6 +28,10 @@ function VerifyEmailPage() {
     (state: { email: { emailAddress: string } }) => state.email.emailAddress,
   );
 
+  useEffect(() => {
+    Cookies.set("needsVerification", "true");
+  }, []);
+
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -36,20 +41,27 @@ function VerifyEmailPage() {
     };
     try {
       const response = await axios.post(authBase + "Verify-Email", data);
+
       console.log(response);
 
-      const state = location.state as { isDoctor?: boolean; isStudentDoctor?: boolean } | null;
+      const state = location.state as {
+        isDoctor?: boolean;
+        isStudentDoctor?: boolean;
+        doctorId?: string;
+      } | null;
       const isDoctor = state?.isDoctor;
       const isStudentDoctor = state?.isStudentDoctor;
+      const doctorId = state?.doctorId;
 
       if (!isDoctor && !isStudentDoctor) {
         dispatch(setToken(response.data?.data?.token));
       }
       dispatch(clearEmail());
+      Cookies.remove("needsVerification");
 
       if (isDoctor || isStudentDoctor) {
         navigator("/verify-doctor", {
-          state: { isStudentDoctor },
+          state: { isStudentDoctor, doctorId },
         });
       } else {
         navigator("/onboarding");

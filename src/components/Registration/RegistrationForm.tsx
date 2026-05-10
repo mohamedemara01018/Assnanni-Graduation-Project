@@ -86,16 +86,20 @@ const RegistrationForm = ({
 
   const registerMutation = useMutation({
     mutationFn: async (data: Inputs) => {
-      console.log(data);
       if (doctor) {
-        return axios.post(authBase + "Authentications/Register-Doctor", {
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-          phoneNumber: data.phoneNumber,
-          password: data.password,
-          confirmPassword: data.confirmPassword,
-        });
+        const response = await axios.post(
+          authBase + "Authentications/Register-Doctor",
+          {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            phoneNumber: data.phoneNumber,
+            password: data.password,
+            confirmPassword: data.confirmPassword,
+          },
+        );
+        console.log(response);
+        return response;
       } else if (studentDoctor) {
         const formData = new FormData();
         formData.append("FirstName", data.firstName);
@@ -109,11 +113,17 @@ const RegistrationForm = ({
           formData.append("ProfileImage", data.image[0]);
         }
 
-        return axios.post(authBase + "StudentDoctor/register", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
+        const response = await axios.post(
+          authBase + "StudentDoctor/register",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           },
-        });
+        );
+        console.log(response);
+        return response;
       } else {
         const formattedDate = data.dateOfBirth
           ? `${data.dateOfBirth}T00:00:00Z`
@@ -133,10 +143,23 @@ const RegistrationForm = ({
         });
       }
     },
-    onSuccess: (_, data) => {
+    onSuccess: (response: any, data) => {
       dispatch(getEmail(data.email));
+
+      let doctorId = null;
+      if (doctor && response && response.data) {
+        const responseText =
+          typeof response.data === "string"
+            ? response.data
+            : JSON.stringify(response.data);
+        const doctorIdMatch = responseText.match(/DoctorId:\s*(\d+)/);
+        if (doctorIdMatch) {
+          doctorId = doctorIdMatch[1];
+        }
+      }
+
       navigator("/verify-email", {
-        state: { isDoctor: doctor, isStudentDoctor: studentDoctor },
+        state: { isDoctor: doctor, isStudentDoctor: studentDoctor, doctorId },
       });
     },
     onError: (error: any) => {
