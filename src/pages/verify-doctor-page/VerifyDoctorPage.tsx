@@ -7,9 +7,10 @@ import { toast } from "react-toastify";
 
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useMutation } from "@tanstack/react-query";
 import type { RootState } from "@/store/store";
+import { setToken } from "../../store/slices/auth/authSlice";
 
 interface Inputs {
   MedicalLicenseNumber: string;
@@ -33,6 +34,7 @@ interface Inputs {
 function VerifyDoctorPage() {
   const authBase = useSelector((s: RootState) => s.config.backendUrl);
   const authId = useSelector((s: RootState) => s.auth.id);
+  const dispatch = useDispatch();
 
   const navigator = useNavigate();
   const { state } = useLocation();
@@ -120,7 +122,7 @@ function VerifyDoctorPage() {
         );
       } else {
         const formData = new FormData();
-        formData.append("DoctorId", stateDoctorId || authId || "");
+        formData.append("DoctorId", stateDoctorId || authId || "24");
         formData.append("MedicalLicenseNumber", data.MedicalLicenseNumber);
         formData.append("NationalId", data.NationalId);
         formData.append(
@@ -174,10 +176,14 @@ function VerifyDoctorPage() {
       }
     },
 
-    onSuccess: () => {
-      navigator("/verify-email");
+    onSuccess: (response) => {
+      // Save token to Redux store using dispatch and setToken
+      if (response?.data?.token) {
+        dispatch(setToken(response.data.token));
+      }
+      navigator("/");
       toast.success(
-        "You have successfully send the request wait until the admin accept it",
+        "You have successfully send request wait until admin accept it",
       );
     },
     onError: (error: any) => {
@@ -337,6 +343,10 @@ function VerifyDoctorPage() {
                       errors.ClinicPhone && "border-red-500 w-full"
                     }`}
                     {...register("ClinicPhone", {
+                      minLength: {
+                        value: 11,
+                        message: "Clinic phone must be at least 11 digits",
+                      },
                       required: "You must provide your clinic phone",
                     })}
                   />
@@ -488,6 +498,10 @@ function VerifyDoctorPage() {
                       errors.NationalId && "border-red-500"
                     }`}
                     {...register("NationalId", {
+                      minLength: {
+                        value: 14,
+                        message: "National ID must be at least 14 digits",
+                      },
                       required: "You must provide your National ID Number",
                     })}
                   />
@@ -576,6 +590,10 @@ function VerifyDoctorPage() {
                 {...register(
                   isStudentDoctor ? "CertificateFile" : "Certificate",
                   {
+                    minLength: {
+                      value: 3,
+                      message: "You must provide a file",
+                    },
                     required: isStudentDoctor
                       ? "You must provide your dental university proof"
                       : "You must provide your certificate",

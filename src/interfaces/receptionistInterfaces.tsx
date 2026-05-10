@@ -38,4 +38,6 @@ export interface ReceptionistFormInput {
   username: string;
   password?: string;
   shift: string;
+  shiftStart: string;
+  shiftEnd: string;
 }

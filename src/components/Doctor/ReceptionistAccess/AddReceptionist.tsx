@@ -59,8 +59,10 @@ const AddReceptionist = () => {
       formData.append("Clinic", data.clinic);
       formData.append("Username", data.username);
       formData.append("Password", data.password || "");
+      formData.append("ShiftStart", data.shiftStart);
+      formData.append("ShiftEnd", data.shiftEnd);
       formData.append("Shift", data.shift);
-
+      console.log([...formData.entries()]);
       const response = await axios.post(
         `${backendUrl}Doctors/add-receptionist`,
         formData,
@@ -69,12 +71,12 @@ const AddReceptionist = () => {
             Authorization: `Bearer ${token}`,
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       if (response.data.succeeded) {
         toast.success(
-          response.data.message || "Receptionist account created successfully!"
+          response.data.message || "Receptionist account created successfully!",
         );
         reset();
         setProfileImage(null);
@@ -82,13 +84,13 @@ const AddReceptionist = () => {
         navigate("/receptionist-access");
       } else {
         toast.error(
-          response.data.message || "Failed to create receptionist profile"
+          response.data.message || "Failed to create receptionist profile",
         );
       }
     } catch (err: any) {
       console.error("Error creating receptionist:", err);
       toast.error(
-        err.response?.data?.message || "An error occurred during submission"
+        err.response?.data?.message || "An error occurred during submission",
       );
     }
   };
@@ -329,6 +331,58 @@ const AddReceptionist = () => {
                     )}
                   </div>
 
+                  {/* Shift Start */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-medium text-(--color-text)">
+                      Shift Start
+                    </label>
+                    <div className="relative">
+                      <FiClock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input
+                        {...register("shiftStart", {
+                          required: "Shift start time is required",
+                        })}
+                        type="time"
+                        className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${
+                          errors.shiftStart
+                            ? "border-red-400 ring-2 ring-red-500/10"
+                            : "border-gray-200 dark:border-gray-700"
+                        } rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}
+                      />
+                    </div>
+                    {errors.shiftStart && (
+                      <span className="text-[11px] text-red-500 mt-1">
+                        {errors.shiftStart.message as string}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Shift End */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-sm font-medium text-(--color-text)">
+                      Shift End
+                    </label>
+                    <div className="relative">
+                      <FiClock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+                      <input
+                        {...register("shiftEnd", {
+                          required: "Shift end time is required",
+                        })}
+                        type="time"
+                        className={`w-full bg-gray-50/50 dark:bg-gray-800/50 border ${
+                          errors.shiftEnd
+                            ? "border-red-400 ring-2 ring-red-500/10"
+                            : "border-gray-200 dark:border-gray-700"
+                        } rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all`}
+                      />
+                    </div>
+                    {errors.shiftEnd && (
+                      <span className="text-[11px] text-red-500 mt-1">
+                        {errors.shiftEnd.message as string}
+                      </span>
+                    )}
+                  </div>
+
                   {/* Username */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-sm font-medium text-(--color-text)">
@@ -442,4 +496,3 @@ const AddReceptionist = () => {
 };
 
 export default AddReceptionist;
-

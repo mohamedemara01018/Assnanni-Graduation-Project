@@ -307,8 +307,15 @@ const RegistrationForm = ({
                 placeholder="+1 (555) 000-000"
                 id="phoneNumber"
                 {...register("phoneNumber", {
-                  required: "PhonephoneNumber Number is Required",
-                  minLength: 11,
+                  required: "Phone Number is Required",
+                  minLength: {
+                    value: 11,
+                    message: "The Phone number must be 11 number",
+                  },
+                  maxLength: {
+                    value: 11,
+                    message: "The Phone number must be 11 number",
+                  },
                   pattern: {
                     value: /^01[0-2]\d{1,8}$/i,
                     message: "Please, make sure your number is correct",

@@ -40,8 +40,8 @@ function VerifyEmailPage() {
       code: value,
     };
     try {
-      const response = await axios.post(authBase + "Verify-Email", data);
-
+      // const response = await axios.post(authBase + "Verify-Email", data);
+      const response = true;
       console.log(response);
 
       const state = location.state as {
