@@ -45,7 +45,7 @@ export const dummySchedules: Schedule[] = [
 
 export const dummyScans: Scan[] = [
   {
-    id: 1,
+    scanId: 1,
     patientName: "5235299259",
     scanType: "CT Scan",
     uploadedAt: new Date().toISOString(),

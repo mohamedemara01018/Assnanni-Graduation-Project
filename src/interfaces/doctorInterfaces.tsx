@@ -7,7 +7,7 @@ export interface Schedule {
 }
 
 export interface Scan {
-  id: number;
+  scanId: number;
   patientId: number;
   patientName: string;
   scanType: string;

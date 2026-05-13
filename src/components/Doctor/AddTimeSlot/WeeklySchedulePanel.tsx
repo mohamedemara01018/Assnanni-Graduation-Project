@@ -462,6 +462,15 @@ const WeeklySchedulePanel = () => {
       </div>
     );
   }
+  const daysArray = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
 
   return (
     <div className="flex flex-col gap-4">
@@ -511,7 +520,7 @@ const WeeklySchedulePanel = () => {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold text-(--color-text)">
-                    {day.name}
+                    {daysArray[new Date(day.name).getDay() ?? 0]} {day.name}
                   </span>
                   <span className="text-xs bg-(--color-primary-lighter) text-(--color-primary) font-medium px-2 py-0.5 rounded-full">
                     {day.slots.length} slot{day.slots.length !== 1 ? "s" : ""}

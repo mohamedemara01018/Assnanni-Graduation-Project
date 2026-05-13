@@ -2,9 +2,9 @@ import { NavLink, useNavigate } from "react-router";
 import { Button } from "../ui/button";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
-import { setToken } from "@/store/slices/auth/authSlice";
+import { setToken, fetchUserProfile } from "@/store/slices/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "@/store/store";
+import type { RootState, AppDispatch } from "@/store/store";
 import axios from "axios";
 // import { updateRole } from "@/features/auth/authSlice";
 
@@ -19,7 +19,7 @@ function LoginForm() {
   )}Authentications/`;
   void loginApiBase;
   const navigator = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const {
     register,
     handleSubmit,
@@ -31,7 +31,7 @@ function LoginForm() {
       const response = await axios.post(loginApiBase + "Login", data);
       console.log(response);
       dispatch(setToken(response.data.data.token)); // Use real token when uncommenting API
-      // dispatch(setToken(response..data.data.token));
+      await dispatch(fetchUserProfile());
       toast.success("Welcome Back");
       navigator("/");
     } catch (error: any) {

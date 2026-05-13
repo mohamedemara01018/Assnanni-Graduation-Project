@@ -3,7 +3,7 @@ import {
   FiPlus,
   FiTrash2,
   FiAlertCircle,
-  FiActivity,
+  // FiActivity,
   FiClock,
   FiPhone,
   FiArrowLeft,
@@ -15,23 +15,14 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
+// import { BeatLoader } from "react-spinners";
+import AllergyForm from "./AllergyForm";
 
 const MedicalReportForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const patientId = searchParams.get("patientId");
-
-  const [allergies, setAllergies] = useState<string[]>([]);
-  const [newAllergy, setNewAllergy] = useState("");
-
-  const [history, setHistory] = useState<
-    { condition: string; date: string; status: string }[]
-  >([]);
-  const [newCondition, setNewCondition] = useState({
-    condition: "",
-    date: "",
-    status: "Ongoing",
-  });
+  const [isAllergyFormOpen, setIsAllergyFormOpen] = useState(false);
 
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
@@ -57,23 +48,12 @@ const MedicalReportForm = () => {
     phone: "",
   });
 
-  const addAllergy = () => {
-    if (newAllergy.trim()) {
-      setAllergies([...allergies, newAllergy.trim()]);
-      setNewAllergy("");
-    }
-  };
-
-  const removeAllergy = (index: number) => {
-    setAllergies(allergies.filter((_, i) => i !== index));
-  };
-
-  const addCondition = () => {
-    if (newCondition.condition && newCondition.date) {
-      setHistory([...history, newCondition]);
-      setNewCondition({ condition: "", date: "", status: "Ongoing" });
-    }
-  };
+  // const addCondition = () => {
+  //   if (newCondition.condition && newCondition.date) {
+  //     setHistory([...history, newCondition]);
+  //     setNewCondition({ condition: "", date: "", status: "Ongoing" });
+  //   }
+  // };
 
   const addPrescription = () => {
     if (newPrescription.medicationName && newPrescription.dosage) {
@@ -157,47 +137,24 @@ const MedicalReportForm = () => {
             <div className="p-8 space-y-12">
               {/* Allergies Section */}
               <section>
-                <div className="flex items-center gap-2 mb-6 text-red-600">
-                  <FiAlertCircle className="text-xl" />
-                  <h3 className="font-bold text-lg">Allergies</h3>
-                </div>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {allergies.length === 0 && (
-                    <p className="text-gray-400 text-sm italic">
-                      No allergies added yet.
-                    </p>
-                  )}
-                  {allergies.map((allergy, index) => (
-                    <span
-                      key={index}
-                      className="bg-red-50 text-red-600 px-4 py-2 rounded-full text-sm font-bold flex items-center gap-2 animate-in fade-in zoom-in duration-200"
-                    >
-                      {allergy}
-                      <button
-                        onClick={() => removeAllergy(index)}
-                        className="hover:text-red-800"
-                      >
-                        <FiPlus className="rotate-45" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Add new allergy (e.g. Penicillin)..."
-                    className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-red-200 focus:border-red-400 outline-none flex-1 transition-all"
-                    value={newAllergy}
-                    onChange={(e) => setNewAllergy(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && addAllergy()}
-                  />
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-2 text-red-600">
+                    <FiAlertCircle className="text-xl" />
+                    <h3 className="font-bold text-lg">Allergies</h3>
+                  </div>
                   <button
-                    onClick={addAllergy}
-                    className="bg-red-600 text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-red-700 transition-colors shadow-lg shadow-red-100"
+                    onClick={() => setIsAllergyFormOpen(!isAllergyFormOpen)}
+                    className="flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-100 transition-colors"
                   >
-                    Add
+                    <FiPlus className={isAllergyFormOpen ? "rotate-45" : ""} />
+                    {isAllergyFormOpen ? "Close Form" : "Add Allergy"}
                   </button>
                 </div>
+                {isAllergyFormOpen && patientId && (
+                  <div className="animate-in fade-in slide-in-from-top duration-300">
+                    <AllergyForm patientId={patientId} />
+                  </div>
+                )}
               </section>
 
               {/* Prescriptions Section */}

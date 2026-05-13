@@ -54,7 +54,7 @@ const RequestTimeOff = () => {
   const mutation = useMutation({
     mutationFn: async (data: TimeOffForm) => {
       const now = new Date();
-      const startTime = new Date(now.getTime() + 1 * 60 * 1000);
+      const startTime = new Date(now.getTime() + 5 * 60 * 1000);
       const payload = {
         startTime: startTime.toISOString(),
         durationInMinutes: Number(data.durationInMinutes),

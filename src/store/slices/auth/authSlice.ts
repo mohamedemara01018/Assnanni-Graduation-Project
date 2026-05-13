@@ -1,15 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
+import axios from "axios";
 
 interface AuthState {
   token: string | null;
   id: string | null;
   role: string;
   name: string | null;
+  fullName: string | null;
   email: string | null;
+  phoneNumber: string | null;
+  profileImageUrl: string | null;
   expiresAt: number | null;
+  status: "idle" | "loading" | "succeeded" | "failed";
 }
 
 const claimKeyPrefixes = [
@@ -47,9 +51,9 @@ const getAuthFromToken = (token: string) => {
     jwtDecode<Record<string, unknown>>(token),
   );
   const tokenExpirationDate = getTokenExpirationDate(decoded.exp);
-  console.log(decoded);
   if (tokenExpirationDate && tokenExpirationDate.getTime() <= Date.now()) {
     Cookies.remove("jwtToken");
+    Cookies.remove("userProfile");
     throw new Error("Token expired");
   }
 
@@ -65,17 +69,53 @@ const getAuthFromToken = (token: string) => {
   };
 };
 
+export const fetchUserProfile = createAsyncThunk(
+  "auth/fetchUserProfile",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as {
+        auth: AuthState;
+        config: { backendUrl: string };
+      };
+      const response = await axios.get(`${state.config.backendUrl}Users/my-profile`, {
+        headers: {
+          Authorization: `Bearer ${state.auth.token}`,
+        },
+      });
+      const profile = response.data.data;
+      Cookies.set("userProfile", JSON.stringify(profile), {
+        expires: state.auth.expiresAt ? new Date(state.auth.expiresAt) : 7,
+      });
+      return profile;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Failed to fetch profile");
+    }
+  },
+);
+
 const getInitialAuth = () => {
   const token = Cookies.get("jwtToken");
+  const profileCookie = Cookies.get("userProfile");
+  const profile = profileCookie ? JSON.parse(profileCookie) : null;
+
   if (token) {
     try {
-      return getAuthFromToken(token);
+      const auth = getAuthFromToken(token);
+      return {
+        ...auth,
+        fullName: profile?.fullName || null,
+        phoneNumber: profile?.phoneNumber || null,
+        profileImageUrl: profile?.profileImageUrl || null,
+      };
     } catch (e) {
       return {
         id: null,
         role: "guest",
         name: null,
+        fullName: null,
         email: null,
+        phoneNumber: null,
+        profileImageUrl: null,
         expiresAt: null,
       };
     }
@@ -84,7 +124,10 @@ const getInitialAuth = () => {
     id: null,
     role: "guest",
     name: null,
+    fullName: null,
     email: null,
+    phoneNumber: null,
+    profileImageUrl: null,
     expiresAt: null,
   };
 };
@@ -95,8 +138,12 @@ const initialState: AuthState = {
   id: initialAuth.id,
   role: initialAuth.role,
   name: initialAuth.name,
+  fullName: initialAuth.fullName,
   email: initialAuth.email,
+  phoneNumber: initialAuth.phoneNumber,
+  profileImageUrl: initialAuth.profileImageUrl,
   expiresAt: initialAuth.expiresAt,
+  status: "idle",
 };
 
 const authSlice = createSlice({
@@ -123,9 +170,11 @@ const authSlice = createSlice({
         state.id = null;
         state.role = "guest";
         state.name = null;
+        state.fullName = null;
         state.email = null;
         state.expiresAt = null;
         Cookies.remove("jwtToken");
+        Cookies.remove("userProfile");
       }
     },
     logout: (state) => {
@@ -133,10 +182,29 @@ const authSlice = createSlice({
       state.id = null;
       state.role = "guest";
       state.name = null;
+      state.fullName = null;
       state.email = null;
+      state.phoneNumber = null;
+      state.profileImageUrl = null;
       state.expiresAt = null;
       Cookies.remove("jwtToken");
+      Cookies.remove("userProfile");
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchUserProfile.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchUserProfile.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.fullName = action.payload.fullName;
+        state.phoneNumber = action.payload.phoneNumber;
+        state.profileImageUrl = action.payload.profileImageUrl;
+      })
+      .addCase(fetchUserProfile.rejected, (state) => {
+        state.status = "failed";
+      });
   },
 });
 

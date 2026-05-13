@@ -10,6 +10,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import Cookies from "js-cookie";
 import { ScaleLoader } from "react-spinners";
+import { useMutation } from "@tanstack/react-query";
 
 interface StudentDoctorRequest {
   id: number;
@@ -33,14 +34,21 @@ const ViewSupervisioningRequest = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
 
-  const { data: responseData, isLoading, error } = useQuery<RequestResponse>({
+  const {
+    data: responseData,
+    isLoading,
+    error,
+  } = useQuery<RequestResponse>({
     queryKey: ["supervising-request", id],
     queryFn: async () => {
-      const response = await axios.get(`${backendUrl}Doctors/supervising-requests/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.get(
+        `${backendUrl}Doctors/supervising-requests/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
       return response.data;
     },
     enabled: !!id && !!token && !!backendUrl,
@@ -53,6 +61,51 @@ const ViewSupervisioningRequest = () => {
   }, [error]);
 
   const student = responseData?.data;
+
+  const approveMutation = useMutation({
+    mutationFn: async (studentDoctorId: number) => {
+      await axios.post(
+        `${backendUrl}Doctors/approve-student-doctor`,
+        { studentDoctorId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+    },
+    onSuccess: () => {
+      toast.success("Supervisioning request approved");
+      navigate(`/doctor-supervisioning/assign-student-doctor/${student?.id}`);
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || "Failed to approve request");
+    },
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: async (studentDoctorId: number) => {
+      await axios.post(
+        `${backendUrl}Doctors/reject-student-doctor`,
+        { studentDoctorId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+    },
+    onSuccess: () => {
+      toast.info("Supervisioning request declined");
+      navigate("/doctor-supervisioning");
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || "Failed to reject request");
+    },
+  });
+
+  const isActionPending = approveMutation.isPending || rejectMutation.isPending;
+  const isActionSuccess = approveMutation.isSuccess || rejectMutation.isSuccess;
 
   return (
     <DashboardLayout pageTitle="View Supervisioning Request">
@@ -73,7 +126,9 @@ const ViewSupervisioningRequest = () => {
           {isLoading ? (
             <div className="py-20 flex flex-col items-center justify-center gap-4">
               <ScaleLoader color="#00AFE5" />
-              <p className="text-(--color-text-light) font-medium">Loading request details...</p>
+              <p className="text-(--color-text-light) font-medium">
+                Loading request details...
+              </p>
             </div>
           ) : !student ? (
             <div className="rounded-xl border border-(--color-border) bg-(--color-bg) p-5">
@@ -133,7 +188,8 @@ const ViewSupervisioningRequest = () => {
                         src={
                           student.proofImageUrl.startsWith("http")
                             ? student.proofImageUrl
-                            : backendUrl.replace("/api/", "/") + student.proofImageUrl
+                            : backendUrl.replace("/api/", "/") +
+                              student.proofImageUrl
                         }
                         alt="Dental university proof"
                         className="max-h-80 w-full rounded-xl border border-(--color-border) bg-(--color-surface) object-contain p-2"
@@ -162,29 +218,40 @@ const ViewSupervisioningRequest = () => {
             </div>
           )}
 
-          {student && (
+          {student && !isActionSuccess && (
             <div className="mt-6 flex flex-col gap-3 rounded-xl border border-(--color-border) bg-(--color-bg) p-4 sm:flex-row sm:items-center sm:justify-end">
               <button
                 type="button"
-                disabled={isLoading}
+                disabled={isLoading || isActionPending}
                 onClick={() => {
-                  toast.success("Supervisioning request approved");
-                  navigate("/doctor-supervisioning");
+                  if (student) approveMutation.mutate(student.id);
                 }}
-                className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-600/20 transition-all hover:-translate-y-0.5 hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-emerald-600/20 transition-all hover:-translate-y-0.5 hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50 min-w-[120px] flex items-center justify-center"
               >
-                Approve
+                {approveMutation.isPending ? (
+                  <ScaleLoader color="white" height={15} width={2} margin={1} />
+                ) : (
+                  "Approve"
+                )}
               </button>
               <button
                 type="button"
-                disabled={isLoading}
+                disabled={isLoading || isActionPending}
                 onClick={() => {
-                  toast.info("Supervisioning request declined");
-                  navigate("/doctor-supervisioning");
+                  if (student) rejectMutation.mutate(student.id);
                 }}
-                className="rounded-xl border border-red-300 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700 transition-all hover:-translate-y-0.5 hover:bg-red-100 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-300 disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-xl border border-red-300 bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-700 transition-all hover:-translate-y-0.5 hover:bg-red-100 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-300 disabled:cursor-not-allowed disabled:opacity-50 min-w-[120px] flex items-center justify-center"
               >
-                Decline
+                {rejectMutation.isPending ? (
+                  <ScaleLoader
+                    color="#ef4444"
+                    height={15}
+                    width={2}
+                    margin={1}
+                  />
+                ) : (
+                  "Decline"
+                )}
               </button>
             </div>
           )}
@@ -195,4 +262,3 @@ const ViewSupervisioningRequest = () => {
 };
 
 export default ViewSupervisioningRequest;
-

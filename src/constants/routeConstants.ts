@@ -20,7 +20,7 @@ export const roleRoutePaths = {
     "receptionist-access",
     "receptionist-access/add",
     "scan/upload",
-    "scan/analysis/:patientId",
+    "scan/analysis/:scanId",
   ],
   studentDoctor: [
     "/student-doctor",

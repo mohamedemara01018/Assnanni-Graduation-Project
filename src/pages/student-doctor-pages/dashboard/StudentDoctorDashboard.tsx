@@ -1,21 +1,46 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
 import FirstDiv from "../../../components/Student Doctor/Dashboard/FirstDiv/FirstDiv";
 import SecondDiv from "../../../components/Student Doctor/Dashboard/SecondDiv/SecondDiv";
 import { CiCircleAlert } from "react-icons/ci";
 import { FaGraduationCap } from "react-icons/fa6";
 import DashboardCard from "@/components/DashboardCard/DashboardCard";
 import { SlCalender } from "react-icons/sl";
-import { MdPeople } from "react-icons/md";
-import { LuFileSpreadsheet } from "react-icons/lu";
+import { LuCircleCheck } from "react-icons/lu";
+import { LuFileSpreadsheet, LuClock, LuUserCheck } from "react-icons/lu";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 const StudentDoctorDashboard = () => {
+  const { fullName, name: authName } = useSelector(
+    (state: RootState) => state.auth,
+  );
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
+  const token = Cookies.get("jwtToken");
+
+  const { data: stats } = useQuery({
+    queryKey: ["StudentDoctorDashboardStats"],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${backendUrl}StudentDoctor/dashboard-card`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      return response.data.data;
+    },
+    enabled: !!token && !!backendUrl,
+  });
+
   return (
     <DashboardLayout pageTitle={"Student Doctor Dashboard"}>
       <div className="-mt-6 -ml-6 bg-(--color-bg) rounded-2xl min-h-screen">
         <div className="p-6">
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-3xl text-(--color-text) font-bold font-sans">
-              Welcome, John Doe!
+              Welcome, Dr.{fullName || authName || "Student"}!
             </h1>
             <span className="flex text-[10px] py-1 px-3 items-center gap-2 bg-violet-100 rounded-full text-violet-600 font-bold uppercase tracking-wider">
               <FaGraduationCap size={14} />
@@ -45,31 +70,62 @@ const StudentDoctorDashboard = () => {
             <div className="grid grid-cols-4 max-lg:grid-cols-2 max-sm:grid-cols-1 gap-6">
               <DashboardCard
                 title="Observations"
-                num="3"
-                subTitle="Today"
+                num={stats?.observations.toString() || "0"}
+                subTitle="Clinical"
                 color="blue"
                 logo={<SlCalender />}
               />
               <DashboardCard
-                title="Patients (View Only)"
-                num="42"
-                subTitle="+8%"
+                title="Total Patients"
+                num={stats?.patients.toString() || "0"}
+                subTitle="Assigned"
                 color="green"
-                logo={<MdPeople />}
+                logo={<LuUserCheck />}
               />
               <DashboardCard
-                title="Scans to Study"
-                num="1"
-                subTitle="Review"
+                title="Radiology Scans"
+                num={stats?.scans.toString() || "0"}
+                subTitle="To Review"
                 color="yellow"
                 logo={<LuFileSpreadsheet />}
               />
               <DashboardCard
-                title="Completion Rate"
-                num="85%"
-                subTitle="85%"
+                title="Completion"
+                num={`${stats?.completionRate || 0}%`}
+                subTitle="Progress"
                 color="violet"
+                logo={<LuCircleCheck />}
+              />
+            </div>
+
+            <div className="grid grid-cols-4 max-lg:grid-cols-2 max-sm:grid-cols-1 gap-6">
+              <DashboardCard
+                title="Avg. Score"
+                num={stats?.averageScore.toString() || "0"}
+                subTitle="Academic"
+                color="orange"
                 logo={<FaGraduationCap />}
+              />
+              <DashboardCard
+                title="Attendance"
+                num={`${stats?.attendanceRate || 0}%`}
+                subTitle="Rate"
+                color="blue"
+                logo={<LuClock />}
+              />
+              <DashboardCard
+                title="Pending Records"
+                num={stats?.pendingMedicalRecords.toString() || "0"}
+                subTitle="Action Needed"
+                color="yellow"
+                logo={<CiCircleAlert />}
+              />
+              <DashboardCard
+                title="Approved"
+                num={stats?.approvedMedicalRecords.toString() || "0"}
+                subTitle="Validated"
+                color="green"
+                logo={<LuCircleCheck />}
               />
             </div>
 

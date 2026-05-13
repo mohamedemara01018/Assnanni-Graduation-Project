@@ -7,12 +7,22 @@ interface Props {
   role: string;
   onDeleteSlot: (slotId: number) => void;
 }
+const daysArray = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
 
 const Days = ({ day, time, role, onDeleteSlot }: Props) => {
+  const today = new Date(day).getDay();
   return (
     <div className="flex flex-col gap-3 pb-4 border-b border-gray-100 dark:border-gray-800 last:border-0 last:pb-0">
       <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-        {day}
+        {daysArray[today] + " " + day}
       </h3>
       <div className="flex flex-wrap gap-3">
         {time.length > 0 ? (

@@ -306,6 +306,7 @@ const AddReceptionist = () => {
                       >
                         <option value="">Select a shift</option>
                         <option value="Morning">Morning Shift</option>
+                        <option value="Evening">Evening Shift</option>
                         <option value="Night">Night Shift</option>
                       </select>
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">

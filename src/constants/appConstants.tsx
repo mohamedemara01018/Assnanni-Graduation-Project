@@ -114,7 +114,7 @@ export const routeElements = {
   "receptionist-access": <ReceptionistAccess />,
   "receptionist-access/add": <AddReceptionist />,
   "scan/upload": <Scan />,
-  "scan/analysis/:patientId": <ScanDetails />,
+  "scan/analysis/:scanId": <ScanDetails />,
   notification: <Notifications />,
   "doctor-appointments": <StudentAppointments />,
   "doctor-appointments/:id": <StudentAppointmentDetails />,

@@ -27,7 +27,7 @@ interface ScanDetailsData {
 }
 
 const ScanDetails = () => {
-  const { patientId } = useParams();
+  const { scanId } = useParams();
   const navigate = useNavigate();
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
@@ -44,15 +44,15 @@ const ScanDetails = () => {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["ScanDetails", patientId],
+    queryKey: ["ScanDetails", scanId],
     queryFn: async () => {
-      const response = await axios.get(`${backendUrl}Scans/${patientId}`, {
+      const response = await axios.get(`${backendUrl}Scans/${scanId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log(response);
       return response.data;
     },
-    enabled: !!patientId,
+    enabled: !!scanId,
   });
 
   const scan = scanData?.data as ScanDetailsData;
@@ -69,7 +69,7 @@ const ScanDetails = () => {
     onSuccess: () => {
       toast.success("Review submitted successfully");
       setIsReviewModalOpen(false);
-      queryClient.invalidateQueries({ queryKey: ["ScanDetails", patientId] });
+      queryClient.invalidateQueries({ queryKey: ["ScanDetails", scanId] });
     },
     onError: (err: any) => {
       toast.error(err.response?.data?.message || "Failed to submit review");
@@ -97,7 +97,7 @@ const ScanDetails = () => {
     },
     onSuccess: () => {
       toast.success("Review session started");
-      queryClient.invalidateQueries({ queryKey: ["ScanDetails", patientId] });
+      queryClient.invalidateQueries({ queryKey: ["ScanDetails", scanId] });
     },
     onError: (err: any) => {
       toast.error(err.response?.data?.message || "Failed to start review");
@@ -117,7 +117,7 @@ const ScanDetails = () => {
     onSuccess: () => {
       toast.success("Scan rejected successfully");
       navigate(-1);
-      queryClient.invalidateQueries({ queryKey: ["ScanDetails", patientId] });
+      queryClient.invalidateQueries({ queryKey: ["ScanDetails", scanId] });
     },
     onError: (err: any) => {
       toast.error(err.response?.data?.message || "Failed to reject scan");
@@ -126,13 +126,17 @@ const ScanDetails = () => {
 
   const reopenMutation = useMutation({
     mutationFn: async () => {
-      await axios.patch(`${backendUrl}Scans/${scan.id}/reopen`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.patch(
+        `${backendUrl}Scans/${scan.id}/reopen`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
     },
     onSuccess: () => {
       toast.success("Scan reopened successfully");
-      queryClient.invalidateQueries({ queryKey: ["ScanDetails", patientId] });
+      queryClient.invalidateQueries({ queryKey: ["ScanDetails", scanId] });
     },
     onError: (err: any) => {
       toast.error(err.response?.data?.message || "Failed to reopen scan");
@@ -213,7 +217,9 @@ const ScanDetails = () => {
                 disabled={reopenMutation.isPending}
                 className="flex items-center justify-center gap-2 bg-blue-50 hover:bg-blue-100 text-blue-600 px-8 py-4 rounded-2xl font-bold transition-all active:scale-95 cursor-pointer h-fit disabled:opacity-50 border border-blue-200"
               >
-                <span>{reopenMutation.isPending ? "Reopening..." : "Reopen Scan"}</span>
+                <span>
+                  {reopenMutation.isPending ? "Reopening..." : "Reopen Scan"}
+                </span>
               </button>
             )}
 

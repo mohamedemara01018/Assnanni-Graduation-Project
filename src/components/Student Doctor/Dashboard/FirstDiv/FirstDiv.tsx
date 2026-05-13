@@ -1,13 +1,91 @@
-import Card from "./Card";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import Cookies from "js-cookie";
+import { toast } from "react-toastify";
+import { ScaleLoader } from "react-spinners";
 import { FaRegClock } from "react-icons/fa6";
 import { LuFileSpreadsheet } from "react-icons/lu";
 import { NavLink } from "react-router";
 import Patient from "./Patient";
 import { CiLock } from "react-icons/ci";
-import { dummyPatients } from "@/constants/doctorConstants";
-import { dummyObservations, dummyScans } from "@/constants/studentConstants";
+import Card from "./Card";
+import { useEffect } from "react";
 
 const FirstDiv = () => {
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
+  const token = Cookies.get("jwtToken");
+
+  const {
+    data: todayData,
+    isLoading: isTodayLoading,
+    isError: todayError,
+  } = useQuery({
+    queryKey: ["student-today"],
+    queryFn: async () => {
+      const response = await axios.get(`${backendUrl}StudentDoctor/today`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data.data;
+    },
+    enabled: !!token && !!backendUrl,
+  });
+
+  useEffect(() => {
+    if (todayError) {
+      toast.error("Failed to load today's observations");
+    }
+  }, [todayError]);
+
+  const {
+    data: learningData,
+    isLoading: isLearningLoading,
+    isError: isLearningError,
+  } = useQuery({
+    queryKey: ["student-learning"],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${backendUrl}StudentDoctor/for-learning`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      return response.data.data;
+    },
+    enabled: !!token && !!backendUrl,
+  });
+
+  useEffect(() => {
+    if (isLearningError) {
+      toast.error("Failed to load learning scans");
+    }
+  }, [isLearningError]);
+
+  const {
+    data: casesData,
+    isLoading: isCasesLoading,
+    isError: isCasesError,
+  } = useQuery({
+    queryKey: ["student-cases"],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${backendUrl}StudentDoctor/my-patient-cases`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      return response.data.data;
+    },
+    enabled: !!token && !!backendUrl,
+  });
+
+  useEffect(() => {
+    if (isCasesError) {
+      toast.error("Failed to load patient cases");
+    }
+  }, [isCasesError]);
+
   return (
     <div className="flex-2">
       <div className="bg-(--color-surface) p-6 rounded-xl shadow-sm border border-(--color-border)">
@@ -21,22 +99,34 @@ const FirstDiv = () => {
           </h1>
         </div>
         <div className="flex flex-col gap-4 max-h-80 overflow-y-auto pr-1">
-          {dummyObservations.map((obs) => (
-            <Card
-              key={obs.id}
-              title={`Observation: ${obs.doctorName}`}
-              status={
-                obs.status === "Observe Only" ? "Observe Only" : "View & Learn"
-              }
-              color="blue"
-              logo={<FaRegClock />}
-            >
-              <p>{obs.specialty}</p>
-              <p>
-                {obs.time} • Supervisor: {obs.supervisor}
-              </p>
-            </Card>
-          ))}
+          {isTodayLoading ? (
+            <div className="py-10 flex justify-center">
+              <ScaleLoader color="#00AFE5" height={20} />
+            </div>
+          ) : todayData?.length > 0 ? (
+            todayData.map((obs: any) => (
+              <Card
+                key={obs.id}
+                title={`Observation: ${obs.doctorFullName || obs.doctorName}`}
+                status={
+                  obs.status === "Observe Only"
+                    ? "Observe Only"
+                    : "View & Learn"
+                }
+                color="blue"
+                logo={<FaRegClock />}
+              >
+                <p>{obs.specialty}</p>
+                <p>
+                  {obs.time} • Supervisor: {obs.supervisorName || obs.supervisor}
+                </p>
+              </Card>
+            ))
+          ) : (
+            <p className="text-sm text-(--color-text-light) py-4 text-center">
+              No observations scheduled for today.
+            </p>
+          )}
         </div>
       </div>
 
@@ -50,20 +140,32 @@ const FirstDiv = () => {
           </h1>
         </div>
         <div className="flex flex-col gap-4 max-h-60 overflow-y-auto pr-1">
-          {dummyScans.map((scan) => (
-            <Card
-              key={scan.id}
-              title={scan.type}
-              status={
-                scan.status === "Observe Only" ? "Observe Only" : "View & Learn"
-              }
-              color="violet"
-              logo={<LuFileSpreadsheet />}
-            >
-              <p>Case Study {scan.caseStudyNum}</p>
-              <p>{scan.note}</p>
-            </Card>
-          ))}
+          {isLearningLoading ? (
+            <div className="py-10 flex justify-center">
+              <ScaleLoader color="#8B5CF6" height={20} />
+            </div>
+          ) : learningData?.length > 0 ? (
+            learningData.map((scan: any) => (
+              <Card
+                key={scan.id}
+                title={scan.type}
+                status={
+                  scan.status === "Observe Only"
+                    ? "Observe Only"
+                    : "View & Learn"
+                }
+                color="violet"
+                logo={<LuFileSpreadsheet />}
+              >
+                <p>Case Study {scan.caseStudyNum}</p>
+                <p>{scan.note}</p>
+              </Card>
+            ))
+          ) : (
+            <p className="text-sm text-(--color-text-light) py-4 text-center">
+              No scans available for learning at the moment.
+            </p>
+          )}
         </div>
       </div>
 
@@ -80,15 +182,25 @@ const FirstDiv = () => {
           </NavLink>
         </div>
         <div className="flex flex-col gap-4 max-h-80 overflow-y-auto pr-1">
-          {dummyPatients.map((patient) => (
-            <Patient
-              key={patient.id}
-              id={patient.id}
-              name={patient.name}
-              imageUrl={patient.imageUrl}
-              lastInteractionDate={patient.lastInteractionDate}
-            />
-          ))}
+          {isCasesLoading ? (
+            <div className="py-10 flex justify-center">
+              <ScaleLoader color="#3B82F6" height={20} />
+            </div>
+          ) : casesData?.length > 0 ? (
+            casesData.map((patient: any) => (
+              <Patient
+                key={patient.id}
+                id={patient.id}
+                name={patient.fullName || patient.name}
+                imageUrl={patient.imageUrl || patient.profileImageUrl}
+                lastInteractionDate={patient.lastInteractionDate}
+              />
+            ))
+          ) : (
+            <p className="text-sm text-(--color-text-light) py-4 text-center">
+              No patient cases assigned to you.
+            </p>
+          )}
         </div>
         <p className="bg-blue-50 text-blue-600 text-[10px] px-4 py-2 mt-6 rounded-lg border border-blue-100 flex items-center gap-2">
           <span>🔒</span> Full patient records require supervisor authorization

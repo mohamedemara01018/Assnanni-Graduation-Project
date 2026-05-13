@@ -40,11 +40,26 @@ interface Appointment {
   status: string;
 }
 
+interface MedicalHistory {
+  diagnosis: string;
+  diagnosedDate: string;
+  doctorNotes: string;
+  createdBy: string;
+}
+
+interface Prescription {
+  medicationName: string;
+  dosage: string;
+  frequency: string;
+  doctorName: string;
+  date: string;
+}
+
 interface PatientData {
   personalInfo: PersonalInfo;
   allergies: string[];
-  medicalHistories: any[];
-  prescriptions: any[];
+  medicalHistories: MedicalHistory[];
+  prescriptions: Prescription[];
   appointments: Appointment[];
 }
 
@@ -248,19 +263,22 @@ const PatientDetails = () => {
                   patient.medicalHistories.map((item, i) => (
                     <div
                       key={i}
-                      className="p-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl flex justify-between items-center border border-border/50"
+                      className="p-4 bg-gray-50/50 dark:bg-gray-800/30 rounded-xl flex flex-col gap-2 border border-border/50"
                     >
-                      <div>
+                      <div className="flex justify-between items-center">
                         <p className="text-sm font-bold text-(--color-text)">
-                          {item.condition || item.title || "Medical Record"}
+                          {item.diagnosis}
                         </p>
-                        <p className="text-xs text-(--color-text-light) mt-1">
-                          Date: {item.date}
-                        </p>
+                        <span className="px-3 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                          {new Date(item.diagnosedDate).toLocaleDateString()}
+                        </span>
                       </div>
-                      <span className="px-3 py-1 bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                        {item.status || "Recorded"}
-                      </span>
+                      <p className="text-xs text-(--color-text-light)">
+                        <span className="font-semibold text-(--color-text)">Notes:</span> {item.doctorNotes}
+                      </p>
+                      <p className="text-[10px] text-(--color-text-light) italic">
+                        Created by: {item.createdBy}
+                      </p>
                     </div>
                   ))
                 ) : (
@@ -288,7 +306,7 @@ const PatientDetails = () => {
                     >
                       <div className="flex justify-between mb-1">
                         <p className="text-sm font-bold text-(--color-text)">
-                          {pill.name || pill.medicineName}
+                          {pill.medicationName} ({pill.dosage})
                         </p>
                         <span className="text-xs font-medium text-(--color-text-light)">
                           {pill.frequency}
@@ -297,9 +315,9 @@ const PatientDetails = () => {
                       <p className="text-xs text-(--color-text-light)">
                         Prescribed by{" "}
                         <span className="text-(--color-text) font-semibold">
-                          {pill.prescribedBy || pill.doctorName}
+                          {pill.doctorName}
                         </span>{" "}
-                        on {pill.date}
+                        on {new Date(pill.date).toLocaleDateString()}
                       </p>
                     </div>
                   ))

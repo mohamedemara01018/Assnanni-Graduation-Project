@@ -59,7 +59,7 @@ const FirstDiv = () => {
   const recentPatients = data?.recentPatients
     ? data.recentPatients
     : dummyPatients;
-  console.log(recentPatients);
+
   useEffect(() => {
     if (isSuccess && data) {
       toast.success("Dashboard details loaded");
@@ -126,8 +126,8 @@ const FirstDiv = () => {
           {pendingScans.length > 0 ? (
             pendingScans.map((scan: Scan) => (
               <NavLink
-                key={scan.id}
-                to={`/scan/analysis/${scan.patientId}`}
+                key={scan.scanId}
+                to={`/scan/analysis/${scan.scanId}`}
                 className="block hover:opacity-90 transition-opacity"
               >
                 <Card
