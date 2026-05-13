@@ -178,12 +178,13 @@ function VerifyDoctorPage() {
 
     onSuccess: (response) => {
       // Save token to Redux store using dispatch and setToken
-      if (response?.data?.token) {
-        dispatch(setToken(response.data.token));
+      const token = response.data?.data?.token || response.data?.token;
+      if (token) {
+        dispatch(setToken(token));
       }
       navigator("/");
       toast.success(
-        "You have successfully send request wait until admin accept it",
+        "Verification request submitted successfully. You can now access your dashboard.",
       );
     },
     onError: (error: any) => {

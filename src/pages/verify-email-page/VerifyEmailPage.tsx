@@ -17,8 +17,8 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 function VerifyEmailPage() {
-  const authBase =
-    useSelector((s: RootState) => s.config.backendUrl) + "Authentications/";
+  const backendUrl = useSelector((s: RootState) => s.config.backendUrl);
+  const authBase = backendUrl + "Authentications/";
   const dispatch = useDispatch();
   const navigator = useNavigate();
   const location = useLocation();
@@ -40,18 +40,24 @@ function VerifyEmailPage() {
       code: value,
     };
     try {
-      const response = await axios.post(authBase + "Verify-Email", data);
-      // const response = true;
-      console.log(response);
-
       const state = location.state as {
         isDoctor?: boolean;
         isStudentDoctor?: boolean;
+        isPatient?: boolean;
         doctorId?: string;
       } | null;
       const isDoctor = state?.isDoctor;
       const isStudentDoctor = state?.isStudentDoctor;
+      const isPatient = state?.isPatient;
       const doctorId = state?.doctorId;
+
+      const verificationUrl = isPatient
+        ? backendUrl + "Patient/email-verify"
+        : authBase + "Verify-Email";
+
+      const response = true;
+      // const response = await axios.post(verificationUrl, data);
+      console.log(response);
 
       if (!isDoctor && !isStudentDoctor) {
         dispatch(setToken(response.data?.data?.token));
@@ -63,6 +69,8 @@ function VerifyEmailPage() {
         navigator("/verify-doctor", {
           state: { isStudentDoctor, doctorId },
         });
+      } else if (isPatient) {
+        navigator("/");
       } else {
         navigator("/onboarding");
       }
