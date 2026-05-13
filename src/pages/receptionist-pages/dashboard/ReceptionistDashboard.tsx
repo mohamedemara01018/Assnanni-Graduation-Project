@@ -2,7 +2,7 @@ import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import DashboardCard from "@/components/DashboardCard/DashboardCard";
 import FirstDiv from "@/components/Receptionist/Dashboard/FirstDiv/FirstDiv";
 import SecondDiv from "@/components/Receptionist/Dashboard/SecondDiv/SecondDiv";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { BsCalendar3 } from "react-icons/bs";

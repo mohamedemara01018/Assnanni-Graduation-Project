@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
@@ -11,11 +11,33 @@ import { NavLink } from "react-router";
 import Patient from "./Patient";
 import { CiLock } from "react-icons/ci";
 import Card from "./Card";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { XCircle } from "lucide-react";
 
 const FirstDiv = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
+  const [selectedScanUrl, setSelectedScanUrl] = useState<string | null>(null);
+
+  const queryClient = useQueryClient();
+  const markAsViewedMutation = useMutation({
+    mutationFn: async (caseStudyId: number) => {
+      await axios.post(
+        `${backendUrl}StudentDoctor/mark-as-viewed`,
+        { caseStudyId },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+    },
+    onSuccess: () => {
+      toast.success("Case marked as viewed");
+      queryClient.invalidateQueries({ queryKey: ["student-learning"] });
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to mark as viewed");
+    },
+  });
 
   const {
     data: todayData,
@@ -45,12 +67,9 @@ const FirstDiv = () => {
   } = useQuery({
     queryKey: ["student-learning"],
     queryFn: async () => {
-      const response = await axios.get(
-        `${backendUrl}StudentDoctor/for-learning`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const response = await axios.get(`${backendUrl}StudentDoctor`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       return response.data.data;
     },
     enabled: !!token && !!backendUrl,
@@ -104,21 +123,18 @@ const FirstDiv = () => {
               <ScaleLoader color="#00AFE5" height={20} />
             </div>
           ) : todayData?.length > 0 ? (
-            todayData.map((obs: any) => (
+            todayData.map((obs: any, i: number) => (
               <Card
-                key={obs.id}
-                title={`Observation: ${obs.doctorFullName || obs.doctorName}`}
-                status={
-                  obs.status === "Observe Only"
-                    ? "Observe Only"
-                    : "View & Learn"
-                }
+                key={obs.id || `obs-${i}`}
+                title={`Observer: ${obs.doctorFullName || obs.doctorName}`}
+                status={obs.status}
                 color="blue"
                 logo={<FaRegClock />}
               >
                 <p>{obs.specialty}</p>
                 <p>
-                  {obs.time} • Supervisor: {obs.supervisorName || obs.supervisor}
+                  {obs.time} • Supervisor:{" "}
+                  {obs.supervisorName || obs.supervisor}
                 </p>
               </Card>
             ))
@@ -145,20 +161,34 @@ const FirstDiv = () => {
               <ScaleLoader color="#8B5CF6" height={20} />
             </div>
           ) : learningData?.length > 0 ? (
-            learningData.map((scan: any) => (
+            learningData.map((scan: any, i: number) => (
               <Card
-                key={scan.id}
-                title={scan.type}
-                status={
-                  scan.status === "Observe Only"
-                    ? "Observe Only"
-                    : "View & Learn"
-                }
+                key={scan.id || `scan-${i}`}
+                title={scan.title}
+                status={scan.isViewed ? "Completed" : "New Case"}
                 color="violet"
                 logo={<LuFileSpreadsheet />}
+                onMarkViewed={() => markAsViewedMutation.mutate(scan.id)}
+                isMarkingViewed={markAsViewedMutation.isPending}
               >
-                <p>Case Study {scan.caseStudyNum}</p>
-                <p>{scan.note}</p>
+                <div className="flex flex-col gap-1">
+                  <p className="text-[10px] font-bold text-violet-500 uppercase">
+                    Supervisor: {scan.doctorName || "Assigned Doctor"}
+                  </p>
+                  <p className="line-clamp-2 text-sm text-(--color-text-light)">
+                    {scan.description}
+                  </p>
+                  {scan.scanUrl && (
+                    <button
+                      onClick={() =>
+                        setSelectedScanUrl(`${backendUrl}${scan.scanUrl}`)
+                      }
+                      className="text-[10px] w-fit font-bold text-blue-600 hover:text-blue-700 underline uppercase cursor-pointer mt-1"
+                    >
+                      View Diagnostic Scan
+                    </button>
+                  )}
+                </div>
               </Card>
             ))
           ) : (
@@ -187,12 +217,13 @@ const FirstDiv = () => {
               <ScaleLoader color="#3B82F6" height={20} />
             </div>
           ) : casesData?.length > 0 ? (
-            casesData.map((patient: any) => (
+            casesData.map((patient: any, i: number) => (
               <Patient
-                key={patient.id}
-                id={patient.id}
-                name={patient.fullName || patient.name}
-                imageUrl={patient.imageUrl || patient.profileImageUrl}
+                key={patient.patientId || `patient-${i}`}
+                id={patient.patientId}
+                name={patient.patientName}
+                doctorName={patient.doctorName}
+                imageUrl={patient.imageUrl}
                 lastInteractionDate={patient.lastInteractionDate}
               />
             ))
@@ -206,6 +237,32 @@ const FirstDiv = () => {
           <span>🔒</span> Full patient records require supervisor authorization
         </p>
       </div>
+
+      {/* Scan Viewer Modal */}
+      {selectedScanUrl && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative max-w-4xl w-full bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setSelectedScanUrl(null)}
+              className="absolute top-4 right-4 z-10 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors cursor-pointer"
+            >
+              <XCircle size={24} />
+            </button>
+            <div className="p-2">
+              <img
+                src={selectedScanUrl}
+                alt="Diagnostic Scan"
+                className="w-full h-auto max-h-[80vh] object-contain rounded-xl"
+              />
+            </div>
+            <div className="p-4 bg-gray-50 dark:bg-gray-800 text-center">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">
+                Educational Case Study Scan
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

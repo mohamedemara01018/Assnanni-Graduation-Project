@@ -1,5 +1,4 @@
 import { NavLink } from "react-router";
-import { CiLock } from "react-icons/ci";
 
 const QuickActions = () => {
   return (
@@ -11,37 +10,21 @@ const QuickActions = () => {
         <h3 className="text-blue-900 font-normal">View Schedule</h3>
         <p className="text-sm font-light text-blue-700">Observation times</p>
       </NavLink>
+
       <NavLink
-        to={"#"}
+        to={"/student-doctor/medical-record-drafts"}
         className={
-          "bg-(--color-border) rounded-lg p-4 cursor-not-allowed blur-[0.4px] flex justify-between items-center"
+          "bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800 rounded-xl p-4 flex justify-between items-center hover:bg-blue-100 transition-all group"
         }
       >
-        <div>
-          <h3 className="text-(--color-text-light) font-semibold ">
-            Prescribe Medication
+        <div className="flex flex-col gap-0.5">
+          <h3 className="text-blue-600 dark:text-blue-400 font-bold text-sm">
+            Clinical Record Drafts
           </h3>
-          <p className="text-sm font-light text-gray-400">
-            Requires authorization
+          <p className="text-[11px] font-medium text-blue-500/70">
+            Review and complete your drafts
           </p>
         </div>
-        <CiLock className="text-2xl text-(--color-text-light)" />
-      </NavLink>
-      <NavLink
-        to={"#"}
-        className={
-          "bg-(--color-border) rounded-lg p-4 blur-[0.4px] cursor-not-allowed flex justify-between items-center"
-        }
-      >
-        <div>
-          <h3 className="text-(--color-text-light) font-semibold">
-            Edit Patient Records
-          </h3>
-          <p className="text-sm font-light text-gray-400">
-            Requires authorization
-          </p>
-        </div>
-        <CiLock className="text-2xl text-(--color-text-light)" />
       </NavLink>
     </div>
   );

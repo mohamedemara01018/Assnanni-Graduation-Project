@@ -5,7 +5,7 @@ import { MdOutlinePersonAddAlt1 } from "react-icons/md";
 import { FaSearch } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import PatientsCard from "../../../components/Doctor/Patients/PatientsCard";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { NavLink } from "react-router";
@@ -13,6 +13,27 @@ import Cookies from "js-cookie";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import type { Patient } from "@/interfaces/doctorInterfaces";
+import { UserPlus, XCircle } from "lucide-react";
+import { ScaleLoader } from "react-spinners";
+import { useForm } from "react-hook-form";
+
+interface StudentDoctor {
+  studentDoctorId: number;
+  studentName: string;
+  university: string;
+  status: string;
+}
+
+interface MyStudentsResponse {
+  succeeded: boolean;
+  message: string;
+  data: StudentDoctor[];
+}
+
+interface AssignForm {
+  studentDoctorId: number;
+  notes: string;
+}
 
 const Patients = () => {
   const [view, setView] = useState<"Table" | "Cards">(
@@ -20,6 +41,8 @@ const Patients = () => {
   );
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
+  const queryClient = useQueryClient();
+
   const { role } = useSelector(
     (state: {
       auth: {
@@ -28,11 +51,19 @@ const Patients = () => {
     }) => state.auth,
   );
 
+  // Modal State
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [selectedPatientId, setSelectedPatientId] = useState<number | string | null>(null);
+  const [selectedStudentIdInModal, setSelectedStudentIdInModal] = useState<number | null>(null);
+
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<AssignForm>();
+
   // Filters and Pagination State
   const [search, setSearch] = useState("");
   const [patientStatus, setPatientStatus] = useState<
     "Active" | "InActive" | ""
   >("");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [otherStatus, setOtherStatus] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -66,6 +97,42 @@ const Patients = () => {
         },
       });
       return response.data;
+    },
+  });
+
+  const { data: studentsData } = useQuery<MyStudentsResponse>({
+    queryKey: ["my-students"],
+    queryFn: async () => {
+      const response = await axios.get(`${backendUrl}Doctors/my-students`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return response.data;
+    },
+    enabled: role === "doctor" && isAssignModalOpen,
+  });
+
+  const assignMutation = useMutation({
+    mutationFn: async (formData: AssignForm) => {
+      await axios.post(
+        `${backendUrl}StudentDoctor/assign-patient-case`,
+        {
+          patientId: selectedPatientId,
+          studentDoctorId: Number(formData.studentDoctorId),
+          notes: formData.notes,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+    },
+    onSuccess: () => {
+      toast.success("Patient case assigned successfully");
+      setIsAssignModalOpen(false);
+      reset();
+      queryClient.invalidateQueries({ queryKey: ["DoctorPatients"] });
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || "Failed to assign patient case");
     },
   });
 
@@ -125,6 +192,15 @@ const Patients = () => {
     link.click();
     document.body.removeChild(link);
     toast.success("Exporting data to CSV...");
+  };
+
+  const handleOpenAssignModal = (id: number | string) => {
+    setSelectedPatientId(id);
+    setIsAssignModalOpen(true);
+  };
+
+  const onAssignSubmit = (data: AssignForm) => {
+    assignMutation.mutate(data);
   };
 
   return (
@@ -255,6 +331,8 @@ const Patients = () => {
                           gender={patient.gender}
                           status={patient.status}
                           lastVisit={patient.lastVisit}
+                          role={role}
+                          onAssign={handleOpenAssignModal}
                         />
                       ))}
                     </tbody>
@@ -272,6 +350,8 @@ const Patients = () => {
                       gender={patient.gender}
                       status={patient.status}
                       lastVisit={patient.lastVisit}
+                      role={role}
+                      onAssign={handleOpenAssignModal}
                     />
                   ))}
                 </div>
@@ -357,6 +437,128 @@ const Patients = () => {
           </>
         )}
       </div>
+
+      {/* Assign Student Doctor Modal */}
+      {isAssignModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-(--color-surface) w-full max-w-lg rounded-2xl shadow-2xl border border-(--color-border) overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col">
+            <div className="flex justify-between items-center p-6 border-b border-(--color-border)">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-violet-50 dark:bg-violet-900/20 rounded-lg text-violet-600">
+                  <UserPlus size={20} />
+                </div>
+                <h2 className="text-xl font-bold text-(--color-text)">
+                  Assign Student Doctor
+                </h2>
+              </div>
+              <button
+                onClick={() => {
+                  setIsAssignModalOpen(false);
+                  reset();
+                }}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+              >
+                <XCircle size={20} className="text-(--color-text-light)" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit(onAssignSubmit)} className="p-6 space-y-5 flex-1 overflow-y-auto">
+              <div className="space-y-3">
+                <label className="text-sm font-bold text-(--color-text) ml-1">
+                  Select Student Doctor
+                </label>
+                <div className="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+                  {studentsData?.data.map((student) => {
+                    const isSelected = Number(selectedStudentIdInModal) === student.studentDoctorId;
+                    return (
+                      <div
+                        key={student.studentDoctorId}
+                        onClick={() => {
+                          setSelectedStudentIdInModal(student.studentDoctorId);
+                          setValue("studentDoctorId", student.studentDoctorId);
+                        }}
+                        className={`p-4 rounded-2xl border-2 transition-all cursor-pointer flex justify-between items-center ${
+                          isSelected
+                            ? "border-blue-600 bg-blue-50/50 dark:bg-blue-900/20"
+                            : "border-(--color-border) hover:border-gray-300 dark:hover:border-gray-700 bg-(--color-bg)"
+                        }`}
+                      >
+                        <div className="flex flex-col gap-0.5">
+                          <h4 className="text-sm font-bold text-(--color-text)">
+                            {student.studentName}
+                          </h4>
+                          <p className="text-[11px] text-(--color-text-light) font-medium">
+                            {student.university} • {student.status || "Clinical Level"}
+                          </p>
+                        </div>
+                        <div
+                          className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                            isSelected
+                              ? "border-blue-600 bg-blue-600 shadow-[0_0_0_2px_white_inset]"
+                              : "border-gray-300 dark:border-gray-600"
+                          }`}
+                        >
+                          {isSelected && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                <input
+                  type="hidden"
+                  {...register("studentDoctorId", { required: "Please select a student" })}
+                />
+                {errors.studentDoctorId && (
+                  <p className="text-[10px] text-red-500 font-bold uppercase ml-1 tracking-wider">
+                    {errors.studentDoctorId.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-(--color-text) ml-1">
+                  Assignment Notes
+                </label>
+                <textarea
+                  {...register("notes", { required: "Notes are required" })}
+                  placeholder="Instructions or context for the student..."
+                  rows={3}
+                  className={`w-full px-4 py-3 rounded-xl border ${errors.notes ? 'border-red-500' : 'border-(--color-border)'} bg-(--color-bg) text-(--color-text) focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm resize-none`}
+                />
+                {errors.notes && <p className="text-[10px] text-red-500 font-bold uppercase ml-1 tracking-wider">{errors.notes.message}</p>}
+              </div>
+
+              <div className="pt-2 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsAssignModalOpen(false);
+                    reset();
+                    setSelectedStudentIdInModal(null);
+                  }}
+                  className="flex-1 py-3 text-sm font-bold text-(--color-text-light) border border-(--color-border) rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={assignMutation.isPending}
+                  className="flex-[2] bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-xl text-sm font-bold shadow-lg shadow-blue-500/20 transition-all flex items-center justify-center gap-2"
+                >
+                  {assignMutation.isPending ? (
+                    <>
+                      <ScaleLoader color="#fff" height={10} width={2} />
+                      Assigning...
+                    </>
+                  ) : (
+                    "Assign Case"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 };

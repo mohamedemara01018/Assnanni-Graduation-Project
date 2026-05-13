@@ -71,6 +71,32 @@ const QuickActions = () => {
           Manage student Doctors
         </p>
       </NavLink>
+      <NavLink
+        to={"/doctor-learning-sessions"}
+        className={
+          "bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition rounded-lg p-4"
+        }
+      >
+        <h3 className="text-indigo-900 dark:text-indigo-300 font-semibold text-sm">
+          Learning Sessions
+        </h3>
+        <p className="text-xs font-light text-indigo-700 dark:text-indigo-400 mt-1">
+          Clinical teaching & cases
+        </p>
+      </NavLink>
+      <NavLink
+        to={"/doctor/student-record-approvals"}
+        className={
+          "bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/40 transition rounded-lg p-4"
+        }
+      >
+        <h3 className="text-purple-900 dark:text-purple-300 font-semibold text-sm">
+          Student Record Approvals
+        </h3>
+        <p className="text-xs font-light text-purple-700 dark:text-purple-400 mt-1">
+          Review clinical documentations
+        </p>
+      </NavLink>
     </div>
   );
 };

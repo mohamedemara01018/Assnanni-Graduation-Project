@@ -85,7 +85,7 @@ const SecondDiv = () => {
     contactMutation.mutate(formData);
   };
   return (
-    <div className="flex-1 flex flex-col gap-8">
+    <div className="flex-1 flex flex-col-reverse gap-8">
       <LearningProgress data={progress} isLoading={isProgressLoading} />
 
       <div className="bg-(--color-surface) p-6 rounded-2xl shadow-sm border border-(--color-border) flex flex-col gap-6">
@@ -119,7 +119,19 @@ const SecondDiv = () => {
           </p>
         )}
       </div>
-
+      <div className="flex bg-violet-50 px-6 py-4 items-center gap-4 text-violet-500 border border-violet-100 rounded-2xl shadow-sm">
+        <div className="bg-violet-100 p-2 rounded-lg">
+          <FaGraduationCap size={24} className="text-violet-600" />
+        </div>
+        <div>
+          <h3 className="font-bold text-sm text-violet-700">
+            Student Mode Active
+          </h3>
+          <p className="text-[10px] text-violet-500 font-medium">
+            Complete your training program to unlock full doctor permissions
+          </p>
+        </div>
+      </div>
       {/* Contact Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -151,6 +163,7 @@ const SecondDiv = () => {
                   }
                 />
               </div>
+
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold text-(--color-text-light) uppercase tracking-wider">
                   Message
@@ -184,19 +197,6 @@ const SecondDiv = () => {
         </div>
       )}
 
-      <div className="flex bg-violet-50 px-6 py-4 items-center gap-4 text-violet-500 border border-violet-100 rounded-2xl shadow-sm">
-        <div className="bg-violet-100 p-2 rounded-lg">
-          <FaGraduationCap size={24} className="text-violet-600" />
-        </div>
-        <div>
-          <h3 className="font-bold text-sm text-violet-700">
-            Student Mode Active
-          </h3>
-          <p className="text-[10px] text-violet-500 font-medium">
-            Complete your training program to unlock full doctor permissions
-          </p>
-        </div>
-      </div>
       <QuickActions />
     </div>
   );

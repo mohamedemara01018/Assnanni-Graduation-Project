@@ -21,11 +21,17 @@ export const roleRoutePaths = {
     "receptionist-access/add",
     "scan/upload",
     "scan/analysis/:scanId",
+    "doctor-learning-sessions",
+    "doctor-learning-sessions/create",
+    "doctor-learning-sessions/:id",
+    "doctor/student-record-approvals",
   ],
   studentDoctor: [
     "/student-doctor",
     "student-notification",
     "contact-supervisor",
+    "student-doctor/create-medical-record/:id",
+    "student-doctor/medical-record-drafts",
   ],
   receptionist: [
     "/receptionist",

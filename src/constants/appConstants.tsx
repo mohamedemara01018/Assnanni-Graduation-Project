@@ -19,17 +19,23 @@ import Reports from "../pages/doctor-pages/reports/Reports";
 import ManageSupervisioning from "../pages/doctor-pages/supervisioning/ManageSupervisioning";
 import ViewSupervisioningRequest from "../pages/doctor-pages/supervisioning/ViewSupervisioningRequest";
 import AssignStudentDoctor from "../pages/doctor-pages/supervisioning/AssignStudentDoctor";
+import StudentRecordApprovals from "../pages/doctor-pages/supervisioning/StudentRecordApprovals";
 import MedicalReportForm from "../components/Doctor/Reports/MedicalReportForm";
 import ReceptionistAccess from "../components/Doctor/ReceptionistAccess/ReceptionistAccess";
 import AddReceptionist from "../components/Doctor/ReceptionistAccess/AddReceptionist";
 import Scan from "../pages/doctor-pages/Scan/Scan";
 import ScanDetails from "../pages/doctor-pages/scans/ScanDetails";
 import Notifications from "../pages/doctor-pages/notifications/Notifications";
+import LearningSessions from "../pages/doctor-pages/learning-sessions/LearningSessions";
+import CreateLearningSession from "../pages/doctor-pages/learning-sessions/CreateLearningSession";
+import SessionDetails from "../pages/doctor-pages/learning-sessions/SessionDetails";
 import StudentAppointments from "../pages/student-doctor-pages/appointments/StudentAppointments";
 import StudentAppointmentDetails from "../pages/student-doctor-pages/appointments/StudentAppointmentDetails";
 import StudentDoctorDashboard from "../pages/student-doctor-pages/dashboard/StudentDoctorDashboard";
 
 import ContactSupervisor from "../pages/student-doctor-pages/supervisor/ContactSupervisor";
+import CreateMedicalRecord from "../pages/student-doctor-pages/medical-records/CreateMedicalRecord";
+import MedicalRecordDrafts from "../pages/student-doctor-pages/medical-records/MedicalRecordDrafts";
 import ReceptionistDashboard from "../pages/receptionist-pages/dashboard/ReceptionistDashboard";
 import ScheduleAppointment from "../pages/receptionist-pages/appointments/ScheduleAppointment";
 import CheckIn from "../pages/receptionist-pages/appointments/CheckIn";
@@ -118,11 +124,17 @@ export const routeElements = {
   notification: <Notifications />,
   "doctor-appointments": <StudentAppointments />,
   "doctor-appointments/:id": <StudentAppointmentDetails />,
+  "doctor-learning-sessions": <LearningSessions />,
+  "doctor-learning-sessions/create": <CreateLearningSession />,
+  "doctor-learning-sessions/:id": <SessionDetails />,
+  "doctor/student-record-approvals": <StudentRecordApprovals />,
 
   // Student Doctor routes
   "/student-doctor": <StudentDoctorDashboard />,
   "student-notification": <Notifications />,
   "contact-supervisor": <ContactSupervisor />,
+  "student-doctor/create-medical-record/:id": <CreateMedicalRecord />,
+  "student-doctor/medical-record-drafts": <MedicalRecordDrafts />,
 
   // Receptionist routes
   "/receptionist": <ReceptionistDashboard />,

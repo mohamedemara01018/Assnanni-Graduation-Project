@@ -1,6 +1,7 @@
 import { IoEyeOutline } from "react-icons/io5";
 import { BsFileMedical } from "react-icons/bs";
 import { NavLink } from "react-router";
+import { UserPlus } from "lucide-react";
 
 interface Props {
   id: number | string;
@@ -10,6 +11,8 @@ interface Props {
   gender: "Male" | "Female";
   status: "Active" | "Inactive" | "Pending";
   lastVisit: string;
+  role?: string;
+  onAssign?: (id: number | string) => void;
 }
 
 const PatientsTable = ({
@@ -20,6 +23,8 @@ const PatientsTable = ({
   gender,
   status,
   lastVisit,
+  role,
+  onAssign,
 }: Props) => {
   return (
     <tr className="group hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-colors">
@@ -64,7 +69,17 @@ const PatientsTable = ({
       </td>
 
       <td className="px-8 py-5">
-        <div className="flex justify-end gap-4 items-center">
+        <div className="flex justify-end gap-3 items-center">
+          {role === "doctor" && onAssign && (
+            <button
+              type="button"
+              onClick={() => onAssign(id)}
+              className="p-1.5 text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 rounded-lg transition-colors cursor-pointer"
+              title="Assign Student Doctor"
+            >
+              <UserPlus size={18} />
+            </button>
+          )}
           <NavLink
             to={`/doctor-patients/${id}`}
             className="p-1.5 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors cursor-pointer"

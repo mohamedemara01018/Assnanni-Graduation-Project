@@ -75,8 +75,10 @@ const ViewSupervisioningRequest = () => {
       );
     },
     onSuccess: () => {
-      toast.success("Supervisioning request approved");
-      navigate(`/doctor-supervisioning/assign-student-doctor/${student?.id}`);
+      toast.success(
+        "Supervisioning request approved, Please assign the student",
+      );
+      navigate(`/doctor-supervisioning`);
     },
     onError: (err: any) => {
       toast.error(err.response?.data?.message || "Failed to approve request");
