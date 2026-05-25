@@ -202,7 +202,7 @@ function AdminPage() {
               <div className="w-full space-y-4">
                 <QuickActionComps
                   title="Verify Doctors"
-                  subTitle="3 pending"
+                  subTitle={`${pendingDoctor.length} pending`}
                   classProbs="blue"
                   path="/verify-doctors"
                 />
