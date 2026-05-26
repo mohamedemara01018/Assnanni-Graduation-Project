@@ -57,6 +57,7 @@ function UsersPage() {
 
   const {
     usersData,
+    totalCount,
     loading: usersLoading,
   } = useSelector(selectUsers) as UsersState;
 
@@ -242,7 +243,7 @@ function UsersPage() {
             </select>
             <select
               onChange={(e) => setFilterGender(e.target.value as UserGender)}
-              className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-(--color-border) rounded-lg focus:outline-none focus:ring-2 focus:ring-(--color-text-blue)"
+              className="px-4 py-2 bg-gray-50 dark:bg-gray-700 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-(--color-text-blue)"
             >
               <option value="">All Gender</option>
               <option value="male">Male</option>
@@ -253,7 +254,7 @@ function UsersPage() {
       </div>
 
       {/* Users Table */}
-      <div className="bg-(--color-surface) rounded-xl border border-(--color-border) overflow-hidden">
+      <div className="bg-(--color-surface) rounded-xl border border-border overflow-hidden">
         {error ? (
           <Error message={error} />
         ) : loading || usersLoading ? (
@@ -419,7 +420,7 @@ function UsersPage() {
         <Pagination
           pageNumber={pageNumber}
           pageSize={pageSize}
-          totalItems={usersData.length + 20}
+          totalItems={Number(totalCount)}
           onPageChange={(page) => setPageNumber(page)}
           onPageSizeChange={(size) => {
             setPageSize(size);
