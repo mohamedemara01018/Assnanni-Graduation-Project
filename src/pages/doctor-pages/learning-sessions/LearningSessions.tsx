@@ -75,7 +75,7 @@ const LearningSessions = () => {
 
       try {
         const response = await axios.get(
-          `${backendUrl}StudentDoctor/trainsessions`,
+          `${backendUrl}StudentDoctor/doctor-learning-sessions`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
@@ -323,7 +323,7 @@ const LearningSessions = () => {
                       onClick={() =>
                         navigate(`/doctor-learning-sessions/${session.id}`)
                       }
-                      className="flex-1 lg:w-32 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      className="flex-1 lg:w-32 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-50 dark:bg-gray-800 dark:text-gray-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                     >
                       View Details
                     </button>

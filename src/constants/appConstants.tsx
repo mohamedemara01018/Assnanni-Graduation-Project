@@ -36,6 +36,9 @@ import StudentDoctorDashboard from "../pages/student-doctor-pages/dashboard/Stud
 import ContactSupervisor from "../pages/student-doctor-pages/supervisor/ContactSupervisor";
 import CreateMedicalRecord from "../pages/student-doctor-pages/medical-records/CreateMedicalRecord";
 import MedicalRecordDrafts from "../pages/student-doctor-pages/medical-records/MedicalRecordDrafts";
+import TrainingSessions from "../pages/student-doctor-pages/training-sessions/TrainingSessions";
+import MedicalRecordDraftDetails from "../pages/student-doctor-pages/medical-records/MedicalRecordDraftDetails";
+import UpdateMedicalRecordDraft from "../pages/student-doctor-pages/medical-records/UpdateMedicalRecordDraft";
 import ReceptionistDashboard from "../pages/receptionist-pages/dashboard/ReceptionistDashboard";
 import ScheduleAppointment from "../pages/receptionist-pages/appointments/ScheduleAppointment";
 import CheckIn from "../pages/receptionist-pages/appointments/CheckIn";
@@ -135,6 +138,9 @@ export const routeElements = {
   "contact-supervisor": <ContactSupervisor />,
   "student-doctor/create-medical-record/:id": <CreateMedicalRecord />,
   "student-doctor/medical-record-drafts": <MedicalRecordDrafts />,
+  "student-doctor/training-sessions": <TrainingSessions />,
+  "student-doctor/medical-record-drafts/:draftId": <MedicalRecordDraftDetails />,
+  "student-doctor/medical-record-drafts/update/:draftId": <UpdateMedicalRecordDraft />,
 
   // Receptionist routes
   "/receptionist": <ReceptionistDashboard />,

@@ -180,9 +180,7 @@ const FirstDiv = () => {
                   </p>
                   {scan.scanUrl && (
                     <button
-                      onClick={() =>
-                        setSelectedScanUrl(`${backendUrl}${scan.scanUrl}`)
-                      }
+                      onClick={() => setSelectedScanUrl(`${scan.scanUrl}`)}
                       className="text-[10px] w-fit font-bold text-blue-600 hover:text-blue-700 underline uppercase cursor-pointer mt-1"
                     >
                       View Diagnostic Scan

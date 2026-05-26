@@ -26,6 +26,22 @@ const QuickActions = () => {
           </p>
         </div>
       </NavLink>
+
+      <NavLink
+        to={"/student-doctor/training-sessions"}
+        className={
+          "bg-indigo-50/50 dark:bg-indigo-900/10 border border-indigo-100 dark:border-indigo-800 rounded-xl p-4 flex justify-between items-center hover:bg-indigo-100 dark:hover:bg-indigo-900/20 transition-all group cursor-pointer"
+        }
+      >
+        <div className="flex flex-col gap-0.5">
+          <h3 className="text-indigo-600 dark:text-indigo-400 font-bold text-sm">
+            Training Sessions
+          </h3>
+          <p className="text-[11px] font-medium text-indigo-500/70">
+            View your educational training history
+          </p>
+        </div>
+      </NavLink>
     </div>
   );
 };
