@@ -8,6 +8,9 @@ import pendingDoctorReducer from './slices/admin-slice/pending-doctor-slice/pend
 import searchPendingDoctorReducer from './slices/admin-slice/search-pending-doctors-slice/searchPendingDoctorSlice'
 import approvePendingDoctorReducer from './slices/admin-slice/approve-pending-doctor-slice/approvePendingDoctorSlice'
 import rejectPendingDoctorReducer from './slices/admin-slice/reject-pending-doctor-slice/rejectPendingDoctorSlice'
+import patientDashboardReducer from './slices/patient-slice/patient-dashboard-slice/patientDashboardSlice'
+import allDoctorsReducer from './slices/patient-slice/all-doctors.slice/allDoctorsSlice'
+import doctorProfileReducer from './slices/patient-slice/doctor-profile-slice/doctorProfileSlice'
 
 export const store = configureStore({
   reducer: {
@@ -21,7 +24,13 @@ export const store = configureStore({
     pendingDoctorsSlice: pendingDoctorReducer,
     searchPendingDoctorSlice: searchPendingDoctorReducer,
     approvePendingDoctorSlice: approvePendingDoctorReducer,
-    rejectPendingDoctorSlice: rejectPendingDoctorReducer
+    rejectPendingDoctorSlice: rejectPendingDoctorReducer,
+
+
+    // patient dashoard
+    patientDashboardSlice: patientDashboardReducer,
+    allDoctorsSlice: allDoctorsReducer,
+    doctorProfileSlice: doctorProfileReducer,
   },
 });
 

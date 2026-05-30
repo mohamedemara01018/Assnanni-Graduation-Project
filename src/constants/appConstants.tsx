@@ -53,6 +53,7 @@ import AppointmentsBookingPage from "../pages/appointments-booking-page/Appointm
 import PatientProfilePage from "../pages/patient-profile-page/PatientProfilePage";
 import EditPatientProfilePage from "../pages/edit-patient-profile-page/EditPatientProfilePage";
 import ProfilePage from "../pages/profile-page/ProfilePage";
+import PrescriptionsPage from "@/pages/prescriptions-page/PrescriptionsPage";
 
 // ProtectedRoute component for role-based access control
 export const ProtectedRoute = ({
@@ -96,6 +97,7 @@ export const homePageByRole = {
 export const routeElements = {
   // Patient routes
   "/patient": <PatientPage />,
+  'prescriptions': <PrescriptionsPage />,
   // Admin routes
   "/admin": <AdminPage />,
   users: <UsersPage />,
