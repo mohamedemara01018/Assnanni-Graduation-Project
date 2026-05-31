@@ -3,7 +3,7 @@ import LearningProgress from "./LearningProgress";
 import Patient from "../FirstDiv/Patient";
 import { FaGraduationCap } from "react-icons/fa6";
 // import { NavLink } from "react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -13,11 +13,28 @@ import { toast } from "react-toastify";
 import { ScaleLoader } from "react-spinners";
 import { FiX, FiSend } from "react-icons/fi";
 
+interface AssignedSupervisorData {
+  name: string;
+  email: string;
+  phone: string;
+  specialty: string;
+  imageUrl: string;
+}
+
+interface AssignedSupervisorResponse {
+  succeeded: boolean;
+  message: string;
+  data: AssignedSupervisorData | null;
+  meta: unknown;
+}
+
 const SecondDiv = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ subject: "", message: "" });
+  const supervisorToastId = useRef("assigned-supervisor-load");
+  const supervisorErrorToastId = useRef("assigned-supervisor-error");
 
   const {
     data: progress,
@@ -41,9 +58,10 @@ const SecondDiv = () => {
   }, [isProgressError]);
 
   const {
-    data: supervisor,
+    data: supervisorResponse,
     isLoading: isSupervisorLoading,
     isError: isSupervisorError,
+    isSuccess: isSupervisorSuccess,
   } = useQuery({
     queryKey: ["assigned-supervisor"],
     queryFn: async () => {
@@ -53,16 +71,35 @@ const SecondDiv = () => {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      return response.data.data;
+      return response.data as AssignedSupervisorResponse;
     },
     enabled: !!token && !!backendUrl,
   });
 
   useEffect(() => {
     if (isSupervisorError) {
-      toast.error("Failed to load supervisor details");
+      toast.error("Failed to load supervisor details", {
+        toastId: supervisorErrorToastId.current,
+      });
     }
   }, [isSupervisorError]);
+
+  useEffect(() => {
+    if (isSupervisorSuccess && supervisorResponse) {
+      if (supervisorResponse.succeeded) {
+        toast.success(supervisorResponse.message || "Supervisor loaded", {
+          toastId: supervisorToastId.current,
+        });
+      } else {
+        toast.error(
+          supervisorResponse.message || "No supervisor assigned yet",
+          {
+            toastId: supervisorErrorToastId.current,
+          },
+        );
+      }
+    }
+  }, [isSupervisorSuccess, supervisorResponse]);
 
   const contactMutation = useMutation({
     mutationFn: async (data: { subject: string; message: string }) => {
@@ -96,14 +133,15 @@ const SecondDiv = () => {
           <div className="py-6 flex justify-center">
             <ScaleLoader color="#00AFE5" height={20} />
           </div>
-        ) : supervisor ? (
+        ) : supervisorResponse?.data ? (
           <>
             <Patient
-              name={supervisor.fullName || supervisor.name}
-              imageUrl={supervisor.profileImageUrl || supervisor.imageUrl}
+              name={supervisorResponse.data.name}
+              imageUrl={supervisorResponse.data.imageUrl}
+              showCreateMedicalRecord={false}
             >
               <p className="text-xs">
-                {supervisor.specialty || "Dental Supervisor"}
+                {supervisorResponse.data.specialty || "Dental Supervisor"}
               </p>
             </Patient>
             <button

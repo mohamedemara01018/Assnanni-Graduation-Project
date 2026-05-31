@@ -11,6 +11,7 @@ interface Props {
   imageUrl?: string;
   lastInteractionDate?: string;
   children?: ReactNode;
+  showCreateMedicalRecord?: boolean;
 }
 
 const Patient = ({
@@ -20,6 +21,7 @@ const Patient = ({
   imageUrl,
   lastInteractionDate,
   children,
+  showCreateMedicalRecord = true,
 }: Props) => {
   let firstCharacter: string = " ";
   if (name && typeof name === "string" && name.startsWith("Dr.")) {
@@ -81,15 +83,17 @@ const Patient = ({
           )}
         </div>
       </div>
-      <div className="flex flex-col items-end gap-2">
-        <NavLink
-          to={`/student-doctor/create-medical-record/${id}`}
-          className="p-2.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all duration-300 shadow-sm cursor-pointer"
-          title="Create Medical Record"
-        >
-          <BsFileMedical className="text-xl" />
-        </NavLink>
-      </div>
+      {showCreateMedicalRecord && (
+        <div className="flex flex-col items-end gap-2">
+          <NavLink
+            to={`/student-doctor/create-medical-record/${id}`}
+            className="p-2.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all duration-300 shadow-sm cursor-pointer"
+            title="Create Medical Record"
+          >
+            <BsFileMedical className="text-xl" />
+          </NavLink>
+        </div>
+      )}
     </div>
   );
 };

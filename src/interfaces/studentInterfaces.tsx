@@ -31,4 +31,6 @@ export interface Supervisor {
   name: string;
   specialty: string;
   imageUrl: string;
+  email?: string;
+  phone?: string;
 }

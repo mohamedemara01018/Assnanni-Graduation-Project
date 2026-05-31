@@ -55,8 +55,7 @@ function VerifyEmailPage() {
         ? backendUrl + "Patient/email-verify"
         : authBase + "Verify-Email";
 
-      const response = true;
-      // const response = await axios.post(verificationUrl, data);
+      const response = await axios.post(verificationUrl, data);
       console.log(response);
 
       if (!isDoctor && !isStudentDoctor) {
