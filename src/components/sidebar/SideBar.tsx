@@ -125,6 +125,7 @@ const sidebarDataRole = {
     { icon: LayoutDashboard, label: "Dashboard", path: "/patient" },
     { icon: Calendar, label: "Appointments", path: "/appointments" },
     { icon: Stethoscope, label: "Doctors", path: "/doctors-list" },
+    { icon: Stethoscope, label: "Prescriptions", path: "/prescriptions" },
     { icon: Scan, label: "Scans", path: "/scan/upload" },
     { icon: Users, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },

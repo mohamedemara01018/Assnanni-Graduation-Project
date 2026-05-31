@@ -7,71 +7,106 @@ import {
     User,
     FileText,
     Phone,
-    Mail,
     Building2,
-    Globe,
     Star,
     Briefcase,
-    AlertCircle
+    AlertCircle,
+    Loader2
 } from 'lucide-react';
-// import { useAuth } from '../contexts/AuthContext';
 import DashboardLayout from '@/components/dashboard-layout/DashboardLayout';
+import { useSelector, useDispatch } from 'react-redux';
+import type { AppDispatch } from '@/store/store';
+import { appointmentDetailsState, fetchAppointmentDetails, type AppointmentDetailsState } from '@/store/slices/patient-slice/appintment-details-slice/appointmentDetailsSlice';
+import { useEffect, useState } from 'react';
+import { RescheduleAppointmentModal } from '@/components/reschedule-appointment-modal/RescheduleAppointmentModal';
+
+
+// helpers
+
+
+function parseDate(iso: string) {
+    const d = new Date(iso + 'T00:00:00');
+    return {
+        day: d.toLocaleDateString('en-US', { weekday: 'short' }),
+        dateNum: d.getDate(),
+        monthLabel: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        fullLabel: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        iso,
+    };
+}
+
+function formatTime(t: string) {
+    const [h, m] = t.split(':').map(Number);
+    const ampm = h < 12 ? 'AM' : 'PM';
+    const hour = h % 12 || 12;
+    return `${hour}:${String(m).padStart(2, '0')} ${ampm}`;
+}
 
 export default function AppointmentDetailsPage() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const user = { role: 'patient' }
+    const user = { role: 'patient' };
+    const [showRescheduleModal, setShowRescheduleModal] = useState<boolean>(false)
 
-    // Mock appointment data
-    const appointment = {
-        id: id,
-        date: 'January 25, 2024',
-        time: '2:30 PM',
-        duration: '30 minutes',
-        status: 'Confirmed',
-        type: 'General Consultation',
-        doctor: {
-            name: 'Dr. Michael Chen',
-            specialty: 'Cardiologist',
-            experience: '15 years',
-            rating: 4.8,
-            reviews: 234,
-            phone: '+1 (555) 123-4567',
-            email: 'dr.chen@assnani.com',
-            image: 'https://i.pravatar.cc/150?img=12',
-            languages: ['English', 'Mandarin', 'Spanish']
-        },
-        clinic: {
-            name: 'Assnani Heart Care Center',
-            address: '123 Medical Plaza, Suite 302',
-            city: 'New York, NY 10001',
-            phone: '+1 (555) 100-2000',
-            email: 'info@heartcare.assnani.com',
-            website: 'www.heartcare.assnani.com',
-            hours: 'Mon-Fri: 8:00 AM - 6:00 PM',
-        },
-        patient: {
-            name: 'Sarah Johnson',
-            age: 34,
-            gender: 'Female',
-            phone: '+1 (555) 987-6543',
-            email: 'sarah.j@email.com',
-            image: 'https://i.pravatar.cc/150?img=5',
-            bloodType: 'A+',
-        },
-        location: 'Room 302, 3rd Floor',
-        notes: 'Follow-up appointment for blood pressure monitoring. Patient reported occasional dizziness.',
-        instructions: 'Please arrive 15 minutes early. Bring your previous medical records and current medication list.',
-        symptoms: 'Occasional chest discomfort, fatigue',
-        reason: 'Follow-up cardiovascular assessment'
-    };
+    const dispatch: AppDispatch = useDispatch();
+    const { data, loading, error } = useSelector(appointmentDetailsState) as AppointmentDetailsState
+
+    useEffect(() => {
+        dispatch(fetchAppointmentDetails({ id: String(id) }));
+    }, [dispatch, id]);
 
     const isPatient = user?.role === 'patient';
     const isDoctor = user?.role === 'doctor' || user?.role === 'student_doctor';
 
+    // ─── Loading State ──────────────────────────────────────────────────────────
+    if (loading) {
+        return (
+            <DashboardLayout pageTitle="Appointment Details">
+                <div className="flex items-center justify-center min-h-[60vh]">
+                    <div className="flex flex-col items-center space-y-3 text-gray-500 dark:text-gray-400">
+                        <Loader2 className="w-8 h-8 animate-spin" />
+                        <p className="text-sm">Loading appointment details...</p>
+                    </div>
+                </div>
+            </DashboardLayout>
+        );
+    }
+
+    // ─── Error State ────────────────────────────────────────────────────────────
+    if (error) {
+        return (
+            <DashboardLayout pageTitle="Appointment Details">
+                <div className="flex items-center justify-center min-h-[60vh]">
+                    <div className="flex flex-col items-center space-y-3 text-red-500 dark:text-red-400">
+                        <AlertCircle className="w-8 h-8" />
+                        <p className="text-sm">{error}</p>
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="text-sm text-gray-600 dark:text-gray-400 hover:underline"
+                        >
+                            Go Back
+                        </button>
+                    </div>
+                </div>
+            </DashboardLayout>
+        );
+    }
+
+    // ─── Derived values from real API data ──────────────────────────────────────
+    const { status, date, time, location, type, doctor, clinic, notes, instructions } = data;
+    console.log(data)
+    // Format duration display — the API doesn't return it, so omit or hardcode fallback
+    const statusColorMap: Record<string, string> = {
+        Confirmed: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
+        Pending: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
+        Cancelled: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
+        Completed: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+    };
+    const statusClass = statusColorMap[status] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
+
     return (
         <DashboardLayout pageTitle="Appointment Details">
-            <div >
+            <div>
                 <button
                     onClick={() => navigate(-1)}
                     className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6"
@@ -81,8 +116,9 @@ export default function AppointmentDetailsPage() {
                 </button>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Main Content */}
+                    {/* ── Main Content ────────────────────────────────────────── */}
                     <div className="lg:col-span-2 space-y-6">
+
                         {/* Header */}
                         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
                             <div className="flex items-start justify-between mb-4">
@@ -90,18 +126,17 @@ export default function AppointmentDetailsPage() {
                                     <h1 className="text-2xl text-gray-900 dark:text-white mb-1">Appointment Details</h1>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">ID: #{id}</p>
                                 </div>
-                                <span className="px-3 py-1.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 rounded-lg text-sm font-medium">
-                                    {appointment.status}
+                                <span className={`px-3 py-1.5 rounded-lg text-sm font-medium ${statusClass}`}>
+                                    {status}
                                 </span>
                             </div>
 
-                            {/* Appointment Info */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                                 <div className="flex items-start space-x-3">
                                     <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
                                     <div>
                                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Date</p>
-                                        <p className="text-sm text-gray-900 dark:text-white font-medium">{appointment.date}</p>
+                                        <p className="text-sm text-gray-900 dark:text-white font-medium">{parseDate(date).fullLabel || '—'}</p>
                                     </div>
                                 </div>
 
@@ -109,8 +144,7 @@ export default function AppointmentDetailsPage() {
                                     <Clock className="w-5 h-5 text-gray-400 mt-0.5" />
                                     <div>
                                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Time</p>
-                                        <p className="text-sm text-gray-900 dark:text-white font-medium">{appointment.time}</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Duration: {appointment.duration}</p>
+                                        <p className="text-sm text-gray-900 dark:text-white font-medium">{formatTime(time) || '—'}</p>
                                     </div>
                                 </div>
 
@@ -118,7 +152,7 @@ export default function AppointmentDetailsPage() {
                                     <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
                                     <div>
                                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Location</p>
-                                        <p className="text-sm text-gray-900 dark:text-white font-medium">{appointment.location}</p>
+                                        <p className="text-sm text-gray-900 dark:text-white font-medium">{location || '—'}</p>
                                     </div>
                                 </div>
 
@@ -126,7 +160,7 @@ export default function AppointmentDetailsPage() {
                                     <FileText className="w-5 h-5 text-gray-400 mt-0.5" />
                                     <div>
                                         <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Type</p>
-                                        <p className="text-sm text-gray-900 dark:text-white font-medium">{appointment.type}</p>
+                                        <p className="text-sm text-gray-900 dark:text-white font-medium">{type || '—'}</p>
                                     </div>
                                 </div>
                             </div>
@@ -140,42 +174,36 @@ export default function AppointmentDetailsPage() {
                                     Doctor Information
                                 </h2>
                                 <div className="flex items-start space-x-4 mb-6">
-                                    <img
-                                        src={appointment.doctor.image}
-                                        alt={appointment.doctor.name}
-                                        className="w-20 h-20 rounded-full border-2 border-blue-100 dark:border-blue-900"
-                                    />
+                                    {doctor.imageUrl ? (
+                                        <img
+                                            src={doctor.imageUrl}
+                                            alt={doctor.name}
+                                            className="w-20 h-20 rounded-full border-2 border-blue-100 dark:border-blue-900 object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-20 h-20 rounded-full border-2 border-blue-100 dark:border-blue-900 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                                            <User className="w-8 h-8 text-gray-400" />
+                                        </div>
+                                    )}
                                     <div className="flex-1">
-                                        <h3 className="text-lg text-gray-900 dark:text-white font-medium">{appointment.doctor.name}</h3>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{appointment.doctor.specialty}</p>
-                                        <div className="flex items-center space-x-4 mb-3">
-                                            <div className="flex items-center space-x-1">
-                                                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                                <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{appointment.doctor.rating}</span>
-                                                <span className="text-xs text-gray-500 dark:text-gray-400">({appointment.doctor.reviews} reviews)</span>
-                                            </div>
-                                            <div className="flex items-center space-x-1">
-                                                <Briefcase className="w-4 h-4 text-gray-400" />
-                                                <span className="text-xs text-gray-600 dark:text-gray-400">{appointment.doctor.experience} experience</span>
-                                            </div>
+                                        <h3 className="text-lg text-gray-900 dark:text-white font-medium">{doctor.name || '—'}</h3>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{doctor.specialization || '—'}</p>
+                                        <div className="flex items-center space-x-4">
+                                            {doctor.rating > 0 && (
+                                                <div className="flex items-center space-x-1">
+                                                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                                                    <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{doctor.rating}</span>
+                                                </div>
+                                            )}
+                                            {doctor.experienceYears > 0 && (
+                                                <div className="flex items-center space-x-1">
+                                                    <Briefcase className="w-4 h-4 text-gray-400" />
+                                                    <span className="text-xs text-gray-600 dark:text-gray-400">
+                                                        {doctor.experienceYears} yr{doctor.experienceYears !== 1 ? 's' : ''} experience
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
-                                        <div className="flex flex-wrap gap-2 mb-3">
-                                            {appointment.doctor.languages.map((lang) => (
-                                                <span key={lang} className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-xs">
-                                                    {lang}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                    <div className="flex items-center space-x-2 text-sm">
-                                        <Phone className="w-4 h-4 text-gray-400" />
-                                        <span className="text-gray-600 dark:text-gray-400">{appointment.doctor.phone}</span>
-                                    </div>
-                                    <div className="flex items-center space-x-2 text-sm">
-                                        <Mail className="w-4 h-4 text-gray-400" />
-                                        <span className="text-gray-600 dark:text-gray-400">{appointment.doctor.email}</span>
                                     </div>
                                 </div>
                             </div>
@@ -190,126 +218,52 @@ export default function AppointmentDetailsPage() {
                                 </h2>
                                 <div className="space-y-4">
                                     <div>
-                                        <h3 className="text-base text-gray-900 dark:text-white font-medium mb-1">{appointment.clinic.name}</h3>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">{appointment.clinic.address}</p>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">{appointment.clinic.city}</p>
+                                        <h3 className="text-base text-gray-900 dark:text-white font-medium mb-1">{clinic.name || '—'}</h3>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">{clinic.address || '—'}</p>
                                     </div>
-
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-                                        <div className="flex items-center space-x-2 text-sm">
+                                    {clinic.phone && (
+                                        <div className="flex items-center space-x-2 text-sm pt-3 border-t border-gray-200 dark:border-gray-700">
                                             <Phone className="w-4 h-4 text-gray-400" />
-                                            <span className="text-gray-600 dark:text-gray-400">{appointment.clinic.phone}</span>
+                                            <span className="text-gray-600 dark:text-gray-400">{clinic.phone}</span>
                                         </div>
-                                        <div className="flex items-center space-x-2 text-sm">
-                                            <Mail className="w-4 h-4 text-gray-400" />
-                                            <span className="text-gray-600 dark:text-gray-400">{appointment.clinic.email}</span>
-                                        </div>
-                                        <div className="flex items-center space-x-2 text-sm">
-                                            <Globe className="w-4 h-4 text-gray-400" />
-                                            <span className="text-gray-600 dark:text-gray-400">{appointment.clinic.website}</span>
-                                        </div>
-                                        <div className="flex items-center space-x-2 text-sm">
-                                            <Clock className="w-4 h-4 text-gray-400" />
-                                            <span className="text-gray-600 dark:text-gray-400">{appointment.clinic.hours}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Doctor View: Patient Information */}
-                        {isDoctor && (
-                            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                                <h2 className="text-lg text-gray-900 dark:text-white mb-4 flex items-center">
-                                    <User className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
-                                    Patient Information
-                                </h2>
-                                <div className="flex items-start space-x-4 mb-6">
-                                    <img
-                                        src={appointment.patient.image}
-                                        alt={appointment.patient.name}
-                                        className="w-20 h-20 rounded-full border-2 border-blue-100 dark:border-blue-900"
-                                    />
-                                    <div className="flex-1">
-                                        <h3 className="text-lg text-gray-900 dark:text-white font-medium">{appointment.patient.name}</h3>
-                                        <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2">
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                <span className="text-xs text-gray-500 dark:text-gray-500">Age:</span> {appointment.patient.age} years
-                                            </p>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                <span className="text-xs text-gray-500 dark:text-gray-500">Gender:</span> {appointment.patient.gender}
-                                            </p>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                <span className="text-xs text-gray-500 dark:text-gray-500">Blood Type:</span> {appointment.patient.bloodType}
-                                            </p>
-                                           
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                    <div className="flex items-center space-x-2 text-sm">
-                                        <Phone className="w-4 h-4 text-gray-400" />
-                                        <span className="text-gray-600 dark:text-gray-400">{appointment.patient.phone}</span>
-                                    </div>
-                                    <div className="flex items-center space-x-2 text-sm">
-                                        <Mail className="w-4 h-4 text-gray-400" />
-                                        <span className="text-gray-600 dark:text-gray-400">{appointment.patient.email}</span>
-                                    </div>
-                                </div>
-
-                                
-                            </div>
-                        )}
-
-                        {/* Reason & Symptoms (for doctors) */}
-                        {isDoctor && (
-                            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                                <h2 className="text-lg text-gray-900 dark:text-white mb-4">Appointment Reason</h2>
-                                <div className="space-y-3">
-                                    <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Chief Complaint</p>
-                                        <p className="text-sm text-gray-900 dark:text-white">{appointment.reason}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Symptoms</p>
-                                        <p className="text-sm text-gray-900 dark:text-white">{appointment.symptoms}</p>
-                                    </div>
+                                    )}
                                 </div>
                             </div>
                         )}
 
                         {/* Notes */}
-                        {appointment.notes && (
+                        {notes && (
                             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
                                 <h3 className="text-sm text-blue-900 dark:text-blue-300 font-medium mb-2 flex items-center">
                                     <FileText className="w-4 h-4 mr-2" />
                                     Notes
                                 </h3>
-                                <p className="text-sm text-blue-700 dark:text-blue-400">{appointment.notes}</p>
+                                <p className="text-sm text-blue-700 dark:text-blue-400">{notes}</p>
                             </div>
                         )}
 
                         {/* Instructions (for patients) */}
-                        {isPatient && appointment.instructions && (
+                        {isPatient && instructions && (
                             <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
                                 <h3 className="text-sm text-yellow-900 dark:text-yellow-300 font-medium mb-2 flex items-center">
                                     <AlertCircle className="w-4 h-4 mr-2" />
                                     Pre-appointment Instructions
                                 </h3>
-                                <p className="text-sm text-yellow-700 dark:text-yellow-400">{appointment.instructions}</p>
+                                <p className="text-sm text-yellow-700 dark:text-yellow-400">{instructions}</p>
                             </div>
                         )}
                     </div>
 
-                    {/* Sidebar Actions */}
-                    <div className="lg:col-span-1">
+                    {/* ── Sidebar Actions ──────────────────────────────────────── */}
+                    {(status == 'Pending' || status == 'Confirmed') && <div className="lg:col-span-1">
                         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 sticky top-6">
                             <h3 className="text-base text-gray-900 dark:text-white font-medium mb-4">Actions</h3>
                             <div className="space-y-3">
                                 {isPatient && (
                                     <>
-                                        <button className="w-full px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
+                                        <button
+                                            onClick={() => setShowRescheduleModal(true)}
+                                            className="w-full px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
                                             Reschedule Appointment
                                         </button>
                                         <button className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm">
@@ -318,17 +272,28 @@ export default function AppointmentDetailsPage() {
                                     </>
                                 )}
                                 {isDoctor && (
-                                    <>
-                                        <button className="w-full px-4 py-2.5 border border-blue-600 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors text-sm">
-                                            View Medical History
-                                        </button>
-                                    </>
+                                    <button className="w-full px-4 py-2.5 border border-blue-600 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors text-sm">
+                                        View Medical History
+                                    </button>
                                 )}
                             </div>
                         </div>
-                    </div>
+                    </div>}
                 </div>
-            </div>
-        </DashboardLayout>
+            </div >
+            {/* Reschedule Modal */}
+            <RescheduleAppointmentModal
+                isOpen={showRescheduleModal}
+                onClose={() => setShowRescheduleModal(false)}
+                appointment={{
+                    id: id || '',
+                    date: data.date,
+                    time: data.time,
+                    doctorName: data.doctor.name,
+                    doctorImage: String(data.doctor.imageUrl)
+                }}
+                id={String(28)}
+            />
+        </DashboardLayout >
     );
 }
