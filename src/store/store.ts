@@ -11,6 +11,13 @@ import rejectPendingDoctorReducer from './slices/admin-slice/reject-pending-doct
 import patientDashboardReducer from './slices/patient-slice/patient-dashboard-slice/patientDashboardSlice'
 import allDoctorsReducer from './slices/patient-slice/all-doctors.slice/allDoctorsSlice'
 import doctorProfileReducer from './slices/patient-slice/doctor-profile-slice/doctorProfileSlice'
+import availableDatesReducer from './slices/patient-slice/available-dates-slice/availableDatesSlice'
+import availableSlotsReducer from './slices/patient-slice/available-slots-slice/availableSlotsSlice'
+import allAppointmentsReducer from './slices/patient-slice/all-appointments-slice/allAppointmentsSlice'
+import appointmentDetailsReducer from './slices/patient-slice/appintment-details-slice/appointmentDetailsSlice'
+import doctorBookingDetailsReducer from './slices/patient-slice/doctor-booking-details-slice/doctorBookingDetailsSlice'
+import bookAppointmentReducer from './slices/patient-slice/book-appointment-slice/bookAppointmentSlice'
+import rescheduleAppointmentReducer from './slices/patient-slice/reschedule-appointment-slice/rescheduleAppointmentSlice'
 
 export const store = configureStore({
   reducer: {
@@ -31,6 +38,13 @@ export const store = configureStore({
     patientDashboardSlice: patientDashboardReducer,
     allDoctorsSlice: allDoctorsReducer,
     doctorProfileSlice: doctorProfileReducer,
+    availableDatesSlice: availableDatesReducer,
+    availableSlotsSlice: availableSlotsReducer,
+    allAppointmentsSlice: allAppointmentsReducer,
+    appointmentDetailsSlice: appointmentDetailsReducer,
+    doctorBookingDetailsSlice: doctorBookingDetailsReducer,
+    bookAppointmentSlice: bookAppointmentReducer,
+    rescheduleAppointmentSlice: rescheduleAppointmentReducer
   },
 });
 

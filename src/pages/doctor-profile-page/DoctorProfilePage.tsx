@@ -13,7 +13,7 @@ import { FiAward } from "react-icons/fi";
 import { IoLanguageOutline, IoLocationOutline } from "react-icons/io5";
 import { LuAward } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 
 function DoctorProfilePage() {
   const role = useSelector(
@@ -34,13 +34,15 @@ function View() {
 
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
-  const { data, loading, error } = useSelector(doctorProfileState);
+  const { data, loading, error } = useSelector(doctorProfileState) as DoctorDetailsState
 
   useEffect(() => {
     if (id) {
       dispatch(fetchDoctorProfile({ id }));
     }
   }, [dispatch, id]);
+
+  console.log(data)
 
   if (loading) {
     return (
@@ -240,28 +242,36 @@ function View() {
                     </p>
                   </div>
 
-                  <button
-                    disabled={!data.isAvailable}
-                    className="flex items-center gap-2 p-2 bg-(--color-primary) hover:bg-(--color-primary-light) disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-md cursor-pointer duration-150"
+                  <Link
+                    to={data.isAvailable ? `/appointments/booking/${data.id}` : "#"}
+                    onClick={(e) => {
+                      if (!data.isAvailable) {
+                        e.preventDefault();
+                      }
+                    }}
+                    className={`flex items-center gap-2 p-2 text-white rounded-md duration-150 ${data.isAvailable
+                      ? "bg-(--color-primary) hover:bg-(--color-primary-light) cursor-pointer"
+                      : "bg-gray-400 cursor-not-allowed pointer-events-none"
+                      }`}
                   >
                     <CiBookmark className="w-5 h-5" />
                     <span>Book Appointment</span>
-                  </button>
+                  </Link>
                 </div>
               </div>
             </CardComp>
 
             {/* Time Slots */}
-            <CardComp>
+            <CardComp classProbs="">
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold">
                   Available Time Slots
                 </h2>
 
                 {data.timeSlots.length > 0 ? (
-                  <div className="space-y-3">
+                  <div className="space-y-3 w-85">
                     {data.timeSlots.map(
-                      (slot: any, index: number) => (
+                      (slot, index) => (
                         <div
                           key={index}
                           className="space-y-2"
@@ -273,14 +283,14 @@ function View() {
                           <div className="flex flex-wrap gap-2">
                             {slot.times?.map(
                               (
-                                time: string,
-                                timeIndex: number
+                                time,
+                                timeIndex
                               ) => (
                                 <span
                                   key={timeIndex}
                                   className="text-sm py-1 px-3 rounded-lg bg-(--color-bg-link-hover)"
                                 >
-                                  {time}
+                                  {time.startTime}
                                 </span>
                               )
                             )}

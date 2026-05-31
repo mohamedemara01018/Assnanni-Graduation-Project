@@ -1,5 +1,4 @@
 import CardComp from "@/components/card-comp/CardComp";
-import { AiOutlineSchedule } from "react-icons/ai";
 import { Link } from "react-router";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import { MdOutlineStar } from "react-icons/md";
@@ -94,29 +93,29 @@ function PatientPage() {
                     : data.upcomingAppointments.map((appointment) => {
                       return (
                         <Link
-                          to={"/appointments/1"}
+                          to={`/appointments/${appointment.id}`}
                           className="flex items-center justify-between gap-4 p-4 bg-(--color-bg-link)  hover:bg-(--color-bg-link-hover) rounded-md transition duration-150"
                         >
                           <div className="flex items-center gap-4 w-full">
-                            <div className="flex items-center justify-center bg-(--color-bg-blue) text-(--color-text-blue) w-15 h-15 rounded-full max-sm:hidden">
-                              <AiOutlineSchedule className="text-3xl " />
+                            <div className="flex items-center justify-center bg-(--color-bg-blue) text-(--color-text-blue) w-15 h-15 rounded-full overflow-hidden max-sm:hidden">
+                              <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png" alt="" />
                             </div>
                             <div>
-                              <h3 className="text-(--color-text)">mohamed gamal</h3>
+                              <h3 className="text-(--color-text)">{appointment.doctorName}</h3>
                               <p className="text-(--color-text-light) text-sm">
-                                software engineer
+                                {appointment.specialization}
                               </p>
                               <div className="flex items-center gap-4 mt-1 text-sm">
                                 <span className="text-(--color-text-light) ">
-                                  2025-10-1
+                                  {appointment.date}
                                 </span>
                                 <span className="bg-(--color-text-light) w-1 h-1 rounded-full"></span>
-                                <span className="text-(--color-text-light)">2 pm </span>
+                                <span className="text-(--color-text-light)">{appointment.startTime}</span>
                               </div>
                             </div>
                           </div>
                           <div className="text-green-500 bg-green-500/20 px-3 pb-1 rounded-2xl text-sm flex items-center">
-                            pending
+                            {appointment.status}
                           </div>
                         </Link>
                       )

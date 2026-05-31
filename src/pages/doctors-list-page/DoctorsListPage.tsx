@@ -18,6 +18,7 @@ import Pagination from "@/components/pagination/Pagination";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import { allDoctorsState, fetchAllDoctors } from "@/store/slices/patient-slice/all-doctors.slice/allDoctorsSlice";
+import { User } from "lucide-react";
 function DoctorsListPage() {
   const role = useSelector(
     (state: { auth: { role: string } }) => state.auth.role
@@ -129,12 +130,10 @@ function DoctorList() {
             </button>
           </div>
         </div>
-        <div>
-
-
-          <div className="flex flex-col items-start w-full gap-4">
+        <div className="w-full">
+          <div className="flex flex-col items-start w-full gap-4 ">
             <h1 className="text-2xl">{data.totalCount} Doctors Founded</h1>
-            <div className={`grid md:grid-cols-1 xl:${data.totalCount == 0 ? 'grid-cols-1' : 'grid-cols-3 '} gap-4 w-full justify-items-center `}>
+            <div className={`grid md:grid-cols-1 xl:${data.totalCount == 0 || loading ? 'grid-cols-1' : 'grid-cols-3 '} gap-4 w-full justify-items-center `}>
               {data.totalCount == 0 ? <NotFound subMessage={'There are no Doctors Found'} /> : loading ? (
                 <div className="w-full  flex items-center justify-center">
                   <ScaleLoader color="#6d61ff" />{" "}
@@ -146,11 +145,17 @@ function DoctorList() {
                   <div className="bg-(--color-surface) p-4 border border-(--color-border) shadow-sm rounded-lg flex items-center justify-center grow">
                     <div className="space-y-4">
                       <div className="flex items-center gap-4">
-                        <LazyImage
-                          src={doctor.imageUrl ? doctor.imageUrl : `https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg`}
-                          alt="docotr-img"
-                          className="w-16 h-16 rounded-full"
-                        />
+                        {doctor.imageUrl ? (
+                          <img
+                            src={doctor.imageUrl}
+                            alt={doctor.name}
+                            className="w-20 h-20 rounded-full object-cover border-2 border-blue-100 dark:border-blue-900 mb-2"
+                          />
+                        ) : (
+                          <div className="w-20 h-20 rounded-full bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-100 dark:border-blue-900 flex items-center justify-center mb-2">
+                            <User className="w-8 h-8 text-blue-400" />
+                          </div>
+                        )}
                         <div className="space-y-2">
                           <h2 className="text-lg">{doctor.name.trim().length > 0 ? `Dr.${doctor.name}` : 'unkown'}</h2>
                           <div className="flex items-center gap-4">
@@ -174,7 +179,7 @@ function DoctorList() {
                           </span>
                         </div>}
                         {doctor.status && <div className="flex gap-1 items-center ml-1">
-                          <span className="p-1 w-1 rounded-full bg-red-500 block"></span>
+                          <span className={`p-1 w-1 rounded-full ${doctor.status == 'Offline' ? 'bg-red-500' : 'bg-green-500'} block`}></span>
                           <span className="text-sm text-(--color-text-light)">
                             {doctor.status}
                           </span>

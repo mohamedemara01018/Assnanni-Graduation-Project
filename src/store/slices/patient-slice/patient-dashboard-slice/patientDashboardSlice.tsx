@@ -11,6 +11,15 @@ export interface DashboardStats {
     labResults: number;
 }
 
+export interface UpcomingAppointment {
+    id: number;
+    doctorName: string;
+    startTime: string;
+    specialization: string;
+    date: string;
+    status: string;
+}
+
 export interface Doctor {
     id: number;
     name: string;
@@ -18,20 +27,33 @@ export interface Doctor {
     rating: number;
     experienceYears: number;
     imageUrl: string | null;
-    status: 'Available' | 'Busy';
+    status: "Available" | "Busy";
 }
 
-// Interface for your slice's initial state
-export interface DashboardState {
-    data: {
-        stats: DashboardStats;
-        upcomingAppointments: any[];
-        availableDoctors: Doctor[];
-        recentActivities: any[];
-    };
-    loading: boolean;          // Track loading state
-    error: string | null;       // Track error state
+// export interface RecentActivity {
+//     // أضف الحقول عندما تعرف شكل الـ API
+// }
+
+export interface HealthReminder {
+    message: string;
+    reminderTime: string;
 }
+
+export interface DashboardData {
+    stats: DashboardStats;
+    upcomingAppointments: UpcomingAppointment[];
+    availableDoctors: Doctor[];
+    recentActivities: any[];
+    healthReminder: HealthReminder;
+    healthTip: string;
+}
+
+export interface DashboardState {
+    data: DashboardData;
+    loading: boolean;
+    error: string | null;
+}
+
 
 const initialState: DashboardState = {
     data: {
@@ -44,6 +66,11 @@ const initialState: DashboardState = {
         upcomingAppointments: [],
         availableDoctors: [],
         recentActivities: [],
+        healthReminder: {
+            message: "",
+            reminderTime: "",
+        },
+        healthTip: "",
     },
     loading: false,
     error: null,

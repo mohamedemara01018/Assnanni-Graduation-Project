@@ -4,8 +4,24 @@ import Cookies from "js-cookie";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
+export interface TimeSlotItem {
+    id: number;
+    startTime: string;
+    endTime: string;
+}
+
+export interface TimeSlot {
+    date: string;
+    times: TimeSlotItem[];
+}
+
+// export interface Review {
+//     // أضف الحقول لاحقًا عندما تعرف شكل الـ API
+// }
+
 export interface DoctorDetails {
     id: number;
+    doctorImage: string;
     name: string;
     specialty: string;
     rating: number;
@@ -18,19 +34,20 @@ export interface DoctorDetails {
     clinicName: string;
     clinicLocation: string;
     isAvailable: boolean;
-    timeSlots: any[];
+    timeSlots: TimeSlot[];
     reviews: any[];
 }
 
 export interface DoctorDetailsState {
     data: DoctorDetails;
-    loading: boolean;
-    error: string | null;
+    loading: boolean,
+    error: string | null,
 }
 
 const initialState: DoctorDetailsState = {
     data: {
         id: 0,
+        doctorImage: "",
         name: "",
         specialty: "",
         rating: 0,

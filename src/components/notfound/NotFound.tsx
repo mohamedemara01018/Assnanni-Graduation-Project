@@ -1,6 +1,6 @@
 export function NotFound({ message = "No results found", subMessage }) {
     return (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="flex flex-col items-center justify-center py-16 text-center w-full">
 
             {/* Icon */}
             <div className="text-5xl mb-4">🔍</div>
