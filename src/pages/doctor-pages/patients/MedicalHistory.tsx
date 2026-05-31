@@ -60,6 +60,7 @@ const MedicalHistory = () => {
   const { data, isLoading, isError, error, isSuccess } = useQuery({
     queryKey: ["PatientMedicalHistory", id, role],
     queryFn: async () => {
+      console.log(id);
       const endpoint =
         role === "receptionist"
           ? `Receptionist/${id}/medical-history`

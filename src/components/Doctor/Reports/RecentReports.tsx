@@ -6,6 +6,8 @@ import type { RootState } from "@/store/store";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import { ScaleLoader } from "react-spinners";
+import { useNavigate } from "react-router";
+import { useEffect } from "react";
 
 interface Report {
   title: string;
@@ -24,8 +26,13 @@ interface RecentReportsResponse {
 const RecentReports = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
+  const navigate = useNavigate();
 
-  const { data: responseData, isLoading, error } = useQuery<RecentReportsResponse>({
+  const {
+    data: responseData,
+    isLoading,
+    error,
+  } = useQuery<RecentReportsResponse>({
     queryKey: ["recent-reports"],
     queryFn: async () => {
       const response = await axios.get(`${backendUrl}Doctors/recent-reports`, {
@@ -38,21 +45,31 @@ const RecentReports = () => {
     enabled: !!token && !!backendUrl,
   });
 
-  if (error) {
-    toast.error("Failed to load recent reports");
-  }
+  const reports = responseData?.data?.slice(0, 3) || [];
+  const handleViewAll = () => {
+    navigate("/doctor-reports/all");
+  };
 
-  const reports = responseData?.data || [];
+  useEffect(() => {
+    if (error) {
+      toast.error("Failed to load recent reports");
+    }
+  }, [error]);
 
   return (
     <div className="bg-(--color-surface) border border-(--color-border) p-6 rounded-2xl shadow-sm h-full flex flex-col">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-(--color-text) font-bold text-lg">Recent Reports</h3>
-        <button className="text-(--color-primary) hover:text-(--color-primary-light) font-semibold text-sm transition-colors">
+        <h3 className="text-(--color-text) font-bold text-lg">
+          Recent Reports
+        </h3>
+        <button
+          onClick={handleViewAll}
+          className="text-(--color-primary) hover:text-(--color-primary-light) font-semibold text-sm transition-colors cursor-pointer"
+        >
           View All
         </button>
       </div>
-      
+
       <div className="space-y-1 flex-1 overflow-y-auto custom-scrollbar">
         {isLoading ? (
           <div className="h-full flex items-center justify-center py-10">
@@ -63,9 +80,7 @@ const RecentReports = () => {
             <p className="text-sm font-medium">No recent reports found</p>
           </div>
         ) : (
-          reports.map((report, index) => (
-            <Card key={index} {...report} />
-          ))
+          reports.map((report, index) => <Card key={index} {...report} />)
         )}
       </div>
     </div>
@@ -73,4 +88,3 @@ const RecentReports = () => {
 };
 
 export default RecentReports;
-

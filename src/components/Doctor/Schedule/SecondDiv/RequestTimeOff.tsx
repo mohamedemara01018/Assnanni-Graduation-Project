@@ -23,7 +23,10 @@ const RequestTimeOff = () => {
 
   useEffect(() => {
     const checkDisabled = () => {
-      const disabledUntil = localStorage.getItem("timeOffDisabledUntil");
+      let disabledUntil = Cookies.get("timeOffDisabledUntil");
+      if (!disabledUntil) {
+        disabledUntil = localStorage.getItem("timeOffDisabledUntil") || "";
+      }
       if (disabledUntil) {
         const remainingMs = parseInt(disabledUntil) - Date.now();
         if (remainingMs > 0) {
@@ -33,6 +36,7 @@ const RequestTimeOff = () => {
           setRemainingTimeText(`${minutes}m ${seconds}s`);
         } else {
           setIsDisabled(false);
+          Cookies.remove("timeOffDisabledUntil");
           localStorage.removeItem("timeOffDisabledUntil");
           setRemainingTimeText("");
         }
@@ -75,7 +79,13 @@ const RequestTimeOff = () => {
 
       const disableDurationMs = (duration + 5) * 60 * 1000;
       const until = Date.now() + disableDurationMs;
+      
+      // Save state in cookies and localStorage to survive page refresh
       localStorage.setItem("timeOffDisabledUntil", until.toString());
+      Cookies.set("timeOffDisabledUntil", until.toString(), {
+        expires: new Date(until),
+      });
+      
       setIsDisabled(true);
 
       setIsOpen(false);

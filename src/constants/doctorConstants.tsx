@@ -22,6 +22,7 @@ export const defaultDashboardData = {
 export const dummySchedules: Schedule[] = [
   {
     appointmentId: 1,
+    patientId: 1,
     patientName: "Dr. Sarah Johnson",
     specialty: "Cardiology",
     time: "10:00",
@@ -29,6 +30,7 @@ export const dummySchedules: Schedule[] = [
   },
   {
     appointmentId: 2,
+    patientId: 2,
     patientName: "Dr. Emily Rodriguez",
     specialty: "Pediatrics",
     time: "14:00",
@@ -36,6 +38,7 @@ export const dummySchedules: Schedule[] = [
   },
   {
     appointmentId: 3,
+    patientId: 3,
     patientName: "Dr. Michael Chen",
     specialty: "Neurology",
     time: "09:00",

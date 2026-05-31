@@ -105,7 +105,7 @@ const SessionDetails = () => {
 
       try {
         const response = await axios.get(
-          `${backendUrl}StudentDoctor/trainsessions/${id}`,
+          `${backendUrl}StudentDoctor/learning-sessions/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           },
