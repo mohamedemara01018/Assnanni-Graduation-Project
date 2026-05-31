@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -28,30 +28,30 @@ interface StudentDraft {
   submittedAt: string;
 }
 
-const tempStudentDrafts: StudentDraft[] = [
-  {
-    id: 1,
-    appointmentId: 10,
-    studentName: "Ahmed Ali",
-    studentId: 22,
-    title: "Root Canal - Phase 1",
-    diagnosis: "Acute Pulpitis",
-    notes:
-      "Accessed pulp chamber, cleared canals, placed temporary dressing. Patient tolerated procedure well.",
-    submittedAt: "2026-05-13T10:30:00Z",
-  },
-  {
-    id: 2,
-    appointmentId: 14,
-    studentName: "Sara Hassan",
-    studentId: 25,
-    title: "Initial Consultation",
-    diagnosis: "Multiple Caries",
-    notes:
-      "Full mouth exam completed. Multiple cavities in upper right quadrant. Proposed treatment plan discussed.",
-    submittedAt: "2026-05-13T14:15:00Z",
-  },
-];
+// const tempStudentDrafts: StudentDraft[] = [
+//   {
+//     id: 1,
+//     appointmentId: 10,
+//     studentName: "Ahmed Ali",
+//     studentId: 22,
+//     title: "Root Canal - Phase 1",
+//     diagnosis: "Acute Pulpitis",
+//     notes:
+//       "Accessed pulp chamber, cleared canals, placed temporary dressing. Patient tolerated procedure well.",
+//     submittedAt: "2026-05-13T10:30:00Z",
+//   },
+//   {
+//     id: 2,
+//     appointmentId: 14,
+//     studentName: "Sara Hassan",
+//     studentId: 25,
+//     title: "Initial Consultation",
+//     diagnosis: "Multiple Caries",
+//     notes:
+//       "Full mouth exam completed. Multiple cavities in upper right quadrant. Proposed treatment plan discussed.",
+//     submittedAt: "2026-05-13T14:15:00Z",
+//   },
+// ];
 
 const StudentRecordApprovals = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
@@ -60,24 +60,58 @@ const StudentRecordApprovals = () => {
   const queryClient = useQueryClient();
 
   const {
-    data: apiDrafts,
+    data: apiResponse,
     isLoading,
     isError,
+    error,
+    isSuccess,
   } = useQuery({
     queryKey: ["student-approvals"],
     queryFn: async () => {
       const response = await axios.get(
-        `${backendUrl}Doctors/student-medical-record-drafts`,
+        `${backendUrl}StudentDoctor/medical-record-drafts-for-doctor`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
       );
-      return response.data.data as StudentDraft[];
+      return response.data;
     },
     enabled: !!token && !!backendUrl,
   });
 
-  const drafts = [...(apiDrafts || []), ...tempStudentDrafts];
+  // Handle toast notifications on query fetch
+  useEffect(() => {
+    if (isSuccess && apiResponse) {
+      toast.success(
+        apiResponse.message || "Student record drafts loaded successfully",
+      );
+    }
+  }, [isSuccess, apiResponse]);
+
+  useEffect(() => {
+    if (isError && error) {
+      const err = error as any;
+      toast.error(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to load student record drafts",
+      );
+    }
+  }, [isError, error]);
+
+  const rawDrafts = apiResponse?.data || [];
+  const mappedDrafts: StudentDraft[] = rawDrafts.map((apiDraft: any) => ({
+    id: apiDraft.draftId,
+    appointmentId: apiDraft.appointmentId,
+    studentName: apiDraft.studentName || "Unknown Student",
+    studentId: apiDraft.studentDoctorId || 0,
+    title: apiDraft.title || "Untitled Draft",
+    notes: apiDraft.notes || "",
+    diagnosis: apiDraft.diagnosis || "No Diagnosis",
+    submittedAt: new Date().toISOString(),
+  }));
+
+  const drafts = [...mappedDrafts];
 
   const [rejectingDraftId, setRejectingDraftId] = useState<number | null>(null);
 
@@ -129,10 +163,6 @@ const StudentRecordApprovals = () => {
       rejectMutation.mutate({ id: rejectingDraftId, reason: data.reason });
     }
   };
-
-  if (isError) {
-    toast.error("Failed to load student record drafts");
-  }
 
   return (
     <DashboardLayout pageTitle="Student Record Approvals">

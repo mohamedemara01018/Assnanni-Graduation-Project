@@ -34,33 +34,6 @@ interface TrainingSession {
   status: string; // e.g. "Cancelled", "Completed", "Scheduled"
 }
 
-const fallbackSessions: TrainingSession[] = [
-  {
-    trainingSessionId: 3,
-    date: "2026-05-20",
-    startTime: "08:10:00",
-    endTime: "11:10:00",
-    topic: "Ada",
-    notes: "aaaaaaaa",
-    doctorName: "Mohamed Amer",
-    attendanceStatus: 0,
-    evaluationScore: null,
-    status: "Cancelled",
-  },
-  {
-    trainingSessionId: 4,
-    date: "2026-05-13",
-    startTime: "19:00:00",
-    endTime: "21:00:00",
-    topic: "sssssssssssssssssshhhhhhhhhhh",
-    notes: "Details aaaa",
-    doctorName: "Mohamed Amer",
-    attendanceStatus: 0,
-    evaluationScore: null,
-    status: "Cancelled",
-  },
-];
-
 const TrainingSessions = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
@@ -80,7 +53,7 @@ const TrainingSessions = () => {
     queryFn: async () => {
       // Axios request to: backendUrl + "student-doctor/training-sessions"
       const response = await axios.get(
-        `${backendUrl}student-doctor/training-sessions`,
+        `${backendUrl}StudentDoctor/student-doctor/training-sessions`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -94,7 +67,9 @@ const TrainingSessions = () => {
   // Handle toast notifications on mount / API response changes
   useEffect(() => {
     if (isSuccess && responseBody) {
-      toast.success(responseBody.message || "Training sessions loaded successfully");
+      toast.success(
+        responseBody.message || "Training sessions loaded successfully",
+      );
     }
   }, [isSuccess, responseBody]);
 
@@ -102,7 +77,8 @@ const TrainingSessions = () => {
     if (isError && error) {
       const err = error as any;
       toast.error(
-        err.response?.data?.message || "Failed to fetch training sessions from server. Using offline data."
+        err.response?.data?.message ||
+          "Failed to fetch training sessions from server. Using offline data.",
       );
     }
   }, [isError, error]);
@@ -116,7 +92,8 @@ const TrainingSessions = () => {
     const matchesSearch =
       session.topic.toLowerCase().includes(searchTerm.toLowerCase()) ||
       session.doctorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (session.notes && session.notes.toLowerCase().includes(searchTerm.toLowerCase()));
+      (session.notes &&
+        session.notes.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchesStatus =
       statusFilter === "all" ||
@@ -127,9 +104,15 @@ const TrainingSessions = () => {
 
   // Calculate statistics
   const totalSessions = sessionsList.length;
-  const cancelledCount = sessionsList.filter((s) => s.status.toLowerCase() === "cancelled").length;
-  const completedCount = sessionsList.filter((s) => s.status.toLowerCase() === "completed").length;
-  const attendedCount = sessionsList.filter((s) => s.attendanceStatus === 1).length;
+  const cancelledCount = sessionsList.filter(
+    (s) => s.status.toLowerCase() === "cancelled",
+  ).length;
+  const completedCount = sessionsList.filter(
+    (s) => s.status.toLowerCase() === "completed",
+  ).length;
+  const attendedCount = sessionsList.filter(
+    (s) => s.attendanceStatus === 1,
+  ).length;
 
   const getStatusBadgeStyles = (status: string) => {
     switch (status.toLowerCase()) {
@@ -164,7 +147,8 @@ const TrainingSessions = () => {
               My Training Sessions
             </h1>
             <p className="text-sm text-(--color-text-light) mt-1">
-              View and track all your student training records, supervisor evaluations, and attendance
+              View and track all your student training records, supervisor
+              evaluations, and attendance
             </p>
           </div>
           {isError && (
@@ -260,7 +244,7 @@ const TrainingSessions = () => {
                   </div>
                   <span
                     className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${getStatusBadgeStyles(
-                      session.status
+                      session.status,
                     )}`}
                   >
                     {session.status}
@@ -313,7 +297,8 @@ const TrainingSessions = () => {
                           Duration
                         </span>
                         <p className="text-xs text-(--color-text) font-medium">
-                          {session.startTime.substring(0, 5)} - {session.endTime.substring(0, 5)}
+                          {session.startTime.substring(0, 5)} -{" "}
+                          {session.endTime.substring(0, 5)}
                         </p>
                       </div>
                     </div>
@@ -367,13 +352,17 @@ const TrainingSessions = () => {
         ) : (
           <div className="bg-(--color-surface) rounded-3xl border-2 border-dashed border-(--color-border) p-16 flex flex-col items-center text-center shadow-sm">
             <div className="w-20 h-20 bg-gray-50 dark:bg-gray-800/50 rounded-full flex items-center justify-center mb-6">
-              <BsJournalText size={40} className="text-(--color-text-light) opacity-25" />
+              <BsJournalText
+                size={40}
+                className="text-(--color-text-light) opacity-25"
+              />
             </div>
             <h2 className="text-xl font-bold text-(--color-text) mb-2">
               No Sessions Matches Your Criteria
             </h2>
             <p className="text-sm text-(--color-text-light) max-w-sm leading-relaxed">
-              We couldn't find any training sessions matching your search or selected filters. Try updating your filters above.
+              We couldn't find any training sessions matching your search or
+              selected filters. Try updating your filters above.
             </p>
           </div>
         )}

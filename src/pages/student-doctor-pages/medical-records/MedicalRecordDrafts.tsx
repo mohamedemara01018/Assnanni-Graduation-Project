@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
@@ -46,6 +46,30 @@ const MedicalRecordDrafts = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const submitMutation = useMutation({
+    mutationFn: async (draftId: number) => {
+      await axios.post(
+        `${backendUrl}StudentDoctor/medical-records/${draftId}/submit`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    },
+    onSuccess: () => {
+      toast.success("Medical record draft submitted successfully for supervision review!");
+      queryClient.invalidateQueries({ queryKey: ["medical-drafts"] });
+    },
+    onError: (error: any) => {
+      toast.error(
+        error.response?.data?.message || "Failed to submit medical record draft"
+      );
+    },
+  });
 
   const {
     data: responseBody,
@@ -183,6 +207,20 @@ const MedicalRecordDrafts = () => {
                   >
                     <BsPencilSquare size={14} />
                     Update Draft
+                  </button>
+                  <button
+                    onClick={() => submitMutation.mutate(draft.id)}
+                    disabled={submitMutation.isPending}
+                    className="flex-1 lg:flex-initial px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-emerald-500/10 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
+                  >
+                    {submitMutation.isPending && submitMutation.variables === draft.id ? (
+                      "Submitting..."
+                    ) : (
+                      <>
+                        <BsFileEarmarkMedical size={14} />
+                        Submit Draft
+                      </>
+                    )}
                   </button>
                 </div>
               </div>

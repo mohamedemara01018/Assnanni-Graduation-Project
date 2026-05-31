@@ -89,20 +89,25 @@ const FirstDiv = () => {
         <div className="flex flex-col  gap-4 max-h-60 overflow-y-auto">
           {schedules.length > 0 ? (
             schedules.map((schedule: Schedule) => (
-              <Card
+              <NavLink
                 key={schedule.appointmentId}
-                title={`Patient: ${schedule.patientName}`}
-                status={schedule.status}
-                color="blue"
-                logo={<FaRegClock />}
+                to={`/doctor-patients/${schedule.patientId || schedule.appointmentId}/medical-history/add?appointmentId=${schedule.appointmentId}`}
+                className="block hover:opacity-95 transition-opacity"
               >
-                <p className="text-(--color-text-light) text-sm">
-                  {schedule.specialty}
-                </p>
-                <p className="text-(--color-text-light) text-sm">
-                  {schedule.time}
-                </p>
-              </Card>
+                <Card
+                  title={`Patient: ${schedule.patientName}`}
+                  status={schedule.status}
+                  color="blue"
+                  logo={<FaRegClock />}
+                >
+                  <p className="text-(--color-text-light) text-sm">
+                    {schedule.specialty}
+                  </p>
+                  <p className="text-(--color-text-light) text-sm">
+                    {schedule.time}
+                  </p>
+                </Card>
+              </NavLink>
             ))
           ) : (
             <p className=" text-(--color-text-light)">No appointments today.</p>

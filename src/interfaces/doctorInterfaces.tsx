@@ -1,5 +1,6 @@
 export interface Schedule {
   appointmentId: number;
+  patientId?: number;
   patientName: string;
   specialty: string;
   time: string;

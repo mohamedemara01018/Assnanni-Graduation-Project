@@ -13,7 +13,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import Cookies from "js-cookie";
 import type { AppointmentData } from "@/interfaces/studentInterfaces";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface AppointmentAPI {
   id: number;
@@ -33,22 +33,35 @@ interface StudentAppointmentsResponse {
   appointments: AppointmentAPI[];
 }
 
+interface ApiResponse<T> {
+  succeeded: boolean;
+  message: string;
+  data: T;
+  meta: any;
+}
+
 const StudentAppointments = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
+  const role = useSelector((state: RootState) => state.auth.role);
 
   const [search, setSearch] = useState("");
   const [bookingType, setBookingType] = useState("");
   const [appointmentStatus, setAppointmentStatus] = useState("");
 
-  const { data, isLoading, isError, error } = useQuery<
-    StudentAppointmentsResponse,
+  const { data: responseBody, isLoading, isError, error, isSuccess } = useQuery<
+    ApiResponse<StudentAppointmentsResponse>,
     Error
   >({
-    queryKey: ["studentAppointments", search, bookingType, appointmentStatus],
+    queryKey: ["studentAppointments", role, search, bookingType, appointmentStatus],
     queryFn: async () => {
+      const endpoint =
+        role === "studentDoctor"
+          ? "StudentDoctor/appointments-dashboard"
+          : "Receptionist/dashboard/appointments";
+
       const response = await axios.get(
-        `${backendUrl}Receptionist/dashboard/appointments`,
+        `${backendUrl}${endpoint}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -65,14 +78,26 @@ const StudentAppointments = () => {
         throw new Error(response.data.message || "Failed to fetch appointments");
       }
 
-      return response.data.data;
+      return response.data;
     },
-    enabled: !!token,
+    enabled: !!token && !!backendUrl,
   });
 
-  if (isError) {
-    toast.error(error.message);
-  }
+  // Success and failure toast notifications
+  useEffect(() => {
+    if (isSuccess && responseBody) {
+      toast.success(responseBody.message || "Appointments loaded successfully");
+    }
+  }, [isSuccess, responseBody]);
+
+  useEffect(() => {
+    if (isError && error) {
+      const err = error as any;
+      toast.error(
+        err.response?.data?.message || err.message || "Failed to load appointments"
+      );
+    }
+  }, [isError, error]);
 
   const mapAppointment = (apiApp: AppointmentAPI): AppointmentData => ({
     id: apiApp.id,
@@ -83,11 +108,16 @@ const StudentAppointments = () => {
     status:
       apiApp.status === "Confirmed"
         ? "Upcoming"
-        : (apiApp.status as "Upcoming" | "Completed" | "Cancelled"),
+        : apiApp.status === "Completed"
+        ? "Completed"
+        : apiApp.status === "Cancelled"
+        ? "Cancelled"
+        : (apiApp.status as any),
     meetingType: apiApp.mode === "Online" ? "Video Call" : "In-Person",
   });
 
-  const appointments = data?.appointments.map(mapAppointment) || [];
+  const appointmentsData = responseBody?.data;
+  const appointments = appointmentsData?.appointments.map(mapAppointment) || [];
 
   const filterSelectClass =
     "px-4 py-3 bg-(--color-surface) border border-(--color-border) rounded-xl text-sm font-medium text-(--color-text-light) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm cursor-pointer min-w-[140px]";
@@ -110,25 +140,25 @@ const StudentAppointments = () => {
             title="Total Appointments"
             color="blue"
             logo={<SlCalender size={20} />}
-            num={isLoading ? "..." : data?.total || 0}
+            num={isLoading ? "..." : appointmentsData?.total || 0}
           />
           <Card
             title="Upcoming"
             color="violet"
             logo={<FaRegClock size={20} />}
-            num={isLoading ? "..." : data?.upcoming || 0}
+            num={isLoading ? "..." : appointmentsData?.upcoming || 0}
           />
           <Card
             title="Completed"
             color="green"
             logo={<FaRegCheckCircle size={20} />}
-            num={isLoading ? "..." : data?.completed || 0}
+            num={isLoading ? "..." : appointmentsData?.completed || 0}
           />
           <Card
             title="Cancelled"
             color="red"
             logo={<IoMdCloseCircleOutline size={22} />}
-            num={isLoading ? "..." : data?.cancelled || 0}
+            num={isLoading ? "..." : appointmentsData?.cancelled || 0}
           />
         </div>
 

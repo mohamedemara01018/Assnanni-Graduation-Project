@@ -16,6 +16,7 @@ import PatientDetails from "../pages/doctor-pages/patients/PatientDetails";
 import MedicalHistory from "../pages/doctor-pages/patients/MedicalHistory";
 import AddMedicalHistoryRecord from "../pages/doctor-pages/patients/AddMedicalHistoryRecord";
 import Reports from "../pages/doctor-pages/reports/Reports";
+import AllReports from "../pages/doctor-pages/reports/AllReports";
 import ManageSupervisioning from "../pages/doctor-pages/supervisioning/ManageSupervisioning";
 import ViewSupervisioningRequest from "../pages/doctor-pages/supervisioning/ViewSupervisioningRequest";
 import AssignStudentDoctor from "../pages/doctor-pages/supervisioning/AssignStudentDoctor";
@@ -116,6 +117,7 @@ export const routeElements = {
   "doctor-patients/:id/medical-history": <MedicalHistory />,
   "doctor-patients/:id/medical-history/add": <AddMedicalHistoryRecord />,
   "doctor-reports": <Reports />,
+  "doctor-reports/all": <AllReports />,
   "doctor-supervisioning": <ManageSupervisioning />,
   "doctor-supervisioning/view-request/:id": <ViewSupervisioningRequest />,
   "doctor-supervisioning/assign-student-doctor/:id": <AssignStudentDoctor />,
