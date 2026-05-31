@@ -12,6 +12,12 @@ function UserComp() {
     const [showUserMenu, setShowUserMenu] = useState(false);
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const userProfileCookie = Cookies.get("userProfile");
+    const userProfile = userProfileCookie ? JSON.parse(userProfileCookie) : null;
+    const fullName =
+        userProfile?.fullName ||
+        userProfile?.name ||
+        "User";
 
     const handleLogout = () => {
         dispatch(logout());
@@ -31,7 +37,7 @@ function UserComp() {
                 <div className="p-2 bg-blue-500 rounded-full ">
                     <FaRegUser className="text-white" />
                 </div>
-                <span className="font-medium text-(--color-text)">User</span>
+                <span className="font-medium text-(--color-text)">{fullName}</span>
             </button>
             {/* drob down */}
             {showUserMenu && (
@@ -72,4 +78,4 @@ function UserComp() {
     )
 }
 
-export default UserComp
+export default UserComp

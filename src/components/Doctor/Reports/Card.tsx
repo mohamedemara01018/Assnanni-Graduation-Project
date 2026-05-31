@@ -6,9 +6,10 @@ interface Props {
   size: string;
   type: "PDF" | "Excel" | "File";
   fileUrl?: string;
+  onClick?: () => void;
 }
 
-const Card = ({ title, date, size, type, fileUrl }: Props) => {
+const Card = ({ title, date, size, type, fileUrl, onClick }: Props) => {
   const getIcon = () => {
     switch (type) {
       case "PDF":
@@ -32,7 +33,10 @@ const Card = ({ title, date, size, type, fileUrl }: Props) => {
   };
 
   return (
-    <div className="flex justify-between items-center bg-(--color-bg) hover:bg-(--color-bg-link-hover) p-4 rounded-xl transition-colors duration-200 cursor-pointer mb-3 last:mb-0 group border border-(--color-border)">
+    <div
+      onClick={onClick}
+      className="flex justify-between items-center bg-(--color-bg) hover:bg-(--color-bg-link-hover) p-4 rounded-xl transition-colors duration-200 cursor-pointer mb-3 last:mb-0 group border border-(--color-border)"
+    >
       <div className="flex gap-4 items-center">
         <div className={`${getIconBg()} p-3 rounded-lg`}>
           {getIcon()}
@@ -59,7 +63,7 @@ const Card = ({ title, date, size, type, fileUrl }: Props) => {
             <FiDownload className="text-lg" />
           </a>
         ) : (
-          <button 
+          <button
             title="Download Report"
             className="p-2 text-(--color-text-light) hover:text-(--color-primary) hover:bg-(--color-primary-lighter)/20 rounded-lg transition-all duration-200"
             onClick={(e) => {
