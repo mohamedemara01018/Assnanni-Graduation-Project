@@ -49,6 +49,7 @@ export const roleRoutePaths = {
     "patient-profile",
     "patient-profile/edit",
     "appointments",
+    "prescriptions"
   ],
 };
 
