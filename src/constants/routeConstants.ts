@@ -13,6 +13,8 @@ export const roleRoutePaths = {
     "add-time-slot",
     "doctor-patients/:id/medical-history/add",
     "doctor-reports",
+    "/doctor-profile/:id",
+    "/doctor-profile/edit/:id",
     "doctor-supervisioning",
     "doctor-supervisioning/view-request/:id",
     "doctor-supervisioning/assign-student-doctor/:id",
@@ -49,7 +51,7 @@ export const roleRoutePaths = {
     "patient-profile",
     "patient-profile/edit",
     "appointments",
-    "prescriptions"
+    "prescriptions",
   ],
 };
 
@@ -126,6 +128,7 @@ export const publicRoutePaths = [
   "/doctors-list",
   "/doctors-list/:id",
   "/appointments/booking/:id",
+
   "/patient-profile/:id",
   "/patient-profile/edit/:id",
 ];

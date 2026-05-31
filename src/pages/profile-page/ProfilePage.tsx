@@ -82,7 +82,6 @@ const ProfilePage = () => {
       toast.error("Failed to update profile image");
     },
   });
-
   const deleteImageMutation = useMutation({
     mutationFn: async () => {
       await axios.delete(`${backendUrl}Users/image-profile`, {
@@ -200,7 +199,7 @@ const ProfilePage = () => {
               )}
             </h1>
             <div className="flex flex-wrap justify-center md:justify-start gap-2">
-              {profile?.roles.map((role) => (
+              {profile?.roles?.map((role) => (
                 <span
                   key={role}
                   className="px-3 py-1 bg-(--color-primary-lighter) text-(--color-primary) dark:bg-(--color-primary-dark)/30 dark:text-(--color-primary-light) rounded-full text-xs font-semibold uppercase tracking-wider flex items-center gap-1"
@@ -209,6 +208,11 @@ const ProfilePage = () => {
                   {role}
                 </span>
               ))}
+              {!profile?.roles?.length && !isLoading && (
+                <span className="px-3 py-1 bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 rounded-full text-xs font-semibold uppercase tracking-wider">
+                  No roles available
+                </span>
+              )}
             </div>
           </div>
         </div>
