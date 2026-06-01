@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router';
+import { useParams, useNavigate } from "react-router";
 import {
     ArrowLeft,
     Calendar,
@@ -11,78 +11,175 @@ import {
     Star,
     Briefcase,
     AlertCircle,
-    Loader2
-} from 'lucide-react';
-import DashboardLayout from '@/components/dashboard-layout/DashboardLayout';
-import { useSelector, useDispatch } from 'react-redux';
-import type { AppDispatch } from '@/store/store';
-import { appointmentDetailsState, fetchAppointmentDetails, type AppointmentDetailsState } from '@/store/slices/patient-slice/appintment-details-slice/appointmentDetailsSlice';
-import { useEffect, useState } from 'react';
-import { RescheduleAppointmentModal } from '@/components/reschedule-appointment-modal/RescheduleAppointmentModal';
+    Loader2,
+    Mail,
+    Globe,
+} from "lucide-react";
+import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
+import { useSelector, useDispatch } from "react-redux";
+import type { AppDispatch } from "@/store/store";
+import {
+    appointmentDetailsState,
+    fetchAppointmentDetails,
+    type AppointmentDetailsState,
+} from "@/store/slices/patient-slice/appintment-details-slice/appointmentDetailsSlice";
+import { useEffect, useCallback, useState } from "react";
+import { RescheduleAppointmentModal } from "@/components/reschedule-appointment-modal/RescheduleAppointmentModal";
+import { CancelAppointmentModal } from "@/components/cancel-appointment-modal/CancelAppointmentModal";
+import { formatTime, parseDate } from "@/lib/utils";
 
+// ─── Status badge styles using CSS variables ─────────────────────────────────
 
-// helpers
+const statusConfig: Record<
+    string,
+    { bg: string; color: string; label: string }
+> = {
+    Confirmed: {
+        bg: "rgba(22, 163, 74, 0.1)",
+        color: "var(--color-success)",
+        label: "Confirmed",
+    },
+    Pending: {
+        bg: "rgba(234, 179, 8, 0.1)",
+        color: "#ca8a04",
+        label: "Pending",
+    },
+    Cancelled: {
+        bg: "rgba(220, 38, 38, 0.1)",
+        color: "#dc2626",
+        label: "Cancelled",
+    },
+    Completed: {
+        bg: "var(--color-bg-blue)",
+        color: "var(--color-text-blue)",
+        label: "Completed",
+    },
+};
 
+// ─── Info Row ─────────────────────────────────────────────────────────────────
 
-function parseDate(iso: string) {
-    const d = new Date(iso + 'T00:00:00');
-    return {
-        day: d.toLocaleDateString('en-US', { weekday: 'short' }),
-        dateNum: d.getDate(),
-        monthLabel: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        fullLabel: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        iso,
-    };
+function InfoRow({
+    icon,
+    label,
+    value,
+}: {
+    icon: React.ReactNode;
+    label: string;
+    value: React.ReactNode;
+}) {
+    return (
+        <div className="flex gap-3">
+            <span className="mt-0.5 shrink-0" style={{ color: "var(--color-text-light)" }}>
+                {icon}
+            </span>
+            <div>
+                <p className="text-xs mb-0.5" style={{ color: "var(--color-text-light)" }}>
+                    {label}
+                </p>
+                <p className="font-medium text-sm" style={{ color: "var(--color-text)" }}>
+                    {value || "—"}
+                </p>
+            </div>
+        </div>
+    );
 }
 
-function formatTime(t: string) {
-    const [h, m] = t.split(':').map(Number);
-    const ampm = h < 12 ? 'AM' : 'PM';
-    const hour = h % 12 || 12;
-    return `${hour}:${String(m).padStart(2, '0')} ${ampm}`;
+// ─── Section Card ─────────────────────────────────────────────────────────────
+
+function SectionCard({
+    title,
+    icon,
+    children,
+}: {
+    title?: string;
+    icon?: React.ReactNode;
+    children: React.ReactNode;
+}) {
+    return (
+        <div
+            className="rounded-xl border p-6"
+            style={{
+                backgroundColor: "var(--color-surface)",
+                borderColor: "var(--color-border)",
+            }}
+        >
+            {title && (
+                <h2
+                    className="flex items-center gap-2 text-lg font-semibold mb-5"
+                    style={{ color: "var(--color-text)" }}
+                >
+                    {icon && (
+                        <span style={{ color: "var(--color-primary)" }}>{icon}</span>
+                    )}
+                    {title}
+                </h2>
+            )}
+            {children}
+        </div>
+    );
 }
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function AppointmentDetailsPage() {
-    const { id } = useParams();
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const user = { role: 'patient' };
-    const [showRescheduleModal, setShowRescheduleModal] = useState<boolean>(false)
-
     const dispatch: AppDispatch = useDispatch();
-    const { data, loading, error } = useSelector(appointmentDetailsState) as AppointmentDetailsState
 
-    useEffect(() => {
-        dispatch(fetchAppointmentDetails({ id: String(id) }));
+    const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+    const [isCancelOpen, setIsCancelOpen] = useState(false);
+
+    const { data, loading, error } = useSelector(
+        appointmentDetailsState
+    ) as AppointmentDetailsState;
+
+    // ── Central fetch — call this any time we need fresh data ──
+    const refetch = useCallback(() => {
+        if (id) dispatch(fetchAppointmentDetails({ id }));
     }, [dispatch, id]);
 
-    const isPatient = user?.role === 'patient';
-    const isDoctor = user?.role === 'doctor' || user?.role === 'student_doctor';
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
 
-    // ─── Loading State ──────────────────────────────────────────────────────────
+    // ── Role (replace with your real auth selector when ready) ──
+    const role = useSelector(
+        (state: { auth: { role: string } }) => state.auth.role
+    );
+    const isPatient = role === "patient";
+    const isDoctor = role === "doctor" || role === "student_doctor";
+
+    // ── Loading ──
     if (loading) {
         return (
             <DashboardLayout pageTitle="Appointment Details">
-                <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="flex flex-col items-center space-y-3 text-gray-500 dark:text-gray-400">
-                        <Loader2 className="w-8 h-8 animate-spin" />
-                        <p className="text-sm">Loading appointment details...</p>
+                <div className="flex justify-center items-center min-h-[60vh]">
+                    <div className="flex flex-col items-center gap-3">
+                        <Loader2
+                            className="w-8 h-8 animate-spin"
+                            style={{ color: "var(--color-primary)" }}
+                        />
+                        <p style={{ color: "var(--color-text-light)" }}>
+                            Loading appointment details…
+                        </p>
                     </div>
                 </div>
             </DashboardLayout>
         );
     }
 
-    // ─── Error State ────────────────────────────────────────────────────────────
+    // ── Error ──
     if (error) {
         return (
             <DashboardLayout pageTitle="Appointment Details">
-                <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="flex flex-col items-center space-y-3 text-red-500 dark:text-red-400">
-                        <AlertCircle className="w-8 h-8" />
-                        <p className="text-sm">{error}</p>
+                <div className="flex justify-center items-center min-h-[60vh]">
+                    <div className="flex flex-col items-center gap-4 text-center">
+                        <AlertCircle className="w-8 h-8" style={{ color: "#dc2626" }} />
+                        <p style={{ color: "var(--color-text)" }}>{error}</p>
                         <button
                             onClick={() => navigate(-1)}
-                            className="text-sm text-gray-600 dark:text-gray-400 hover:underline"
+                            className="text-sm hover:underline"
+                            style={{ color: "var(--color-primary)" }}
                         >
                             Go Back
                         </button>
@@ -92,208 +189,339 @@ export default function AppointmentDetailsPage() {
         );
     }
 
-    // ─── Derived values from real API data ──────────────────────────────────────
+    // ── Guard: no data yet ──
+    if (!data) return null;
+
     const { status, date, time, location, type, doctor, clinic, notes, instructions } = data;
-    console.log(data)
-    // Format duration display — the API doesn't return it, so omit or hardcode fallback
-    const statusColorMap: Record<string, string> = {
-        Confirmed: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
-        Pending: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400',
-        Cancelled: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
-        Completed: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+
+    const badge = statusConfig[status] ?? {
+        bg: "var(--color-bg)",
+        color: "var(--color-text-light)",
+        label: status,
     };
-    const statusClass = statusColorMap[status] ?? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
+
+    const canAct = status === "Pending" || status === "Confirmed";
 
     return (
         <DashboardLayout pageTitle="Appointment Details">
             <div>
+                {/* Back */}
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6"
+                    className="flex items-center gap-2 mb-6 text-sm transition-colors hover:opacity-80"
+                    style={{ color: "var(--color-text-light)" }}
                 >
-                    <ArrowLeft className="w-5 h-5" />
-                    <span className="text-sm">Back to Appointments</span>
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to Appointments
                 </button>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* ── Main Content ────────────────────────────────────────── */}
+                    {/* ── Main ── */}
                     <div className="lg:col-span-2 space-y-6">
 
                         {/* Header */}
-                        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                            <div className="flex items-start justify-between mb-4">
+                        <SectionCard>
+                            <div className="flex justify-between items-start mb-4">
                                 <div>
-                                    <h1 className="text-2xl text-gray-900 dark:text-white mb-1">Appointment Details</h1>
-                                    <p className="text-sm text-gray-500 dark:text-gray-400">ID: #{id}</p>
+                                    <h1
+                                        className="text-2xl font-semibold"
+                                        style={{ color: "var(--color-text)" }}
+                                    >
+                                        Appointment Details
+                                    </h1>
+                                    <p className="text-sm mt-0.5" style={{ color: "var(--color-text-light)" }}>
+                                        ID #{data.id}
+                                    </p>
                                 </div>
-                                <span className={`px-3 py-1.5 rounded-lg text-sm font-medium ${statusClass}`}>
-                                    {status}
+
+                                <span
+                                    className="px-3 py-1 rounded-lg text-sm font-medium"
+                                    style={{ backgroundColor: badge.bg, color: badge.color }}
+                                >
+                                    {badge.label}
                                 </span>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                <div className="flex items-start space-x-3">
-                                    <Calendar className="w-5 h-5 text-gray-400 mt-0.5" />
-                                    <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Date</p>
-                                        <p className="text-sm text-gray-900 dark:text-white font-medium">{parseDate(date).fullLabel || '—'}</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start space-x-3">
-                                    <Clock className="w-5 h-5 text-gray-400 mt-0.5" />
-                                    <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Time</p>
-                                        <p className="text-sm text-gray-900 dark:text-white font-medium">{formatTime(time) || '—'}</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start space-x-3">
-                                    <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
-                                    <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Location</p>
-                                        <p className="text-sm text-gray-900 dark:text-white font-medium">{location || '—'}</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex items-start space-x-3">
-                                    <FileText className="w-5 h-5 text-gray-400 mt-0.5" />
-                                    <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Type</p>
-                                        <p className="text-sm text-gray-900 dark:text-white font-medium">{type || '—'}</p>
-                                    </div>
-                                </div>
+                            <div
+                                className="grid md:grid-cols-2 gap-5 pt-4 border-t"
+                                style={{ borderColor: "var(--color-border)" }}
+                            >
+                                <InfoRow
+                                    icon={<Calendar className="w-4 h-4" />}
+                                    label="Date"
+                                    value={parseDate(date).fullLabel}
+                                />
+                                <InfoRow
+                                    icon={<Clock className="w-4 h-4" />}
+                                    label="Time"
+                                    value={formatTime(time)}
+                                />
+                                <InfoRow
+                                    icon={<MapPin className="w-4 h-4" />}
+                                    label="Location"
+                                    value={location}
+                                />
+                                <InfoRow
+                                    icon={<FileText className="w-4 h-4" />}
+                                    label="Type"
+                                    value={type}
+                                />
                             </div>
-                        </div>
+                        </SectionCard>
 
-                        {/* Patient View: Doctor Information */}
+                        {/* Doctor Information */}
                         {isPatient && (
-                            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                                <h2 className="text-lg text-gray-900 dark:text-white mb-4 flex items-center">
-                                    <User className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
-                                    Doctor Information
-                                </h2>
-                                <div className="flex items-start space-x-4 mb-6">
+                            <SectionCard
+                                title="Doctor Information"
+                                icon={<User className="w-5 h-5" />}
+                            >
+                                <div className="flex gap-4">
                                     {doctor.imageUrl ? (
                                         <img
                                             src={doctor.imageUrl}
                                             alt={doctor.name}
-                                            className="w-20 h-20 rounded-full border-2 border-blue-100 dark:border-blue-900 object-cover"
+                                            className="w-20 h-20 rounded-full object-cover border"
+                                            style={{ borderColor: "var(--color-border)" }}
+                                            onError={(e) => {
+                                                (e.currentTarget as HTMLImageElement).style.display = "none";
+                                            }}
                                         />
                                     ) : (
-                                        <div className="w-20 h-20 rounded-full border-2 border-blue-100 dark:border-blue-900 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                                            <User className="w-8 h-8 text-gray-400" />
+                                        <div
+                                            className="w-20 h-20 rounded-full flex items-center justify-center shrink-0"
+                                            style={{ backgroundColor: "var(--color-bg)" }}
+                                        >
+                                            <User className="w-8 h-8" style={{ color: "var(--color-text-light)" }} />
                                         </div>
                                     )}
-                                    <div className="flex-1">
-                                        <h3 className="text-lg text-gray-900 dark:text-white font-medium">{doctor.name || '—'}</h3>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{doctor.specialization || '—'}</p>
-                                        <div className="flex items-center space-x-4">
-                                            {doctor.rating > 0 && (
-                                                <div className="flex items-center space-x-1">
-                                                    <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                                                    <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">{doctor.rating}</span>
-                                                </div>
-                                            )}
-                                            {doctor.experienceYears > 0 && (
-                                                <div className="flex items-center space-x-1">
-                                                    <Briefcase className="w-4 h-4 text-gray-400" />
-                                                    <span className="text-xs text-gray-600 dark:text-gray-400">
-                                                        {doctor.experienceYears} yr{doctor.experienceYears !== 1 ? 's' : ''} experience
-                                                    </span>
-                                                </div>
-                                            )}
+
+                                    <div>
+                                        <h3
+                                            className="font-semibold text-lg"
+                                            style={{ color: "var(--color-text)" }}
+                                        >
+                                            {doctor.name}
+                                        </h3>
+                                        <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
+                                            {doctor.specialization}
+                                        </p>
+
+                                        <div className="flex gap-4 mt-2">
+                                            <div className="flex items-center gap-1">
+                                                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                                                <span className="text-sm" style={{ color: "var(--color-text)" }}>
+                                                    {doctor.rating}
+                                                </span>
+                                            </div>
+                                            <div
+                                                className="flex items-center gap-1 text-sm"
+                                                style={{ color: "var(--color-text-light)" }}
+                                            >
+                                                <Briefcase className="w-4 h-4" />
+                                                <span>{doctor.experienceYears} yrs</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </SectionCard>
                         )}
 
-                        {/* Patient View: Clinic Information */}
+                        {/* Clinic Information */}
                         {isPatient && (
-                            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                                <h2 className="text-lg text-gray-900 dark:text-white mb-4 flex items-center">
-                                    <Building2 className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
-                                    Clinic Information
-                                </h2>
-                                <div className="space-y-4">
-                                    <div>
-                                        <h3 className="text-base text-gray-900 dark:text-white font-medium mb-1">{clinic.name || '—'}</h3>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400">{clinic.address || '—'}</p>
-                                    </div>
-                                    {clinic.phone && (
-                                        <div className="flex items-center space-x-2 text-sm pt-3 border-t border-gray-200 dark:border-gray-700">
-                                            <Phone className="w-4 h-4 text-gray-400" />
-                                            <span className="text-gray-600 dark:text-gray-400">{clinic.phone}</span>
+                            <SectionCard
+                                title="Clinic Information"
+                                icon={<Building2 className="w-5 h-5" />}
+                            >
+                                <div>
+                                    <h3 className="font-semibold" style={{ color: "var(--color-text)" }}>
+                                        {clinic.clinicName || "—"}
+                                    </h3>
+                                    <p className="text-sm mt-0.5" style={{ color: "var(--color-text-light)" }}>
+                                        {clinic.clinicLocation || "—"}
+                                    </p>
+                                </div>
+
+                                <div
+                                    className="space-y-3 border-t pt-4 mt-4"
+                                    style={{ borderColor: "var(--color-border)" }}
+                                >
+                                    {clinic.clinicPhoneNumber && (
+                                        <div className="flex items-center gap-2 text-sm" style={{ color: "var(--color-text)" }}>
+                                            <Phone className="w-4 h-4 shrink-0" style={{ color: "var(--color-text-light)" }} />
+                                            <a href={`tel:${clinic.clinicPhoneNumber}`} className="hover:underline">
+                                                {clinic.clinicPhoneNumber}
+                                            </a>
+                                        </div>
+                                    )}
+
+                                    {clinic.clinicEmail && (
+                                        <div className="flex items-center gap-2 text-sm" style={{ color: "var(--color-text)" }}>
+                                            <Mail className="w-4 h-4 shrink-0" style={{ color: "var(--color-text-light)" }} />
+                                            <a href={`mailto:${clinic.clinicEmail}`} className="hover:underline">
+                                                {clinic.clinicEmail}
+                                            </a>
+                                        </div>
+                                    )}
+
+                                    {clinic.clinicWebsite && (
+                                        <div className="flex items-center gap-2 text-sm">
+                                            <Globe className="w-4 h-4 shrink-0" style={{ color: "var(--color-text-light)" }} />
+                                            <a
+                                                href={clinic.clinicWebsite}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="hover:underline"
+                                                style={{ color: "var(--color-primary)" }}
+                                            >
+                                                {clinic.clinicWebsite}
+                                            </a>
+                                        </div>
+                                    )}
+
+                                    {clinic.clinicHours && (
+                                        <div className="flex items-center gap-2 text-sm" style={{ color: "var(--color-text)" }}>
+                                            <Clock className="w-4 h-4 shrink-0" style={{ color: "var(--color-text-light)" }} />
+                                            <span>{clinic.clinicHours}</span>
                                         </div>
                                     )}
                                 </div>
-                            </div>
+                            </SectionCard>
                         )}
 
                         {/* Notes */}
                         {notes && (
-                            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
-                                <h3 className="text-sm text-blue-900 dark:text-blue-300 font-medium mb-2 flex items-center">
-                                    <FileText className="w-4 h-4 mr-2" />
+                            <div
+                                className="rounded-xl border p-4"
+                                style={{
+                                    backgroundColor: "var(--color-bg-blue)",
+                                    borderColor: "var(--color-primary-lighter)",
+                                }}
+                            >
+                                <h3
+                                    className="font-medium flex items-center gap-2 mb-2 text-sm"
+                                    style={{ color: "var(--color-text-blue)" }}
+                                >
+                                    <FileText className="w-4 h-4" />
                                     Notes
                                 </h3>
-                                <p className="text-sm text-blue-700 dark:text-blue-400">{notes}</p>
+                                <p className="text-sm" style={{ color: "var(--color-text)" }}>
+                                    {notes}
+                                </p>
                             </div>
                         )}
 
-                        {/* Instructions (for patients) */}
-                        {isPatient && instructions && (
-                            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl p-4">
-                                <h3 className="text-sm text-yellow-900 dark:text-yellow-300 font-medium mb-2 flex items-center">
-                                    <AlertCircle className="w-4 h-4 mr-2" />
-                                    Pre-appointment Instructions
+                        {/* Instructions */}
+                        {instructions && (
+                            <div
+                                className="rounded-xl border p-4"
+                                style={{
+                                    backgroundColor: "rgba(234, 179, 8, 0.08)",
+                                    borderColor: "rgba(234, 179, 8, 0.3)",
+                                }}
+                            >
+                                <h3
+                                    className="font-medium flex items-center gap-2 mb-2 text-sm"
+                                    style={{ color: "#ca8a04" }}
+                                >
+                                    <AlertCircle className="w-4 h-4" />
+                                    Instructions
                                 </h3>
-                                <p className="text-sm text-yellow-700 dark:text-yellow-400">{instructions}</p>
+                                <p className="text-sm" style={{ color: "var(--color-text)" }}>
+                                    {instructions}
+                                </p>
                             </div>
                         )}
                     </div>
 
-                    {/* ── Sidebar Actions ──────────────────────────────────────── */}
-                    {(status == 'Pending' || status == 'Confirmed') && <div className="lg:col-span-1">
-                        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 sticky top-6">
-                            <h3 className="text-base text-gray-900 dark:text-white font-medium mb-4">Actions</h3>
-                            <div className="space-y-3">
-                                {isPatient && (
-                                    <>
-                                        <button
-                                            onClick={() => setShowRescheduleModal(true)}
-                                            className="w-full px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
-                                            Reschedule Appointment
-                                        </button>
-                                        <button className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm">
-                                            Cancel Appointment
-                                        </button>
-                                    </>
-                                )}
-                                {isDoctor && (
-                                    <button className="w-full px-4 py-2.5 border border-blue-600 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors text-sm">
-                                        View Medical History
+                    {/* ── Actions sidebar ── */}
+                    {canAct && (
+                        <div>
+                            <div
+                                className="rounded-xl border p-6 sticky top-6"
+                                style={{
+                                    backgroundColor: "var(--color-surface)",
+                                    borderColor: "var(--color-border)",
+                                }}
+                            >
+                                <h3
+                                    className="font-semibold mb-4"
+                                    style={{ color: "var(--color-text)" }}
+                                >
+                                    Actions
+                                </h3>
+
+                                <div className="space-y-3">
+                                    <button
+                                        onClick={() => setShowRescheduleModal(true)}
+                                        className="w-full py-2.5 rounded-lg text-sm font-medium text-white transition-colors hover:opacity-90"
+                                        style={{ backgroundColor: "var(--color-primary)" }}
+                                    >
+                                        Reschedule Appointment
                                     </button>
-                                )}
+
+                                    <button
+                                        onClick={() => setIsCancelOpen(true)}
+                                        className="w-full py-2.5 rounded-lg border text-sm font-medium transition-colors hover:opacity-80"
+                                        style={{
+                                            borderColor: "var(--color-border)",
+                                            color: "var(--color-text)",
+                                        }}
+                                    >
+                                        Cancel Appointment
+                                    </button>
+
+                                    {isDoctor && (
+                                        <button
+                                            className="w-full py-2.5 rounded-lg border text-sm font-medium transition-colors hover:opacity-80"
+                                            style={{
+                                                borderColor: "var(--color-primary)",
+                                                color: "var(--color-primary)",
+                                            }}
+                                        >
+                                            View Medical History
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>}
+                    )}
                 </div>
-            </div >
-            {/* Reschedule Modal */}
+            </div>
+
+            {/* ── Modals ── */}
             <RescheduleAppointmentModal
                 isOpen={showRescheduleModal}
-                onClose={() => setShowRescheduleModal(false)}
+                onClose={() => {
+                    setShowRescheduleModal(false)
+                    refetch();
+                }}
+                // Re-fetch after successful reschedule so status updates without a page refresh
+
                 appointment={{
-                    id: id || '',
+                    id: String(data.id),
                     date: data.date,
                     time: data.time,
                     doctorName: data.doctor.name,
-                    doctorImage: String(data.doctor.imageUrl)
+                    doctorImage: String(data.doctor.imageUrl),
                 }}
-                id={String(28)}
+                id={String(data.doctor.id)}
             />
-        </DashboardLayout >
+
+            <CancelAppointmentModal
+                isOpen={isCancelOpen}
+                onClose={() => {
+                    setIsCancelOpen(false)
+                    refetch();
+                }}
+                // Re-fetch after successful cancel so status updates without a page refresh
+                appointment={{
+                    id: String(data.id),
+                    date: parseDate(data.date).fullLabel,
+                    time: formatTime(data.time),
+                    doctorName: data.doctor.name,
+                    doctorSpecialty: data.doctor.specialization,
+                }}
+            />
+        </DashboardLayout>
     );
 }

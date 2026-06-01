@@ -5,18 +5,24 @@ import Cookies from "js-cookie";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export interface DoctorInfo {
+    id: number;
     name: string;
     specialization: string;
     imageUrl: string | null;
     rating: number;
     experienceYears: number;
+    governments: string | null;
 }
 
 export interface ClinicInfo {
-    name: string;
-    address: string;
-    phone: string;
+    clinicName: string;
+    clinicLocation: string;
+    clinicEmail: string;
+    clinicWebsite: string;
+    clinicHours: string;
+    clinicPhoneNumber: string;
 }
+
 
 export interface AppointmentDetails {
     id: number;
@@ -30,6 +36,7 @@ export interface AppointmentDetails {
     notes: string;
     instructions: string;
 }
+
 
 export interface AppointmentDetailsState {
     data: AppointmentDetails;
@@ -47,16 +54,21 @@ const initialState: AppointmentDetailsState = {
         location: "",
         type: "",
         doctor: {
+            id: 0,
             name: "",
             specialization: "",
             imageUrl: null,
             rating: 0,
             experienceYears: 0,
+            governments: null,
         },
         clinic: {
-            name: "",
-            address: "",
-            phone: "",
+            clinicName: "",
+            clinicLocation: "",
+            clinicEmail: "",
+            clinicWebsite: "",
+            clinicHours: "",
+            clinicPhoneNumber: "",
         },
         notes: "",
         instructions: "",
@@ -64,7 +76,6 @@ const initialState: AppointmentDetailsState = {
     loading: false,
     error: null,
 };
-
 
 export const fetchAppointmentDetails = createAsyncThunk(
     'appointmentDetailsSlice/fetchAppointmentDetails',

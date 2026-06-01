@@ -15,9 +15,15 @@ export interface TimeSlot {
     times: TimeSlotItem[];
 }
 
-// export interface Review {
-//     // أضف الحقول لاحقًا عندما تعرف شكل الـ API
-// }
+export interface ClinicInfo {
+    clinicName: string;
+    clinicLocation: string;
+    clinicEmail: string;
+    clinicWebsite: string;
+    clinicHours: string;
+    clinicPhoneNumber: string;
+    government: string[];
+}
 
 export interface DoctorDetails {
     id: number;
@@ -31,8 +37,16 @@ export interface DoctorDetails {
     about: string;
     education: string;
     languages: string[];
+
+    // NEW (from API)
     clinicName: string;
     clinicLocation: string;
+    clinicEmail: string;
+    clinicWebsite: string;
+    clinicHours: string;
+    clinicPhoneNumber: string;
+    government: string[];
+
     isAvailable: boolean;
     timeSlots: TimeSlot[];
     reviews: any[];
@@ -40,9 +54,10 @@ export interface DoctorDetails {
 
 export interface DoctorDetailsState {
     data: DoctorDetails;
-    loading: boolean,
-    error: string | null,
+    loading: boolean;
+    error: string | null;
 }
+
 
 const initialState: DoctorDetailsState = {
     data: {
@@ -57,8 +72,15 @@ const initialState: DoctorDetailsState = {
         about: "",
         education: "",
         languages: [],
+
         clinicName: "",
         clinicLocation: "",
+        clinicEmail: "",
+        clinicWebsite: "",
+        clinicHours: "",
+        clinicPhoneNumber: "",
+        government: [],
+
         isAvailable: false,
         timeSlots: [],
         reviews: [],
@@ -66,6 +88,7 @@ const initialState: DoctorDetailsState = {
     loading: false,
     error: null,
 };
+
 export const fetchDoctorProfile = createAsyncThunk(
     "doctorProfileSlice/fetchDoctorProfile",
     async ({ id }: { id: string }, { rejectWithValue }) => {

@@ -6,68 +6,221 @@ import {
   CheckCircle,
   FileText,
   ArrowLeft,
+  CreditCard,
 } from "lucide-react";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "@/store/store";
-import { availableDatesState, fetchAvailableDates, type ScheduleDatesState } from "@/store/slices/patient-slice/available-dates-slice/availableDatesSlice";
-import { availableSlotsState, fetchAvailableSlots, type ScheduleSlotsState } from "@/store/slices/patient-slice/available-slots-slice/availableSlotsSlice";
+import {
+  availableDatesState,
+  fetchAvailableDates,
+  type ScheduleDatesState,
+} from "@/store/slices/patient-slice/available-dates-slice/availableDatesSlice";
+import {
+  availableSlotsState,
+  fetchAvailableSlots,
+  type ScheduleSlotsState,
+} from "@/store/slices/patient-slice/available-slots-slice/availableSlotsSlice";
 import Error from "@/components/error/Error";
 import MiniLoading from "@/components/mini-loading/MiniLoading";
-import { doctorBookingDetailsState, fetchDoctorBookingDetails, type DoctorBookingDetailsState } from "@/store/slices/patient-slice/doctor-booking-details-slice/doctorBookingDetailsSlice";
-import { bookAppointmentState, fetchBookAppointment, type AppointmentBookingState } from "@/store/slices/patient-slice/book-appointment-slice/bookAppointmentSlice";
+import {
+  doctorBookingDetailsState,
+  fetchDoctorBookingDetails,
+  type DoctorBookingDetailsState,
+} from "@/store/slices/patient-slice/doctor-booking-details-slice/doctorBookingDetailsSlice";
+import {
+  bookAppointmentState,
+  fetchBookAppointment,
+  type AppointmentBookingState,
+} from "@/store/slices/patient-slice/book-appointment-slice/bookAppointmentSlice";
 import { toast } from "react-toastify";
 import DoctorDetails from "@/components/doctor-details/DoctorDetails";
+import { formatTime, parseDate } from "@/lib/utils";
 
+// ─── Helpers ────────────────────────────────────────────────────────────────
 
+function isValidDoctorId(id: string | undefined): id is string {
+  if (!id) return false;
+  const n = Number(id);
+  return Number.isInteger(n) && n > 0;
+}
 
+// ─── Section Card wrapper ────────────────────────────────────────────────────
 
+function SectionCard({
+  title,
+  icon,
+  children,
+}: {
+  title?: string;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className="rounded-xl border p-6"
+      style={{
+        backgroundColor: "var(--color-surface)",
+        borderColor: "var(--color-border)",
+      }}
+    >
+      {title && (
+        <h2
+          className="text-base font-semibold mb-4 flex items-center gap-2"
+          style={{ color: "var(--color-text)" }}
+        >
+          {icon && (
+            <span style={{ color: "var(--color-primary)" }}>{icon}</span>
+          )}
+          {title}
+        </h2>
+      )}
+      {children}
+    </div>
+  );
+}
+
+// ─── Confirmation Screen ─────────────────────────────────────────────────────
+
+function ConfirmationScreen({
+  doctorName,
+  selectedDate,
+  selectedTime,
+  paymentMethod,
+}: {
+  doctorName?: string;
+  selectedDate: string;
+  selectedTime: string;
+  paymentMethod: string;
+}) {
+  return (
+    <div className="flex items-center justify-center py-12 px-4">
+      <div
+        className="max-w-md w-full rounded-2xl border p-8 text-center"
+        style={{
+          backgroundColor: "var(--color-surface)",
+          borderColor: "var(--color-border)",
+        }}
+      >
+        {/* Icon */}
+        <div
+          className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+          style={{ backgroundColor: "rgba(22, 163, 74, 0.12)" }}
+        >
+          <CheckCircle
+            className="w-10 h-10"
+            style={{ color: "var(--color-success)" }}
+          />
+        </div>
+
+        <h2
+          className="text-2xl font-semibold mb-4"
+          style={{ color: "var(--color-text)" }}
+        >
+          Appointment Confirmed!
+        </h2>
+
+        <div className="space-y-1 mb-6">
+          <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
+            Your appointment with
+          </p>
+          <p className="text-base font-medium" style={{ color: "var(--color-text)" }}>
+            {doctorName || "your doctor"}
+          </p>
+          <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
+            {selectedDate} at {selectedTime}
+          </p>
+          <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
+            Payment:{" "}
+            <span className="font-medium" style={{ color: "var(--color-text)" }}>
+              {paymentMethod === "Cash" ? "Cash at Clinic" : paymentMethod || "—"}
+            </span>
+          </p>
+        </div>
+
+        {/* Info banner */}
+        <div
+          className="rounded-lg p-4 border"
+          style={{
+            backgroundColor: "var(--color-bg-blue)",
+            borderColor: "var(--color-primary-lighter)",
+          }}
+        >
+          <p className="text-xs" style={{ color: "var(--color-text-blue)" }}>
+            A confirmation email has been sent to your registered email address.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function AppointmentBookingPage() {
-
-
-
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const dispatch: AppDispatch = useDispatch();
+
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
   const [slotId, setSlotId] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [notes, setNotes] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<string>("");
-  const [appointmentType, setAppointmentType] = useState<string>("")
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [appointmentType, setAppointmentType] = useState("");
+
   const { role } = useSelector(
-    (state: {
-      auth: {
-        role: string;
-      };
-    }) => state.auth,
+    (state: { auth: { role: string } }) => state.auth
   );
 
-  const { id } = useParams();
-  const dispatch: AppDispatch = useDispatch();
+  const {
+    data: availableDates,
+    loading: loadingDates,
+    error: errorDates,
+  } = useSelector(availableDatesState) as ScheduleDatesState;
 
-  const { data: availableDates, loading: loadingDates, error: errorDates } = useSelector(availableDatesState) as ScheduleDatesState
-  const { data: availableSlots, loading: loadingSlots, error: errorSlots } = useSelector(availableSlotsState) as ScheduleSlotsState
-  const { data: doctorDetails, loading: loadingDoctorDetails, error: errorDoctorDetails } = useSelector(doctorBookingDetailsState) as DoctorBookingDetailsState
-  const { loading: loadingBookAppointment, error: errorBookAppointment } = useSelector(bookAppointmentState) as AppointmentBookingState
+  const {
+    data: availableSlots,
+    loading: loadingSlots,
+    error: errorSlots,
+  } = useSelector(availableSlotsState) as ScheduleSlotsState;
+
+  const {
+    data: doctorDetails,
+    loading: loadingDoctorDetails,
+    error: errorDoctorDetails,
+  } = useSelector(doctorBookingDetailsState) as DoctorBookingDetailsState;
+
+  const {
+    loading: loadingBookAppointment,
+    error: errorBookAppointment,
+  } = useSelector(bookAppointmentState) as AppointmentBookingState;
+
+  // ── Validate id ──
+  const validId = isValidDoctorId(id);
 
   useEffect(() => {
-    dispatch(fetchAvailableDates({ id: String(id) }))
-  }, [dispatch, id])
+    if (!validId) return;
+    dispatch(fetchAvailableDates({ id }));
+    dispatch(fetchDoctorBookingDetails({ id }));
+  }, [dispatch, id, validId]);
 
   useEffect(() => {
-    if (selectedDate) {
-      dispatch(fetchAvailableSlots({ date: selectedDate, id: String(id) }));
-    }
-  }, [dispatch, id, selectedDate]);
-
-  useEffect(() => {
-    dispatch(fetchDoctorBookingDetails({ id: String(id) }))
-  }, [dispatch, id])
-
+    if (!validId || !selectedDate) return;
+    dispatch(fetchAvailableSlots({ date: selectedDate, id }));
+  }, [dispatch, id, selectedDate, validId]);
 
   const handleBooking = async () => {
     if (!doctorDetails?.doctorId || !slotId) return;
+    if (!appointmentType) {
+      toast.warn("Please select an appointment type.");
+      return;
+    }
+    if (!paymentMethod) {
+      toast.warn("Please select a payment method.");
+      return;
+    }
 
     try {
       const resultAction = await dispatch(
@@ -79,248 +232,287 @@ export default function AppointmentBookingPage() {
           notes,
         })
       ).unwrap();
-      toast.error("Booking Successd:" + resultAction.message)
+
+      toast.success("Booking successful: " + resultAction.message);
       setShowConfirmation(true);
 
-      setTimeout(() => {
-        navigate("/dashboard/patient");
-      }, 2000);
+      setTimeout(() => navigate("/dashboard/patient"), 2000);
     } catch (err) {
       console.error("Booking failed:", err);
-      toast.error("Booking failed:" + err)
+      toast.error("Booking failed: " + (err as string));
     }
   };
 
-  if (showConfirmation) {
-    if (role === "patient") {
-      return (
-        <DashboardLayout pageTitle="Appointment Confirmed">
-          <div className="flex items-center justify-center py-12 px-4">
-            <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-8 text-center">
-              <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
-              </div>
-              <h2 className="text-2xl text-gray-900 dark:text-white mb-4">
-                Appointment Confirmed!
-              </h2>
-              <div className="space-y-2 mb-6">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Your appointment with
-                </p>
-                <p className="text-base text-gray-900 dark:text-white font-medium">
-                  {doctorDetails?.name}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {selectedDate} at {selectedTime}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Payment:{" "}
-                  <span className="font-medium">
-                    {paymentMethod === "cash"
-                      ? "Cash at Clinic"
-                      : "Online Payment"}
-                  </span>
-                </p>
-              </div>
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <p className="text-xs text-blue-700 dark:text-blue-400">
-                  A confirmation email has been sent to your registered email
-                  address.
-                </p>
-              </div>
-            </div>
-          </div>
-        </DashboardLayout>
-      );
-    } else {
-      return (
-        <div className="w-11/12 m-auto">
-          <div className="flex items-center justify-center py-12 px-4">
-            <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 p-8 text-center">
-              <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="w-10 h-10 text-green-600 dark:text-green-400" />
-              </div>
-              <h2 className="text-2xl text-gray-900 dark:text-white mb-4">
-                Appointment Confirmed!
-              </h2>
-              <div className="space-y-2 mb-6">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Your appointment with
-                </p>
-                <p className="text-base text-gray-900 dark:text-white font-medium">
-                  {doctorDetails?.name}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {selectedDate} at {selectedTime}
-                </p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Payment:{" "}
-                  <span className="font-medium">
-                    {paymentMethod === "cash"
-                      ? "Cash at Clinic"
-                      : "Online Payment"}
-                  </span>
-                </p>
-              </div>
-              <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                <p className="text-xs text-blue-700 dark:text-blue-400">
-                  A confirmation email has been sent to your registered email
-                  address.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
-    }
+  // ── Guard: invalid route id ──
+  if (!validId) {
+    return (
+      <DashboardLayout pageTitle="Book Appointment">
+        <Error message="Invalid doctor ID. Please check the URL and try again." />
+      </DashboardLayout>
+    );
   }
 
+  // ── Confirmation screen ──
+  if (showConfirmation) {
+    const inner = (
+      <ConfirmationScreen
+        doctorName={doctorDetails?.name}
+        selectedDate={selectedDate}
+        selectedTime={selectedTime}
+        paymentMethod={paymentMethod}
+      />
+    );
 
+    return role === "patient" ? (
+      <DashboardLayout pageTitle="Appointment Confirmed">{inner}</DashboardLayout>
+    ) : (
+      <div className="w-11/12 m-auto">{inner}</div>
+    );
+  }
+
+  // ── Main form ──
   return (
     <DashboardLayout pageTitle="Book Appointment">
       <div>
+        {/* Back button */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center space-x-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-6"
+          className="flex items-center gap-2 mb-6 text-sm transition-colors hover:opacity-80"
+          style={{ color: "var(--color-text-light)" }}
         >
-          <ArrowLeft className="w-5 h-5" />
-          <span className="text-sm">Back</span>
+          <ArrowLeft className="w-4 h-4" />
+          Back
         </button>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Booking Form */}
+          {/* ── Left: Booking Form ── */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Header */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-              <h1 className="text-2xl text-gray-900 dark:text-white mb-2">
+
+            {/* Page header */}
+            <SectionCard>
+              <h1
+                className="text-2xl font-semibold mb-1"
+                style={{ color: "var(--color-text)" }}
+              >
                 Schedule Appointment
               </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                Book your consultation with {doctorDetails?.name}
+              <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
+                Book your consultation
+                {doctorDetails?.name ? ` with ${doctorDetails.name}` : ""}
               </p>
-            </div>
+            </SectionCard>
 
             {/* Appointment Type */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-              <h2 className="text-base text-gray-900 dark:text-white font-medium mb-4">
-                Appointment Type
-              </h2>
-
-              <div className="grid grid-cols-1 gap-4">
-                <select
-                  className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500"
-                  value={appointmentType}
-                  onChange={(e) => setAppointmentType(e.target.value)}
-                >
-                  <option value="">Select Appointment Type</option>
-                  <option value="Consultation">Consultation</option>
-                  <option value="FollowUp">Follow Up</option>
-                  <option value="Checkup">Checkup</option>
-                  <option value="Emergency">Emergency</option>
-                </select>
-              </div>
-            </div>
+            <SectionCard title="Appointment Type">
+              <select
+                className="w-full p-3 rounded-lg border text-sm outline-none transition-colors"
+                style={{
+                  backgroundColor: "var(--color-bg)",
+                  borderColor: appointmentType
+                    ? "var(--color-primary)"
+                    : "var(--color-border)",
+                  color: appointmentType
+                    ? "var(--color-text)"
+                    : "var(--color-text-light)",
+                }}
+                value={appointmentType}
+                onChange={(e) => setAppointmentType(e.target.value)}
+              >
+                <option value="">Select Appointment Type</option>
+                <option value="Consultation">Consultation</option>
+                <option value="FollowUp">Follow Up</option>
+                <option value="Checkup">Checkup</option>
+                <option value="Emergency">Emergency</option>
+              </select>
+            </SectionCard>
 
             {/* Date Selection */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-              <h2 className="text-base text-gray-900 dark:text-white font-medium mb-4 flex items-center">
-                <Calendar className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
-                Select Date
-              </h2>
-              <div className={`grid  gap-3 ${loadingDates || errorDates ? 'grid-cols-1' : 'grid-cols-3'}`}>
-                {loadingDates ? <MiniLoading />
-                  : errorDates ? <Error message={errorDates} /> :
-
-                    availableDates && availableDates?.map((slot, index) => (
+            <SectionCard
+              title="Select Date"
+              icon={<Calendar className="w-4 h-4" />}
+            >
+              {loadingDates ? (
+                <MiniLoading />
+              ) : errorDates ? (
+                <Error message={errorDates} />
+              ) : !availableDates?.length ? (
+                <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
+                  No available dates.
+                </p>
+              ) : (
+                <div className="grid grid-cols-3 gap-3">
+                  {availableDates.map((slot, index) => {
+                    const parsed = parseDate(slot.date);
+                    const isSelected = selectedDate === slot.date;
+                    return (
                       <button
                         key={index}
                         onClick={() => {
                           setSelectedDate(slot.date);
                           setSelectedTime("");
+                          setSlotId("");
                         }}
-                        className={`p-3 rounded-lg border-2 transition-colors ${selectedDate === slot.date
-                          ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20"
-                          : "border-gray-200 dark:border-gray-600 hover:border-blue-400"
-                          }`}
+                        className="p-3 rounded-lg border-2 transition-colors text-center"
+                        style={{
+                          borderColor: isSelected
+                            ? "var(--color-primary)"
+                            : "var(--color-border)",
+                          backgroundColor: isSelected
+                            ? "var(--color-bg-blue)"
+                            : "var(--color-bg)",
+                        }}
                       >
-                        <Calendar className="w-5 h-5 mx-auto mb-2 text-gray-600 dark:text-gray-400" />
-                        <p className="text-xs text-gray-900 dark:text-white font-medium">
-                          {slot.date}
+                        <Calendar
+                          className="w-4 h-4 mx-auto mb-1"
+                          style={{
+                            color: isSelected
+                              ? "var(--color-primary)"
+                              : "var(--color-text-light)",
+                          }}
+                        />
+                        <p
+                          className="text-xs font-medium"
+                          style={{
+                            color: isSelected
+                              ? "var(--color-text-blue)"
+                              : "var(--color-text)",
+                          }}
+                        >
+                          {parsed.fullLabel}
                         </p>
                       </button>
-                    ))}
-              </div>
-            </div>
+                    );
+                  })}
+                </div>
+              )}
+            </SectionCard>
 
-            {/* Time Selection */}
+            {/* Time Selection — only shown after a date is picked */}
             {selectedDate && (
-              <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-                <h2 className="text-base text-gray-900 dark:text-white font-medium mb-4 flex items-center">
-                  <Clock className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
-                  Select Time
-                </h2>
-                <div className={`grid  gap-3 ${loadingSlots || errorSlots ? 'grid-cols-1' : 'grid-cols-4'}`}>
-                  {loadingSlots ? <MiniLoading />
-                    : errorSlots ? <Error message={errorSlots} /> :
-                      availableSlots && availableSlots.map((slot, index) => (
+              <SectionCard
+                title="Select Time"
+                icon={<Clock className="w-4 h-4" />}
+              >
+                {loadingSlots ? (
+                  <MiniLoading />
+                ) : errorSlots ? (
+                  <Error message={errorSlots} />
+                ) : !availableSlots?.length ? (
+                  <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
+                    No time slots available for this date.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-4 gap-3">
+                    {availableSlots.map((slot, index) => {
+                      const isSelected = selectedTime === slot.startTime;
+                      return (
                         <button
                           key={index}
                           onClick={() => {
                             setSelectedTime(slot.startTime);
                             setSlotId(String(slot.id));
                           }}
-                          className={`p-3 rounded-lg border-2 transition-colors ${selectedTime === slot.startTime
-                            ? "border-blue-600 bg-blue-50 dark:bg-blue-900/20"
-                            : "border-gray-200 dark:border-gray-600 hover:border-blue-400"
-                            }`}
+                          className="p-3 rounded-lg border-2 transition-colors text-center"
+                          style={{
+                            borderColor: isSelected
+                              ? "var(--color-primary)"
+                              : "var(--color-border)",
+                            backgroundColor: isSelected
+                              ? "var(--color-bg-blue)"
+                              : "var(--color-bg)",
+                          }}
                         >
-                          <Clock className="w-4 h-4 mx-auto mb-1 text-gray-600 dark:text-gray-400" />
-                          <p className="text-xs text-gray-900 dark:text-white font-medium">
-                            {slot.startTime}
+                          <Clock
+                            className="w-4 h-4 mx-auto mb-1"
+                            style={{
+                              color: isSelected
+                                ? "var(--color-primary)"
+                                : "var(--color-text-light)",
+                            }}
+                          />
+                          <p
+                            className="text-xs font-medium"
+                            style={{
+                              color: isSelected
+                                ? "var(--color-text-blue)"
+                                : "var(--color-text)",
+                            }}
+                          >
+                            {formatTime(slot.startTime)}
                           </p>
                         </button>
-                      ))}
-                </div>
-              </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </SectionCard>
             )}
 
-            {/* Reason for Visit */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-              <h2 className="text-base text-gray-900 dark:text-white font-medium mb-4 flex items-center">
-                <FileText className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
-                Reason for Visit
-              </h2>
+            {/* Notes */}
+            <SectionCard
+              title="Reason for Visit"
+              icon={<FileText className="w-4 h-4" />}
+            >
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={4}
-                className="w-full px-4 py-3 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900 dark:text-white placeholder-gray-400"
+                maxLength={500}
+                className="w-full px-4 py-3 rounded-lg border text-sm resize-none outline-none transition-colors"
+                style={{
+                  backgroundColor: "var(--color-bg)",
+                  borderColor: "var(--color-border)",
+                  color: "var(--color-text)",
+                }}
+                onFocus={(e) =>
+                  (e.currentTarget.style.borderColor = "var(--color-primary)")
+                }
+                onBlur={(e) =>
+                  (e.currentTarget.style.borderColor = "var(--color-border)")
+                }
                 placeholder="Describe your symptoms or reason for consultation (optional)..."
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                This information helps the doctor prepare for your appointment
-              </p>
-            </div>
+              <div className="flex justify-between mt-1">
+                <p className="text-xs" style={{ color: "var(--color-text-light)" }}>
+                  Helps the doctor prepare for your appointment
+                </p>
+                <p className="text-xs" style={{ color: "var(--color-text-light)" }}>
+                  {notes.length}/500
+                </p>
+              </div>
+            </SectionCard>
 
             {/* Payment Method */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+            <SectionCard
+              title="Payment Method"
+              icon={<CreditCard className="w-4 h-4" />}
+            >
               <select
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
-                className="w-full p-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                className="w-full p-3 rounded-lg border text-sm outline-none transition-colors"
+                style={{
+                  backgroundColor: "var(--color-bg)",
+                  borderColor: paymentMethod
+                    ? "var(--color-primary)"
+                    : "var(--color-border)",
+                  color: paymentMethod
+                    ? "var(--color-text)"
+                    : "var(--color-text-light)",
+                }}
               >
                 <option value="">Select Payment Method</option>
-                <option value="Cash">Cash</option>
-                <option value="CreditCard">CreditCard</option>
-                <option value="VodafoneCash">VodafoneCash</option>
-                <option value="BankTransfer">BankTransfer</option>
+                <option value="Cash">Cash at Clinic</option>
+                <option value="CreditCard">Credit Card</option>
+                <option value="VodafoneCash">Vodafone Cash</option>
+                <option value="BankTransfer">Bank Transfer</option>
                 <option value="Insurance">Insurance</option>
-                <option value="OnlinePayment">OnlinePayment</option>
+                <option value="OnlinePayment">Online Payment</option>
               </select>
-            </div>
+            </SectionCard>
           </div>
 
-          {/* Sidebar - Doctor & Clinic Info */}
+          {/* ── Right: Doctor summary + confirm ── */}
           <DoctorDetails
             doctorDetails={doctorDetails}
             loadingDoctorDetails={loadingDoctorDetails}
@@ -333,10 +525,8 @@ export default function AppointmentBookingPage() {
             loadingBookAppointment={loadingBookAppointment}
             errorBookAppointment={errorBookAppointment}
           />
-
         </div>
       </div>
     </DashboardLayout>
   );
 }
-

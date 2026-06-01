@@ -7,15 +7,18 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export type AppointmentStatus = 'upcoming' | 'completed' | 'cancelled';
 
+
 export interface Appointment {
     id: number;
+    doctorId: number;
     doctorName: string;
+    doctorImage: string;
     specialty: string;
-    type: string;
+    type: AppointmentStatus;
     date: string;
     time: string;
     status: AppointmentStatus;
-    mode: string;
+    mode: any;
 }
 
 export interface AppointmentsData {

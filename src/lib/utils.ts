@@ -57,3 +57,33 @@ export function getTimeAgo(dateString: string): string {
 
   return "just now";
 }
+
+
+export function parseDate(iso: string) {
+  if (!iso) {
+    return {
+      fullLabel: "—",
+    };
+  }
+
+  const d = new Date(`${iso}T00:00:00`);
+
+  return {
+    fullLabel: d.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }),
+  };
+}
+
+export function formatTime(time: string) {
+  if (!time) return "—";
+
+  const [hours, minutes] = time.split(":").map(Number);
+
+  const period = hours < 12 ? "AM" : "PM";
+  const formattedHours = hours % 12 || 12;
+
+  return `${formattedHours}:${String(minutes).padStart(2, "0")} ${period}`;
+}
