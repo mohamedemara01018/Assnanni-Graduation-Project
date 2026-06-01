@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
 
 interface PaginationProps {
     pageNumber: number;
@@ -20,84 +20,116 @@ export default function Pagination({
     const totalPages = Math.ceil(totalItems / pageSize);
 
     const handlePrevious = () => {
-        if (pageNumber > 1) {
-            onPageChange(pageNumber - 1);
-        }
+        if (pageNumber > 1) onPageChange(pageNumber - 1);
     };
 
     const handleNext = () => {
-        if (pageNumber < totalPages) {
-            onPageChange(pageNumber + 1);
-        }
+        if (pageNumber < totalPages) onPageChange(pageNumber + 1);
     };
 
-    const generatePages = () => {
-        const pages: number[] = [];
-
-        for (let i = 1; i <= totalPages; i++) {
-            pages.push(i);
+    // Smart page generation with ellipsis
+    const generatePages = (): (number | "...")[] => {
+        if (totalPages <= 7) {
+            return Array.from({ length: totalPages }, (_, i) => i + 1);
         }
 
+        const pages: (number | "...")[] = [1];
+
+        if (pageNumber > 3) pages.push("...");
+
+        const start = Math.max(2, pageNumber - 1);
+        const end = Math.min(totalPages - 1, pageNumber + 1);
+
+        for (let i = start; i <= end; i++) pages.push(i);
+
+        if (pageNumber < totalPages - 2) pages.push("...");
+
+        pages.push(totalPages);
         return pages;
     };
 
-    if (totalPages <= 1) return null;
+    const startItem = (pageNumber - 1) * pageSize + 1;
+    const endItem = Math.min(pageNumber * pageSize, totalItems);
+
+    // if (totalPages <= 1) return null;
 
     return (
-        <div className="mt-6 flex flex-wrap justify-between items-center bg-(--color-surface) p-4 rounded-xl border border-(--color-border) shadow-sm gap-4">
-            {/* Page Size */}
-            {onPageSizeChange && (
-                <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Rows per page:
-                    </span>
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-(--color-border) bg-(--color-surface) px-5 py-3.5"
+            style={{ boxShadow: "var(--shadow)" }}
+        >
+            {/* Left: item range info */}
+            <div className="flex items-center gap-4">
+                <p className="text-xs text-(--color-text-light) tabular-nums">
+                    <span className="font-medium text-(--color-text)">{startItem}–{endItem}</span>
+                    {" "}of{" "}
+                    <span className="font-medium text-(--color-text)">{totalItems}</span>
+                    {" "}results
+                </p>
 
-                    <select
-                        value={pageSize}
-                        onChange={(e) =>
-                            onPageSizeChange(Number(e.target.value))
-                        }
-                        className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm"
-                    >
-                        {pageSizeOptions.map((size) => (
-                            <option key={size} value={size}>
-                                {size}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            )}
+                {onPageSizeChange && (
+                    <>
+                        <span className="w-px h-4 bg-(--color-border)" />
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs text-(--color-text-light)">Per page</span>
+                            <select
+                                value={pageSize}
+                                onChange={(e) => onPageSizeChange(Number(e.target.value))}
+                                className="rounded-lg border border-(--color-border) bg-(--color-bg) text-(--color-text) text-xs px-2.5 py-1.5 outline-none focus:border-(--color-primary) transition-colors cursor-pointer"
+                            >
+                                {pageSizeOptions.map((size) => (
+                                    <option key={size} value={size}>{size}</option>
+                                ))}
+                            </select>
+                        </div>
+                    </>
+                )}
+            </div>
 
-            {/* Pagination */}
-            <div className="flex items-center gap-2">
+            {/* Right: page controls */}
+            <div className="flex items-center gap-1">
+                {/* Prev */}
                 <button
                     onClick={handlePrevious}
                     disabled={pageNumber === 1}
-                    className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                    aria-label="Previous page"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-(--color-border) bg-(--color-surface) text-(--color-text-light) transition-all duration-150 hover:border-(--color-primary) hover:text-(--color-primary) hover:bg-(--color-bg-blue) disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-(--color-border) disabled:hover:text-(--color-text-light) disabled:hover:bg-(--color-surface) cursor-pointer"
                 >
-                    <ChevronLeft className="w-4 h-4" />
+                    <ChevronLeft className="w-3.5 h-3.5" />
                 </button>
 
-                {generatePages().map((page) => (
-                    <button
-                        key={page}
-                        onClick={() => onPageChange(page)}
-                        className={`min-w-[40px] h-[40px] rounded-lg border transition
-                            ${page === pageNumber
-                                ? "bg-blue-600 text-white border-blue-600"
-                                : "border-gray-300 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-800"
-                            }`}
-                    >
-                        {page}
-                    </button>
-                ))}
+                {/* Page numbers */}
+                <div className="flex items-center gap-1 mx-1">
+                    {generatePages().map((page, idx) =>
+                        page === "..." ? (
+                            <span
+                                key={`ellipsis-${idx}`}
+                                className="flex h-8 w-8 items-center justify-center text-xs text-(--color-text-light)"
+                            >
+                                <MoreHorizontal className="w-3.5 h-3.5" />
+                            </span>
+                        ) : (
+                            <button
+                                key={page}
+                                onClick={() => onPageChange(page)}
+                                className={`flex h-8 w-8 items-center justify-center rounded-lg border text-xs font-medium transition-all duration-150 cursor-pointer ${page === pageNumber
+                                    ? "bg-(--color-primary) text-white border-(--color-primary) shadow-sm"
+                                    : "border-(--color-border) bg-(--color-surface) text-(--color-text-light) hover:border-(--color-primary) hover:text-(--color-primary) hover:bg-(--color-bg-blue)"
+                                    }`}
+                            >
+                                {page}
+                            </button>
+                        )
+                    )}
+                </div>
 
+                {/* Next */}
                 <button
                     onClick={handleNext}
                     disabled={pageNumber === totalPages}
-                    className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                    aria-label="Next page"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-(--color-border) bg-(--color-surface) text-(--color-text-light) transition-all duration-150 hover:border-(--color-primary) hover:text-(--color-primary) hover:bg-(--color-bg-blue) disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-(--color-border) disabled:hover:text-(--color-text-light) disabled:hover:bg-(--color-surface) cursor-pointer"
                 >
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight className="w-3.5 h-3.5" />
                 </button>
             </div>
         </div>

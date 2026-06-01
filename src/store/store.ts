@@ -18,6 +18,7 @@ import appointmentDetailsReducer from './slices/patient-slice/appintment-details
 import doctorBookingDetailsReducer from './slices/patient-slice/doctor-booking-details-slice/doctorBookingDetailsSlice'
 import bookAppointmentReducer from './slices/patient-slice/book-appointment-slice/bookAppointmentSlice'
 import rescheduleAppointmentReducer from './slices/patient-slice/reschedule-appointment-slice/rescheduleAppointmentSlice'
+import cancelAppointmentReducer from './slices/patient-slice/cancel-appointment-slice/cancelAppointmentSlice'
 
 export const store = configureStore({
   reducer: {
@@ -44,7 +45,8 @@ export const store = configureStore({
     appointmentDetailsSlice: appointmentDetailsReducer,
     doctorBookingDetailsSlice: doctorBookingDetailsReducer,
     bookAppointmentSlice: bookAppointmentReducer,
-    rescheduleAppointmentSlice: rescheduleAppointmentReducer
+    rescheduleAppointmentSlice: rescheduleAppointmentReducer,
+    cancelAppointmentSlice: cancelAppointmentReducer
   },
 });
 

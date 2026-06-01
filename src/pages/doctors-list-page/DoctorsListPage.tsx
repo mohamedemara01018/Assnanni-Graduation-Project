@@ -18,14 +18,25 @@ import Pagination from "@/components/pagination/Pagination";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import { allDoctorsState, fetchAllDoctors } from "@/store/slices/patient-slice/all-doctors.slice/allDoctorsSlice";
-import { User } from "lucide-react";
+import { SlidersHorizontal, User, X, Stethoscope, CalendarCheck } from "lucide-react";
+
+// ── Quick filter tabs ──────────────────────────────────────────────────────────
+
+const QUICK_FILTERS = [
+  { label: "Top Rated", value: "rating" },
+  { label: "Available Now", value: "available" },
+  { label: "Most Experienced", value: "experience" },
+];
+
+// ── Page shell ────────────────────────────────────────────────────────────────
+
 function DoctorsListPage() {
   const role = useSelector(
     (state: { auth: { role: string } }) => state.auth.role
   );
 
-  return role == "patient" ? (
-    <DashboardLayout pageTitle="Patient ">
+  return role === "patient" ? (
+    <DashboardLayout pageTitle="Patient">
       <DoctorList />
     </DashboardLayout>
   ) : (
@@ -39,185 +50,334 @@ function DoctorsListPage() {
 
 export default DoctorsListPage;
 
-function DoctorList() {
+// ── Doctor list ───────────────────────────────────────────────────────────────
 
-  const [governorate, setGovernorate] = useState('');
-  const [region, setRegion] = useState('');
-  const [filters, setFilters] = useState({ experience: '', rating: '', availability: '', gender: '', sort: '' })
+function DoctorList() {
+  const [governorate, setGovernorate] = useState("");
+  const [region, setRegion] = useState("");
+  const [activeQuick, setActiveQuick] = useState("");
+  const [filters, setFilters] = useState({
+    experience: "", rating: "", availability: "", gender: "", sort: "",
+  });
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const dispatch: AppDispatch = useDispatch();
   const { data, loading, error } = useSelector(allDoctorsState);
 
   useEffect(() => {
-    dispatch(fetchAllDoctors({ SpecializationId: 1, Experience: filters.experience, RatingFilter: filters.rating, Availability: filters.availability, Gender: filters.gender, SortBy: filters.sort, Page: pageNumber, PageSize: pageSize }))
-  }, [dispatch, filters.availability, filters.experience, filters.gender, filters.rating, filters.sort, pageNumber, pageSize])
-  console.log(data)
+    dispatch(fetchAllDoctors({
+      SpecializationId: 1,
+      Experience: filters.experience,
+      RatingFilter: filters.rating,
+      Availability: filters.availability,
+      Gender: filters.gender,
+      SortBy: filters.sort,
+      Page: pageNumber,
+      PageSize: pageSize,
+    }));
+  }, [dispatch, filters.availability, filters.experience, filters.gender, filters.rating, filters.sort, pageNumber, pageSize]);
+
   const clearFilters = () => {
-    setGovernorate('');
-    setRegion('');
-    setFilters({ experience: '', rating: '', availability: '', gender: '', sort: '' })
-  }
+    setGovernorate("");
+    setRegion("");
+    setActiveQuick("");
+    setFilters({ experience: "", rating: "", availability: "", gender: "", sort: "" });
+  };
+
+  const hasActiveFilters =
+    governorate || region || filters.experience || filters.rating ||
+    filters.availability || filters.gender || filters.sort;
 
   return (
-    <div className="flex flex-col items-center gap-9">
-      <SearchInput
-        style="w-[80%] max-sm:w-full bg-(--color-surface)"
-        placeholder="Search by doctor name, specialization, or location"
-        padding="p-4"
-      />
-      <div className="flex items-center justify-center flex-wrap gap-4">
-        <button className="px-6 py-2 border border-(--color-border) bg-(--color-surface) hover:bg-(--color-bg-blue) hover:border-(--color-primary) rounded-full shadow-sm cursor-pointer">
-          Top Rated
-        </button>
-        <button className="px-6 py-2 border border-(--color-border) bg-(--color-surface) hover:bg-(--color-bg-blue) hover:border-(--color-primary) rounded-full shadow-sm cursor-pointer">
-          Available Now
-        </button>
-        <button className="px-6 py-2 border border-(--color-border) bg-(--color-surface) hover:bg-(--color-bg-blue) hover:border-(--color-primary) rounded-full shadow-sm cursor-pointer">
-          Most Experienced
-        </button>
-      </div>
-      <div className="relative flex w-full space-x-6">
-        <div className="sticky self-start top-1 p-4 bg-(--color-surface) border border-(--color-border) rounded-lg shadow-sm w-[300px] max-sm:hidden">
-          <div className="space-y-6">
-            <h1 className="text-2xl">Filters</h1>
-            <div className="space-y-4">
+    <div className="flex flex-col gap-6">
 
-              <div className='flex flex-col gap-2 items-start '>
-                <label htmlFor={'governorate'}>{'Governorate'}</label>
-                <select name={'governorate'} id={'governorate'} onChange={(e) => setGovernorate(e.target.value)} className='w-full p-2 border-2 border-(--color-border) rounded-lg'>
-                  {
-                    governorates && governorates.map((governorate, idx) => {
-                      return (
-                        <option key={idx} value={governorate.value}>{governorate.label}</option>
-                      )
-                    })
-                  }
-                </select>
-              </div>
+      {/* ── Search ──────────────────────────────────────────────────────────── */}
+      <div className="flex flex-col items-center gap-4">
+        <SearchInput
+          style="w-full max-w-2xl bg-(--color-surface)"
+          placeholder="Search by doctor name, specialization, or location"
+          padding="p-3.5"
+        />
 
-              <div className='flex flex-col gap-2 items-start '>
-                <label htmlFor={'region'}>{'Region'}</label>
-                <select disabled={governorate == ''} name={'region'} id={'region'} onChange={(e) => setRegion(e.target.value)} className='w-full p-2 border-2 border-(--color-border) rounded-lg'>
-                  {
-                    governorate && regions && regions[governorate].map((region, idx) => {
-                      return (
-                        <option key={idx} value={region.value}>{region.label}</option>
-                      )
-                    })
-                  }
-                </select>
-              </div>
-
-              {selectInputData &&
-                selectInputData.map((item) => {
-                  return (
-                    <>
-                      <SelectInput
-                        id={item.id}
-                        label={item.label}
-                        options={item.options}
-                        setFilter={setFilters}
-                      />
-                    </>
-                  );
-                })}
-            </div>
-
-            <button onClick={clearFilters} className="border border-(--color-border) w-full p-2 rounded-lg hover:bg-(--color-bg) duration-150 cursor-pointer">
-              Clear All Filter
+        {/* Quick filter pills */}
+        <div className="flex items-center gap-2 flex-wrap justify-center">
+          {QUICK_FILTERS.map((f) => (
+            <button
+              key={f.value}
+              onClick={() => setActiveQuick(activeQuick === f.value ? "" : f.value)}
+              className={`px-4 py-1.5 rounded-full text-sm border transition-all duration-150 cursor-pointer font-medium ${activeQuick === f.value
+                ? "bg-(--color-primary) text-white border-(--color-primary) shadow-sm"
+                : "border-(--color-border) bg-(--color-surface) text-(--color-text-light) hover:border-(--color-primary) hover:text-(--color-primary) hover:bg-(--color-bg-blue)"
+                }`}
+            >
+              {f.label}
             </button>
-          </div>
+          ))}
+
+          {/* Mobile filter toggle */}
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm border border-(--color-border) bg-(--color-surface) text-(--color-text-light) hover:border-(--color-primary) hover:text-(--color-primary) hover:bg-(--color-bg-blue) transition-all duration-150 cursor-pointer sm:hidden"
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5" />
+            Filters
+            {hasActiveFilters && (
+              <span className="w-1.5 h-1.5 rounded-full bg-(--color-primary) ml-0.5" />
+            )}
+          </button>
         </div>
-        <div className="w-full">
-          <div className="flex flex-col items-start w-full gap-4 ">
-            <h1 className="text-2xl">{data.totalCount} Doctors Founded</h1>
-            <div className={`grid md:grid-cols-1 xl:${data.totalCount == 0 || loading ? 'grid-cols-1' : 'grid-cols-3 '} gap-4 w-full justify-items-center `}>
-              {data.totalCount == 0 ? <NotFound subMessage={'There are no Doctors Found'} /> : loading ? (
-                <div className="w-full  flex items-center justify-center">
-                  <ScaleLoader color="#6d61ff" />{" "}
-                </div>
-              ) : error ? (
-                <Error message={error} />
-              ) : data.items.map((doctor) => {
-                return (
-                  <div className="bg-(--color-surface) p-4 border border-(--color-border) shadow-sm rounded-lg flex items-center justify-center grow">
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-4">
-                        {doctor.imageUrl ? (
-                          <img
-                            src={doctor.imageUrl}
-                            alt={doctor.name}
-                            className="w-20 h-20 rounded-full object-cover border-2 border-blue-100 dark:border-blue-900 mb-2"
-                          />
-                        ) : (
-                          <div className="w-20 h-20 rounded-full bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-100 dark:border-blue-900 flex items-center justify-center mb-2">
-                            <User className="w-8 h-8 text-blue-400" />
-                          </div>
-                        )}
-                        <div className="space-y-2">
-                          <h2 className="text-lg">{doctor.name.trim().length > 0 ? `Dr.${doctor.name}` : 'unkown'}</h2>
-                          <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-1">
-                              <FaStar className="text-amber-400" />
-                              <span className="text-(--color-text-light) text-sm">
-                                {doctor.rating}
-                              </span>
-                            </div>
-                            <span className="bg-(--color-bg-blue) px-2 text-sm rounded-sm border border-(--color-primary) text-(--color-primary)">
-                              {doctor.yearsOfExperience} years
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div>
-                        {doctor.city && <div className="flex items-center gap-1">
-                          <IoLocationOutline />
-                          <span className="text-sm text-(--color-text-light)">
-                            {doctor.city}
-                          </span>
-                        </div>}
-                        {doctor.status && <div className="flex gap-1 items-center ml-1">
-                          <span className={`p-1 w-1 rounded-full ${doctor.status == 'Offline' ? 'bg-red-500' : 'bg-green-500'} block`}></span>
-                          <span className="text-sm text-(--color-text-light)">
-                            {doctor.status}
-                          </span>
-                        </div>}
-                      </div>
-                      <div className="flex flex-col items-center  gap-2">
-                        <Link
-                          to={`/doctors-list/${doctor.doctorId}`}
-                          className="w-full p-2 text-center border border-(--color-primary) rounded-lg text-(--color-primary) cursor-pointer hover:bg-(--color-bg-blue) duration-150"
-                        >
-                          View Profile
-                        </Link>
-                        <Link
-                          to={`/appointments/booking/${doctor.doctorId}`}
-                          className=" flex items-center justify-center gap-1 w-full p-2 border border-(--color-primary) rounded-lg bg-(--color-primary) text-white cursor-pointer hover:bg-(--color-primary-dark) duration-150 "
-                        >
-                          <CiBookmark className="text-xl text-white" />
-                          <span>Book</span>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+      </div>
+
+      {/* ── Body ────────────────────────────────────────────────────────────── */}
+      <div className="flex gap-5 w-full relative">
+
+        {/* ── Sidebar (desktop) ──────────────────────────────────────────────── */}
+        <aside className="sticky self-start top-4 w-[260px] shrink-0 max-sm:hidden rounded-2xl border border-(--color-border) bg-(--color-surface) overflow-hidden"
+          style={{ boxShadow: "var(--shadow)" }}
+        >
+          <div className="flex items-center justify-between px-4 py-3.5 border-b border-(--color-border)">
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal className="w-4 h-4 text-(--color-text-light)" />
+              <h2 className="text-sm font-semibold text-(--color-text)">Filters</h2>
             </div>
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="text-xs text-(--color-primary) hover:text-(--color-primary-light) font-medium transition-colors cursor-pointer"
+              >
+                Clear all
+              </button>
+            )}
           </div>
-          {!error && !loading && data.items.length > 0 && < Pagination
-            pageNumber={pageNumber}
-            pageSize={pageSize}
-            totalItems={data.totalCount}
-            onPageChange={(page) => setPageNumber(page)}
-            onPageSizeChange={(size) => {
-              setPageSize(size);
-              setPageNumber(1);
-            }} />}
+
+          <div className="p-4 space-y-5">
+            <FilterSelect
+              id="governorate" label="Governorate"
+              value={governorate}
+              onChange={(v) => { setGovernorate(v); setRegion(""); }}
+              options={governorates}
+            />
+
+            <FilterSelect
+              id="region" label="Region"
+              value={region}
+              onChange={setRegion}
+              disabled={!governorate}
+              options={governorate && regions[governorate] ? regions[governorate] : []}
+            />
+
+            {selectInputData && selectInputData.map((item) => (
+              <SelectInput
+                key={item.id}
+                id={item.id}
+                label={item.label}
+                options={item.options}
+                setFilter={setFilters}
+              />
+            ))}
+          </div>
+        </aside>
+
+        {/* ── Mobile sidebar overlay ─────────────────────────────────────────── */}
+        {sidebarOpen && (
+          <div className="fixed inset-0 z-50 sm:hidden">
+            <div
+              className="absolute inset-0 bg-black/50"
+              onClick={() => setSidebarOpen(false)}
+            />
+            <aside className="absolute right-0 top-0 h-full w-72 bg-(--color-surface) overflow-y-auto shadow-xl">
+              <div className="flex items-center justify-between px-4 py-4 border-b border-(--color-border)">
+                <h2 className="text-sm font-semibold text-(--color-text)">Filters</h2>
+                <button onClick={() => setSidebarOpen(false)} className="cursor-pointer text-(--color-text-light)">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="p-4 space-y-5">
+                <FilterSelect id="governorate" label="Governorate" value={governorate} onChange={(v) => { setGovernorate(v); setRegion(""); }} options={governorates} />
+                <FilterSelect id="region" label="Region" value={region} onChange={setRegion} disabled={!governorate} options={governorate && regions[governorate] ? regions[governorate] : []} />
+                {selectInputData && selectInputData.map((item) => (
+                  <SelectInput key={item.id} id={item.id} label={item.label} options={item.options} setFilter={setFilters} />
+                ))}
+                {hasActiveFilters && (
+                  <button onClick={() => { clearFilters(); setSidebarOpen(false); }} className="w-full py-2 rounded-lg border border-(--color-border) text-sm text-(--color-text-light) hover:bg-(--color-bg) transition-colors cursor-pointer">
+                    Clear all filters
+                  </button>
+                )}
+              </div>
+            </aside>
+          </div>
+        )}
+
+        {/* ── Doctor grid ────────────────────────────────────────────────────── */}
+        <div className="flex-1 min-w-0 space-y-4">
+
+          {/* Result count */}
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-(--color-text-light)">
+              <span className="font-semibold text-(--color-text) text-base">{data.totalCount}</span>
+              {" "}doctor{data.totalCount !== 1 ? "s" : ""} found
+            </p>
+          </div>
+
+          {/* Grid */}
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <ScaleLoader color="var(--color-primary)" />
+            </div>
+          ) : error ? (
+            <Error message={error} />
+          ) : data.totalCount === 0 ? (
+            <NotFound subMessage="No doctors found matching your criteria" />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {data.items.map((doctor) => (
+                <DoctorCard key={doctor.doctorId} doctor={doctor} />
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {!error && !loading && data.items.length > 0 && (
+            <Pagination
+              pageNumber={pageNumber}
+              pageSize={pageSize}
+              totalItems={data.totalCount}
+              onPageChange={(page) => setPageNumber(page)}
+              onPageSizeChange={(size) => { setPageSize(size); setPageNumber(1); }}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Doctor card ───────────────────────────────────────────────────────────────
+
+function DoctorCard({ doctor }: { doctor: any }) {
+  const isOnline = doctor.status?.toLowerCase() === "online";
+
+  return (
+    <div
+      className="group flex flex-col rounded-2xl border border-(--color-border) bg-(--color-surface) overflow-hidden transition-all duration-200 hover:shadow-md hover:border-(--color-primary)/30"
+      style={{ boxShadow: "var(--shadow)" }}
+    >
+      {/* Card top */}
+      <div className="p-4 flex items-start gap-3.5">
+        {/* Avatar */}
+        <div className="relative shrink-0">
+          {doctor.imageUrl ? (
+            <img
+              src={doctor.imageUrl}
+              alt={doctor.name}
+              className="w-16 h-16 rounded-xl object-cover ring-2 ring-(--color-border)"
+            />
+          ) : (
+            <div className="w-16 h-16 rounded-xl bg-(--color-bg-blue) border border-(--color-primary)/20 flex items-center justify-center">
+              <User className="w-7 h-7 text-(--color-primary)" />
+            </div>
+          )}
+          {/* Online dot */}
+          <span
+            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-(--color-surface) ${isOnline ? "bg-emerald-500" : "bg-red-400"}`}
+          />
         </div>
 
+        {/* Info */}
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <h2 className="text-sm font-semibold text-(--color-text) truncate">
+            {doctor.name?.trim().length > 0 ? `Dr. ${doctor.name}` : "Unknown"}
+          </h2>
+
+          {doctor.specialty && (
+            <p className="text-xs text-(--color-text-light) flex items-center gap-1">
+              <Stethoscope className="w-3 h-3 shrink-0" />
+              {doctor.specialty}
+            </p>
+          )}
+
+          <div className="flex items-center gap-2 flex-wrap">
+            {/* Rating */}
+            <span className="inline-flex items-center gap-1 text-xs text-(--color-text-light)">
+              <FaStar className="text-amber-400 w-3 h-3" />
+              <span>{doctor.rating ?? 0}</span>
+            </span>
+
+            {/* Experience */}
+            <span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-md bg-(--color-bg-blue) text-(--color-primary) border border-(--color-primary)/20">
+              {doctor.yearsOfExperience} yrs
+            </span>
+
+            {/* Status */}
+            <span className={`inline-flex items-center gap-1 text-xs ${isOnline ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-500" : "bg-red-400"}`} />
+              {doctor.status ?? "Offline"}
+            </span>
+          </div>
+
+          {doctor.city && (
+            <p className="text-xs text-(--color-text-light) flex items-center gap-1">
+              <IoLocationOutline className="w-3 h-3 shrink-0" />
+              {doctor.city}
+            </p>
+          )}
+        </div>
       </div>
+
+      {/* Divider */}
+      <div className="h-px bg-(--color-border)" />
+
+      {/* Actions */}
+      <div className="flex gap-2 p-3">
+        <Link
+          to={`/doctors-list/${doctor.doctorId}`}
+          className="flex-1 py-2 text-center text-xs font-medium rounded-xl border border-(--color-border) text-(--color-text-light) hover:border-(--color-primary) hover:text-(--color-primary) hover:bg-(--color-bg-blue) transition-all duration-150"
+        >
+          View Profile
+        </Link>
+        <Link
+          to={`/appointments/booking/${doctor.doctorId}`}
+          className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded-xl bg-(--color-primary) text-white hover:bg-(--color-primary-dark) transition-all duration-150"
+        >
+          <CalendarCheck className="w-3.5 h-3.5" />
+          Book
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+// ── Reusable filter select ────────────────────────────────────────────────────
+
+function FilterSelect({
+  id, label, value, onChange, options, disabled = false,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  disabled?: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <label htmlFor={id} className="text-xs font-medium text-(--color-text-light) uppercase tracking-wide">
+        {label}
+      </label>
+      <select
+        id={id}
+        name={id}
+        value={value}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-lg border border-(--color-border) bg-(--color-bg) text-(--color-text) text-sm px-3 py-2 outline-none focus:border-(--color-primary) transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+      >
+        {options.map((opt, idx) => (
+          <option key={idx} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
     </div>
   );
 }
