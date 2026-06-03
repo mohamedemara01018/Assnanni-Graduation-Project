@@ -279,9 +279,9 @@ function DoctorList() {
 // ── Doctor card ───────────────────────────────────────────────────────────────
 
 function DoctorCard({ doctor }: { doctor: any }) {
+
   const isOnline = doctor.status?.toLowerCase() === "available";
-  const role = useSelector((state: RootState) => state.auth.role);
-  console.log(role)
+  const role = useSelector((state: RootState) => state.auth?.role);
   const navigate = useNavigate();
 
   const handleClick = (id: string) => {
@@ -320,7 +320,7 @@ function DoctorCard({ doctor }: { doctor: any }) {
           )}
           {/* Online dot */}
           <span
-            className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-(--color-surface) ${isOnline ? "bg-emerald-500" : "bg-red-400"}`}
+            className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full border-2 border-(--color-surface) ${isOnline ? "bg-emerald-500" : "bg-red-400"}`}
           />
         </div>
 

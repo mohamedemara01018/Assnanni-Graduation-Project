@@ -4,6 +4,8 @@ import Cookies from "js-cookie";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
+// ─── Interfaces ───────────────────────────────────────────────────────────────
+
 export interface DashboardStats {
     upcomingAppointments: number;
     prescriptions: number;
@@ -13,26 +15,29 @@ export interface DashboardStats {
 
 export interface UpcomingAppointment {
     id: number;
+    doctorId: number;           // ← was missing
     doctorName: string;
+    doctorImage: string | null; // ← was missing
     startTime: string;
     specialization: string;
     date: string;
     status: string;
 }
 
-export interface Doctor {
+export interface AvailableDoctor {
     id: number;
     name: string;
     specialization: string | null;
     rating: number;
     experienceYears: number;
     imageUrl: string | null;
-    status: "Available" | "Busy";
+    status: string | null;      // ← was "Available" | "Busy", API returns null
 }
 
-// export interface RecentActivity {
-//     // أضف الحقول عندما تعرف شكل الـ API
-// }
+export interface RecentActivity {  // ← was commented out / any[]
+    title: string;
+    createdAt: string;
+}
 
 export interface HealthReminder {
     message: string;
@@ -42,8 +47,8 @@ export interface HealthReminder {
 export interface DashboardData {
     stats: DashboardStats;
     upcomingAppointments: UpcomingAppointment[];
-    availableDoctors: Doctor[];
-    recentActivities: any[];
+    availableDoctors: AvailableDoctor[];
+    recentActivities: RecentActivity[];
     healthReminder: HealthReminder;
     healthTip: string;
 }
@@ -54,6 +59,7 @@ export interface DashboardState {
     error: string | null;
 }
 
+// ─── Initial state ────────────────────────────────────────────────────────────
 
 const initialState: DashboardState = {
     data: {
@@ -76,20 +82,23 @@ const initialState: DashboardState = {
     error: null,
 };
 
-export const fetchPatientDashboard = createAsyncThunk(
-    'patientDashboard/fetchPatientDashboard',
+// ─── Thunk ────────────────────────────────────────────────────────────────────
+
+export const fetchPatientDashboard = createAsyncThunk<
+    DashboardData,
+    void,
+    { rejectValue: string }
+>(
+    "patientDashboard/fetchPatientDashboard",
     async (_, { rejectWithValue }) => {
         const cookieToken = Cookies.get("jwtToken");
 
         try {
-            const response = await fetch(
-                `${backendUrl}Patient/dashboard`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${cookieToken}`,
-                    },
-                }
-            );
+            const response = await fetch(`${backendUrl}Patient/dashboard`, {
+                headers: {
+                    Authorization: `Bearer ${cookieToken}`,
+                },
+            });
 
             const json = await response.json();
 
@@ -99,23 +108,24 @@ export const fetchPatientDashboard = createAsyncThunk(
                 );
             }
 
-            return json; // This payload matches the structure of initialState.data
+            return json?.data;
         } catch (err: any) {
             return rejectWithValue(err.message || "Something went wrong");
         }
     }
 );
 
+// ─── Slice ────────────────────────────────────────────────────────────────────
+
 export const patientDashboardSlice = createSlice({
-    name: 'patientDashboard',
+    name: "patientDashboard",
     initialState,
     reducers: {
-        // You can add synchronous reducers here if needed (e.g., clearDashboardState)
         clearDashboardState: (state) => {
             state.data = initialState.data;
             state.loading = false;
             state.error = null;
-        }
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -125,18 +135,17 @@ export const patientDashboardSlice = createSlice({
             })
             .addCase(fetchPatientDashboard.fulfilled, (state, action) => {
                 state.loading = false;
-                state.data = action.payload?.data;
+                state.data = action.payload;
             })
             .addCase(fetchPatientDashboard.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload as string;
+                state.error = action.payload ?? "Something went wrong";
             });
-    }
+    },
 });
 
 export const { clearDashboardState } = patientDashboardSlice.actions;
 
-// state
-export const patientDashboardState = (state: RootState) => state.patientDashboardSlice
+export const patientDashboardState = (state: RootState) => state.patientDashboardSlice;
 
 export default patientDashboardSlice.reducer;
