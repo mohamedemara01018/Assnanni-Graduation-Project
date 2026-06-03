@@ -58,6 +58,8 @@ import PatientProfilePage from "../pages/patient-profile-page/PatientProfilePage
 import EditPatientProfilePage from "../pages/edit-patient-profile-page/EditPatientProfilePage";
 import ProfilePage from "../pages/profile-page/ProfilePage";
 import PrescriptionsPage from "@/pages/prescriptions-page/PrescriptionsPage";
+import MyFeedbackPage from "@/pages/my-feedbacks-page/MyFeedbacks";
+import MyDoctorsPage from "@/pages/my-doctors-page/MyDoctorsPage";
 
 // ProtectedRoute component for role-based access control
 export const ProtectedRoute = ({
@@ -109,6 +111,10 @@ export const routeElements = {
   "verify-doctors": <VerifyDoctorsPage />,
   analytics: <AnalyticsPage />,
   "ai-models": <AIModelsPage />,
+  "medical-history": <MedicalHistory />,
+  'my-feedbacks': <MyFeedbackPage />,
+  'my-doctors': <MyDoctorsPage />,
+
 
   // Doctor routes
   "/doctor": <DoctorDashboard />,
@@ -168,5 +174,4 @@ export const routeElements = {
   "/patient-profile/:id": <PatientProfilePage />,
   "/patient-profile/edit/:id": <EditPatientProfilePage />,
   profile: <ProfilePage />,
-  "medical-history": <MedicalHistory />
 };

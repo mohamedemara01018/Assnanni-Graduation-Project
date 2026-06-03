@@ -4,7 +4,7 @@ import logo from '../../assets/logo.png'
 
 function Footer() {
     return (
-        <footer className="bg-(--color-background) py-16 border-t-2 border-t-(--color-border) mt-10  shadow-(--color-shadow) shadow-top-2xl shadow-bottom-2xl">
+        <footer className="bg-(--color-background) py-16 border-t-2 border-t-(--color-border) mt-10 shadow-(--color-shadow) shadow-top-2xl shadow-bottom-2xl">
             <div className="wrapper ">
                 <div className="grid md:grid-cols-4 gap-8 ">
                     <div>

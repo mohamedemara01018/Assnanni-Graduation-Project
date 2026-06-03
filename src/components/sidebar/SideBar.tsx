@@ -6,12 +6,14 @@ import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { Link, NavLink, useNavigate } from "react-router";
 import {
   Brain,
+  BriefcaseMedical,
   Calendar,
   FileText,
   LayoutDashboard,
   Pill,
   Scan,
   Settings,
+  Star,
   Stethoscope,
   Users,
   X,
@@ -136,6 +138,8 @@ const sidebarDataRole = {
     { icon: Stethoscope, label: "Doctors", path: "/doctors-list" },
     { icon: Pill, label: "Prescriptions", path: "/prescriptions" },
     { icon: FileText, label: "Medical History", path: "/medical-history" },
+    { icon: Star, label: "My Feedback", path: "/my-feedbacks" },
+    { icon: BriefcaseMedical, label: "My Doctors", path: "/my-doctors" },
     { icon: Scan, label: "Scans", path: "/scan/upload" },
     { icon: Users, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
