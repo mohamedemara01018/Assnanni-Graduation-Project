@@ -69,7 +69,7 @@ function UserComp() {
                     <User className="w-4 h-4 text-(--color-primary)" />
                 </div>
 
-                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+                <span className="text-sm font-medium text-gray-800 dark:text-gray-200 max-sm:hidden">
                     {fullName}
                 </span>
 
