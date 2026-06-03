@@ -15,8 +15,8 @@ import { NotFound } from "@/components/notfound/NotFound";
 import Pagination from "@/components/pagination/Pagination";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
-import { allDoctorsState, fetchAllDoctors } from "@/store/slices/patient-slice/all-doctors.slice/allDoctorsSlice";
-import { SlidersHorizontal, User, X, Stethoscope, CalendarCheck } from "lucide-react";
+import { allDoctorsState, fetchAllDoctors, type Doctor } from "@/store/slices/patient-slice/all-doctors.slice/allDoctorsSlice";
+import { SlidersHorizontal, User, X, Stethoscope, CalendarCheck, Tag } from "lucide-react";
 import { toast } from "react-toastify";
 
 // ── Quick filter tabs ──────────────────────────────────────────────────────────
@@ -254,7 +254,7 @@ function DoctorList() {
             <NotFound subMessage="No doctors found matching your criteria" />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {data.items.map((doctor) => (
+              {data.items.map((doctor: Doctor) => (
                 <DoctorCard key={doctor.doctorId} doctor={doctor} />
               ))}
             </div>
@@ -276,112 +276,114 @@ function DoctorList() {
   );
 }
 
-// ── Doctor card ───────────────────────────────────────────────────────────────
 
-function DoctorCard({ doctor }: { doctor: any }) {
-
+export function DoctorCard({ doctor }: { doctor: Doctor }) {
   const isOnline = doctor.status?.toLowerCase() === "available";
   const role = useSelector((state: RootState) => state.auth?.role);
   const navigate = useNavigate();
 
-  const handleClick = (id: string) => {
+  const handleBookingClick = (id: number) => {
     if (role === "guest") {
       const redirectPath = `/appointments/booking/${id}`;
-
       sessionStorage.setItem("redirectAfterAuth", redirectPath);
-
       toast.info("Please sign in to continue booking your appointment.");
-
       navigate("/login");
       return;
     }
-
     navigate(`/appointments/booking/${id}`);
   };
+
   return (
-    <div
-      className="group flex flex-col rounded-2xl border border-(--color-border) bg-(--color-surface) overflow-hidden transition-all duration-200 hover:shadow-md hover:border-primary/30 shadow-sm"
-    // style={{ boxShadow: "var(--shadow)" }}
-    >
-      {/* Card top */}
-      <div className="p-4 flex items-start gap-3.5">
-        {/* Avatar */}
+    <div className="group flex flex-col rounded-2xl border border-(--color-border) bg-(--color-surface) overflow-hidden transition-all duration-200 hover:shadow-md hover:border-primary/30 shadow-sm">
+
+      {/* Main Container */}
+      <div className="p-4 flex items-start gap-4">
+
+        {/* Avatar Section */}
         <div className="relative shrink-0">
           {doctor.imageUrl ? (
             <img
               src={doctor.imageUrl}
               alt={doctor.name}
-              className="w-16 h-16 rounded-xl object-cover ring-2 ring-(--color-border)"
+              className="w-16 h-16 rounded-full object-cover ring-2 ring-(--color-border)"
             />
           ) : (
             <div className="w-16 h-16 rounded-full bg-(--color-bg-blue) border border-primary/20 flex items-center justify-center">
               <User className="w-7 h-7 text-(--color-primary)" />
             </div>
           )}
-          {/* Online dot */}
+          {/* Status Dot indicator */}
           <span
-            className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full border-2 border-(--color-surface) ${isOnline ? "bg-emerald-500" : "bg-red-400"}`}
+            className={`absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full border-2 border-(--color-surface) ${isOnline ? "bg-emerald-500" : "bg-red-400"
+              }`}
           />
         </div>
 
-        {/* Info */}
+        {/* Info Layout Column */}
         <div className="min-w-0 flex-1 space-y-1.5">
-          <h2 className="text-sm font-semibold text-(--color-text) truncate">
-            {doctor.name?.trim().length > 0 ? `Dr. ${doctor.name}` : "Unknown"}
-          </h2>
-
-          {doctor.specialty && (
-            <p className="text-xs text-(--color-text-light) flex items-center gap-1">
-              <Stethoscope className="w-3 h-3 shrink-0" />
-              {doctor.specialty}
-            </p>
-          )}
-
-          <div className="flex items-center gap-2 flex-wrap">
-            {/* Rating */}
-            <span className="inline-flex items-center gap-1 text-xs text-(--color-text-light)">
-              <FaStar className="text-amber-400 w-3 h-3" />
-              <span>{doctor.rating ?? 0}</span>
-            </span>
-
-            {/* Experience */}
-            <span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-md bg-(--color-bg-blue) text-(--color-primary) border border-primary/20">
-              {doctor.yearsOfExperience} yrs
-            </span>
-
-            {/* Status */}
-            <span className={`inline-flex items-center gap-1 text-xs ${isOnline ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"}`}>
-              <span className={`w-1.5 h-1.5 rounded-full ${isOnline ? "bg-emerald-500" : "bg-red-400"}`} />
-              {doctor.status ?? "Offline"}
+          <div className="flex items-start justify-between gap-2">
+            <h2 className="text-sm font-semibold text-(--color-text) truncate">
+              {doctor.name?.trim().length > 0 ? `Dr. ${doctor.name}` : "Unknown Doctor"}
+            </h2>
+            {/* Dynamic Price Flag */}
+            <span className="text-xs font-bold text-(--color-primary) bg-(--color-bg-blue) px-2 py-0.5 rounded-md border border-primary/10 shrink-0">
+              ${doctor.price}
             </span>
           </div>
 
-          {doctor.city && (
-            <p className="text-xs text-(--color-text-light) flex items-center gap-1">
-              <IoLocationOutline className="w-3 h-3 shrink-0" />
-              {doctor.city}
+          {/* Specialization Field - Fixed mapping */}
+          {doctor.specialization && (
+            <p className="text-xs font-medium text-(--color-text-light) flex items-center gap-1">
+              <Stethoscope className="w-3.5 h-3.5 text-(--color-primary) shrink-0" />
+              <span className="truncate">{doctor.specialization}</span>
+            </p>
+          )}
+
+          {/* Dynamic Badges Row */}
+          <div className="flex items-center gap-2 flex-wrap pt-0.5">
+            {/* Rating and Reviews Counter combined */}
+            <span className="inline-flex items-center gap-1 text-xs text-(--color-text-light) bg-amber-50 dark:bg-amber-950/20 px-1.5 py-0.5 rounded border border-amber-200/40">
+              <FaStar className="text-amber-400 w-3 h-3" />
+              <span className="font-semibold text-gray-800 dark:text-gray-200">{doctor.rating ?? 0}</span>
+              <span className="text-[10px] text-(--color-text-light)">({doctor.reviewsCount ?? 0})</span>
+            </span>
+
+            {/* Experience */}
+            <span className="inline-flex items-center text-xs font-medium px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-800 text-(--color-text) border border-(--color-border)">
+              {doctor.yearsOfExperience} yrs exp
+            </span>
+          </div>
+
+          {/* Location details (Clinic Name + City metadata mapping) */}
+          {(doctor.clinicName || doctor.city) && (
+            <p className="text-[11px] text-(--color-text-light) flex items-center gap-1 truncate">
+              <IoLocationOutline className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+              <span className="truncate">
+                {doctor.clinicName && `${doctor.clinicName}, `}
+                {doctor.city && <span className="font-medium text-(--color-text)">{doctor.city}</span>}
+              </span>
             </p>
           )}
         </div>
       </div>
 
-      {/* Divider */}
+      {/* Divider line */}
       <div className="h-px bg-(--color-border)" />
 
-      {/* Actions */}
-      <div className="flex gap-2 p-3">
+      {/* Action Footer Controls */}
+      <div className="flex gap-2 p-3 bg-gray-50/50 dark:bg-gray-900/10">
         <Link
           to={`/doctors-list/${doctor.doctorId}`}
-          className="flex-1 py-2 text-center text-xs font-medium rounded-xl border border-(--color-border) text-(--color-text-light) hover:border-(--color-primary) hover:text-(--color-primary) hover:bg-(--color-bg-blue) transition-all duration-150"
+          className="flex-1 py-2 text-center text-xs font-semibold rounded-xl border border-(--color-border) text-(--color-text-light) hover:border-(--color-primary) hover:text-(--color-primary) hover:bg-(--color-bg-blue) transition-all duration-150"
         >
           View Profile
         </Link>
         <button
-          onClick={() => handleClick(doctor.doctorId)}
-          className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded-xl bg-(--color-primary) text-white hover:bg-(--color-primary-dark) transition-all duration-150"
+          onClick={() => handleBookingClick(doctor.doctorId)}
+          className="flex-1 flex items-center justify-center gap-1.5 py-2 px-2 text-xs font-semibold rounded-xl bg-(--color-primary) text-white hover:bg-(--color-primary-dark) transition-all duration-150 shadow-sm cursor-pointer"
         >
           <CalendarCheck className="w-3.5 h-3.5" />
-          Book
+          Book Appointment
         </button>
       </div>
     </div>

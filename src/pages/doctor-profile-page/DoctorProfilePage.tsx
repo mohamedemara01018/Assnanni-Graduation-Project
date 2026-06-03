@@ -5,6 +5,7 @@ import Error from "@/components/error/Error";
 import Footer from "@/components/footer/Footer";
 import Header from "@/components/header/Header";
 import Loading from "@/components/loading/Loading";
+import { formatDateTime, formatTime, parseDate } from "@/lib/utils";
 import {
   doctorProfileState,
   fetchDoctorProfile,
@@ -13,7 +14,7 @@ import {
 } from "@/store/slices/patient-slice/doctor-profile-slice/doctorProfileSlice";
 import type { AppDispatch, RootState } from "@/store/store";
 import { User } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { BsCurrencyDollar } from "react-icons/bs";
 import { CiBookmark } from "react-icons/ci";
 import { FaStar, FaRegStar } from "react-icons/fa";
@@ -79,6 +80,7 @@ function DoctorProfilePage() {
 function View() {
   const { id } = useParams<{ id: string }>();
   const dispatch = useDispatch<AppDispatch>();
+  const [imageError, setImageError] = useState<boolean>(false)
   const { data, loading, error } = useSelector(
     doctorProfileState
   ) as DoctorDetailsState;
@@ -134,60 +136,68 @@ function View() {
   return (
     <div className="space-y-6">
       {/* ── Header Card ── */}
-      <CardComp>
-        <div className="flex items-center gap-6 max-md:flex-col max-md:text-center">
-          {doctorImage ? <img
-            className="w-32 h-32 rounded-full object-cover border-2"
-            style={{ borderColor: "var(--color-border)" }}
-            src={doctorImage}
-            alt={`Dr. ${data.name}`}
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src =
-                "https://via.placeholder.com/150?text=Doctor";
-            }}
-          /> :
-            <div className="w-32 h-32 rounded-full bg-(--color-bg-blue) border border-primary/20 flex items-center justify-center">
-              <User className="w-7 h-7 text-(--color-primary)" />
+      <div className="flex items-center gap-6 p-6 bg-(--color-surface) rounded-2xl border border-(--color-border) shadow-sm max-md:flex-col max-md:text-center">
+        {/* Avatar Section */}
+        <div className="relative shrink-0">
+          {doctorImage && !imageError ? (
+            <img
+              className="w-32 h-32 rounded-full object-cover border-2 border-(--color-border) shadow-inner"
+              src={doctorImage}
+              alt={`Dr. ${data.name || "Doctor"}`}
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="w-32 h-32 rounded-full bg-(--color-bg-blue) border border-primary/20 flex items-center justify-center shadow-inner">
+              <User className="w-12 h-12 text-(--color-primary)" />
             </div>
-          }
+          )}
+        </div>
 
-          <div className="space-y-3 flex-1">
-            <h1 className="text-3xl font-semibold" style={{ color: "var(--color-text)" }}>
+        {/* Information Meta Body Column */}
+        <div className="space-y-3.5 flex-1 min-w-0">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold tracking-tight text-(--color-text)">
               Dr. {data.name || "Unknown Doctor"}
             </h1>
-
-            <p className="text-base" style={{ color: "var(--color-text-light)" }}>
+            <p className="text-base font-medium text-(--color-text-light) capitalize">
               {data.specialty || "Specialty not available"}
             </p>
+          </div>
 
-            <div className="flex items-center gap-5 flex-wrap">
-              {/* Rating */}
-              <div className="flex items-center gap-2">
-                <StarRating rating={data.rating ?? 0} />
-                <span className="text-sm" style={{ color: "var(--color-text-light)" }}>
-                  {(data.rating ?? 0).toFixed(1)} ({data.reviewsCount ?? 0} reviews)
-                </span>
-              </div>
+          {/* Metadata Rows (Ratings, Experience, Price Flags) */}
+          <div className="flex items-center gap-5 flex-wrap pt-1 max-md:justify-center">
 
-              {/* Experience */}
-              <div className="flex items-center gap-1.5">
-                <LuAward style={{ color: "var(--color-primary)" }} />
-                <span className="text-sm" style={{ color: "var(--color-text-light)" }}>
-                  {data.yearsOfExperience ?? 0} yrs experience
+            {/* Rating Row layout */}
+            <div className="flex items-center gap-2 bg-gray-50 dark:bg-gray-800/40 px-3 py-1.5 rounded-xl border border-(--color-border)">
+              <StarRating rating={data.rating ?? 0} />
+              <span className="text-sm font-semibold text-(--color-text)">
+                {(data.rating ?? 0).toFixed(1)}
+                <span className="text-xs font-normal text-(--color-text-light) ml-1">
+                  ({data.reviewsCount ?? 0} reviews)
                 </span>
-              </div>
-
-              {/* Price */}
-              <div className="flex items-center gap-1">
-                <BsCurrencyDollar style={{ color: "var(--color-primary)" }} />
-                <span className="text-sm font-medium" style={{ color: "var(--color-text)" }}>
-                  ${data.consultationPrice ?? 0} / visit
-                </span>
-              </div>
+              </span>
             </div>
+
+            {/* Experience Badge layout - Wrapped string to prevent translation injection */}
+            <div className="flex items-center gap-1.5 text-(--color-text-light)">
+              <LuAward size={18} className="text-(--color-primary) shrink-0" />
+              <span className="text-sm font-medium">
+                <span>{data.yearsOfExperience ?? 0} yrs experience</span>
+              </span>
+            </div>
+
+            {/* Pricing Tag layout */}
+            <div className="flex items-center gap-1 text-(--color-text)">
+              <BsCurrencyDollar size={18} className="text-(--color-primary) shrink-0" />
+              <span className="text-sm font-bold">
+                {data.consultationPrice ?? 0}
+                <span className="text-xs font-normal text-(--color-text-light) ml-0.5"> / visit</span>
+              </span>
+            </div>
+
           </div>
         </div>
-      </CardComp>
+      </div>
 
       {/* ── Body ── */}
       <div className="flex gap-4 max-lg:flex-col">
@@ -226,7 +236,7 @@ function View() {
               Clinic Information
             </h2>
 
-            <div className="space-y-3">
+            <div className="space-y-3 grid grid-cols-2 w-full">
               <InfoRow icon={<IoLocationOutline className="mt-0.5 shrink-0" />} label={data.clinicName || "Clinic"}>
                 {data.clinicLocation || "No location provided"}
               </InfoRow>
@@ -298,41 +308,64 @@ function View() {
               )}
             </h2>
 
-            {data.reviews?.length ? (
-              <div className="space-y-5">
-                {data.reviews.map((review: any, i: number) => {
-                  // Validate each review has at least a comment
+            {data?.reviews?.length ? (
+              <div className="space-y-6">
+                {data.reviews.map((review, i) => {
                   if (!review) return null;
+
+                  // Extract localized clean date and time using your helper function
+                  const { date, time } = formatDateTime(review.createdAt || "");
+
+                  // Extract patient initials safely
+                  const avatarInitials = review.patientName
+                    ? review.patientName.trim().split(" ").slice(0, 2).map((n: any[]) => n[0]).join("").toUpperCase()
+                    : "A";
+
                   return (
                     <div
                       key={review.id ?? i}
-                      className="pb-5 border-b last:border-b-0"
-                      style={{ borderColor: "var(--color-border)" }}
+                      className="flex items-start gap-4 pb-6 border-b border-(--color-border) last:border-b-0 last:pb-0"
                     >
-                      <div className="flex items-center justify-between mb-1">
-                        <p className="font-medium" style={{ color: "var(--color-text)" }}>
-                          {review.patientName || "Anonymous"}
-                        </p>
-                        {review.createdAt && (
-                          <span className="text-xs" style={{ color: "var(--color-text-light)" }}>
-                            {review.createdAt}
-                          </span>
-                        )}
+                      {/* Patient Initial Avatar */}
+                      <div className="w-10 h-10 rounded-full bg-(--color-bg-blue) border border-primary/10 flex items-center justify-center shrink-0">
+                        <span className="text-xs font-semibold text-(--color-primary) tracking-wider">
+                          {avatarInitials}
+                        </span>
                       </div>
 
-                      <StarRating rating={review.rating ?? 0} />
+                      {/* Content Area */}
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <div className="flex items-center justify-between gap-4">
+                          <h4 className="text-sm font-semibold text-(--color-text) truncate">
+                            {review.patientName || "Anonymous Patient"}
+                          </h4>
+                          {review.createdAt && (
+                            <time className="text-xs font-medium text-(--color-text-light) shrink-0">
+                              {date} <span className="text-gray-300 dark:text-gray-600 mx-1">•</span> {time}
+                            </time>
+                          )}
+                        </div>
 
-                      {review.comment && (
-                        <p className="mt-2 text-sm leading-relaxed" style={{ color: "var(--color-text-light)" }}>
-                          {review.comment}
-                        </p>
-                      )}
+                        {/* Star Rating Layout Component */}
+                        <div className="flex items-center pt-0.5">
+                          <StarRating rating={review.rating ?? 0} />
+                        </div>
+
+                        {/* Review Comment Message Body */}
+                        {review.comment && (
+                          <p className="pt-1.5 text-sm leading-relaxed text-(--color-text-light) break-words font-normal">
+                            {review.comment}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
               </div>
             ) : (
-              <p style={{ color: "var(--color-text-light)" }}>No reviews yet.</p>
+              <p className="text-sm font-medium text-(--color-text-light) -mt-6">
+                No reviews yet. Be the first to leave feedback!
+              </p>
             )}
           </CardComp>
         </div>
@@ -408,7 +441,7 @@ function View() {
                         className="text-xs font-semibold uppercase tracking-wide mb-2"
                         style={{ color: "var(--color-text-light)" }}
                       >
-                        {slot.date}
+                        {parseDate(slot.date).fullLabel}
                       </p>
 
                       {slot.times?.length ? (
@@ -423,7 +456,7 @@ function View() {
                                 backgroundColor: "var(--color-bg)",
                               }}
                             >
-                              {t.startTime}
+                              {formatTime(t.startTime)}
                             </span>
                           ))}
                         </div>

@@ -87,3 +87,48 @@ export function formatTime(time: string) {
 
   return `${formattedHours}:${String(minutes).padStart(2, "0")} ${period}`;
 }
+
+
+export interface FormattedDateTime {
+  date: string;  // e.g., "Jun 3, 2026"
+  time: string;  // e.g., "08:25 PM"
+  rawDate: string; // e.g., "2026-06-03" (Good for HTML inputs if needed)
+}
+
+export const formatDateTime = (isoString: string): FormattedDateTime => {
+  if (!isoString) {
+    return { date: "N/A", time: "N/A", rawDate: "" };
+  }
+
+  const dateObj = new Date(isoString);
+
+  // Guard against invalid date strings safely
+  if (isNaN(dateObj.getTime())) {
+    return { date: "Invalid Date", time: "Invalid Time", rawDate: "" };
+  }
+
+  // 1. Format Date: e.g., "Jun 3, 2026" (Clean & Professional)
+  const dateOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  };
+  const formattedDate = dateObj.toLocaleDateString('en-US', dateOptions);
+
+  // 2. Format Time: e.g., "08:25 PM"
+  const timeOptions: Intl.DateTimeFormatOptions = {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  };
+  const formattedTime = dateObj.toLocaleTimeString('en-US', timeOptions);
+
+  // 3. Raw YYYY-MM-DD string extraction
+  const rawDate = dateObj.toISOString().split('T')[0];
+
+  return {
+    date: formattedDate,
+    time: formattedTime,
+    rawDate
+  };
+};
