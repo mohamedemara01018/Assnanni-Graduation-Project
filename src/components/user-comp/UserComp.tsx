@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { logout } from "../../store/slices/auth/authSlice";
 import { clearEmail } from "../../store/slices/email/emailSlice";
 import Cookies from "js-cookie";
+import { User } from "lucide-react";
 
 function UserComp() {
     const [showUserMenu, setShowUserMenu] = useState(false);
@@ -64,8 +65,8 @@ function UserComp() {
                 aria-expanded={showUserMenu}
                 className="flex items-center gap-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2.5 py-1.5 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all"
             >
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 shrink-0">
-                    <CiUser className="h-4 w-4 text-white" />
+                <div className="w-8 h-8 rounded-full bg-(--color-bg-blue) border border-primary/20 flex items-center justify-center">
+                    <User className="w-4 h-4 text-(--color-primary)" />
                 </div>
 
                 <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
@@ -83,8 +84,8 @@ function UserComp() {
                 <div className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden z-40 shadow-lg">
                     {/* User Info */}
                     <div className="flex items-center gap-3 px-3.5 py-3 border-b border-gray-100 dark:border-gray-800">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 shrink-0">
-                            <CiUser className="h-4 w-4 text-white" />
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-(--color-bg-blue) border border-primary/20 shrink-0">
+                            <User className="w-4 h-4 text-(--color-primary)" />
                         </div>
 
                         <div className="min-w-0">

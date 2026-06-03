@@ -38,6 +38,7 @@ export interface DoctorsState {
 }
 
 export interface DoctorsFilters {
+    Search: string,
     SpecializationId?: number;
     Experience?: string;
     RatingFilter?: string;

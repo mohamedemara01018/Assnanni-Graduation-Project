@@ -3,14 +3,12 @@ import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import SearchInput from "@/components/search-input/SearchInput";
 import { governorates, regions, selectInputData } from "@/constants/doctorsListConstant";
 import SelectInput from "@/components/select-input/SelectInput";
-import { CiBookmark } from "react-icons/ci";
 import { FaStar } from "react-icons/fa";
 import { IoLocationOutline } from "react-icons/io5";
-import { Link } from "react-router";
-import LazyImage from "@/components/ui/LazyImage";
+import { Link, useNavigate } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import type { AppDispatch } from "@/store/store";
+import type { AppDispatch, RootState } from "@/store/store";
 import Error from "@/components/error/Error";
 import { ScaleLoader } from "react-spinners";
 import { NotFound } from "@/components/notfound/NotFound";
@@ -19,15 +17,16 @@ import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import { allDoctorsState, fetchAllDoctors } from "@/store/slices/patient-slice/all-doctors.slice/allDoctorsSlice";
 import { SlidersHorizontal, User, X, Stethoscope, CalendarCheck } from "lucide-react";
+import { toast } from "react-toastify";
 
 // ── Quick filter tabs ──────────────────────────────────────────────────────────
 
 const QUICK_FILTERS = [
-  { label: "Top Rated", value: "rating" },
-  { label: "Available Now", value: "available" },
-  { label: "Most Experienced", value: "experience" },
+  { label: "Top Rated", value: "HighestRating" },
+  // { label: "Available Now", value: "AvailableNow" }, // Assuming this is the naming convention
+  { label: "Most Experienced", value: "MostExperienced" },
+  { label: "Lowest Fee", value: "LowestFee" }, // Added based on the image
 ];
-
 // ── Page shell ────────────────────────────────────────────────────────────────
 
 function DoctorsListPage() {
@@ -55,6 +54,7 @@ export default DoctorsListPage;
 function DoctorList() {
   const [governorate, setGovernorate] = useState("");
   const [region, setRegion] = useState("");
+  const [search, setSearch] = useState("");
   const [activeQuick, setActiveQuick] = useState("");
   const [filters, setFilters] = useState({
     experience: "", rating: "", availability: "", gender: "", sort: "",
@@ -68,6 +68,7 @@ function DoctorList() {
 
   useEffect(() => {
     dispatch(fetchAllDoctors({
+      Search: search,
       SpecializationId: 1,
       Experience: filters.experience,
       RatingFilter: filters.rating,
@@ -77,7 +78,7 @@ function DoctorList() {
       Page: pageNumber,
       PageSize: pageSize,
     }));
-  }, [dispatch, filters.availability, filters.experience, filters.gender, filters.rating, filters.sort, pageNumber, pageSize]);
+  }, [dispatch, search, filters.availability, filters.experience, filters.gender, filters.rating, filters.sort, pageNumber, pageSize]);
 
   const clearFilters = () => {
     setGovernorate("");
@@ -99,6 +100,7 @@ function DoctorList() {
           style="w-full max-w-2xl bg-(--color-surface)"
           placeholder="Search by doctor name, specialization, or location"
           padding="p-3.5"
+          setSearch={setSearch}
         />
 
         {/* Quick filter pills */}
@@ -106,7 +108,25 @@ function DoctorList() {
           {QUICK_FILTERS.map((f) => (
             <button
               key={f.value}
-              onClick={() => setActiveQuick(activeQuick === f.value ? "" : f.value)}
+              onClick={() => {
+                const newActiveQuick = activeQuick === f.value ? "" : f.value;
+
+                setActiveQuick(newActiveQuick);
+
+                dispatch(
+                  fetchAllDoctors({
+                    Search: search,
+                    SpecializationId: 1,
+                    Experience: filters.experience,
+                    RatingFilter: filters.rating,
+                    Availability: filters.availability,
+                    Gender: filters.gender,
+                    SortBy: newActiveQuick || filters.sort,
+                    Page: pageNumber,
+                    PageSize: pageSize,
+                  })
+                );
+              }}
               className={`px-4 py-1.5 rounded-full text-sm border transition-all duration-150 cursor-pointer font-medium ${activeQuick === f.value
                 ? "bg-(--color-primary) text-white border-(--color-primary) shadow-sm"
                 : "border-(--color-border) bg-(--color-surface) text-(--color-text-light) hover:border-(--color-primary) hover:text-(--color-primary) hover:bg-(--color-bg-blue)"
@@ -257,12 +277,29 @@ function DoctorList() {
 // ── Doctor card ───────────────────────────────────────────────────────────────
 
 function DoctorCard({ doctor }: { doctor: any }) {
-  const isOnline = doctor.status?.toLowerCase() === "online";
+  const isOnline = doctor.status?.toLowerCase() === "available";
+  const role = useSelector((state: RootState) => state.auth.role);
+  console.log(role)
+  const navigate = useNavigate();
 
+  const handleClick = (id: string) => {
+    if (role === "guest") {
+      const redirectPath = `/appointments/booking/${id}`;
+
+      sessionStorage.setItem("redirectAfterAuth", redirectPath);
+
+      toast.info("Please sign in to continue booking your appointment.");
+
+      navigate("/login");
+      return;
+    }
+
+    navigate(`/appointments/booking/${id}`);
+  };
   return (
     <div
-      className="group flex flex-col rounded-2xl border border-(--color-border) bg-(--color-surface) overflow-hidden transition-all duration-200 hover:shadow-md hover:border-(--color-primary)/30"
-      style={{ boxShadow: "var(--shadow)" }}
+      className="group flex flex-col rounded-2xl border border-(--color-border) bg-(--color-surface) overflow-hidden transition-all duration-200 hover:shadow-md hover:border-primary/30 shadow-sm"
+    // style={{ boxShadow: "var(--shadow)" }}
     >
       {/* Card top */}
       <div className="p-4 flex items-start gap-3.5">
@@ -275,7 +312,7 @@ function DoctorCard({ doctor }: { doctor: any }) {
               className="w-16 h-16 rounded-xl object-cover ring-2 ring-(--color-border)"
             />
           ) : (
-            <div className="w-16 h-16 rounded-xl bg-(--color-bg-blue) border border-(--color-primary)/20 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-(--color-bg-blue) border border-primary/20 flex items-center justify-center">
               <User className="w-7 h-7 text-(--color-primary)" />
             </div>
           )}
@@ -306,7 +343,7 @@ function DoctorCard({ doctor }: { doctor: any }) {
             </span>
 
             {/* Experience */}
-            <span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-md bg-(--color-bg-blue) text-(--color-primary) border border-(--color-primary)/20">
+            <span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-md bg-(--color-bg-blue) text-(--color-primary) border border-primary/20">
               {doctor.yearsOfExperience} yrs
             </span>
 
@@ -337,13 +374,13 @@ function DoctorCard({ doctor }: { doctor: any }) {
         >
           View Profile
         </Link>
-        <Link
-          to={`/appointments/booking/${doctor.doctorId}`}
+        <button
+          onClick={() => handleClick(doctor.doctorId)}
           className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-medium rounded-xl bg-(--color-primary) text-white hover:bg-(--color-primary-dark) transition-all duration-150"
         >
           <CalendarCheck className="w-3.5 h-3.5" />
           Book
-        </Link>
+        </button>
       </div>
     </div>
   );

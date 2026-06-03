@@ -2,6 +2,8 @@
 import CardComp from "@/components/card-comp/CardComp";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import Error from "@/components/error/Error";
+import Footer from "@/components/footer/Footer";
+import Header from "@/components/header/Header";
 import Loading from "@/components/loading/Loading";
 import {
   doctorProfileState,
@@ -9,7 +11,8 @@ import {
   type DoctorDetails,
   type DoctorDetailsState,
 } from "@/store/slices/patient-slice/doctor-profile-slice/doctorProfileSlice";
-import type { AppDispatch } from "@/store/store";
+import type { AppDispatch, RootState } from "@/store/store";
+import { User } from "lucide-react";
 import { useEffect } from "react";
 import { BsCurrencyDollar } from "react-icons/bs";
 import { CiBookmark } from "react-icons/ci";
@@ -18,7 +21,8 @@ import { FiAward, FiMail, FiPhone, FiGlobe, FiClock } from "react-icons/fi";
 import { IoLanguageOutline, IoLocationOutline } from "react-icons/io5";
 import { LuAward } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
+import { toast } from "react-toastify";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -60,9 +64,13 @@ function DoctorProfilePage() {
       <View />
     </DashboardLayout>
   ) : (
-    <div className="w-11/12 m-auto my-10">
-      <View />
-    </div>
+    <>
+      <Header />
+      <div className="wrapper m-auto my-30">
+        <View />
+      </div>
+      <Footer />
+    </>
   );
 }
 
@@ -75,6 +83,24 @@ function View() {
     doctorProfileState
   ) as DoctorDetailsState;
 
+  const role = useSelector((state: RootState) => state.auth.role);
+  console.log(role)
+  const navigate = useNavigate();
+
+  const handleClick = (id: string) => {
+    if (role === "guest") {
+      const redirectPath = `/appointments/booking/${id}`;
+
+      sessionStorage.setItem("redirectAfterAuth", redirectPath);
+
+      toast.info("Please sign in to continue booking your appointment.");
+
+      navigate("/login");
+      return;
+    }
+
+    navigate(`/appointments/booking/${id}`);
+  };
   // ── Validation: id must be a positive integer ──
   const validId = isValidId(id);
 
@@ -98,6 +124,8 @@ function View() {
     return <Error message="Doctor profile not found or data is unavailable." />;
   }
 
+
+
   const doctorImage =
     data.doctorImage?.trim()
       ? data.doctorImage
@@ -108,7 +136,7 @@ function View() {
       {/* ── Header Card ── */}
       <CardComp>
         <div className="flex items-center gap-6 max-md:flex-col max-md:text-center">
-          <img
+          {doctorImage ? <img
             className="w-32 h-32 rounded-full object-cover border-2"
             style={{ borderColor: "var(--color-border)" }}
             src={doctorImage}
@@ -117,7 +145,11 @@ function View() {
               (e.currentTarget as HTMLImageElement).src =
                 "https://via.placeholder.com/150?text=Doctor";
             }}
-          />
+          /> :
+            <div className="w-32 h-32 rounded-full bg-(--color-bg-blue) border border-primary/20 flex items-center justify-center">
+              <User className="w-7 h-7 text-(--color-primary)" />
+            </div>
+          }
 
           <div className="space-y-3 flex-1">
             <h1 className="text-3xl font-semibold" style={{ color: "var(--color-text)" }}>
@@ -333,8 +365,8 @@ function View() {
             </div>
 
             {data.isAvailable ? (
-              <Link
-                to={`/appointments/booking/${data.id}`}
+              <button
+                onClick={() => handleClick(id)}
                 className="flex items-center justify-center gap-2 w-full p-2.5 rounded-md text-white font-medium transition-colors"
                 style={{ backgroundColor: "var(--color-primary)" }}
                 onMouseEnter={(e) =>
@@ -346,7 +378,7 @@ function View() {
               >
                 <CiBookmark className="text-lg" />
                 Book Appointment
-              </Link>
+              </button>
             ) : (
               <button
                 disabled

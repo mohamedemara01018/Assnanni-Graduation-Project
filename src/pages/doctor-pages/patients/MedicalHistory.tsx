@@ -19,6 +19,7 @@ import { useMyProfile } from "@/hooks/useMyProfile";
 import { HiOutlinePaperClip } from "react-icons/hi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Cookies from "js-cookie";
+import { NotFound } from "@/components/notfound/NotFound";
 
 const MedicalHistory = () => {
   const role = useSelector((state: RootState) => state.auth.role);
@@ -128,7 +129,7 @@ const MedicalHistory = () => {
       console.error("Error fetching medical history:", error);
       toast.error(
         (error as any)?.response?.data?.message ||
-          "Failed to load medical history",
+        "Failed to load medical history",
       );
     }
   }, [isSuccess, isError, error, data]);
@@ -137,11 +138,9 @@ const MedicalHistory = () => {
 
   const handleDownload = (item: MedicalHistoryItem) => {
     // Simulate downloading the record as a text file
-    const content = `Medical Record: ${item.title}\nDoctor: ${
-      item.doctorName
-    }\nDate: ${item.date}\nType: ${item.type}\n\nDescription:\n${
-      item.description
-    }\n\nAttachments: ${item.attachments.map((a) => a.fileName).join(", ")}`;
+    const content = `Medical Record: ${item.title}\nDoctor: ${item.doctorName
+      }\nDate: ${item.date}\nType: ${item.type}\n\nDescription:\n${item.description
+      }\n\nAttachments: ${item.attachments.map((a) => a.fileName).join(", ")}`;
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -234,9 +233,6 @@ const MedicalHistory = () => {
               <IoArrowBack />
               <span>Back</span>
             </button>
-            <h1 className="text-3xl text-(--color-text) font-semibold tracking-tight">
-              Medical History
-            </h1>
           </div>
           {role === "doctor" && (
             <button
@@ -300,7 +296,7 @@ const MedicalHistory = () => {
                         title="Add Attachment"
                       >
                         {uploadAttachmentMutation.isPending &&
-                        activeRecordId === item.id ? (
+                          activeRecordId === item.id ? (
                           <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                         ) : (
                           <HiOutlinePaperClip className="text-2xl" />
@@ -357,10 +353,7 @@ const MedicalHistory = () => {
 
             {history.length === 0 && !isLoading && (
               <div className="text-center py-24 bg-(--color-surface) rounded-2xl border border-(--color-border) shadow-sm">
-                <HiOutlineDocumentText className="text-6xl text-gray-300 mx-auto mb-4" />
-                <p className="text-lg text-(--color-text-light) font-medium">
-                  No medical history records found.
-                </p>
+                <NotFound subMessage=" No medical history records found." />
               </div>
             )}
           </div>

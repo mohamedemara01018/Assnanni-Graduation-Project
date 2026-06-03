@@ -37,7 +37,15 @@ function LoginForm() {
       dispatch(setToken(response.data.data.token));
       await dispatch(fetchUserProfile());
       toast.success("Welcome Back");
-      navigator("/");
+      const redirectPath = sessionStorage.getItem("redirectAfterAuth");
+
+      if (redirectPath) {
+        sessionStorage.removeItem("redirectAfterAuth");
+        navigator(redirectPath);
+      } else {
+        navigator("/");
+      }
+
     } catch (error: any) {
       toast.error(error.message || "Something went wrong");
     }

@@ -168,4 +168,5 @@ export const routeElements = {
   "/patient-profile/:id": <PatientProfilePage />,
   "/patient-profile/edit/:id": <EditPatientProfilePage />,
   profile: <ProfilePage />,
+  "medical-history": <MedicalHistory />
 };

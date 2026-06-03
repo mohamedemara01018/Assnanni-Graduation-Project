@@ -266,31 +266,35 @@ export function RescheduleAppointmentModal({
                                         <p className="text-xs text-red-600 dark:text-red-400">{errorDates}</p>
                                     </div>
                                 ) : (
-                                    <div className="grid grid-cols-6 gap-2">
-                                        {availableDates.map((d) => {
-                                            const parsed = parseDate(d.date);
-                                            const isSelected = selectedDate === d.date;
-                                            return (
-                                                <button
-                                                    key={d.date}
-                                                    onClick={() => setSelectedDate(d.date)}
-                                                    className={`rounded-xl border px-1.5 py-2.5 text-center transition-all ${isSelected
-                                                        ? 'border-blue-600 bg-blue-600'
-                                                        : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
-                                                        }`}
-                                                >
-                                                    <p className={`text-[9px] font-medium uppercase tracking-wider mb-1 ${isSelected ? 'text-blue-200' : 'text-gray-400 dark:text-gray-500'}`}>
-                                                        {parsed.day}
-                                                    </p>
-                                                    <p className={`text-lg font-serif leading-none mb-1 ${isSelected ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
-                                                        {parsed.dateNum}
-                                                    </p>
-                                                    <p className={`text-[9px] ${isSelected ? 'text-blue-200' : 'text-gray-400 dark:text-gray-500'}`}>
-                                                        {parsed.monthLabel.split(' ')[0]}
-                                                    </p>
-                                                </button>
-                                            );
-                                        })}
+                                    <div className={`grid ${availableDates.length <= 0 ? 'grid-cols-1' : 'grid-cols-6'} gap-2`}>
+                                        {availableDates.length === 0 || (availableDates.length === 1) ? (
+                                            <div className="flex items-center gap-2 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 px-4 py-3">
+                                                <Info className="h-4 w-4 text-gray-400 shrink-0" />
+                                                <p className="text-xs text-gray-400">No dates available for this doctor.</p>
+                                            </div>) : availableDates.map((d) => {
+                                                const parsed = parseDate(d.date);
+                                                const isSelected = selectedDate === d.date;
+                                                return (
+                                                    <button
+                                                        key={d.date}
+                                                        onClick={() => setSelectedDate(d.date)}
+                                                        className={`rounded-xl border px-1.5 py-2.5 text-center transition-all ${isSelected
+                                                            ? 'border-blue-600 bg-blue-600'
+                                                            : 'border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600'
+                                                            }`}
+                                                    >
+                                                        <p className={`text-[9px] font-medium uppercase tracking-wider mb-1 ${isSelected ? 'text-blue-200' : 'text-gray-400 dark:text-gray-500'}`}>
+                                                            {parsed.day}
+                                                        </p>
+                                                        <p className={`text-lg font-serif leading-none mb-1 ${isSelected ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
+                                                            {parsed.dateNum}
+                                                        </p>
+                                                        <p className={`text-[9px] ${isSelected ? 'text-blue-200' : 'text-gray-400 dark:text-gray-500'}`}>
+                                                            {parsed.monthLabel.split(' ')[0]}
+                                                        </p>
+                                                    </button>
+                                                );
+                                            })}
                                     </div>
                                 )}
                             </div>
@@ -422,8 +426,9 @@ export function RescheduleAppointmentModal({
                             </div>
                         </div>
                     </>
-                )}
-            </div>
-        </div>
+                )
+                }
+            </div >
+        </div >
     );
 }

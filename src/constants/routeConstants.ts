@@ -52,6 +52,7 @@ export const roleRoutePaths = {
     "patient-profile/edit",
     "appointments",
     "prescriptions",
+    "medical-history"
   ],
 };
 
@@ -120,6 +121,10 @@ export const sharedRoutePaths = [
     path: "doctor-patients/:id/medical-history",
     allowedRoles: ["doctor", "receptionist"],
   },
+  {
+    path: "medical-history",
+    allowedRoles: ["doctor", "patient"],
+  }
 ];
 
 // Public route paths (accessible without authentication)

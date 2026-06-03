@@ -287,11 +287,8 @@ export default function AppointmentDetailsPage() {
                                             }}
                                         />
                                     ) : (
-                                        <div
-                                            className="w-20 h-20 rounded-full flex items-center justify-center shrink-0"
-                                            style={{ backgroundColor: "var(--color-bg)" }}
-                                        >
-                                            <User className="w-8 h-8" style={{ color: "var(--color-text-light)" }} />
+                                        <div className="w-20 h-20 rounded-full bg-(--color-bg-blue) border border-primary/20 flex items-center justify-center">
+                                            <User className="w-8 h-8 text-(--color-primary)" />
                                         </div>
                                     )}
 

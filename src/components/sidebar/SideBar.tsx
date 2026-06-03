@@ -1,20 +1,24 @@
 import { FiLogOut } from "react-icons/fi";
 import Logo from "../../assets/Logo.png";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import {
   Brain,
   Calendar,
   FileText,
   LayoutDashboard,
+  Pill,
   Scan,
   Settings,
   Stethoscope,
   Users,
   X,
 } from "lucide-react";
+import { logout } from "@/store/slices/auth/authSlice";
+import { clearEmail } from "@/store/slices/email/emailSlice";
+import Cookies from "js-cookie";
 
 interface SideBarProp {
   collapsed: boolean;
@@ -27,12 +31,17 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
   const role = useSelector(
     (state: { auth: { role: string } }) => state.auth.role,
   );
-
-  // const role = "admin";
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.location.href = "/login";
+    dispatch(logout());
+    dispatch(clearEmail());
+
+    Cookies.remove("patientsView");
+
+
+    navigate("/");
   };
 
   const linkStyle = ({ isActive }: { isActive: boolean }) =>
@@ -125,7 +134,8 @@ const sidebarDataRole = {
     { icon: LayoutDashboard, label: "Dashboard", path: "/patient" },
     { icon: Calendar, label: "Appointments", path: "/appointments" },
     { icon: Stethoscope, label: "Doctors", path: "/doctors-list" },
-    { icon: Stethoscope, label: "Prescriptions", path: "/prescriptions" },
+    { icon: Pill, label: "Prescriptions", path: "/prescriptions" },
+    { icon: FileText, label: "Medical History", path: "/medical-history" },
     { icon: Scan, label: "Scans", path: "/scan/upload" },
     { icon: Users, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },

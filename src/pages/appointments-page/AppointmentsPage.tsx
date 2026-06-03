@@ -14,6 +14,7 @@ import {
   CalendarX,
   RefreshCw,
   Eye,
+  User,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import type { AppDispatch } from "@/store/store";
@@ -26,6 +27,7 @@ import MiniLoading from "@/components/mini-loading/MiniLoading";
 import Error from "@/components/error/Error";
 import { RescheduleAppointmentModal } from "@/components/reschedule-appointment-modal/RescheduleAppointmentModal";
 import { CancelAppointmentModal } from "@/components/cancel-appointment-modal/CancelAppointmentModal";
+import { NotFound } from "@/components/notfound/NotFound";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -73,6 +75,7 @@ const TABS = [
 
 function AppointmentsPage() {
   const [search, setSearch] = useState("");
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const [appointmentStatus, setAppointmentStatus] = useState("");
   const [showReschedule, setShowReschedule] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
@@ -119,13 +122,29 @@ function AppointmentsPage() {
     setShowCancel(true);
   };
 
+
   const closeReschedule = () => {
     setShowReschedule(false);
     setSelectedAppointment(null);
+    dispatch(
+      fetchAllAppointments({
+        search,
+        AppointmentStatus: appointmentStatus,
+        BookingType: "",
+      })
+    );
+
   };
   const closeCancel = () => {
     setShowCancel(false);
     setSelectedAppointment(null);
+    dispatch(
+      fetchAllAppointments({
+        search,
+        AppointmentStatus: appointmentStatus,
+        BookingType: "",
+      })
+    );
   };
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -155,8 +174,7 @@ function AppointmentsPage() {
 
         {/* ── Search + Tabs ── */}
         <div
-          className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-4 space-y-3"
-          style={{ boxShadow: "var(--shadow)" }}
+          className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-4 space-y-3 shadow-sm"
         >
           <SearchInput style="w-full" setSearch={setSearch} />
           <div className="flex items-center gap-1.5 flex-wrap pt-1">
@@ -167,8 +185,8 @@ function AppointmentsPage() {
                   key={tab.value}
                   onClick={() => setAppointmentStatus(tab.value)}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-all duration-150 cursor-pointer ${active
-                      ? "bg-(--color-primary) text-white border-(--color-primary)"
-                      : "bg-(--color-bg) text-(--color-text-light) border-(--color-border) hover:border-gray-300 dark:hover:border-gray-600"
+                    ? "bg-(--color-primary) text-white border-(--color-primary)"
+                    : "bg-(--color-bg) text-(--color-text-light) border-(--color-border) hover:border-gray-300 dark:hover:border-gray-600"
                     }`}
                 >
                   {tab.label}
@@ -189,18 +207,9 @@ function AppointmentsPage() {
           </div>
         ) : appointments.length === 0 ? (
           <div
-            className="flex flex-col items-center justify-center py-16 px-8 text-center rounded-2xl border border-(--color-border) bg-(--color-surface)"
-            style={{ boxShadow: "var(--shadow)" }}
+            className="flex flex-col items-center justify-center py-16 px-8 text-center rounded-2xl border border-(--color-border) bg-(--color-surface) shadow-sm"
           >
-            <div className="w-14 h-14 rounded-2xl bg-(--color-bg) border border-(--color-border) flex items-center justify-center mb-4">
-              <CalendarX className="w-6 h-6 text-(--color-text-light)" />
-            </div>
-            <p className="text-sm font-medium text-(--color-text) mb-1">
-              No appointments found
-            </p>
-            <p className="text-xs text-(--color-text-light)">
-              Try adjusting your filters or book a new visit
-            </p>
+            <NotFound message={'No appointments found'} subMessage="Try adjusting your filters or book a new visit" />
           </div>
         ) : (
           <>
@@ -213,26 +222,31 @@ function AppointmentsPage() {
                 return (
                   <div
                     key={appointment.id ?? index}
-                    className="group flex items-start justify-between gap-4 px-5 py-4 rounded-2xl border border-(--color-border) bg-(--color-surface) hover:border-(--color-primary) transition-all duration-150"
-                    style={{ boxShadow: "var(--shadow)" }}
+                    className="group flex items-start justify-between gap-4 px-5 py-4 rounded-2xl border border-(--color-border) bg-(--color-surface) hover:border-(--color-primary) transition-all duration-150 shadow-sm"
+                  // style={{ boxShadow: "var(--shadow)" }}
                   >
                     {/* Avatar + info */}
                     <div className="flex items-start gap-4 min-w-0">
                       {/* Avatar with status dot */}
                       <div className="relative shrink-0">
-                        <LazyImage
-                          src={
-                            appointment.doctorImage?.trim()
-                              ? appointment.doctorImage
-                              : "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjtHioeP3798yMa6QIJsA3piLZlDdOMuA17Q&s"
-                          }
-                          alt={appointment.doctorName}
-                          className="w-12 h-12 rounded-xl object-cover ring-2 ring-(--color-border)"
-                          onError={(e) => {
-                            e.currentTarget.src =
-                              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTjtHioeP3798yMa6QIJsA3piLZlDdOMuA17Q&s";
-                          }}
-                        />
+                        {appointment.doctorImage?.trim() && !imageErrors[appointment.id] ? (
+                          <LazyImage
+                            src={appointment.doctorImage}
+                            alt={appointment.doctorName}
+                            className="w-12 h-12 rounded-full object-cover ring-2 ring-(--color-border)"
+                            onError={() =>
+                              setImageErrors((prev) => ({
+                                ...prev,
+                                [appointment.id]: true,
+                              }))
+                            }
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-(--color-bg-blue) border border-primary/20 flex items-center justify-center">
+                            <User className="w-6 h-6 text-(--color-primary)" />
+                          </div>
+                        )}
+
                         <span
                           className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-(--color-surface) ${cfg.dot}`}
                         />
