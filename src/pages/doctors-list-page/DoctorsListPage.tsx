@@ -41,7 +41,9 @@ function DoctorsListPage() {
   ) : (
     <div className="m-6">
       <Header />
-      <DoctorList />
+      <main className="flex-1 w-full mt-33">
+        <DoctorList />
+      </main>
       <Footer />
     </div>
   );

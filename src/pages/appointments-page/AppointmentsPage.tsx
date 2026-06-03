@@ -15,6 +15,7 @@ import {
   RefreshCw,
   Eye,
   User,
+  Star,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import type { AppDispatch } from "@/store/store";
@@ -28,6 +29,7 @@ import Error from "@/components/error/Error";
 import { RescheduleAppointmentModal } from "@/components/reschedule-appointment-modal/RescheduleAppointmentModal";
 import { CancelAppointmentModal } from "@/components/cancel-appointment-modal/CancelAppointmentModal";
 import { NotFound } from "@/components/notfound/NotFound";
+import { GiveFeedbackModal } from "@/components/give-feedback-modal/GiveFeedbackModal";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -79,6 +81,7 @@ function AppointmentsPage() {
   const [appointmentStatus, setAppointmentStatus] = useState("");
   const [showReschedule, setShowReschedule] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
   const [selectedAppointment, setSelectedAppointment] =
     useState<SelectedAppointment | null>(null);
 
@@ -96,55 +99,58 @@ function AppointmentsPage() {
     );
   }, [dispatch, search, appointmentStatus]);
 
+  // ── Helpers ──────────────────────────────────────────────────────────────────
+
+  const refetch = () =>
+    dispatch(
+      fetchAllAppointments({
+        search,
+        AppointmentStatus: appointmentStatus,
+        BookingType: "",
+      })
+    );
+
+  const buildSelected = (appt: any): SelectedAppointment => ({
+    id: String(appt.id),
+    date: appt.date ?? "",
+    time: appt.time ?? "",
+    doctorName: appt.doctorName ?? "",
+    doctorSpecialty: appt.specialty ?? "",
+    doctorImage: appt.doctorImage ?? "",
+  });
+
   // ── Handlers ────────────────────────────────────────────────────────────────
 
   const openReschedule = (appt: any) => {
-    setSelectedAppointment({
-      id: String(appt.id),
-      date: appt.date ?? "",
-      time: appt.time ?? "",
-      doctorName: appt.doctorName ?? "",
-      doctorSpecialty: appt.specialty ?? "",
-      doctorImage: appt.doctorImage ?? "",
-    });
+    setSelectedAppointment(buildSelected(appt));
     setShowReschedule(true);
   };
 
   const openCancel = (appt: any) => {
-    setSelectedAppointment({
-      id: String(appt.id),
-      date: appt.date ?? "",
-      time: appt.time ?? "",
-      doctorName: appt.doctorName ?? "",
-      doctorSpecialty: appt.specialty ?? "",
-      doctorImage: appt.doctorImage ?? "",
-    });
+    setSelectedAppointment(buildSelected(appt));
     setShowCancel(true);
   };
 
+  const openFeedback = (appt: any) => {
+    setSelectedAppointment(buildSelected(appt));
+    setShowFeedback(true);
+  };
 
   const closeReschedule = () => {
     setShowReschedule(false);
     setSelectedAppointment(null);
-    dispatch(
-      fetchAllAppointments({
-        search,
-        AppointmentStatus: appointmentStatus,
-        BookingType: "",
-      })
-    );
-
+    refetch();
   };
+
   const closeCancel = () => {
     setShowCancel(false);
     setSelectedAppointment(null);
-    dispatch(
-      fetchAllAppointments({
-        search,
-        AppointmentStatus: appointmentStatus,
-        BookingType: "",
-      })
-    );
+    refetch();
+  };
+
+  const closeFeedback = () => {
+    setShowFeedback(false);
+    setSelectedAppointment(null);
   };
 
   // ── Render ──────────────────────────────────────────────────────────────────
@@ -173,9 +179,7 @@ function AppointmentsPage() {
         </div>
 
         {/* ── Search + Tabs ── */}
-        <div
-          className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-4 space-y-3 shadow-sm"
-        >
+        <div className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-4 space-y-3 shadow-sm">
           <SearchInput style="w-full" setSearch={setSearch} />
           <div className="flex items-center gap-1.5 flex-wrap pt-1">
             {TABS.map((tab) => {
@@ -185,8 +189,8 @@ function AppointmentsPage() {
                   key={tab.value}
                   onClick={() => setAppointmentStatus(tab.value)}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-all duration-150 cursor-pointer ${active
-                    ? "bg-(--color-primary) text-white border-(--color-primary)"
-                    : "bg-(--color-bg) text-(--color-text-light) border-(--color-border) hover:border-gray-300 dark:hover:border-gray-600"
+                      ? "bg-(--color-primary) text-white border-(--color-primary)"
+                      : "bg-(--color-bg) text-(--color-text-light) border-(--color-border) hover:border-gray-300 dark:hover:border-gray-600"
                     }`}
                 >
                   {tab.label}
@@ -206,24 +210,24 @@ function AppointmentsPage() {
             <Error message={error} />
           </div>
         ) : appointments.length === 0 ? (
-          <div
-            className="flex flex-col items-center justify-center py-16 px-8 text-center rounded-2xl border border-(--color-border) bg-(--color-surface) shadow-sm"
-          >
-            <NotFound message={'No appointments found'} subMessage="Try adjusting your filters or book a new visit" />
+          <div className="flex flex-col items-center justify-center py-16 px-8 text-center rounded-2xl border border-(--color-border) bg-(--color-surface) shadow-sm">
+            <NotFound
+              message="No appointments found"
+              subMessage="Try adjusting your filters or book a new visit"
+            />
           </div>
         ) : (
           <>
             <div className="space-y-3">
               {appointments.map((appointment, index) => {
                 const cfg = getStatusCfg(appointment.status);
-                const isCancelled =
-                  appointment.status.toLowerCase() === "cancelled";
+                const isCancelled = appointment.status.toLowerCase() === "cancelled";
+                const isCompleted = appointment.status.toLowerCase() === "completed";
 
                 return (
                   <div
                     key={appointment.id ?? index}
                     className="group flex items-start justify-between gap-4 px-5 py-4 rounded-2xl border border-(--color-border) bg-(--color-surface) hover:border-(--color-primary) transition-all duration-150 shadow-sm"
-                  // style={{ boxShadow: "var(--shadow)" }}
                   >
                     {/* Avatar + info */}
                     <div className="flex items-start gap-4 min-w-0">
@@ -246,7 +250,6 @@ function AppointmentsPage() {
                             <User className="w-6 h-6 text-(--color-primary)" />
                           </div>
                         )}
-
                         <span
                           className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-(--color-surface) ${cfg.dot}`}
                         />
@@ -300,7 +303,7 @@ function AppointmentsPage() {
                             View
                           </Link>
 
-                          {!isCancelled && (
+                          {!isCancelled && !isCompleted && (
                             <>
                               <span className="w-px h-3 bg-(--color-border)" />
                               <button
@@ -317,6 +320,20 @@ function AppointmentsPage() {
                               >
                                 <CalendarX className="w-3 h-3" />
                                 Cancel
+                              </button>
+                            </>
+                          )}
+
+                          {isCompleted && (
+                            <>
+                              <span className="w-px h-3 bg-(--color-border)" />
+                              <button
+                                onClick={() => openFeedback(appointment)}
+                                className="inline-flex items-center gap-1 text-xs font-medium transition-colors cursor-pointer"
+                                style={{ color: "#ca8a04" }}
+                              >
+                                <Star className="w-3 h-3" />
+                                Feedback
                               </button>
                             </>
                           )}
@@ -364,6 +381,16 @@ function AppointmentsPage() {
             isOpen={showCancel}
             onClose={closeCancel}
             appointment={selectedAppointment}
+          />
+          <GiveFeedbackModal
+            isOpen={showFeedback}
+            onClose={closeFeedback}
+            doctor={{
+              id: selectedAppointment.id,
+              name: selectedAppointment.doctorName,
+              specialty: selectedAppointment.doctorSpecialty ?? "",
+              image: selectedAppointment.doctorImage ?? "",
+            }}
           />
         </>
       )}

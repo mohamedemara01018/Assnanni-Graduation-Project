@@ -124,6 +124,14 @@ export const sharedRoutePaths = [
   {
     path: "medical-history",
     allowedRoles: ["doctor", "patient"],
+  },
+  {
+    path: 'my-feedbacks',
+    allowedRoles: ["patient"],
+  },
+  {
+    path: 'my-doctors',
+    allowedRoles: ["patient"],
   }
 ];
 
