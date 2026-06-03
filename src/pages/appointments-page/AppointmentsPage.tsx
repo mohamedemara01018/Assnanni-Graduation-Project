@@ -16,6 +16,9 @@ import {
   Eye,
   User,
   Star,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import type { AppDispatch } from "@/store/store";
@@ -30,11 +33,14 @@ import { RescheduleAppointmentModal } from "@/components/reschedule-appointment-
 import { CancelAppointmentModal } from "@/components/cancel-appointment-modal/CancelAppointmentModal";
 import { NotFound } from "@/components/notfound/NotFound";
 import { GiveFeedbackModal } from "@/components/give-feedback-modal/GiveFeedbackModal";
+import { formatTime, parseDate } from "@/lib/utils";
+import Pagination from "@/components/pagination/Pagination";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface SelectedAppointment {
   id: string;
+  doctorId: string,
   date: string;
   time: string;
   doctorName: string;
@@ -44,20 +50,28 @@ interface SelectedAppointment {
 
 // ── Status config ─────────────────────────────────────────────────────────────
 
-type StatusKey = "upcoming" | "confirmed" | "cancelled";
+type StatusKey = "upcoming" | "completed" | "confirmed" | "cancelled" | "noshow";
 
 const STATUS_CONFIG: Record<StatusKey, { pill: string; dot: string }> = {
   upcoming: {
     pill: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800/50",
     dot: "bg-blue-500",
   },
-  confirmed: {
+  completed: {
     pill: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50",
     dot: "bg-emerald-500",
+  },
+  confirmed: {
+    pill: "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800/50",
+    dot: "bg-green-500",
   },
   cancelled: {
     pill: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50",
     dot: "bg-red-400",
+  },
+  noshow: {
+    pill: "bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/50",
+    dot: "bg-yellow-400",
   },
 };
 
@@ -69,14 +83,17 @@ const getStatusCfg = (status: AppointmentStatus) =>
 const TABS = [
   { label: "All", value: "" },
   { label: "Upcoming", value: "upcoming" },
-  { label: "Confirmed", value: "confirmed" },
+  { label: "Completed", value: "completed" },
   { label: "Cancelled", value: "cancelled" },
+  { label: "Missed", value: "Missed" },
 ];
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
 function AppointmentsPage() {
   const [search, setSearch] = useState("");
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const [appointmentStatus, setAppointmentStatus] = useState("");
   const [showReschedule, setShowReschedule] = useState(false);
@@ -112,6 +129,7 @@ function AppointmentsPage() {
 
   const buildSelected = (appt: any): SelectedAppointment => ({
     id: String(appt.id),
+    doctorId: String(appt.doctorId),
     date: appt.date ?? "",
     time: appt.time ?? "",
     doctorName: appt.doctorName ?? "",
@@ -139,19 +157,51 @@ function AppointmentsPage() {
   const closeReschedule = () => {
     setShowReschedule(false);
     setSelectedAppointment(null);
-    refetch();
   };
 
   const closeCancel = () => {
     setShowCancel(false);
     setSelectedAppointment(null);
-    refetch();
   };
+
 
   const closeFeedback = () => {
     setShowFeedback(false);
     setSelectedAppointment(null);
   };
+
+  const statsConfig = [
+    {
+      label: 'Total Appointments',
+      value: data.total.toString(),
+      icon: Calendar,
+      color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+    },
+    {
+      label: 'Upcoming',
+      value: data.upcoming.toString(),
+      icon: Clock,
+      color: 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+    },
+    {
+      label: 'Completed',
+      value: data.completed.toString(),
+      icon: CheckCircle,
+      color: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
+    },
+    {
+      label: 'Cancelled',
+      value: data.cancelled.toString(),
+      icon: XCircle,
+      color: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+    },
+    {
+      label: 'Missed',
+      value: data.missedAppointments,
+      icon: AlertCircle,
+      color: 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
+    },
+  ];
 
   // ── Render ──────────────────────────────────────────────────────────────────
 
@@ -178,6 +228,30 @@ function AppointmentsPage() {
           </Link>
         </div>
 
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {statsConfig.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <div
+                key={stat.label}
+                className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+                      {stat.value}
+                    </p>
+                  </div>
+                  <div className={`w-12 h-12 rounded-lg ${stat.color} flex items-center justify-center`}>
+                    <Icon className="w-6 h-6" />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
         {/* ── Search + Tabs ── */}
         <div className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-4 space-y-3 shadow-sm">
           <SearchInput style="w-full" setSearch={setSearch} />
@@ -189,8 +263,8 @@ function AppointmentsPage() {
                   key={tab.value}
                   onClick={() => setAppointmentStatus(tab.value)}
                   className={`px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-all duration-150 cursor-pointer ${active
-                      ? "bg-(--color-primary) text-white border-(--color-primary)"
-                      : "bg-(--color-bg) text-(--color-text-light) border-(--color-border) hover:border-gray-300 dark:hover:border-gray-600"
+                    ? "bg-(--color-primary) text-white border-(--color-primary)"
+                    : "bg-(--color-bg) text-(--color-text-light) border-(--color-border) hover:border-gray-300 dark:hover:border-gray-600"
                     }`}
                 >
                   {tab.label}
@@ -276,13 +350,13 @@ function AppointmentsPage() {
                           {appointment.date && (
                             <span className="inline-flex items-center gap-1 text-[11px] text-(--color-text-light) bg-(--color-bg) border border-(--color-border) rounded-md px-2 py-0.5">
                               <Calendar className="w-3 h-3 shrink-0" />
-                              {appointment.date}
+                              {parseDate(appointment.date).fullLabel}
                             </span>
                           )}
                           {appointment.time && (
                             <span className="inline-flex items-center gap-1 text-[11px] text-(--color-text-light) bg-(--color-bg) border border-(--color-border) rounded-md px-2 py-0.5">
                               <Clock className="w-3 h-3 shrink-0" />
-                              {appointment.time}
+                              {formatTime(appointment.time)}
                             </span>
                           )}
                           {appointment.type && (
@@ -355,15 +429,6 @@ function AppointmentsPage() {
                 );
               })}
             </div>
-
-            {/* Count footer */}
-            <p className="text-xs text-(--color-text-light) px-1">
-              Showing{" "}
-              <span className="font-semibold text-(--color-text)">
-                {appointments.length}
-              </span>{" "}
-              appointment{appointments.length !== 1 ? "s" : ""}
-            </p>
           </>
         )}
       </div>
@@ -374,12 +439,18 @@ function AppointmentsPage() {
           <RescheduleAppointmentModal
             isOpen={showReschedule}
             onClose={closeReschedule}
+            onSuccess={() => {
+              refetch();
+            }}
             appointment={selectedAppointment}
             id={selectedAppointment.id}
           />
           <CancelAppointmentModal
             isOpen={showCancel}
             onClose={closeCancel}
+            onSuccess={() => {
+              refetch();
+            }}
             appointment={selectedAppointment}
           />
           <GiveFeedbackModal
@@ -393,6 +464,17 @@ function AppointmentsPage() {
             }}
           />
         </>
+      )}
+
+      {/* Pagination */}
+      {!error && !loading && data.appointments.length > 0 && (
+        <Pagination
+          pageNumber={pageNumber}
+          pageSize={pageSize}
+          totalItems={data.total}
+          onPageChange={(page) => setPageNumber(page)}
+          onPageSizeChange={(size) => { setPageSize(size); setPageNumber(1); }}
+        />
       )}
     </DashboardLayout>
   );

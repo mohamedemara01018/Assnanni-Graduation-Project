@@ -41,7 +41,7 @@ export const fetchDoctorBookingDetails = createAsyncThunk(
 
         try {
             const response = await fetch(
-                `${backendUrl}Patient/doctor-booking-details?DoctorId=${id}`,
+                `${backendUrl}Patient/doctor-booking-details/${id}`,
                 {
                     method: "GET",
                     headers: {

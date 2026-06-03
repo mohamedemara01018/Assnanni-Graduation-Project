@@ -37,8 +37,9 @@ function LoginForm() {
       dispatch(setToken(response.data.data.token));
       await dispatch(fetchUserProfile());
       toast.success("Welcome back!");
+      console.log(response.data.data?.roles)
       const redirect = sessionStorage.getItem("redirectAfterAuth");
-      if (redirect) { sessionStorage.removeItem("redirectAfterAuth"); navigate(redirect); }
+      if (redirect && response.data.data?.roles.toLowerCase() == 'Patient'.toLowerCase()) { sessionStorage.removeItem("redirectAfterAuth"); navigate(redirect); }
       else navigate("/");
     } catch (error: any) {
       toast.error(error?.response?.data?.message || error.message || "Something went wrong");

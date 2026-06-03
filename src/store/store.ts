@@ -21,7 +21,10 @@ import rescheduleAppointmentReducer from './slices/patient-slice/reschedule-appo
 import cancelAppointmentReducer from './slices/patient-slice/cancel-appointment-slice/cancelAppointmentSlice'
 import prescriptionsReducer from './slices/patient-slice/prescriptions-slice/prescriptionsSlice';
 import myFeedbacksReducer from './slices/patient-slice/my-feedbacks-slice/myFeedbacksSlice'
-import myDoctorsReducer from './slices/patient-slice/my-doctors-slice/myDoctorsSlice'
+import myDoctorsReducer from './slices/patient-slice/my-doctors-slice/myDoctorsSlice';
+import spectializationsReducer from './slices/patient-slice/specializations-slice/specializationsSlice';
+import addFeedbackReducer from './slices/patient-slice/add-feedback-slice/addFeedbackSlice';
+import editFeedbackReducer from './slices/patient-slice/edit-feedback-slice/editFeedbackSlice';
 
 export const store = configureStore({
   reducer: {
@@ -52,7 +55,10 @@ export const store = configureStore({
     cancelAppointmentSlice: cancelAppointmentReducer,
     prescriptionsSlice: prescriptionsReducer,
     myFeedbacksSlice: myFeedbacksReducer,
-    myDoctorsSlice: myDoctorsReducer
+    myDoctorsSlice: myDoctorsReducer,
+    spectializationsSlice: spectializationsReducer,
+    addFeedbackSlice: addFeedbackReducer,
+    editFeedbackSlice: editFeedbackReducer
   },
 });
 

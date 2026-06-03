@@ -26,6 +26,7 @@ export interface AppointmentsData {
     upcoming: number;
     completed: number;
     cancelled: number;
+    missedAppointments: number;
     appointments: Appointment[];
 }
 
@@ -41,6 +42,7 @@ const initialState: AppointmentsState = {
         upcoming: 0,
         completed: 0,
         cancelled: 0,
+        missedAppointments: 0,
         appointments: [],
     },
     loading: false,

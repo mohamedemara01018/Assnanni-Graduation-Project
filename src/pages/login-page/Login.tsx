@@ -4,7 +4,7 @@ import { Shield, Briefcase, Users2 } from "lucide-react";
 
 function Login() {
   return (
-    <div className="flex">
+    <div className="flex -mb-10">
       {/* ── Left panel — branding ──────────────────────────────────────────── */}
       <div className="hidden lg:flex lg:w-1/2 bg-(--color-surface) border-r border-(--color-border) p-12 flex-col justify-between">
         {/* Hero text */}
@@ -52,17 +52,9 @@ function Login() {
       {/* ── Right panel — form ─────────────────────────────────────────────── */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-md space-y-6">
-
-          {/* Mobile logo */}
-          <Link to="/" className="flex items-center gap-2 lg:hidden">
-            <div className="w-7 h-7 rounded-lg bg-linear-to-br from-blue-600 to-emerald-500" />
-            <span className="text-lg font-bold text-(--color-text)">assnani</span>
-            <span className="text-lg font-bold text-(--color-primary)">.</span>
-          </Link>
-
           {/* Card */}
           <div
-            className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-7"
+            className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-7 mt-10"
             style={{ boxShadow: "var(--shadow)" }}
           >
             {/* Register / Login tabs */}

@@ -72,7 +72,7 @@ export const availableDatesSlice = createSlice({
 
             .addCase(fetchAvailableDates.fulfilled, (state, action) => {
                 state.loading = false;
-                state.data = action.payload.data;
+                state.data = action.payload?.data;
             })
 
             .addCase(fetchAvailableDates.rejected, (state, action) => {

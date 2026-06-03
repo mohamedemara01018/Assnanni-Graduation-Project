@@ -25,6 +25,8 @@ import type { AppDispatch } from '@/store/store';
 interface CancelAppointmentModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onSuccess: () => void;
+
     appointment: {
         id: string;
         date: string;
@@ -39,6 +41,7 @@ interface CancelAppointmentModalProps {
 export function CancelAppointmentModal({
     isOpen,
     onClose,
+    onSuccess,
     appointment,
 }: CancelAppointmentModalProps) {
     const dispatch = useDispatch<AppDispatch>();
@@ -74,6 +77,7 @@ export function CancelAppointmentModal({
         if (fetchCancelAppointment.fulfilled.match(result)) {
             toast.success('Appointment cancelled successfully.');
             setShowSuccess(true);
+            onSuccess();
         } else {
             const errMsg =
                 typeof result.payload === 'string'
