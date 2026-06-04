@@ -12,10 +12,10 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import { useNavigate } from "react-router";
-import { logout } from "@/store/slices/auth/authSlice";
+import { fetchUserProfile, logout } from "@/store/slices/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import type { RootState } from "@/store/store";
+import type { AppDispatch, RootState } from "@/store/store";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -41,7 +41,7 @@ const ProfilePage = () => {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
 
   const { data, isLoading } = useQuery<ProfileResponse>({
     queryKey: ["my-profile"],
@@ -58,6 +58,10 @@ const ProfilePage = () => {
 
   const profile = data?.data;
 
+  if (profile?.imageUrl?.length === 26) {
+    // eslint-disable-next-line react-hooks/immutability
+    profile.imageUrl = "";
+  }
   const uploadImageMutation = useMutation({
     mutationFn: async (file: File) => {
       const formData = new FormData();
@@ -74,7 +78,8 @@ const ProfilePage = () => {
         },
       });
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await dispatch(fetchUserProfile());
       toast.success("Profile image updated successfully");
       queryClient.invalidateQueries({ queryKey: ["my-profile"] });
     },
@@ -90,7 +95,8 @@ const ProfilePage = () => {
         },
       });
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      await dispatch(fetchUserProfile());
       toast.success("Profile image deleted successfully");
       queryClient.invalidateQueries({ queryKey: ["my-profile"] });
     },
@@ -176,9 +182,7 @@ const ProfilePage = () => {
             {profile?.imageUrl && (
               <button
                 onClick={() => {
-                  if (window.confirm("Delete profile image?")) {
-                    deleteImageMutation.mutate();
-                  }
+                  deleteImageMutation.mutate();
                 }}
                 disabled={deleteImageMutation.isPending}
                 className="flex items-center gap-1.5 text-xs font-bold text-red-500 hover:text-red-600 transition-colors cursor-pointer py-1 px-3 bg-red-50 dark:bg-red-900/20 rounded-full"
@@ -309,13 +313,7 @@ const ProfilePage = () => {
         <div className="pt-8 border-t border-(--color-border) flex justify-center">
           <button
             onClick={() => {
-              if (
-                window.confirm(
-                  "CRITICAL: This will permanently delete your account and all associated data. This action cannot be undone. Are you sure?",
-                )
-              ) {
-                deleteAccountMutation.mutate();
-              }
+              deleteAccountMutation.mutate();
             }}
             disabled={deleteAccountMutation.isPending}
             className="flex items-center gap-3 bg-red-50 hover:bg-red-100 text-red-600 px-8 py-4 rounded-2xl font-bold transition-all active:scale-95 cursor-pointer shadow-sm border border-red-200 disabled:opacity-50"

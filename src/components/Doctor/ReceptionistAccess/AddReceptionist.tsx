@@ -62,7 +62,6 @@ const AddReceptionist = () => {
       formData.append("ShiftStart", data.shiftStart);
       formData.append("ShiftEnd", data.shiftEnd);
       formData.append("Shift", data.shift);
-      console.log([...formData.entries()]);
       const response = await axios.post(
         `${backendUrl}Doctors/add-receptionist`,
         formData,

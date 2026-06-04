@@ -79,7 +79,6 @@ export function RescheduleAppointmentModal({
     appointment,
 }: RescheduleAppointmentModalProps) {
 
-    // console.log(appointment)
     const dispatch = useDispatch<AppDispatch>();
 
     const { data: availableDates, loading: loadingDates, error: errorDates } =
@@ -129,7 +128,6 @@ export function RescheduleAppointmentModal({
 
     const handleConfirm = async () => {
         if (!selectedSlotId) return;
-        console.log(appointment.id, selectedSlotId)
         const result = await dispatch(
             fetchRescheduleAppointment({
                 appointmentId: appointment.id,

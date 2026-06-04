@@ -93,7 +93,6 @@ const MedicalReportForm = () => {
           },
         },
       );
-      console.log(response);
       if (response.data.succeeded) {
         toast.success(
           "Medical report and prescriptions generated successfully",

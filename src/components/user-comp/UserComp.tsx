@@ -18,9 +18,12 @@ function UserComp() {
   const userProfileCookie = Cookies.get("userProfile");
 
   const userProfile = userProfileCookie ? JSON.parse(userProfileCookie) : null;
-
   const fullName = userProfile?.fullName || userProfile?.name || "User";
-  const imageUrl = userProfile?.imageUrl;
+  let imageUrl = userProfile?.imageUrl;
+
+  if (imageUrl.length === 26) {
+    imageUrl = "";
+  }
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -87,7 +90,15 @@ function UserComp() {
           {/* User Info */}
           <div className="flex items-center gap-3 px-3.5 py-3 border-b border-gray-100 dark:border-gray-800">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-(--color-bg-blue) border border-primary/20 shrink-0">
-              <User className="w-4 h-4 text-(--color-primary)" />
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt="Profile Image"
+                  className="w-9 h-9 rounded-full text-(--color-primary)"
+                />
+              ) : (
+                <User className="w-4 h-4 text-(--color-primary)" />
+              )}
             </div>
 
             <div className="min-w-0">

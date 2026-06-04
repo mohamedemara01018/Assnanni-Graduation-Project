@@ -8,7 +8,6 @@ interface SecondDivProps {
 }
 
 const SecondDiv = ({ dashboardData }: SecondDivProps) => {
-  console.log(dashboardData);
   return (
     <div className="flex-1 flex flex-col gap-6">
       <QuickActions />

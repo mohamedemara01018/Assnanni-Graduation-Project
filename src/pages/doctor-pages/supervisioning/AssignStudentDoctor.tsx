@@ -18,7 +18,6 @@ interface AssignFormInputs {
 const AssignStudentDoctor = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  console.log(id);
   const location = useLocation();
   const { studentName, university, academicYear } = location.state || {};
 
@@ -204,17 +203,17 @@ const AssignStudentDoctor = () => {
                 disabled={isSubmitting}
                 className="rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-all flex items-center gap-2"
               >
-                  {isSubmitting ? (
-                    <>
-                      <ScaleLoader
-                        color="#fff"
-                        height={15}
-                        width={2}
-                        margin={1}
-                      />
-                      Processing...
-                    </>
-                  ) : (
+                {isSubmitting ? (
+                  <>
+                    <ScaleLoader
+                      color="#fff"
+                      height={15}
+                      width={2}
+                      margin={1}
+                    />
+                    Processing...
+                  </>
+                ) : (
                   "Confirm Assignment"
                 )}
               </button>

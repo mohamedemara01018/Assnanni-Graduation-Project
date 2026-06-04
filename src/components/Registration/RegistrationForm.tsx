@@ -98,7 +98,6 @@ const RegistrationForm = ({
             confirmPassword: data.confirmPassword,
           },
         );
-        console.log(response);
         return response;
       } else if (studentDoctor) {
         const formData = new FormData();
@@ -122,14 +121,12 @@ const RegistrationForm = ({
             },
           },
         );
-        console.log(response);
         return response;
       } else {
         const formattedDate = data.dateOfBirth
           ? `${data.dateOfBirth}T00:00:00Z`
           : new Date().toISOString();
 
-        console.log(formattedDate);
         return axios.post(authBase + "Patient/register", {
           firstName: data.firstName,
           lastName: data.lastName,
@@ -163,7 +160,6 @@ const RegistrationForm = ({
       });
     },
     onError: (error: any) => {
-      console.log(error);
       const errorMessage =
         error.response?.data?.message ||
         error.response?.data ||

@@ -6,126 +6,123 @@ import Cookies from "js-cookie";
 /* ================= TYPES ================= */
 
 export interface User {
-    id: string;
-    fullName: string;
-    email: string;
-    phoneNumber: string;
-    role: string;
-    isActive: boolean;
-    gender: string | null;
-    createdAt: string;
-    imageUrl: string;
+  id: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  role: string;
+  isActive: boolean;
+  gender: string | null;
+  createdAt: string;
+  imageUrl: string;
 }
 
 interface UsersResponse {
-    succeeded: boolean;
-    message: string;
-    data: {
-        users: User[];
-        totalCount: number;
-    };
+  succeeded: boolean;
+  message: string;
+  data: {
+    users: User[];
+    totalCount: number;
+  };
 }
 
 interface FetchUsersParams {
-    SearchTerm?: string;
-    Role?: string;
-    gender?: "" | "male" | "female"
-    PageNumber?: number;
-    PageSize?: number;
+  SearchTerm?: string;
+  Role?: string;
+  gender?: "" | "male" | "female";
+  PageNumber?: number;
+  PageSize?: number;
 }
 
 export interface UsersState {
-    usersData: User[];
-    totalCount?: number;
-    loading: boolean;
-    error: string | null;
+  usersData: User[];
+  totalCount?: number;
+  loading: boolean;
+  error: string | null;
 }
 
 const initialState: UsersState = {
-    usersData: [],
-    totalCount: 0,
-    loading: false,
-    error: null,
+  usersData: [],
+  totalCount: 0,
+  loading: false,
+  error: null,
 };
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 /* ================= THUNK ================= */
 export const fetchAdminUsers = createAsyncThunk<
-    UsersResponse,
-    FetchUsersParams,
-    { rejectValue: string }
+  UsersResponse,
+  FetchUsersParams,
+  { rejectValue: string }
 >(
-    "users/fetchAdminUsers",
-    async (
-        { SearchTerm = "", Role = "", gender = "", PageNumber = 1, PageSize = 10 },
-        { rejectWithValue }
-    ) => {
-        const cookieToken = Cookies.get("jwtToken");
-        console.log(cookieToken)
-        try {
+  "users/fetchAdminUsers",
+  async (
+    { SearchTerm = "", Role = "", gender = "", PageNumber = 1, PageSize = 10 },
+    { rejectWithValue },
+  ) => {
+    const cookieToken = Cookies.get("jwtToken");
+    try {
+      const response = await fetch(`${backendUrl}Admin/users/all`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${cookieToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          SearchTerm,
+          gender,
+          Role,
+          PageNumber,
+          PageSize,
+        }),
+      });
 
-            const response = await fetch(`${backendUrl}Admin/users/all`, {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${cookieToken}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    SearchTerm,
-                    gender,
-                    Role,
-                    PageNumber,
-                    PageSize
-                })
-            });
+      const json: UsersResponse = await response.json();
+      if (!response.ok || !json.succeeded) {
+        return rejectWithValue(json.message || "Request failed");
+      }
 
-            const json: UsersResponse = await response.json();
-            console.log('json', json)
-            if (!response.ok || !json.succeeded) {
-                return rejectWithValue(json.message || "Request failed");
-            }
-
-            return json;
-        } catch (err: any) {
-            return rejectWithValue(err.message || "Something went wrong");
-        }
+      return json;
+    } catch (err: any) {
+      return rejectWithValue(err.message || "Something went wrong");
     }
+  },
 );
 
 /* ================= SLICE ================= */
 
 const UsersSlice = createSlice({
-    name: "users",
-    initialState,
-    reducers: {
-        // optional: reset state
-        resetUsers: (state) => {
-            state.usersData = [];
-            state.totalCount = 0;
-            state.loading = false;
-            state.error = null;
-        },
+  name: "users",
+  initialState,
+  reducers: {
+    // optional: reset state
+    resetUsers: (state) => {
+      state.usersData = [];
+      state.totalCount = 0;
+      state.loading = false;
+      state.error = null;
     },
-    extraReducers: (builder) => {
-        builder
-            .addCase(fetchAdminUsers.pending, (state) => {
-                state.loading = true;
-                state.error = null;
-            })
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchAdminUsers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
 
-            .addCase(fetchAdminUsers.fulfilled, (state, action) => {
-                state.loading = false;
-                state.usersData = action.payload.data.users;
-                state.totalCount = action.payload.data.totalCount;
-            })
+      .addCase(fetchAdminUsers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.usersData = action.payload.data.users;
+        state.totalCount = action.payload.data.totalCount;
+      })
 
-            .addCase(fetchAdminUsers.rejected, (state, action) => {
-                state.loading = false;
-                state.error =
-                    action.payload || action.error.message || "Error occurred";
-            });
-    },
+      .addCase(fetchAdminUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload || action.error.message || "Error occurred";
+      });
+  },
 });
 
 /* ================= SELECTOR ================= */

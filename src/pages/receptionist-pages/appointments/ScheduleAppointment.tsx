@@ -96,7 +96,6 @@ const ScheduleAppointment = () => {
           data.paymentMethod.slice(1),
         bookingType: data.bookingType,
       };
-      console.log(payload);
 
       await axios.post(
         `${backendUrl}Receptionist/schedule-appointment?appointmentType=${data.appointmentType}`,

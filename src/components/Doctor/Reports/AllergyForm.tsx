@@ -52,7 +52,6 @@ const AllergyForm = ({ patientId }: AllergyFormProps) => {
       allergyId: number;
       notes: string;
     }) => {
-      console.log(patientId);
       const response = await axios.post(
         `${backendUrl}Patient/add-allergy`,
         newAllergy,

@@ -89,7 +89,6 @@ const ScanDetails = () => {
       const response = await axios.get(`${backendUrl}Scans/${scanId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log(response);
       return response.data;
     },
     enabled: !!scanId,
@@ -146,11 +145,6 @@ const ScanDetails = () => {
 
   const reviewMutation = useMutation({
     mutationFn: async (payload: ReviewFormData) => {
-      console.log("scanning for review");
-      console.log(scan.scanId);
-      console.log(token);
-      console.log(payload);
-
       await axios.post(
         `${backendUrl}Scans/review`,
         {

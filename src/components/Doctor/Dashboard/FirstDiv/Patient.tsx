@@ -9,7 +9,6 @@ interface Props {
 }
 
 const Patient = ({ id, name, imageUrl, lastInteractionDate }: Props) => {
-  console.log(imageUrl && !imageUrl.startsWith("https://asnani.runasp.net/"));
   if (imageUrl) {
     imageUrl = "https://asnani.runasp.net/" + imageUrl;
   }

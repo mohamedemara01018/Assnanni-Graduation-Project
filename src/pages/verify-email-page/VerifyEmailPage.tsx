@@ -1,6 +1,5 @@
 import { setToken } from "@/store/slices/auth/authSlice";
 import { clearEmail } from "@/store/slices/email/emailSlice";
-// import axios from "axios";
 import { MdOutlineMail } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router";
@@ -56,7 +55,6 @@ function VerifyEmailPage() {
         : authBase + "Verify-Email";
 
       const response = await axios.post(verificationUrl, data);
-      console.log(response);
 
       if (!isDoctor && !isStudentDoctor) {
         dispatch(setToken(response.data?.data?.token));
@@ -76,7 +74,6 @@ function VerifyEmailPage() {
 
       toast.success("You have successfully verified your email address");
     } catch (error: any) {
-      console.log(error);
       toast.error(error.message);
     }
   };

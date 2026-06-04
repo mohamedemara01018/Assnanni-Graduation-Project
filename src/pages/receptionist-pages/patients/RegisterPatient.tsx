@@ -53,7 +53,6 @@ const RegisterPatient = () => {
         ...data,
         dateOfBirth: new Date(data.dateOfBirth).toISOString(),
       };
-      console.log(formattedData);
       const response = await axios.post(
         `${backendUrl}Receptionist/register-patient`,
         formattedData,
