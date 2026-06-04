@@ -36,8 +36,10 @@ import type { AppDispatch } from '@/store/store';
 interface RescheduleAppointmentModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onSuccess: () => void;
     appointment: {
         id: string;
+        doctorId: string
         date: string;
         time: string;
         doctorName: string;
@@ -73,9 +75,11 @@ function formatTime(t: string) {
 export function RescheduleAppointmentModal({
     isOpen,
     onClose,
+    onSuccess,
     appointment,
-    id,
 }: RescheduleAppointmentModalProps) {
+
+    // console.log(appointment)
     const dispatch = useDispatch<AppDispatch>();
 
     const { data: availableDates, loading: loadingDates, error: errorDates } =
@@ -93,18 +97,18 @@ export function RescheduleAppointmentModal({
     // Fetch available dates when the modal opens
     useEffect(() => {
         if (isOpen) {
-            dispatch(fetchAvailableDates({ id: String(id) }));
+            dispatch(fetchAvailableDates({ id: String(appointment.doctorId) }));
         }
-    }, [dispatch, id, isOpen]);
+    }, [appointment.doctorId, dispatch, isOpen]);
 
     // Fetch time slots whenever a date is selected
     useEffect(() => {
         if (selectedDate) {
-            dispatch(fetchAvailableSlots({ date: selectedDate, id: String(id) }));
+            dispatch(fetchAvailableSlots({ date: selectedDate, id: String(appointment.doctorId) }));
             // eslint-disable-next-line react-hooks/set-state-in-effect
             setSelectedSlotId(null);
         }
-    }, [dispatch, id, selectedDate]);
+    }, [appointment.doctorId, dispatch, selectedDate]);
 
     // Clean up reschedule state on unmount
     useEffect(() => {
@@ -137,7 +141,7 @@ export function RescheduleAppointmentModal({
         if (fetchRescheduleAppointment.fulfilled.match(result)) {
             toast.success('Appointment rescheduled successfully!');
             setShowSuccess(true);
-            // onClose();
+            onSuccess();
         } else {
             const errMsg =
                 typeof result.payload === 'string'
@@ -267,7 +271,7 @@ export function RescheduleAppointmentModal({
                                     </div>
                                 ) : (
                                     <div className={`grid ${availableDates.length <= 0 ? 'grid-cols-1' : 'grid-cols-6'} gap-2`}>
-                                        {availableDates.length === 0 || (availableDates.length === 1) ? (
+                                        {availableDates.length === 0 ? (
                                             <div className="flex items-center gap-2 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 px-4 py-3">
                                                 <Info className="h-4 w-4 text-gray-400 shrink-0" />
                                                 <p className="text-xs text-gray-400">No dates available for this doctor.</p>
@@ -317,7 +321,7 @@ export function RescheduleAppointmentModal({
                                             <AlertCircle className="h-4 w-4 text-red-500 shrink-0" />
                                             <p className="text-xs text-red-600 dark:text-red-400">{errorSlots}</p>
                                         </div>
-                                    ) : availableSlots.length === 0 || (availableSlots.length === 1 && availableSlots[0].id === -1) ? (
+                                    ) : availableSlots.length === 0 ? (
                                         <div className="flex items-center gap-2 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-800/50 px-4 py-3">
                                             <Info className="h-4 w-4 text-gray-400 shrink-0" />
                                             <p className="text-xs text-gray-400">No slots available for this date.</p>

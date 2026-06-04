@@ -51,7 +51,7 @@ export default function Pagination({
     const startItem = (pageNumber - 1) * pageSize + 1;
     const endItem = Math.min(pageNumber * pageSize, totalItems);
 
-    // if (totalPages <= 1) return null;
+    if (totalItems < 10) return null;
 
     return (
         <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-(--color-border) bg-(--color-surface) px-5 py-3.5"
