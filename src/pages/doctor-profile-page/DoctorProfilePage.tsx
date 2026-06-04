@@ -21,7 +21,7 @@ import { FiAward, FiMail, FiPhone, FiGlobe, FiClock } from "react-icons/fi";
 import { IoLanguageOutline, IoLocationOutline } from "react-icons/io5";
 import { LuAward } from "react-icons/lu";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

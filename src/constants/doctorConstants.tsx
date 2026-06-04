@@ -49,6 +49,7 @@ export const dummySchedules: Schedule[] = [
 export const dummyScans: Scan[] = [
   {
     scanId: 1,
+    patientId: 1,
     patientName: "5235299259",
     scanType: "CT Scan",
     uploadedAt: new Date().toISOString(),
@@ -304,28 +305,44 @@ export const initialNotifications = [
 
 export const fallbackHistory: MedicalHistoryItem[] = [
   {
+    id: 1,
     title: "Hypertension",
     doctorName: "Dr. Sarah Johnson",
     date: "2025-12-08",
     type: "Consultation",
     description: "Blood pressure elevated. Prescribed medication.",
-    attachments: ["blood-test-results.pdf"],
+    attachments: [
+      {
+        fileName: "blood-test-results.pdf",
+        url: "/attachments/blood-test-results.pdf",
+      },
+    ],
   },
   {
+    id: 2,
     title: "Annual Checkup",
     doctorName: "Dr. Emily Rodriguez",
     date: "2025-11-20",
     type: "Lab Test",
     description: "All tests within normal range.",
-    attachments: ["lab-results.pdf", "x-ray.jpg"],
+    attachments: [
+      {
+        fileName: "lab-results.pdf",
+        url: "/attachments/lab-results.pdf",
+      },
+      { fileName: "x-ray.jpg", url: "/attachments/x-ray.jpg" },
+    ],
   },
   {
+    id: 3,
     title: "Chest X-Ray",
     doctorName: "Dr. Robert Anderson",
     date: "2025-10-15",
     type: "Scan",
     description: "No abnormalities detected.",
-    attachments: ["chest-xray.jpg"],
+    attachments: [
+      { fileName: "chest-xray.jpg", url: "/attachments/chest-xray.jpg" },
+    ],
   },
 ];
 

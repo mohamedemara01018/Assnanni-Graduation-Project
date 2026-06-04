@@ -369,13 +369,15 @@ const SessionDetails = () => {
                   {/* Action Buttons */}
                   <div className="flex gap-2">
                     <button
-                      disabled={session.status !== "started"}
+                      disabled={
+                        session.status.toLocaleLowerCase() !== "started"
+                      }
                       title={
-                        session.status === "not started"
+                        session.status.toLocaleLowerCase() === "not started"
                           ? "Attendance can only be taken once the session has started."
-                          : session.status === "completed"
+                          : session.status.toLocaleLowerCase() === "completed"
                             ? "Attendance cannot be changed after the session is completed."
-                            : session.status === "canceled"
+                            : session.status.toLowerCase() === "canceled"
                               ? "Attendance cannot be taken for a canceled session."
                               : ""
                       }
@@ -389,7 +391,7 @@ const SessionDetails = () => {
                         setIsAttendanceModalOpen(true);
                       }}
                       className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                        session.status === "started"
+                        session.status.toLowerCase() === "started"
                           ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/30"
                           : "bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed opacity-60"
                       }`}
@@ -398,9 +400,11 @@ const SessionDetails = () => {
                       Attendance
                     </button>
                     <button
-                      disabled={session.status !== "completed"}
+                      disabled={
+                        session.status.toLocaleLowerCase() !== "completed"
+                      }
                       title={
-                        session.status !== "completed"
+                        session.status.toLocaleLowerCase() !== "completed"
                           ? "Evaluation is only available after the session is completed."
                           : ""
                       }
@@ -410,7 +414,7 @@ const SessionDetails = () => {
                         setIsEvaluationModalOpen(true);
                       }}
                       className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                        session.status === "completed"
+                        session.status.toLocaleLowerCase() === "completed"
                           ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30"
                           : "bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed opacity-60"
                       }`}

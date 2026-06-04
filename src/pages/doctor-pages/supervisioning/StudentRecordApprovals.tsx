@@ -28,31 +28,6 @@ interface StudentDraft {
   submittedAt: string;
 }
 
-// const tempStudentDrafts: StudentDraft[] = [
-//   {
-//     id: 1,
-//     appointmentId: 10,
-//     studentName: "Ahmed Ali",
-//     studentId: 22,
-//     title: "Root Canal - Phase 1",
-//     diagnosis: "Acute Pulpitis",
-//     notes:
-//       "Accessed pulp chamber, cleared canals, placed temporary dressing. Patient tolerated procedure well.",
-//     submittedAt: "2026-05-13T10:30:00Z",
-//   },
-//   {
-//     id: 2,
-//     appointmentId: 14,
-//     studentName: "Sara Hassan",
-//     studentId: 25,
-//     title: "Initial Consultation",
-//     diagnosis: "Multiple Caries",
-//     notes:
-//       "Full mouth exam completed. Multiple cavities in upper right quadrant. Proposed treatment plan discussed.",
-//     submittedAt: "2026-05-13T14:15:00Z",
-//   },
-// ];
-
 const StudentRecordApprovals = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");

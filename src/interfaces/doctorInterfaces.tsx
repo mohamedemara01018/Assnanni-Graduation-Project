@@ -9,7 +9,7 @@ export interface Schedule {
 
 export interface Scan {
   scanId: number;
-  patientId: number;
+  patientId?: number;
   patientName: string;
   scanType: string;
   uploadedAt: string;
@@ -65,6 +65,7 @@ export interface Patient {
   gender: "Male" | "Female";
   status: "Active" | "Inactive" | "Pending";
   lastVisit: string;
+  doctor?: string;
 }
 
 export interface Receptionist {

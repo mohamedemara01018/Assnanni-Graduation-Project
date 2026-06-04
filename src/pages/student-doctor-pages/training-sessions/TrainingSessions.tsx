@@ -34,6 +34,21 @@ interface TrainingSession {
   status: string; // e.g. "Cancelled", "Completed", "Scheduled"
 }
 
+const fallbackSessions: TrainingSession[] = [
+  {
+    trainingSessionId: 1,
+    date: "2026-05-20",
+    startTime: "09:00:00",
+    endTime: "10:30:00",
+    topic: "Clinical Case Review",
+    notes: "Review of supervised patient cases and treatment planning.",
+    doctorName: "Dr. Sarah Johnson",
+    attendanceStatus: 1,
+    evaluationScore: 9,
+    status: "Completed",
+  },
+];
+
 const TrainingSessions = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");

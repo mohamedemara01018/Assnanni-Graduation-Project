@@ -183,7 +183,7 @@ const CreateLearningSession = () => {
             >
               {isSubmitting ? (
                 <>
-                  <ScaleLoader size={8} color="#fff" height={15} width={2} />
+                  <ScaleLoader color="#fff" height={15} width={2} />
                   Creating Session...
                 </>
               ) : (

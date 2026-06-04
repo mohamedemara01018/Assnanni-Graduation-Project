@@ -201,25 +201,6 @@ const ScanDetails = () => {
     },
   });
 
-  const reopenMutation = useMutation({
-    mutationFn: async () => {
-      await axios.patch(
-        `${backendUrl}Scans/${scan.scanId}/reopen`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-    },
-    onSuccess: () => {
-      toast.success("Scan reopened successfully");
-      queryClient.invalidateQueries({ queryKey: ["ScanDetails", scanId] });
-    },
-    onError: (err: any) => {
-      toast.error(err.response?.data?.message || "Failed to reopen scan");
-    },
-  });
-
   const scanReviewQuery = useQuery({
     queryKey: ["ScanReview", scanId],
     queryFn: async () => {

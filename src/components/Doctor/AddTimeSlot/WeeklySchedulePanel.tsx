@@ -30,6 +30,7 @@ let nextId = 100;
 
 const initialSchedule: DaySchedule[] = [
   {
+    id: 1,
     name: "Monday",
     slots: [
       {
@@ -56,6 +57,7 @@ const initialSchedule: DaySchedule[] = [
     ],
   },
   {
+    id: 2,
     name: "Tuesday",
     slots: [
       {
@@ -67,8 +69,9 @@ const initialSchedule: DaySchedule[] = [
       },
     ],
   },
-  { name: "Wednesday", slots: [] },
+  { id: 3, name: "Wednesday", slots: [] },
   {
+    id: 4,
     name: "Thursday",
     slots: [
       {
@@ -80,9 +83,9 @@ const initialSchedule: DaySchedule[] = [
       },
     ],
   },
-  { name: "Friday", slots: [] },
-  { name: "Saturday", slots: [] },
-  { name: "Sunday", slots: [] },
+  { id: 5, name: "Friday", slots: [] },
+  { id: 6, name: "Saturday", slots: [] },
+  { id: 7, name: "Sunday", slots: [] },
 ];
 
 // Trash icon
@@ -462,16 +465,6 @@ const WeeklySchedulePanel = () => {
       </div>
     );
   }
-  const daysArray = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-
   return (
     <div className="flex flex-col gap-4">
       {/* Summary bar */}
@@ -519,9 +512,9 @@ const WeeklySchedulePanel = () => {
               {/* Day header */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-(--color-text)">
-                    {daysArray[new Date(day.name).getDay() ?? 0]} {day.name}
-                  </span>
+                    <span className="text-sm font-semibold text-(--color-text)">
+                      {day.name}
+                    </span>
                   <span className="text-xs bg-(--color-primary-lighter) text-(--color-primary) font-medium px-2 py-0.5 rounded-full">
                     {day.slots.length} slot{day.slots.length !== 1 ? "s" : ""}
                   </span>

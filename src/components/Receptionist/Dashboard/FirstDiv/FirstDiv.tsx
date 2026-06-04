@@ -142,12 +142,12 @@ const FirstDiv = () => {
   const queryClient = useQueryClient();
 
   const [isQueueModalOpen, setIsQueueModalOpen] = useState(false);
-  const [appointmentIdInput, setAppointmentIdInput] = useState("");
+  const [selectedPatientId, setSelectedPatientId] = useState("");
 
   const addToQueueMutation = useMutation({
-    mutationFn: async (id: string) => {
+    mutationFn: async (appointmentId: string | number) => {
       await axios.post(
-        `${backendUrl}Receptionist/add-to-queue/${id}`,
+        `${backendUrl}Receptionist/add-to-queue/${appointmentId}`,
         {},
         config,
       );
@@ -155,7 +155,7 @@ const FirstDiv = () => {
     onSuccess: () => {
       toast.success("Patient added to queue successfully");
       setIsQueueModalOpen(false);
-      setAppointmentIdInput("");
+      setSelectedPatientId("");
       queryClient.invalidateQueries({
         queryKey: ["ReceptionistDashboardFirstDiv"],
       });
@@ -167,11 +167,34 @@ const FirstDiv = () => {
 
   const handleQueueSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!appointmentIdInput) {
-      toast.warning("Please enter an Appointment ID");
+    if (!selectedPatientId) {
+      toast.warning("Please select a patient");
       return;
     }
-    addToQueueMutation.mutate(appointmentIdInput);
+
+    const resolveAppointmentAndAdd = async () => {
+      try {
+        const response = await axios.get(
+          `${backendUrl}Receptionist/patient-info/${selectedPatientId}`,
+          config,
+        );
+
+        const appointmentId = response.data?.data?.appointmentId;
+        console.log(appointmentId);
+        if (!appointmentId) {
+          toast.error("Could not find an appointment for this patient");
+          return;
+        }
+
+        addToQueueMutation.mutate(appointmentId);
+      } catch (err: any) {
+        toast.error(
+          err.response?.data?.message || "Failed to load patient details",
+        );
+      }
+    };
+
+    void resolveAppointmentAndAdd();
   };
 
   const confirmAppointmentMutation = useMutation({
@@ -368,8 +391,8 @@ const FirstDiv = () => {
                   Select Patient <span className="text-red-500">*</span>
                 </label>
                 <select
-                  value={appointmentIdInput}
-                  onChange={(e) => setAppointmentIdInput(e.target.value)}
+                  value={selectedPatientId}
+                  onChange={(e) => setSelectedPatientId(e.target.value)}
                   className="w-full bg-gray-50/50 dark:bg-gray-800/20 border border-(--color-border) rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-(--color-text) appearance-none"
                 >
                   <option value="">Choose a patient...</option>

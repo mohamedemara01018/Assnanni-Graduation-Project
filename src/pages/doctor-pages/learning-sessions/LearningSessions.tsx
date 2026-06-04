@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import {
   Calendar,
@@ -50,28 +50,7 @@ const LearningSessions = () => {
   } = useQuery<LearningSession[]>({
     queryKey: ["learning-sessions"],
     queryFn: async () => {
-      const singleTempSession: LearningSession[] = [
-        {
-          id: "1",
-          date: "2026-05-13",
-          startTime: "10:00:00",
-          endTime: "11:30:00",
-          topic: "Advanced Implant Techniques (Demo Session)",
-          notes:
-            "This is a demonstration session to show how the dashboard handles educational tracking. You can start, complete, or cancel this session.",
-          status: "not started",
-        },
-        {
-          id: "4",
-          date: "2026-05-13",
-          startTime: "10:00:00",
-          endTime: "11:30:00",
-          topic: "Advanced Implant Techniques (Demo Session)",
-          notes:
-            "This is a demonstration session to show how the dashboard handles educational tracking. You can start, complete, or cancel this session.",
-          status: "not started",
-        },
-      ];
+      const singleTempSession: LearningSession[] = [];
 
       try {
         const response = await axios.get(

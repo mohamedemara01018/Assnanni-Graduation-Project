@@ -104,7 +104,7 @@ const Notifications = () => {
 
       return { previousNotifications, previousCount };
     },
-    onError: (err, id, context) => {
+    onError: (_err, _id, context) => {
       if (context?.previousNotifications) {
         queryClient.setQueryData(["notifications"], context.previousNotifications);
       }
@@ -149,7 +149,7 @@ const Notifications = () => {
 
       return { previousNotifications, previousCount };
     },
-    onError: (err, variables, context) => {
+    onError: (_err, _variables, context) => {
       if (context?.previousNotifications) {
         queryClient.setQueryData(["notifications"], context.previousNotifications);
       }

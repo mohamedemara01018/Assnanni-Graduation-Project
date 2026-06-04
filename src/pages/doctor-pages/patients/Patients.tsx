@@ -63,8 +63,6 @@ const Patients = () => {
   const [patientStatus, setPatientStatus] = useState<
     "Active" | "InActive" | ""
   >("");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [otherStatus, setOtherStatus] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -76,7 +74,6 @@ const Patients = () => {
       pageNumber,
       pageSize,
       patientStatus,
-      otherStatus,
     ],
     queryFn: async () => {
       const endpoint =
@@ -93,7 +90,6 @@ const Patients = () => {
           PageSize: pageSize,
           Search: search,
           PatientStatus: patientStatus || undefined,
-          status: otherStatus || undefined,
         },
       });
       return response.data;
@@ -161,7 +157,7 @@ const Patients = () => {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setPageNumber(1);
-  }, [search, patientStatus, otherStatus]);
+  }, [search, patientStatus]);
 
   const exportToCSV = () => {
     if (items.length === 0) {
