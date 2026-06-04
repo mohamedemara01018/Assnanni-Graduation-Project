@@ -1,5 +1,5 @@
 import { FiLogOut } from "react-icons/fi";
-import Logo from "../../assets/Logo.png";
+import Logo from "../../assets/logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
