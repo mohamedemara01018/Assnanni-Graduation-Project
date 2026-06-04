@@ -37,27 +37,39 @@ function LoginForm() {
       dispatch(setToken(response.data.data.token));
       await dispatch(fetchUserProfile());
       toast.success("Welcome back!");
-      console.log(response.data.data?.roles)
       const redirect = sessionStorage.getItem("redirectAfterAuth");
-      if (redirect && response.data.data?.roles.toLowerCase() == 'Patient'.toLowerCase()) { sessionStorage.removeItem("redirectAfterAuth"); navigate(redirect); }
-      else navigate("/");
+      if (
+        redirect &&
+        response.data.data?.roles.toLowerCase() == "Patient".toLowerCase()
+      ) {
+        sessionStorage.removeItem("redirectAfterAuth");
+        navigate(redirect);
+      } else navigate("/");
     } catch (error: any) {
-      toast.error(error?.response?.data?.message || error.message || "Something went wrong");
+      toast.error(
+        error?.response?.data?.message ||
+          error.message ||
+          "Something went wrong",
+      );
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
-
       {/* ── Email ──────────────────────────────────────────────────────── */}
       <div className="space-y-1.5">
-        <label htmlFor="email" className="text-xs font-medium text-(--color-text)">
+        <label
+          htmlFor="email"
+          className="text-xs font-medium text-(--color-text)"
+        >
           Email address
         </label>
         <div className="relative">
           <Mail
             className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
-            style={{ color: errors.email ? "#dc2626" : "var(--color-text-light)" }}
+            style={{
+              color: errors.email ? "#dc2626" : "var(--color-text-light)",
+            }}
           />
           <input
             id="email"
@@ -97,7 +109,10 @@ function LoginForm() {
       {/* ── Password ───────────────────────────────────────────────────── */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <label htmlFor="password" className="text-xs font-medium text-(--color-text)">
+          <label
+            htmlFor="password"
+            className="text-xs font-medium text-(--color-text)"
+          >
             Password
           </label>
           <NavLink
@@ -110,7 +125,9 @@ function LoginForm() {
         <div className="relative">
           <Lock
             className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none"
-            style={{ color: errors.password ? "#dc2626" : "var(--color-text-light)" }}
+            style={{
+              color: errors.password ? "#dc2626" : "var(--color-text-light)",
+            }}
           />
           <input
             id="password"
@@ -131,7 +148,10 @@ function LoginForm() {
             onFocus={() => setPasswordFocused(true)}
             {...register("password", {
               required: "Password is required",
-              minLength: { value: 6, message: "Password must be at least 6 characters" },
+              minLength: {
+                value: 6,
+                message: "Password must be at least 6 characters",
+              },
               onBlur: () => setPasswordFocused(false),
             })}
           />
@@ -142,7 +162,11 @@ function LoginForm() {
             style={{ color: "var(--color-text-light)" }}
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
-            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            {showPassword ? (
+              <EyeOff className="w-4 h-4" />
+            ) : (
+              <Eye className="w-4 h-4" />
+            )}
           </button>
         </div>
         {errors.password && (
@@ -159,18 +183,31 @@ function LoginForm() {
         disabled={isSubmitting}
         className="relative w-full flex items-center justify-center gap-2 py-3 px-6 rounded-xl text-sm font-semibold text-white transition-all duration-200 mt-1 overflow-hidden group"
         style={{
-          backgroundColor: isSubmitting ? "var(--color-text-light)" : "var(--color-primary)",
+          backgroundColor: isSubmitting
+            ? "var(--color-text-light)"
+            : "var(--color-primary)",
           cursor: isSubmitting ? "not-allowed" : "pointer",
           opacity: isSubmitting ? 0.75 : 1,
           boxShadow: isSubmitting ? "none" : "0 4px 14px rgba(37,99,235,0.3)",
         }}
-        onMouseEnter={(e) => { if (!isSubmitting) e.currentTarget.style.backgroundColor = "var(--color-primary-dark)"; }}
-        onMouseLeave={(e) => { if (!isSubmitting) e.currentTarget.style.backgroundColor = "var(--color-primary)"; }}
+        onMouseEnter={(e) => {
+          if (!isSubmitting)
+            e.currentTarget.style.backgroundColor = "var(--color-primary-dark)";
+        }}
+        onMouseLeave={(e) => {
+          if (!isSubmitting)
+            e.currentTarget.style.backgroundColor = "var(--color-primary)";
+        }}
       >
         {isSubmitting ? (
-          <><Loader2 className="w-4 h-4 animate-spin" /> Signing in…</>
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" /> Signing in…
+          </>
         ) : (
-          <>Sign In <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" /></>
+          <>
+            Sign In{" "}
+            <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+          </>
         )}
       </button>
     </form>

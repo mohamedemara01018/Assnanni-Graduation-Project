@@ -26,7 +26,7 @@ interface ProfileData {
   email: string;
   phoneNumber: string;
   roles: string[];
-  profileImageUrl?: string;
+  imageUrl?: string;
 }
 
 interface ProfileResponse {
@@ -63,7 +63,7 @@ const ProfilePage = () => {
       const formData = new FormData();
       formData.append("ProfileImage", file);
 
-      const method = profile?.profileImageUrl ? "patch" : "post";
+      const method = profile?.imageUrl ? "patch" : "post";
       await axios({
         method,
         url: `${backendUrl}Users/upload-image-profile`,
@@ -138,12 +138,12 @@ const ProfilePage = () => {
               onClick={handleImageClick}
               className="relative w-32 h-32 bg-linear-to-br from-(--color-primary) to-(--color-primary-light) rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg shadow-(--color-primary)/20 shrink-0 cursor-pointer overflow-hidden group transition-all hover:ring-4 hover:ring-(--color-primary-lighter)"
             >
-              {profile?.profileImageUrl ? (
+              {profile?.imageUrl ? (
                 <img
                   src={
-                    profile.profileImageUrl.startsWith("http")
-                      ? profile.profileImageUrl
-                      : `${backendUrl}${profile.profileImageUrl}`
+                    profile.imageUrl.startsWith("http")
+                      ? profile.imageUrl
+                      : `${backendUrl}${profile.imageUrl}`
                   }
                   alt="Profile"
                   className="w-full h-full object-cover transition-transform group-hover:scale-110"
@@ -173,7 +173,7 @@ const ProfilePage = () => {
               accept="image/*"
             />
 
-            {profile?.profileImageUrl && (
+            {profile?.imageUrl && (
               <button
                 onClick={() => {
                   if (window.confirm("Delete profile image?")) {

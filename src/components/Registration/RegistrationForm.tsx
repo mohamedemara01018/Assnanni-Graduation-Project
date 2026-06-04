@@ -15,7 +15,7 @@ import { getEmail } from "@/store/slices/email/emailSlice";
 import type { RootState } from "@/store/store";
 
 interface Inputs {
-  image: FileList;
+  image?: FileList;
   firstName: string;
   lastName: string;
   email: string;
