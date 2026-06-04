@@ -6,12 +6,12 @@ interface WeekProps {
 
 const fallbackWeekStats = {
   appointments: {
-    completed: 24,
-    total: 30,
+    completed: 0,
+    total: 0,
   },
   reviews: {
-    completed: 15,
-    total: 18,
+    completed: 0,
+    total: 0,
   },
 };
 
