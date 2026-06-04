@@ -177,10 +177,6 @@ export default function MyDoctorsPage() {
                             specialty: selectedDoctor.specialization,
                             image: selectedDoctor.imageUrl,
                         }}
-                        onSubmit={(feedback) => {
-                            console.log('Feedback submitted:', feedback);
-                            closeFeedback();
-                        }}
                     />
                 )
             }

@@ -489,25 +489,27 @@ export default function AppointmentDetailsPage() {
             <RescheduleAppointmentModal
                 isOpen={showRescheduleModal}
                 onClose={() => {
-                    setShowRescheduleModal(false)
+                    setShowRescheduleModal(false);
                     refetch();
                 }}
                 // Re-fetch after successful reschedule so status updates without a page refresh
 
                 appointment={{
                     id: String(data.id),
+                    doctorId: String(data.doctor.id),
                     date: data.date,
                     time: data.time,
                     doctorName: data.doctor.name,
                     doctorImage: String(data.doctor.imageUrl),
                 }}
                 id={String(data.doctor.id)}
+                onSuccess={() => refetch()}
             />
 
             <CancelAppointmentModal
                 isOpen={isCancelOpen}
                 onClose={() => {
-                    setIsCancelOpen(false)
+                    setIsCancelOpen(false);
                     refetch();
                 }}
                 // Re-fetch after successful cancel so status updates without a page refresh
@@ -518,6 +520,7 @@ export default function AppointmentDetailsPage() {
                     doctorName: data.doctor.name,
                     doctorSpecialty: data.doctor.specialization,
                 }}
+                onSuccess={() => refetch()}
             />
         </DashboardLayout>
     );
