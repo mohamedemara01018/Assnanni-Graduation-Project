@@ -64,7 +64,10 @@ export default function SupportPage() {
                         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                             Chat with our support team
                         </p>
-                        <button className="text-purple-600 dark:text-purple-400 hover:underline">
+                        <button
+                            onClick={() => window.dispatchEvent(new CustomEvent("open-chatbot"))}
+                            className="text-purple-600 dark:text-purple-400 hover:underline cursor-pointer"
+                        >
                             Start Chat
                         </button>
                     </div>
