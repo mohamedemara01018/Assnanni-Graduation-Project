@@ -271,7 +271,7 @@ const AddNewSlotPanel = () => {
         location: data.location,
         slotDurationInMinutes: parseInt(data.duration.split(" ")[0]),
       };
-      console.log(payload);
+
       return axios.post(`${backendUrl}DoctorSchedules`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,

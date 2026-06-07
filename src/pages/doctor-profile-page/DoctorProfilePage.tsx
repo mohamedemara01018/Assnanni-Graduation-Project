@@ -86,7 +86,6 @@ function View() {
   ) as DoctorDetailsState;
 
   const role = useSelector((state: RootState) => state.auth.role);
-  console.log(role)
   const navigate = useNavigate();
 
   const handleClick = (id: string) => {

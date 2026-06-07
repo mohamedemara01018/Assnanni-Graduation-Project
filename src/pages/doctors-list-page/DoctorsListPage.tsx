@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import SearchInput from "@/components/search-input/SearchInput";
 import { governorates, regions, selectInputData } from "@/constants/doctorsListConstant";

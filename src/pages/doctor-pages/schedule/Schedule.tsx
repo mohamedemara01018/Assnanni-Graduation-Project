@@ -51,7 +51,6 @@ const Schedule = () => {
       );
     },
     onSuccess: (_, slotId) => {
-      toast.success("Time slot deleted successfully");
       queryClient.setQueryData(
         ["DoctorWeeklySchedule"],
         (oldData: WeeklyScheduleData | undefined) => {
@@ -170,10 +169,6 @@ const Schedule = () => {
   }, [isWeeklyScheduleSuccess, isWeeklyScheduleError, weeklyScheduleError]);
 
   useEffect(() => {
-    if (isAppointmentsSuccess && appointments !== dummySchedules) {
-      toast.success("Today's appointments loaded");
-    }
-
     if (isAppointmentsError) {
       console.error("Error fetching appointments:", appointmentsError);
       toast.error(appointmentsError.message || "Failed to load appointments");

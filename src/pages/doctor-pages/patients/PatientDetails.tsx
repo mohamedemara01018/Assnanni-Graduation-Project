@@ -94,7 +94,6 @@ const PatientDetails = () => {
   const { data, isLoading, isError, error, isSuccess } = useQuery({
     queryKey: ["PatientInfo", id, role],
     queryFn: async () => {
-      console.log(id);
       const endpoint =
         role === "receptionist"
           ? `Receptionist/${id}/doctor-info`
@@ -580,7 +579,8 @@ const PatientDetails = () => {
               </div>
 
               <div className="text-xs text-(--color-text-light)">
-                Uploaded at: {new Date(selectedScan.uploadedAt).toLocaleString()}
+                Uploaded at:{" "}
+                {new Date(selectedScan.uploadedAt).toLocaleString()}
               </div>
             </div>
           </div>

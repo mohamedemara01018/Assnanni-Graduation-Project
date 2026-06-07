@@ -64,7 +64,6 @@ const RequestTimeOff = () => {
         durationInMinutes: Number(data.durationInMinutes),
         note: data.note || " ",
       };
-      console.log(payload);
       await axios.post(`${backendUrl}Doctors/time-request-off`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -79,13 +78,13 @@ const RequestTimeOff = () => {
 
       const disableDurationMs = (duration + 5) * 60 * 1000;
       const until = Date.now() + disableDurationMs;
-      
+
       // Save state in cookies and localStorage to survive page refresh
       localStorage.setItem("timeOffDisabledUntil", until.toString());
       Cookies.set("timeOffDisabledUntil", until.toString(), {
         expires: new Date(until),
       });
-      
+
       setIsDisabled(true);
 
       setIsOpen(false);

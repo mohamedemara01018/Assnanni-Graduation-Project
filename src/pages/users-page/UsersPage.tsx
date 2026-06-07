@@ -61,7 +61,6 @@ function UsersPage() {
     loading: usersLoading,
   } = useSelector(selectUsers) as UsersState;
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -78,7 +77,6 @@ function UsersPage() {
           ),
         ]);
       } catch (error: any) {
-        console.log(error);
         const errorMessage =
           typeof error == "string" ? String(error) : error.message;
         toast.error(errorMessage);
@@ -96,9 +94,9 @@ function UsersPage() {
 
   const totalUser = data
     ? data.totalDoctors +
-    data.totalPatients +
-    data.totalReceptionists +
-    data.totalStudents
+      data.totalPatients +
+      data.totalReceptionists +
+      data.totalStudents
     : 0;
 
   const getRoleBadgeColor = (role: string) => {
@@ -115,40 +113,6 @@ function UsersPage() {
         return "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300";
     }
   };
-
-  // const getStatusBadgeColor = (status: string) => {
-  //     switch (status) {
-  //         case 'active': return 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400';
-  //         case 'suspended': return 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400';
-  //         case 'pending': return 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400';
-  //         default: return 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300';
-  //     }
-  // };
-
-  // const handleSuspendUser = (userId: string) => {
-  //     console.log('Suspending user:', userId);
-  //     setShowActionsMenu(null);
-  // };
-
-  // const handleActivateUser = (userId: string) => {
-  //     console.log('Activating user:', userId);
-  //     setShowActionsMenu(null);
-  // };
-
-  // const handleViewDetails = (user: User) => {
-  //     setSelectedUser(user);
-  //     setShowDetailModal(true);
-  //     setShowActionsMenu(null);
-  // };
-
-  // const handleEditUser = (userId: string) => {
-  //     console.log('Editing user:', userId);
-  //     setShowActionsMenu(null);
-  // };
-
-  // const handleExportUsers = () => {
-  //     console.log('Exporting users...');
-  // };
 
   return (
     <DashboardLayout pageTitle="Users page">
@@ -375,33 +339,9 @@ function UsersPage() {
                           <Edit className="w-4 h-4" />
                         </button>
                         <div className="relative">
-                          <button
-                            // onClick={() => setShowActionsMenu(showActionsMenu === user.id ? null : user.id)}
-                            className="p-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-                          >
+                          <button className="p-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
                             <MoreVertical className="w-4 h-4" />
                           </button>
-                          {/* {showActionsMenu === user.id && (
-                                                        <div className="absolute right-0 mt-2 w-48 bg-(--color-surface) rounded-lg shadow-lg border border-(--c) z-10">
-                                                            {user.status === 'active' ? (
-                                                                <button
-                                                                    onClick={() => handleSuspendUser(user.id)}
-                                                                    className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-2"
-                                                                >
-                                                                    <Ban className="w-4 h-4" />
-                                                                    <span>Suspend User</span>
-                                                                </button>
-                                                            ) : (
-                                                                <button
-                                                                    onClick={() => handleActivateUser(user.id)}
-                                                                    className="w-full px-4 py-2 text-left text-sm text-green-600 dark:text-green-400 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center space-x-2"
-                                                                >
-                                                                    <CheckCircle className="w-4 h-4" />
-                                                                    <span>Activate User</span>
-                                                                </button>
-                                                            )}
-                                                        </div>
-                                                    )} */}
                         </div>
                       </div>
                     </td>
@@ -409,11 +349,9 @@ function UsersPage() {
                 ))}
               </tbody>
             </table>
-
           </div>
         )}
       </div>
-
 
       {/* Pagination */}
       {!error && !loading && !usersLoading && usersData.length > 0 && (

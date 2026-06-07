@@ -22,20 +22,21 @@ import { useEffect } from "react";
 import type { AppDispatch } from "@/store/store";
 import { ScaleLoader } from "react-spinners";
 import Error from "@/components/error/Error";
-import { fetchPendingDoctor, selectPendingDoctor, type pendingDoctorInterface } from "@/store/slices/admin-slice/pending-doctor-slice/pendingDoctorSlice";
+import {
+  fetchPendingDoctor,
+  selectPendingDoctor,
+  type pendingDoctorInterface,
+} from "@/store/slices/admin-slice/pending-doctor-slice/pendingDoctorSlice";
 import { toast } from "react-toastify";
 import { getTimeAgo } from "@/lib/utils";
 
-
 function AdminPage() {
   const dispatch: AppDispatch = useDispatch();
-  const { data, loading, error } =
-    useSelector(selectSummary) as SummaryState;
+  const { data, loading, error } = useSelector(selectSummary) as SummaryState;
 
-  const { pendingDoctor } =
-    useSelector(selectPendingDoctor) as pendingDoctorInterface;
-
-  console.log("pending doctor", pendingDoctor);
+  const { pendingDoctor } = useSelector(
+    selectPendingDoctor,
+  ) as pendingDoctorInterface;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,9 +49,7 @@ function AdminPage() {
         console.error(error);
 
         const errorMessage =
-          (typeof error === "string"
-            ? error
-            : error.message) ||
+          (typeof error === "string" ? error : error.message) ||
           "Failed to fetch summary & pending doctors";
 
         toast.error(errorMessage);
@@ -62,16 +61,10 @@ function AdminPage() {
 
   const totalUser = data
     ? data.totalDoctors +
-    data.totalPatients +
-    data.totalReceptionists +
-    data.totalStudents
+      data.totalPatients +
+      data.totalReceptionists +
+      data.totalStudents
     : 0;
-
-  // const now = new Date().;
-
-  // console.log(now);
-
-
 
   return (
     <DashboardLayout pageTitle="Admin page">
@@ -144,56 +137,75 @@ function AdminPage() {
             </div>
             <hr className="w-full" />
 
-            {
-              loading ?
-                <div className="w-full  flex items-center justify-center">
-                  <ScaleLoader color="#6d61ff" />{" "}
-                </div>
-                : error ? <Error message={error} /> :
-                  (<div className="w-full space-y-4">
-
-                    {
-                      pendingDoctor && pendingDoctor.length == 0 ? <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
-                        <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                        <p className="text-gray-600 dark:text-gray-400">No verifications found</p>
-                      </div> :
-                        pendingDoctor && pendingDoctor.map((doctor) => {
-                          return <div key={doctor.id} className="flex justify-between items-center bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) p-4 rounded-lg">
-                            <div className="flex items-center gap-4">
-                              <div className="w-15 h-15 rounded-full overflow-hidden flex justify-center items-center bg-(--color-primary) text-white">
-                                {
-                                  doctor.imageUrl ?
-                                    <img
-                                      src={doctor.imageUrl}
-                                      alt=""
-                                      className="w-full h-full object-cover"
-                                    /> : <span className="text-3xl font-bold">{doctor.fullName.charAt(0).toUpperCase()}</span>
-                                }
-                              </div>
-                              <div>
-                                <h1 className="text-lg font-medium">{doctor.fullName}</h1>
-                                <span className="block text-sm -mt-1">{doctor.specialization}</span>
-                                <span className=" text-xs">
-                                  {`1 documents . Submitted ${getTimeAgo(doctor.createdAt)}`}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <Link to={'/verify-doctors'} className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors">
-                                <CheckCircle className="w-4 h-4" />
-                              </Link>
-                              <Link to={'/verify-doctors'} className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors">
-                                <XCircle className="w-4 h-4" />
-                              </Link>
-                            </div>
+            {loading ? (
+              <div className="w-full  flex items-center justify-center">
+                <ScaleLoader color="#6d61ff" />{" "}
+              </div>
+            ) : error ? (
+              <Error message={error} />
+            ) : (
+              <div className="w-full space-y-4">
+                {pendingDoctor && pendingDoctor.length == 0 ? (
+                  <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-12 text-center">
+                    <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 dark:text-gray-400">
+                      No verifications found
+                    </p>
+                  </div>
+                ) : (
+                  pendingDoctor &&
+                  pendingDoctor.map((doctor) => {
+                    return (
+                      <div
+                        key={doctor.id}
+                        className="flex justify-between items-center bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) p-4 rounded-lg"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-15 h-15 rounded-full overflow-hidden flex justify-center items-center bg-(--color-primary) text-white">
+                            {doctor.imageUrl ? (
+                              <img
+                                src={doctor.imageUrl}
+                                alt=""
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-3xl font-bold">
+                                {doctor.fullName.charAt(0).toUpperCase()}
+                              </span>
+                            )}
                           </div>
-                        })
-                    }
-
-
-                  </div>)
-            }
-
+                          <div>
+                            <h1 className="text-lg font-medium">
+                              {doctor.fullName}
+                            </h1>
+                            <span className="block text-sm -mt-1">
+                              {doctor.specialization}
+                            </span>
+                            <span className=" text-xs">
+                              {`1 documents . Submitted ${getTimeAgo(doctor.createdAt)}`}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Link
+                            to={"/verify-doctors"}
+                            className="p-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-900/50 transition-colors"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                          </Link>
+                          <Link
+                            to={"/verify-doctors"}
+                            className="p-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                          >
+                            <XCircle className="w-4 h-4" />
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            )}
           </CardComp>
 
           <div className="space-y-4 flex-1">

@@ -9,6 +9,9 @@ interface Props {
 }
 
 const Patient = ({ id, name, imageUrl, lastInteractionDate }: Props) => {
+  if (imageUrl) {
+    imageUrl = "https://asnani.runasp.net/" + imageUrl;
+  }
   const firstCharacter = name.charAt(0);
   return (
     <div className="flex justify-between items-center bg-gray-50 dark:bg-slate-700/30 p-4 rounded-xl">

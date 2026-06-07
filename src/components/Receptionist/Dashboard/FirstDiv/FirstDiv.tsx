@@ -180,7 +180,6 @@ const FirstDiv = () => {
         );
 
         const appointmentId = response.data?.data?.appointmentId;
-        console.log(appointmentId);
         if (!appointmentId) {
           toast.error("Could not find an appointment for this patient");
           return;

@@ -16,8 +16,12 @@ const SecondDiv = ({ dashboardData }: SecondDivProps) => {
       <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex gap-3 items-start">
         <GrAlert className="text-yellow-600 text-xl mt-0.5" />
         <div>
-          <h3 className="text-yellow-800 font-semibold text-sm">Urgent Review</h3>
-          <p className="text-yellow-700 text-xs mt-1">2 critical scans need immediate attention</p>
+          <h3 className="text-yellow-800 font-semibold text-sm">
+            Urgent Review
+          </h3>
+          <p className="text-yellow-700 text-xs mt-1">
+            2 critical scans need immediate attention
+          </p>
         </div>
       </div>
     </div>
