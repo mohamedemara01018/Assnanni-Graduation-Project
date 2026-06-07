@@ -42,6 +42,7 @@ import AppointmentsBookingPage from "./pages/appointments-booking-page/Appointme
 import DoctorsListPage from "./pages/doctors-list-page/DoctorsListPage";
 import DoctorProfilePage from "./pages/doctor-profile-page/DoctorProfilePage";
 import Scan from "./pages/doctor-pages/Scan/Scan";
+import ChatbotWidget from "./components/chatbot/ChatbotWidget";
 
 // Constants & helpers
 import { roleRoutePaths, sharedRoutePaths } from "./constants/routeConstants";
@@ -261,6 +262,7 @@ const App = () => {
         </Routes>
       </main>
 
+      <ChatbotWidget />
       <ToastContainer />
     </div>
   );
