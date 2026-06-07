@@ -21,7 +21,7 @@ function UserComp() {
   const fullName = userProfile?.fullName || userProfile?.name || "User";
   let imageUrl = userProfile?.imageUrl;
 
-  if (imageUrl.length === 26) {
+  if (String(imageUrl)?.length === 26) {
     imageUrl = "";
   }
 
@@ -78,9 +78,8 @@ function UserComp() {
         </span>
 
         <FiChevronDown
-          className={`h-3.5 w-3.5 text-gray-400 transition-transform duration-200 ${
-            showUserMenu ? "rotate-180" : ""
-          }`}
+          className={`h-3.5 w-3.5 text-gray-400 transition-transform duration-200 ${showUserMenu ? "rotate-180" : ""
+            }`}
         />
       </button>
 
