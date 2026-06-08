@@ -14,7 +14,7 @@ import { NotFound } from "@/components/notfound/NotFound";
 import Pagination from "@/components/pagination/Pagination";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
-import { allDoctorsState, fetchAllDoctors, type Doctor } from "@/store/slices/patient-slice/all-doctors.slice/allDoctorsSlice";
+import { allDoctorsState, fetchAllDoctors, type Doctor } from "@/store/slices/patient-slice/all-doctors-slice/allDoctorsSlice";
 import { SlidersHorizontal, User, X, Stethoscope, CalendarCheck, ChevronDown, MapPin, Sliders, ArrowUpDown } from "lucide-react";
 import { toast } from "react-toastify";
 

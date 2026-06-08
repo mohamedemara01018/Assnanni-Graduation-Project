@@ -22,18 +22,18 @@ function DoctorDetails({ doctorDetails, loadingDoctorDetails, errorDoctorDetails
                 </h2>
                 <div className="flex flex-col items-center mb-4">
                     {
-                        // doctor.imageUrl ? (
-                        //   <img
-                        //     src={doctor.imageUrl}
-                        //     alt={doctor.name}
-                        //     className="w-20 h-20 rounded-full object-cover border-2 border-blue-100 dark:border-blue-900 mb-2"
-                        //   />
-                        // ) :
-                        (
-                            <div className="w-20 h-20 rounded-full bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-100 dark:border-blue-900 flex items-center justify-center mb-2">
-                                <User className="w-8 h-8 text-blue-400" />
-                            </div>
-                        )}
+                        doctorDetails?.imageUrl ? (
+                            <img
+                                src={doctorDetails.imageUrl}
+                                alt={doctorDetails.name}
+                                className="w-20 h-20 rounded-full object-cover border-2 border-blue-100 dark:border-blue-900 mb-2"
+                            />
+                        ) :
+                            (
+                                <div className="w-20 h-20 rounded-full bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-100 dark:border-blue-900 flex items-center justify-center mb-2">
+                                    <User className="w-8 h-8 text-blue-400" />
+                                </div>
+                            )}
                     <h3 className="text-base text-gray-900 dark:text-white font-medium text-center">
                         {doctorDetails?.name}
                     </h3>
