@@ -9,7 +9,7 @@ import searchPendingDoctorReducer from './slices/admin-slice/search-pending-doct
 import approvePendingDoctorReducer from './slices/admin-slice/approve-pending-doctor-slice/approvePendingDoctorSlice'
 import rejectPendingDoctorReducer from './slices/admin-slice/reject-pending-doctor-slice/rejectPendingDoctorSlice'
 import patientDashboardReducer from './slices/patient-slice/patient-dashboard-slice/patientDashboardSlice'
-import allDoctorsReducer from './slices/patient-slice/all-doctors.slice/allDoctorsSlice'
+import allDoctorsReducer from './slices/patient-slice/all-doctors-slice/allDoctorsSlice'
 import doctorProfileReducer from './slices/patient-slice/doctor-profile-slice/doctorProfileSlice'
 import availableDatesReducer from './slices/patient-slice/available-dates-slice/availableDatesSlice'
 import availableSlotsReducer from './slices/patient-slice/available-slots-slice/availableSlotsSlice'
@@ -25,6 +25,8 @@ import myDoctorsReducer from './slices/patient-slice/my-doctors-slice/myDoctorsS
 import spectializationsReducer from './slices/patient-slice/specializations-slice/specializationsSlice';
 import addFeedbackReducer from './slices/patient-slice/add-feedback-slice/addFeedbackSlice';
 import editFeedbackReducer from './slices/patient-slice/edit-feedback-slice/editFeedbackSlice';
+import deleteFeedbackReducer from './slices/patient-slice/delete-feedback-slice/deleteFeedbackSlice'
+import medicalHistoryReducer from './slices/patient-slice/medical-history-slice/medicalHistorySlice'
 
 export const store = configureStore({
   reducer: {
@@ -58,7 +60,9 @@ export const store = configureStore({
     myDoctorsSlice: myDoctorsReducer,
     spectializationsSlice: spectializationsReducer,
     addFeedbackSlice: addFeedbackReducer,
-    editFeedbackSlice: editFeedbackReducer
+    editFeedbackSlice: editFeedbackReducer,
+    deleteFeedbackSlice: deleteFeedbackReducer,
+    medicalHistorySlice: medicalHistoryReducer
   },
 });
 

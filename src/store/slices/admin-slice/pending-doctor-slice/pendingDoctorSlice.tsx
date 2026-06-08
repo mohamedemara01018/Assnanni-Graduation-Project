@@ -2,30 +2,43 @@ import type { RootState } from "@/store/store";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
 
-export interface pendingDoctor {
-    id: string;
+export interface PendingDoctor {
+    doctorId: string;
     fullName: string;
     email: string;
-    roleName: string;
-    university: string | null;
-    yearOfStudy: string | null;
+    phoneNumber: string;
+    gender: string;
+    birthDate: string | null;
     medicalLicenseNumber: string;
-    specialization: string;
-    imageUrl: string | null;
+    clinicName: string;
+    clinicLocation: string;
+    clinicPhoneNumber: string;
+    about: string;
+    yearsOfExperience: number;
+    country: string;
+    city: string;
+    street: string;
+    details: string;
+    degree: number;
+    education: string;
+    languages: string;
+    price: number;
+    fullProfileImageUrl: string | null;
+    fullCertificateUrl: string | null;
     createdAt: string;
 }
 
-export interface pendingDoctorInterface {
-    pendingDoctor: pendingDoctor[],
-    loading: boolean,
-    error: string | null
+export interface PendingDoctorState {
+    pendingDoctors: PendingDoctor[];
+    loading: boolean;
+    error: string | null;
 }
 
-const initialState: pendingDoctorInterface = {
-    pendingDoctor: [],
+const initialState: PendingDoctorState = {
+    pendingDoctors: [],
     loading: false,
     error: null,
-}
+};
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export const fetchPendingDoctor = createAsyncThunk(
@@ -72,7 +85,7 @@ const pendingDoctorSlice = createSlice({
             .addCase(fetchPendingDoctor.fulfilled, (state, action) => {
                 state.loading = false;
                 state.error = null;
-                state.pendingDoctor = action.payload.data
+                state.pendingDoctors = action.payload.data
             })
             .addCase(fetchPendingDoctor.rejected, (state, action) => {
                 state.loading = false;

@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import {
-    Star, MessageSquare, Phone, MapPin,
+    Star, Phone, MapPin,
     Stethoscope, Award, Globe, Mail, Clock,
     ChevronRight, User, Search, CalendarCheck,
 } from 'lucide-react';
 import DashboardLayout from '@/components/dashboard-layout/DashboardLayout';
-import { GiveFeedbackModal } from '@/components/give-feedback-modal/GiveFeedbackModal';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch } from '@/store/store';
 import {
@@ -18,6 +17,7 @@ import Pagination from '@/components/pagination/Pagination';
 import MiniLoading from '@/components/mini-loading/MiniLoading';
 import Error from '@/components/error/Error';
 import { NotFound } from '@/components/notfound/NotFound';
+import { FeedbackModal } from '@/components/feedback-modal/FeedbackModal';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -109,7 +109,6 @@ export default function MyDoctorsPage() {
                     <Error message={error} />
                 ) : data.items?.length === 0 ? (
                     // ── Empty state ────────────────────────────────────────
-
                     <NotFound
                         message={search ? "No reviews match your filters" : "No feedback yet"}
                         subMessage={
@@ -119,27 +118,6 @@ export default function MyDoctorsPage() {
                         }
                         resetLabel="Clear filters"
                     />
-
-                    // <div
-                    //     className="flex flex-col items-center justify-center rounded-2xl border border-(--color-border) bg-(--color-surface) py-16 px-8 text-center"
-                    //     style={{ boxShadow: 'var(--shadow)' }}
-                    // >
-                    //     <div className="w-14 h-14 rounded-2xl bg-(--color-bg) border border-(--color-border) flex items-center justify-center mb-4">
-                    //         <Stethoscope className="w-6 h-6 text-(--color-text-light)" />
-                    //     </div>
-                    //     <p className="text-sm font-medium text-(--color-text) mb-1">No doctors found</p>
-                    //     <p className="text-xs text-(--color-text-light) mb-5">
-                    //         {search ? 'Try adjusting your search' : "You haven't consulted with any doctors yet"}
-                    //     </p>
-                    //     {!search && (
-                    //         <Link
-                    //             to="/doctors-list"
-                    //             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-(--color-primary) text-white text-xs font-medium hover:bg-(--color-primary-dark) transition-colors"
-                    //         >
-                    //             Find a Doctor
-                    //         </Link>
-                    //     )}
-                    // </div>
                 ) : (
                     <>
                         {/* ── Doctors grid ──────────────────────────────────── */}
@@ -168,7 +146,7 @@ export default function MyDoctorsPage() {
             {/* ── Feedback modal ─────────────────────────────────────────────── */}
             {
                 selectedDoctor && (
-                    <GiveFeedbackModal
+                    <FeedbackModal
                         isOpen={showFeedback}
                         onClose={closeFeedback}
                         doctor={{
@@ -176,8 +154,7 @@ export default function MyDoctorsPage() {
                             name: selectedDoctor.name,
                             specialty: selectedDoctor.specialization,
                             image: selectedDoctor.imageUrl,
-                        }}
-                    />
+                        }} mode={'add'} appointmentId={0} />
                 )
             }
         </DashboardLayout >
@@ -192,7 +169,7 @@ function DoctorCard({ doctor, onFeedback }: { doctor: MyDoctor; onFeedback: () =
 
     return (
         <div
-            className="group flex flex-col rounded-2xl border border-(--color-border) bg-(--color-surface) overflow-hidden transition-all duration-200 hover:border-(--color-primary)/30 hover:shadow-md"
+            className="group flex flex-col rounded-2xl border border-(--color-border) bg-(--color-surface) overflow-hidden transition-all duration-200 hover:border-primary/30 hover:shadow-md"
             style={{ boxShadow: 'var(--shadow)' }}
         >
             {/* ── Top section ──────────────────────────────────────────────── */}
@@ -203,7 +180,7 @@ function DoctorCard({ doctor, onFeedback }: { doctor: MyDoctor; onFeedback: () =
                         <img
                             src={doctor.imageUrl}
                             alt={doctor.name}
-                            className="w-16 h-16 rounded-xl object-cover ring-2 ring-(--color-border)"
+                            className="w-16 h-16 rounded-full object-cover ring-2 ring-(--color-border)"
                         />
                     ) : (
                         <div className="w-16 h-16 rounded-xl bg-(--color-bg-blue) border border-(--color-primary)/20 flex items-center justify-center">
@@ -321,13 +298,13 @@ function DoctorCard({ doctor, onFeedback }: { doctor: MyDoctor; onFeedback: () =
                     <CalendarCheck className="w-3.5 h-3.5" />
                     Book Appointment
                 </Link>
-                <Link
+                {/* <Link
                     to={`/chat/${doctor.doctorId}`}
                     className="flex h-9 w-9 items-center justify-center rounded-xl border border-(--color-border) text-(--color-text-light) hover:border-(--color-primary) hover:text-(--color-primary) hover:bg-(--color-bg-blue) transition-all duration-150"
                     title="Message doctor"
                 >
                     <MessageSquare className="w-3.5 h-3.5" />
-                </Link>
+                </Link> */}
                 <button
                     onClick={onFeedback}
                     className="flex h-9 w-9 items-center justify-center rounded-xl border border-(--color-border) text-(--color-text-light) hover:border-amber-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-all duration-150 cursor-pointer"

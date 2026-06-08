@@ -13,7 +13,6 @@ import Schedule from "../pages/doctor-pages/schedule/Schedule";
 import AddTimeSlotPage from "../pages/add-time-slot-page/AddTimeSlotPage";
 import Patients from "../pages/doctor-pages/patients/Patients";
 import PatientDetails from "../pages/doctor-pages/patients/PatientDetails";
-import MedicalHistory from "../pages/doctor-pages/patients/MedicalHistory";
 import AddMedicalHistoryRecord from "../pages/doctor-pages/patients/AddMedicalHistoryRecord";
 import Reports from "../pages/doctor-pages/reports/Reports";
 import AllReports from "../pages/doctor-pages/reports/AllReports";
@@ -62,9 +61,12 @@ import PatientProfilePage from "../pages/patient-profile-page/PatientProfilePage
 import EditPatientProfilePage from "../pages/edit-patient-profile-page/EditPatientProfilePage";
 import ProfilePage from "../pages/profile-page/ProfilePage";
 import PrescriptionsPage from "@/pages/prescriptions-page/PrescriptionsPage";
-import MyFeedbackPage from "@/pages/my-feedbacks-page/MyFeedbacks";
+import MyFeedbackPage from "@/pages/my-feedbacks-page/MyFeedbacksPage";
 import MyDoctorsPage from "@/pages/my-doctors-page/MyDoctorsPage";
+
 import StudentAppointmentDetails from "@/pages/student-doctor-pages/appointments/StudentAppointmentDetails";
+
+import MedicalHistory from "@/pages/medical-history-page/MedicalHistoryPage";
 
 // ProtectedRoute component for role-based access control
 export const ProtectedRoute = ({

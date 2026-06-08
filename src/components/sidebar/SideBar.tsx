@@ -2,7 +2,6 @@ import { FiLogOut } from "react-icons/fi";
 import Logo from "../../assets/logo.png";
 import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-
 import { Link, NavLink, useNavigate } from "react-router";
 import {
   Brain,
@@ -39,90 +38,146 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
   const handleLogout = () => {
     dispatch(logout());
     dispatch(clearEmail());
-
     Cookies.remove("patientsView");
 
     navigate("/");
   };
 
   const linkStyle = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center ${
-      toggled ? "justify-center" : ""
-    } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
-      isActive ? "bg-(--color-bg-blue) text-(--color-text-blue)" : ""
-    }`;
+    [
+      "group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+      "hover:bg-(--color-bg-link-hover)",
+      isActive
+        ? "bg-(--color-bg-blue) text-(--color-text-blue)"
+        : "text-(--color-text-light) hover:text-(--color-text)",
+      toggled ? "justify-center" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+  const navItems = sidebarDataRole[role as keyof typeof sidebarDataRole] ?? [];
 
   return (
-    <>
-      <div className={`relative`}>
-        {!collapsed && (
+    <div
+      className="flex flex-col h-full"
+      style={{ background: "var(--color-surface)" }}
+    >
+      {/* ── Logo / header ─────────────────────────────────── */}
+      <div
+        className="relative flex items-center justify-between h-16 px-4 shrink-0"
+        style={{ borderBottom: "1px solid var(--color-border)" }}
+      >
+        <Link
+          to="/"
+          className="flex justify-center items-center w-full gap-2 min-w-0"
+        >
+          {!toggled && (
+            <img
+              src={Logo}
+              alt="logo"
+              className="w-28 object-contain transition-all duration-200"
+            />
+          )}
+          {toggled && (
+            <img
+              src={Logo}
+              alt="logo"
+              className="w-8 h-8 object-contain rounded-lg"
+            />
+          )}
+        </Link>
+
+        {/* mobile close */}
+        {collapsed && (
           <button
-            onClick={onToggle}
-            className="flex items-center justify-center rounded-full w-8 h-8 absolute -right-4 top-20 bg-(--color-surface) shadow-lg border-2 border-(--color-border) cursor-pointer text-(--color-text)"
+            onClick={() => setCollapsed(false)}
+            className="p-1.5 rounded-lg hover:bg-(--color-bg-link-hover) transition-colors"
+            style={{ color: "var(--color-text-light)" }}
           >
-            {toggled ? <IoIosArrowForward /> : <IoIosArrowBack />}
+            <X className="w-5 h-5" />
           </button>
         )}
-
-        <div className="flex items-center gap-2 border-b">
-          <Link
-            to={"/"}
-            className="flex items-center justify-center gap-1 h-16 px-4"
-          >
-            <img className="w-36 mx-auto" src={Logo} alt="logo" />
-          </Link>
-          {collapsed && (
-            <button
-              onClick={() => setCollapsed(false)}
-              className="p-2 h-fit cursor-pointer hover:bg-(--color-bg-link-hover) rounded-xl transition-all duration-150"
-            >
-              <X />
-            </button>
-          )}
-        </div>
-
-        <ul className="p-2 py-5 space-y-1">
-          {sidebarDataRole &&
-            sidebarDataRole[role as keyof typeof sidebarDataRole]?.map(
-              (item, idx) => {
-                const Icon = item.icon;
-                return (
-                  <li key={idx}>
-                    <NavLink to={item.path} className={linkStyle}>
-                      <Icon className="text-xl w-5 h-5" />
-                      {!toggled && (
-                        <span className="text-sm font-medium">
-                          {item.label}
-                        </span>
-                      )}
-                    </NavLink>
-                  </li>
-                );
-              },
-            )}
-        </ul>
       </div>
 
-      <div className="p-2 border-t border-border">
+      {/* ── Collapse toggle ───────────────────────────────── */}
+      {!collapsed && (
         <button
-          onClick={handleLogout}
-          className={`flex items-center ${
-            toggled ? "justify-center" : ""
-          } gap-2 px-3 py-2.5 w-full text-start text-sm font-medium bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) rounded-lg`}
+          onClick={onToggle}
+          className="absolute -right-3.5 top-[72px] z-10 flex items-center justify-center w-7 h-7 rounded-full shadow-md border transition-colors duration-150"
+          style={{
+            background: "var(--color-surface)",
+            borderColor: "var(--color-border)",
+            color: "var(--color-text-light)",
+          }}
         >
-          <FiLogOut className="w-5 h-5 shrink-0 text-(--color-text)" />
-          {!toggled && (
-            <span className="text-sm font-medium text-(--color-text)">
-              Logout
-            </span>
+          {toggled ? (
+            <IoIosArrowForward className="w-3.5 h-3.5" />
+          ) : (
+            <IoIosArrowBack className="w-3.5 h-3.5" />
           )}
         </button>
+      )}
+
+      {/* ── Nav items ─────────────────────────────────────── */}
+      <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-0.5">
+        {navItems.map((item, idx) => {
+          const Icon = item.icon;
+          return (
+            <NavLink
+              key={idx}
+              to={item.path}
+              className={linkStyle}
+              title={toggled ? item.label : undefined}
+            >
+              {({ isActive }) => (
+                <>
+                  {/* active left bar */}
+                  {isActive && (
+                    <span
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-full"
+                      style={{ background: "var(--color-primary)" }}
+                    />
+                  )}
+                  <Icon
+                    className="w-[18px] h-[18px] shrink-0 transition-colors duration-150"
+                    style={{
+                      color: isActive ? "var(--color-primary)" : undefined,
+                    }}
+                  />
+                  {!toggled && <span className="truncate">{item.label}</span>}
+                </>
+              )}
+            </NavLink>
+          );
+        })}
+      </nav>
+
+      {/* ── Logout ────────────────────────────────────────── */}
+      <div
+        className="px-2 py-3 shrink-0"
+        style={{ borderTop: "1px solid var(--color-border)" }}
+      >
+        <button
+          onClick={handleLogout}
+          className={[
+            "flex items-center gap-2.5 w-full px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+            "hover:bg-(--color-bg-link-hover)",
+            toggled ? "justify-center" : "",
+          ].join(" ")}
+          style={{ color: "var(--color-text-light)" }}
+          title={toggled ? "Logout" : undefined}
+        >
+          <FiLogOut className="w-[18px] h-[18px] shrink-0" />
+          {!toggled && <span>Logout</span>}
+        </button>
       </div>
-    </>
+    </div>
   );
 }
 
 export default SideBar;
+
+// ─── Sidebar data ─────────────────────────────────────────────────────────────
 
 const sidebarDataRole = {
   admin: [
@@ -142,7 +197,6 @@ const sidebarDataRole = {
     { icon: FileText, label: "Medical History", path: "/medical-history" },
     { icon: Star, label: "My Feedback", path: "/my-feedbacks" },
     { icon: BriefcaseMedical, label: "My Doctors", path: "/my-doctors" },
-    { icon: Scan, label: "Scans", path: "/scan/upload" },
     { icon: Users, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ],

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import SearchInput from "@/components/search-input/SearchInput";
 import { governorates, regions, selectInputData } from "@/constants/doctorsListConstant";
@@ -15,8 +14,8 @@ import { NotFound } from "@/components/notfound/NotFound";
 import Pagination from "@/components/pagination/Pagination";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
-import { allDoctorsState, fetchAllDoctors, type Doctor } from "@/store/slices/patient-slice/all-doctors.slice/allDoctorsSlice";
-import { SlidersHorizontal, User, X, Stethoscope, CalendarCheck } from "lucide-react";
+import { allDoctorsState, fetchAllDoctors, type Doctor } from "@/store/slices/patient-slice/all-doctors-slice/allDoctorsSlice";
+import { SlidersHorizontal, User, X, Stethoscope, CalendarCheck, ChevronDown, MapPin, Sliders, ArrowUpDown } from "lucide-react";
 import { toast } from "react-toastify";
 
 // ── Quick filter tabs ──────────────────────────────────────────────────────────
@@ -64,9 +63,14 @@ function DoctorList() {
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
 
   const dispatch: AppDispatch = useDispatch();
   const { data, loading, error } = useSelector(allDoctorsState);
+
+  // Separate sorting from other filters
+  const detailsFilters = selectInputData.filter((item) => item.id !== "sort");
+  const sortFilter = selectInputData.find((item) => item.id === "sort");
 
   useEffect(() => {
     dispatch(fetchAllDoctors({
@@ -155,8 +159,13 @@ function DoctorList() {
       <div className="flex gap-5 w-full relative">
 
         {/* ── Sidebar (desktop) ──────────────────────────────────────────────── */}
-        <aside className="sticky self-start top-4 w-[260px] shrink-0 max-sm:hidden rounded-2xl border border-(--color-border) bg-(--color-surface) overflow-hidden"
-          style={{ boxShadow: "var(--shadow)" }}
+        <aside
+          className={`self-start sticky top-4 shrink-0 max-sm:hidden rounded-2xl border bg-(--color-surface) transition-all duration-300 ${
+            desktopSidebarOpen
+              ? "w-[260px] border-(--color-border) opacity-100"
+              : "w-0 border-transparent overflow-hidden opacity-0 pointer-events-none"
+          }`}
+          style={{ boxShadow: desktopSidebarOpen ? "var(--shadow)" : "none" }}
         >
           <div className="flex items-center justify-between px-4 py-3.5 border-b border-(--color-border)">
             <div className="flex items-center gap-2">
@@ -173,31 +182,77 @@ function DoctorList() {
             )}
           </div>
 
-          <div className="p-4 space-y-5">
-            <FilterSelect
-              id="governorate" label="Governorate"
-              value={governorate}
-              onChange={(v) => { setGovernorate(v); setRegion(""); }}
-              options={governorates}
-            />
+          <div className="p-4 space-y-6">
+            {/* Section 1: Location */}
+            <div className="space-y-4">
+              <h3 className="text-xs font-bold text-(--color-primary) flex items-center gap-1.5 uppercase tracking-wider">
+                <MapPin className="w-3.5 h-3.5" />
+                <span>Location Settings</span>
+              </h3>
+              <div className="space-y-3.5 pl-0.5">
+                <FilterSelect
+                  id="governorate"
+                  label="Governorate"
+                  value={governorate}
+                  onChange={(v) => {
+                    setGovernorate(v);
+                    setRegion("");
+                  }}
+                  options={governorates}
+                />
 
-            <FilterSelect
-              id="region" label="Region"
-              value={region}
-              onChange={setRegion}
-              disabled={!governorate}
-              options={governorate && regions[governorate] ? regions[governorate] : []}
-            />
+                <FilterSelect
+                  id="region"
+                  label="Region"
+                  value={region}
+                  onChange={setRegion}
+                  disabled={!governorate}
+                  options={governorate && regions[governorate] ? regions[governorate] : []}
+                />
+              </div>
+            </div>
 
-            {selectInputData && selectInputData.map((item) => (
-              <SelectInput
-                key={item.id}
-                id={item.id}
-                label={item.label}
-                options={item.options}
-                setFilter={setFilters}
-              />
-            ))}
+            <div className="h-px bg-(--color-border)" />
+
+            {/* Section 2: Doctor Preferences */}
+            <div className="space-y-4">
+              <h3 className="text-xs font-bold text-(--color-primary) flex items-center gap-1.5 uppercase tracking-wider">
+                <Sliders className="w-3.5 h-3.5" />
+                <span>Doctor Criteria</span>
+              </h3>
+              <div className="space-y-3.5 pl-0.5">
+                {detailsFilters.map((item) => (
+                  <SelectInput
+                    key={item.id}
+                    id={item.id}
+                    label={item.label}
+                    options={item.options}
+                    setFilter={setFilters}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="h-px bg-(--color-border)" />
+
+            {/* Section 3: Sort Options */}
+            {sortFilter && (
+              <div className="space-y-4">
+                <h3 className="text-xs font-bold text-(--color-primary) flex items-center gap-1.5 uppercase tracking-wider">
+                  <ArrowUpDown className="w-3.5 h-3.5" />
+                  <span>Sorting Options</span>
+                </h3>
+                <div className="pl-0.5">
+                  <SelectInput
+                    key={sortFilter.id}
+                    id={sortFilter.id}
+                    label={sortFilter.label}
+                    options={sortFilter.options}
+                    setFilter={setFilters}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </aside>
 
@@ -205,28 +260,106 @@ function DoctorList() {
         {sidebarOpen && (
           <div className="fixed inset-0 z-50 sm:hidden">
             <div
-              className="absolute inset-0 bg-black/50"
+              className="absolute inset-0 bg-black/50 backdrop-blur-xs"
               onClick={() => setSidebarOpen(false)}
             />
-            <aside className="absolute right-0 top-0 h-full w-72 bg-(--color-surface) overflow-y-auto shadow-xl">
+            <aside className="absolute right-0 top-0 h-full w-80 bg-(--color-surface) overflow-y-auto shadow-2xl flex flex-col border-l border-(--color-border)">
               <div className="flex items-center justify-between px-4 py-4 border-b border-(--color-border)">
-                <h2 className="text-sm font-semibold text-(--color-text)">Filters</h2>
-                <button onClick={() => setSidebarOpen(false)} className="cursor-pointer text-(--color-text-light)">
+                <div className="flex items-center gap-2">
+                  <SlidersHorizontal className="w-4 h-4 text-(--color-text-light)" />
+                  <h2 className="text-sm font-bold text-(--color-text)">Filters</h2>
+                </div>
+                <button
+                  onClick={() => setSidebarOpen(false)}
+                  className="cursor-pointer text-(--color-text-light) p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                >
                   <X className="w-4 h-4" />
                 </button>
               </div>
-              <div className="p-4 space-y-5">
-                <FilterSelect id="governorate" label="Governorate" value={governorate} onChange={(v) => { setGovernorate(v); setRegion(""); }} options={governorates} />
-                <FilterSelect id="region" label="Region" value={region} onChange={setRegion} disabled={!governorate} options={governorate && regions[governorate] ? regions[governorate] : []} />
-                {selectInputData && selectInputData.map((item) => (
-                  <SelectInput key={item.id} id={item.id} label={item.label} options={item.options} setFilter={setFilters} />
-                ))}
-                {hasActiveFilters && (
-                  <button onClick={() => { clearFilters(); setSidebarOpen(false); }} className="w-full py-2 rounded-lg border border-(--color-border) text-sm text-(--color-text-light) hover:bg-(--color-bg) transition-colors cursor-pointer">
-                    Clear all filters
-                  </button>
+              <div className="flex-1 p-4 space-y-6">
+                {/* Section 1: Location */}
+                <div className="space-y-4">
+                  <h3 className="text-xs font-bold text-(--color-primary) flex items-center gap-1.5 uppercase tracking-wider">
+                    <MapPin className="w-3.5 h-3.5" />
+                    <span>Location Settings</span>
+                  </h3>
+                  <div className="space-y-3.5 pl-0.5">
+                    <FilterSelect
+                      id="governorate"
+                      label="Governorate"
+                      value={governorate}
+                      onChange={(v) => {
+                        setGovernorate(v);
+                        setRegion("");
+                      }}
+                      options={governorates}
+                    />
+                    <FilterSelect
+                      id="region"
+                      label="Region"
+                      value={region}
+                      onChange={setRegion}
+                      disabled={!governorate}
+                      options={governorate && regions[governorate] ? regions[governorate] : []}
+                    />
+                  </div>
+                </div>
+
+                <div className="h-px bg-(--color-border)" />
+
+                {/* Section 2: Doctor Preferences */}
+                <div className="space-y-4">
+                  <h3 className="text-xs font-bold text-(--color-primary) flex items-center gap-1.5 uppercase tracking-wider">
+                    <Sliders className="w-3.5 h-3.5" />
+                    <span>Doctor Criteria</span>
+                  </h3>
+                  <div className="space-y-3.5 pl-0.5">
+                    {detailsFilters.map((item) => (
+                      <SelectInput
+                        key={item.id}
+                        id={item.id}
+                        label={item.label}
+                        options={item.options}
+                        setFilter={setFilters}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="h-px bg-(--color-border)" />
+
+                {/* Section 3: Sort Options */}
+                {sortFilter && (
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-bold text-(--color-primary) flex items-center gap-1.5 uppercase tracking-wider">
+                      <ArrowUpDown className="w-3.5 h-3.5" />
+                      <span>Sorting Options</span>
+                    </h3>
+                    <div className="pl-0.5">
+                      <SelectInput
+                        key={sortFilter.id}
+                        id={sortFilter.id}
+                        label={sortFilter.label}
+                        options={sortFilter.options}
+                        setFilter={setFilters}
+                      />
+                    </div>
+                  </div>
                 )}
               </div>
+              {hasActiveFilters && (
+                <div className="p-4 border-t border-(--color-border) bg-gray-50/50 dark:bg-gray-900/10">
+                  <button
+                    onClick={() => {
+                      clearFilters();
+                      setSidebarOpen(false);
+                    }}
+                    className="w-full py-2.5 rounded-xl border border-(--color-border) text-sm font-semibold text-(--color-text-light) hover:bg-(--color-bg-link-hover) transition-colors cursor-pointer bg-(--color-surface)"
+                  >
+                    Clear all filters
+                  </button>
+                </div>
+              )}
             </aside>
           </div>
         )}
@@ -234,12 +367,20 @@ function DoctorList() {
         {/* ── Doctor grid ────────────────────────────────────────────────────── */}
         <div className="flex-1 min-w-0 space-y-4">
 
-          {/* Result count */}
-          <div className="flex items-center justify-between">
+          {/* Result count & filters toggle button */}
+          <div className="flex items-center justify-between border-b border-(--color-border) pb-3 mb-2">
             <p className="text-sm text-(--color-text-light)">
               <span className="font-semibold text-(--color-text) text-base">{data.totalCount}</span>
               {" "}doctor{data.totalCount !== 1 ? "s" : ""} found
             </p>
+
+            <button
+              onClick={() => setDesktopSidebarOpen(!desktopSidebarOpen)}
+              className="hidden sm:flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-(--color-border) bg-(--color-surface) text-xs font-bold text-(--color-text) hover:border-(--color-primary) hover:text-(--color-primary) hover:bg-(--color-bg-blue) transition-all duration-150 cursor-pointer shadow-xs"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              {desktopSidebarOpen ? "Hide Filters" : "Show Filters"}
+            </button>
           </div>
 
           {/* Grid */}
@@ -252,7 +393,13 @@ function DoctorList() {
           ) : data.totalCount === 0 ? (
             <NotFound subMessage="No doctors found matching your criteria" />
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            <div
+              className={`grid grid-cols-1 gap-4 transition-all duration-300 ${
+                desktopSidebarOpen
+                  ? "md:grid-cols-2 xl:grid-cols-3"
+                  : "md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+              }`}
+            >
               {data.items.map((doctor: Doctor) => (
                 <DoctorCard key={doctor.doctorId} doctor={doctor} />
               ))}
@@ -392,7 +539,12 @@ export function DoctorCard({ doctor }: { doctor: Doctor }) {
 // ── Reusable filter select ────────────────────────────────────────────────────
 
 function FilterSelect({
-  id, label, value, onChange, options, disabled = false,
+  id,
+  label,
+  value,
+  onChange,
+  options,
+  disabled = false,
 }: {
   id: string;
   label: string;
@@ -402,22 +554,32 @@ function FilterSelect({
   disabled?: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-xs font-medium text-(--color-text-light) uppercase tracking-wide">
+    <div className="flex flex-col gap-1.5 w-full">
+      <label
+        htmlFor={id}
+        className="text-xs font-semibold text-(--color-text-light) uppercase tracking-wide"
+      >
         {label}
       </label>
-      <select
-        id={id}
-        name={id}
-        value={value}
-        disabled={disabled}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-(--color-border) bg-(--color-bg) text-(--color-text) text-sm px-3 py-2 outline-none focus:border-(--color-primary) transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-      >
-        {options.map((opt, idx) => (
-          <option key={idx} value={opt.value}>{opt.label}</option>
-        ))}
-      </select>
+      <div className="relative w-full flex items-center">
+        <select
+          id={id}
+          name={id}
+          value={value}
+          disabled={disabled}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full appearance-none rounded-xl border border-(--color-border) bg-(--color-bg) text-(--color-text) text-sm pl-3.5 pr-10 py-2.5 outline-none focus:border-(--color-primary) focus:ring-1 focus:ring-(--color-primary) transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {options.map((opt, idx) => (
+            <option key={idx} value={opt.value} className="bg-(--color-surface) text-(--color-text)">
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <div className="absolute right-3.5 pointer-events-none flex items-center justify-center text-gray-400 dark:text-gray-500">
+          <ChevronDown className="w-4 h-4" />
+        </div>
+      </div>
     </div>
   );
 }

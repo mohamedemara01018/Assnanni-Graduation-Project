@@ -6,14 +6,24 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 
-export interface EditFeedbackDto {
-    feedbackId: number;
-    appointmentId: number;
-    rating: number;
-    comment: string;
+export interface Attachment {
+    id: number;
+    fileName: string;
+    fileUrl: string;
 }
 
-export interface EditFeedbackState {
+export interface MedicalRecord {
+    appointmentId: number;
+    title: string;
+    doctorName: string;
+    date: string;
+    type: string;
+    description: string;
+    attachments: Attachment[];
+}
+
+export interface MedicalHistoryState {
+    records: MedicalRecord[];
     loading: boolean;
     success: boolean;
     error: string | null;
@@ -22,23 +32,22 @@ export interface EditFeedbackState {
 
 // ─── Thunk ────────────────────────────────────────────────────────────────────
 
-export const fetchEditFeedback = createAsyncThunk<
+export const fetchMedicalHistory = createAsyncThunk<
     any,
-    EditFeedbackDto,
+    void,
     { rejectValue: string }
 >(
-    "editFeedbackSlice/fetchEditFeedback",
-    async (feedbackData, { rejectWithValue }) => {
+    "medicalHistorySlice/fetchMedicalHistory",
+    async (_, { rejectWithValue }) => {
         const cookieToken = Cookies.get("jwtToken");
 
         try {
-            const response = await fetch(`${backendUrl}FeedBacks`, {
-                method: "PUT",
+            const response = await fetch(`${backendUrl}Patient/medical-history`, {
+                method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${cookieToken}`,
                 },
-                body: JSON.stringify(feedbackData),
             });
 
             const text = await response.text();
@@ -59,18 +68,19 @@ export const fetchEditFeedback = createAsyncThunk<
 
 // ─── Slice ────────────────────────────────────────────────────────────────────
 
-const initialState: EditFeedbackState = {
+const initialState: MedicalHistoryState = {
+    records: [],
     loading: false,
     success: false,
     error: null,
     message: null,
 };
 
-export const editFeedbackSlice = createSlice({
-    name: "editFeedbackSlice",
+export const medicalHistorySlice = createSlice({
+    name: "medicalHistorySlice",
     initialState,
     reducers: {
-        resetEditFeedbackStatus: (state) => {
+        resetMedicalHistoryStatus: (state) => {
             state.loading = false;
             state.success = false;
             state.error = null;
@@ -79,18 +89,19 @@ export const editFeedbackSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchEditFeedback.pending, (state) => {
+            .addCase(fetchMedicalHistory.pending, (state) => {
                 state.loading = true;
                 state.success = false;
                 state.error = null;
                 state.message = null;
             })
-            .addCase(fetchEditFeedback.fulfilled, (state, action) => {
+            .addCase(fetchMedicalHistory.fulfilled, (state, action) => {
                 state.loading = false;
                 state.success = action.payload?.succeeded ?? true;
-                state.message = action.payload?.data || "Feedback updated successfully";
+                state.records = action.payload?.data ?? [];
+                state.message = action.payload?.message || "Fetched successfully";
             })
-            .addCase(fetchEditFeedback.rejected, (state, action) => {
+            .addCase(fetchMedicalHistory.rejected, (state, action) => {
                 state.loading = false;
                 state.success = false;
                 state.error = action.payload as string;
@@ -98,8 +109,8 @@ export const editFeedbackSlice = createSlice({
     },
 });
 
-export const { resetEditFeedbackStatus } = editFeedbackSlice.actions;
+export const { resetMedicalHistoryStatus } = medicalHistorySlice.actions;
 
-export const editFeedbackState = (state: RootState) => state.editFeedbackSlice;
+export const medicalHistoryState = (state: RootState) => state.medicalHistorySlice;
 
-export default editFeedbackSlice.reducer;
+export default medicalHistorySlice.reducer;
