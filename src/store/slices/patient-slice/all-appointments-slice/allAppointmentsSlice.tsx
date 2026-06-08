@@ -36,6 +36,28 @@ export interface AppointmentsState {
     error: string | null;
 }
 
+const normalizeAppointmentsData = (payload: unknown): AppointmentsData => {
+    const raw = (payload ?? {}) as Partial<AppointmentsData> & {
+        appointments?: unknown;
+    };
+
+    const appointmentsSource = raw.appointments;
+    const appointments = Array.isArray(appointmentsSource)
+        ? appointmentsSource
+        : Array.isArray((appointmentsSource as unknown as { items?: unknown } | undefined)?.items)
+            ? ((appointmentsSource as unknown as { items: Appointment[] }).items)
+            : [];
+
+    return {
+        total: Number(raw.total ?? appointments.length),
+        upcoming: Number(raw.upcoming ?? 0),
+        completed: Number(raw.completed ?? 0),
+        cancelled: Number(raw.cancelled ?? 0),
+        missedAppointments: Number(raw.missedAppointments ?? 0),
+        appointments,
+    };
+};
+
 const initialState: AppointmentsState = {
     data: {
         total: 0,
@@ -104,7 +126,7 @@ export const allAppointmentsSlice = createSlice({
             })
             .addCase(fetchAllAppointments.fulfilled, (state, action) => {
                 state.loading = false;
-                state.data = action.payload?.data;
+                state.data = normalizeAppointmentsData(action.payload?.data ?? action.payload);
             })
             .addCase(fetchAllAppointments.rejected, (state, action) => {
                 state.loading = false;

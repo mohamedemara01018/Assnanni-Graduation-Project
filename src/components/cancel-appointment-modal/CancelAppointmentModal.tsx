@@ -53,7 +53,7 @@ export function CancelAppointmentModal({
   });
 
   const [showSuccess, setShowSuccess] = useState(false);
-
+  const role = useSelector((state: any) => state.auth.role);
   const appointmentIdNumber = useMemo(() => {
     const parsed = Number(appointment.id);
     return Number.isFinite(parsed) ? parsed : 0;
@@ -70,18 +70,32 @@ export function CancelAppointmentModal({
   const token = Cookies.get("jwtToken");
   const handleConfirm = async (values: { reason: string }) => {
     try {
-      await axios.post(
-        `${backendUrl}Doctors/cancel-appointment`,
-        {
-          appointmentId: appointmentIdNumber,
-          reason: values.reason,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      role === "doctor"
+        ? await axios.post(
+            `${backendUrl}Doctors/cancel-appointment`,
+            {
+              appointmentId: appointmentIdNumber,
+              reason: values.reason,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          )
+        : await axios.put(
+            `${backendUrl}Patient/cancel-my-appointment`,
+            {
+              appointmentId: appointmentIdNumber,
+              reason: values.reason,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            },
+          );
 
       toast.success("Appointment cancelled successfully.");
       setShowSuccess(true);

@@ -40,7 +40,7 @@ import { FeedbackModal } from "@/components/feedback-modal/FeedbackModal";
 
 interface SelectedAppointment {
   id: string;
-  doctorId: string,
+  doctorId: string;
   date: string;
   time: string;
   doctorName: string;
@@ -50,7 +50,12 @@ interface SelectedAppointment {
 
 // ── Status config ─────────────────────────────────────────────────────────────
 
-type StatusKey = "upcoming" | "completed" | "confirmed" | "cancelled" | "noshow";
+type StatusKey =
+  | "upcoming"
+  | "completed"
+  | "confirmed"
+  | "cancelled"
+  | "noshow";
 
 const STATUS_CONFIG: Record<StatusKey, { pill: string; dot: string }> = {
   upcoming: {
@@ -76,7 +81,7 @@ const STATUS_CONFIG: Record<StatusKey, { pill: string; dot: string }> = {
 };
 
 const getStatusCfg = (status: AppointmentStatus) =>
-  STATUS_CONFIG[(status.toLowerCase() as StatusKey)] ?? STATUS_CONFIG.upcoming;
+  STATUS_CONFIG[status.toLowerCase() as StatusKey] ?? STATUS_CONFIG.upcoming;
 
 // ── Filter tabs ───────────────────────────────────────────────────────────────
 
@@ -104,7 +109,9 @@ function AppointmentsPage() {
 
   const dispatch: AppDispatch = useDispatch();
   const { data, loading, error } = useSelector(allAppointmentsState);
-  const appointments = data?.appointments ?? [];
+  const appointments = Array.isArray(data?.appointments)
+    ? data.appointments
+    : [];
 
   useEffect(() => {
     dispatch(
@@ -112,7 +119,7 @@ function AppointmentsPage() {
         search,
         AppointmentStatus: appointmentStatus,
         BookingType: "",
-      })
+      }),
     );
   }, [dispatch, search, appointmentStatus]);
 
@@ -124,7 +131,7 @@ function AppointmentsPage() {
         search,
         AppointmentStatus: appointmentStatus,
         BookingType: "",
-      })
+      }),
     );
 
   const buildSelected = (appt: any): SelectedAppointment => ({
@@ -164,7 +171,6 @@ function AppointmentsPage() {
     setSelectedAppointment(null);
   };
 
-
   const closeFeedback = () => {
     setShowFeedback(false);
     setSelectedAppointment(null);
@@ -172,34 +178,37 @@ function AppointmentsPage() {
 
   const statsConfig = [
     {
-      label: 'Total Appointments',
-      value: data.total.toString(),
+      label: "Total Appointments",
+      value: String(data?.total ?? 0),
       icon: Calendar,
-      color: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+      color: "bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
     },
     {
-      label: 'Upcoming',
-      value: data.upcoming.toString(),
+      label: "Upcoming",
+      value: String(data?.upcoming ?? 0),
       icon: Clock,
-      color: 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+      color:
+        "bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400",
     },
     {
-      label: 'Completed',
-      value: data.completed.toString(),
+      label: "Completed",
+      value: String(data?.completed ?? 0),
       icon: CheckCircle,
-      color: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
+      color:
+        "bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400",
     },
     {
-      label: 'Cancelled',
-      value: data.cancelled.toString(),
+      label: "Cancelled",
+      value: String(data?.cancelled ?? 0),
       icon: XCircle,
-      color: 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400',
+      color: "bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400",
     },
     {
-      label: 'Missed',
-      value: data.missedAppointments,
+      label: "Missed",
+      value: String(data?.missedAppointments ?? 0),
       icon: AlertCircle,
-      color: 'bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
+      color:
+        "bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400",
     },
   ];
 
@@ -208,7 +217,6 @@ function AppointmentsPage() {
   return (
     <DashboardLayout pageTitle="Patient">
       <div className="space-y-5">
-
         {/* ── Header ── */}
         <div className="flex items-center justify-between">
           <div>
@@ -238,12 +246,16 @@ function AppointmentsPage() {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {stat.label}
+                    </p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
                       {stat.value}
                     </p>
                   </div>
-                  <div className={`w-12 h-12 rounded-lg ${stat.color} flex items-center justify-center`}>
+                  <div
+                    className={`w-12 h-12 rounded-lg ${stat.color} flex items-center justify-center`}
+                  >
                     <Icon className="w-6 h-6" />
                   </div>
                 </div>
@@ -262,10 +274,11 @@ function AppointmentsPage() {
                 <button
                   key={tab.value}
                   onClick={() => setAppointmentStatus(tab.value)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-all duration-150 cursor-pointer ${active
-                    ? "bg-(--color-primary) text-white border-(--color-primary)"
-                    : "bg-(--color-bg) text-(--color-text-light) border-(--color-border) hover:border-gray-300 dark:hover:border-gray-600"
-                    }`}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-all duration-150 cursor-pointer ${
+                    active
+                      ? "bg-(--color-primary) text-white border-(--color-primary)"
+                      : "bg-(--color-bg) text-(--color-text-light) border-(--color-border) hover:border-gray-300 dark:hover:border-gray-600"
+                  }`}
                 >
                   {tab.label}
                 </button>
@@ -295,8 +308,10 @@ function AppointmentsPage() {
             <div className="space-y-3">
               {appointments.map((appointment, index) => {
                 const cfg = getStatusCfg(appointment.status);
-                const isCancelled = appointment.status.toLowerCase() === "cancelled";
-                const isCompleted = appointment.status.toLowerCase() === "completed";
+                const isCancelled =
+                  appointment.status.toLowerCase() === "cancelled";
+                const isCompleted =
+                  appointment.status.toLowerCase() === "completed";
                 const isMissed = appointment.status.toLowerCase() === "NoShow";
 
                 return (
@@ -308,7 +323,8 @@ function AppointmentsPage() {
                     <div className="flex items-start gap-4 min-w-0">
                       {/* Avatar with status dot */}
                       <div className="relative shrink-0">
-                        {appointment.doctorImage?.trim() && !imageErrors[appointment.id] ? (
+                        {appointment.doctorImage?.trim() &&
+                        !imageErrors[appointment.id] ? (
                           <LazyImage
                             src={appointment.doctorImage}
                             alt={appointment.doctorName}
@@ -462,18 +478,24 @@ function AppointmentsPage() {
               name: selectedAppointment.doctorName,
               specialty: selectedAppointment.doctorSpecialty ?? "",
               image: selectedAppointment.doctorImage ?? "",
-            }} mode={"add"} appointmentId={Number(selectedAppointment.id)} />
+            }}
+            mode={"add"}
+            appointmentId={Number(selectedAppointment.id)}
+          />
         </>
       )}
 
       {/* Pagination */}
-      {!error && !loading && data.appointments.length > 0 && (
+      {!error && !loading && appointments.length > 0 && (
         <Pagination
           pageNumber={pageNumber}
           pageSize={pageSize}
-          totalItems={data.total}
+          totalItems={data?.total ?? appointments.length}
           onPageChange={(page) => setPageNumber(page)}
-          onPageSizeChange={(size) => { setPageSize(size); setPageNumber(1); }}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setPageNumber(1);
+          }}
         />
       )}
     </DashboardLayout>
