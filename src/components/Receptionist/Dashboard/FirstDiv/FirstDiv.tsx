@@ -23,10 +23,21 @@ export interface DashboardAppointment {
   status: "confirmed" | "pending" | "completed";
 }
 
+export interface CheckedInAppointment {
+  appointmentId: number;
+  patientId: number;
+  patientName: string;
+  date: string;
+  startTime: string;
+  arrivedAt: string;
+  queueStatus: string;
+}
+
 type ReceptionistDashboardData = {
   patientQueue: PatientInQueue[];
   todayAppointments: DashboardAppointment[];
   recentPatients: RecentPatient[];
+  checkedInAppointments: CheckedInAppointment[];
 };
 
 const getResponseData = <T,>(responseData: unknown): T => {
@@ -121,12 +132,17 @@ const FirstDiv = () => {
     useQuery<ReceptionistDashboardData>({
       queryKey: ["ReceptionistDashboardFirstDiv"],
       queryFn: async () => {
-        const [queueRes, appointmentsRes, recentPatientsRes] =
-          await Promise.all([
-            axios.get(`${backendUrl}Receptionist/patient-queue`, config),
-            axios.get(`${backendUrl}Receptionist/today-appointments`, config),
-            axios.get(`${backendUrl}Receptionist/recent-patients`, config),
-          ]);
+        const [
+          queueRes,
+          appointmentsRes,
+          recentPatientsRes,
+          checkedInRes,
+        ] = await Promise.all([
+          axios.get(`${backendUrl}Receptionist/patient-queue`, config),
+          axios.get(`${backendUrl}Receptionist/today-appointments`, config),
+          axios.get(`${backendUrl}Receptionist/recent-patients`, config),
+          axios.get(`${backendUrl}Receptionist/checked-in-appointments`, config),
+        ]);
 
         return {
           patientQueue: getResponseData<PatientInQueue[]>(queueRes.data),
@@ -136,13 +152,18 @@ const FirstDiv = () => {
           recentPatients: getResponseData<RecentPatient[]>(
             recentPatientsRes.data,
           ),
+          checkedInAppointments: getResponseData<CheckedInAppointment[]>(
+            checkedInRes.data,
+          ),
         };
       },
     });
   const queryClient = useQueryClient();
 
   const [isQueueModalOpen, setIsQueueModalOpen] = useState(false);
-  const [selectedPatientId, setSelectedPatientId] = useState("");
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<
+    number | null
+  >(null);
 
   const addToQueueMutation = useMutation({
     mutationFn: async (appointmentId: string | number) => {
@@ -155,7 +176,7 @@ const FirstDiv = () => {
     onSuccess: () => {
       toast.success("Patient added to queue successfully");
       setIsQueueModalOpen(false);
-      setSelectedPatientId("");
+      setSelectedAppointmentId(null);
       queryClient.invalidateQueries({
         queryKey: ["ReceptionistDashboardFirstDiv"],
       });
@@ -167,33 +188,11 @@ const FirstDiv = () => {
 
   const handleQueueSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedPatientId) {
-      toast.warning("Please select a patient");
+    if (!selectedAppointmentId) {
+      toast.warning("Please select a checked-in appointment");
       return;
     }
-
-    const resolveAppointmentAndAdd = async () => {
-      try {
-        const response = await axios.get(
-          `${backendUrl}Receptionist/patient-info/${selectedPatientId}`,
-          config,
-        );
-
-        const appointmentId = response.data?.data?.appointmentId;
-        if (!appointmentId) {
-          toast.error("Could not find an appointment for this patient");
-          return;
-        }
-
-        addToQueueMutation.mutate(appointmentId);
-      } catch (err: any) {
-        toast.error(
-          err.response?.data?.message || "Failed to load patient details",
-        );
-      }
-    };
-
-    void resolveAppointmentAndAdd();
+    addToQueueMutation.mutate(selectedAppointmentId);
   };
 
   const confirmAppointmentMutation = useMutation({
@@ -254,6 +253,7 @@ const FirstDiv = () => {
   const patientQueue = data?.patientQueue || [];
   const todayAppointments = data?.todayAppointments || [];
   const recentPatients = data?.recentPatients || [];
+  const checkedInAppointments = data?.checkedInAppointments || [];
   const waitingPatients = patientQueue.filter(
     (patient) => patient.status === "Waiting",
   ).length;
@@ -387,20 +387,64 @@ const FirstDiv = () => {
             <form onSubmit={handleQueueSubmit} className="p-6 space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-(--color-text-light)">
-                  Select Patient <span className="text-red-500">*</span>
+                  Select Checked-in Appointment{" "}
+                  <span className="text-red-500">*</span>
                 </label>
-                <select
-                  value={selectedPatientId}
-                  onChange={(e) => setSelectedPatientId(e.target.value)}
-                  className="w-full bg-gray-50/50 dark:bg-gray-800/20 border border-(--color-border) rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-(--color-text) appearance-none"
-                >
-                  <option value="">Choose a patient...</option>
-                  {recentPatients.map((patient) => (
-                    <option key={patient.id} value={patient.id}>
-                      {patient.name} (ID: {patient.id})
-                    </option>
-                  ))}
-                </select>
+                <div className="max-h-72 overflow-y-auto space-y-3 pr-1">
+                  {checkedInAppointments.length > 0 ? (
+                    checkedInAppointments.map((appointment) => {
+                      const isSelected =
+                        selectedAppointmentId === appointment.appointmentId;
+
+                      return (
+                        <button
+                          key={appointment.appointmentId}
+                          type="button"
+                          onClick={() =>
+                            setSelectedAppointmentId(appointment.appointmentId)
+                          }
+                          className={`w-full text-left rounded-2xl border p-4 transition-all cursor-pointer ${
+                            isSelected
+                              ? "border-blue-500 bg-blue-50/60 shadow-sm"
+                              : "border-(--color-border) bg-gray-50/50 dark:bg-gray-800/20 hover:bg-gray-50"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="min-w-0">
+                              <h3 className="text-sm font-bold text-(--color-text)">
+                                {appointment.patientName}
+                              </h3>
+                              <p className="text-xs text-(--color-text-light) font-medium mt-1">
+                                Appointment #{appointment.appointmentId} | Patient ID:{" "}
+                                {appointment.patientId}
+                              </p>
+                              <p className="text-xs text-(--color-text-light) font-medium mt-1">
+                                Date: {appointment.date} | Start:{" "}
+                                {appointment.startTime}
+                              </p>
+                              <p className="text-xs text-(--color-text-light) font-medium mt-1">
+                                Arrived at: {appointment.arrivedAt}
+                              </p>
+                            </div>
+                            <span
+                              className={`shrink-0 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${
+                                appointment.queueStatus === "Arrived"
+                                  ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                                  : "bg-gray-100 text-gray-600 border-gray-200"
+                              }`}
+                            >
+                              {appointment.queueStatus}
+                            </span>
+                          </div>
+                        </button>
+                      );
+                    })
+                  ) : (
+                    <p className="text-sm text-(--color-text-light) py-3">
+                      No checked-in appointments found.
+                    </p>
+                  )}
+                </div>
               </div>
 
               <button

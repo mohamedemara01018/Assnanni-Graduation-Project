@@ -13,6 +13,7 @@ import {
   FiCheckCircle,
   FiInfo,
   FiAlertTriangle,
+  FiMessageSquare,
 } from "react-icons/fi";
 
 interface Notification {
@@ -56,17 +57,20 @@ const Notifications = () => {
   const { data: unreadCountData } = useQuery({
     queryKey: ["unread-count"],
     queryFn: async () => {
-      const response = await axios.get(`${backendUrl}Notification/unread-count`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.get(
+        `${backendUrl}Notification/unread-count`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
       return response.data;
     },
     enabled: !!token && !!backendUrl,
   });
 
-  const unreadCount = unreadCountData?.data || 0;
+  const unreadCount = unreadCountData?.data ?? 0;
 
   const markAsReadMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -77,28 +81,31 @@ const Notifications = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
     },
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: ["notifications"] });
       await queryClient.cancelQueries({ queryKey: ["unread-count"] });
-      
-      const previousNotifications = queryClient.getQueryData<NotificationsResponse>(["notifications"]);
-      const previousCount = queryClient.getQueryData<{ data: number }>(["unread-count"]);
+
+      const previousNotifications =
+        queryClient.getQueryData<NotificationsResponse>(["notifications"]);
+      const previousCount = queryClient.getQueryData<{ data: number }>([
+        "unread-count",
+      ]);
 
       if (previousNotifications) {
         queryClient.setQueryData<NotificationsResponse>(["notifications"], {
           ...previousNotifications,
           data: previousNotifications.data.map((n) =>
-            n.id === id ? { ...n, isRead: true } : n
+            n.id === id ? { ...n, isRead: true } : n,
           ),
         });
       }
 
       if (previousCount) {
         queryClient.setQueryData<{ data: number }>(["unread-count"], {
-          data: Math.max(0, previousCount.data - 1)
+          data: Math.max(0, previousCount.data - 1),
         });
       }
 
@@ -106,7 +113,10 @@ const Notifications = () => {
     },
     onError: (_err, _id, context) => {
       if (context?.previousNotifications) {
-        queryClient.setQueryData(["notifications"], context.previousNotifications);
+        queryClient.setQueryData(
+          ["notifications"],
+          context.previousNotifications,
+        );
       }
       if (context?.previousCount) {
         queryClient.setQueryData(["unread-count"], context.previousCount);
@@ -128,15 +138,18 @@ const Notifications = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
     },
     onMutate: async () => {
       await queryClient.cancelQueries({ queryKey: ["notifications"] });
       await queryClient.cancelQueries({ queryKey: ["unread-count"] });
 
-      const previousNotifications = queryClient.getQueryData<NotificationsResponse>(["notifications"]);
-      const previousCount = queryClient.getQueryData<{ data: number }>(["unread-count"]);
+      const previousNotifications =
+        queryClient.getQueryData<NotificationsResponse>(["notifications"]);
+      const previousCount = queryClient.getQueryData<{ data: number }>([
+        "unread-count",
+      ]);
 
       if (previousNotifications) {
         queryClient.setQueryData<NotificationsResponse>(["notifications"], {
@@ -151,12 +164,66 @@ const Notifications = () => {
     },
     onError: (_err, _variables, context) => {
       if (context?.previousNotifications) {
-        queryClient.setQueryData(["notifications"], context.previousNotifications);
+        queryClient.setQueryData(
+          ["notifications"],
+          context.previousNotifications,
+        );
       }
       if (context?.previousCount) {
         queryClient.setQueryData(["unread-count"], context.previousCount);
       }
       toast.error("Failed to mark all as read");
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["unread-count"] });
+    },
+  });
+
+  const clearAllMutation = useMutation({
+    mutationFn: async () => {
+      await axios.delete(`${backendUrl}Notification/clear-all`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["notifications"] });
+      await queryClient.cancelQueries({ queryKey: ["unread-count"] });
+
+      const previousNotifications =
+        queryClient.getQueryData<NotificationsResponse>(["notifications"]);
+      const previousCount = queryClient.getQueryData<{ data: number }>([
+        "unread-count",
+      ]);
+
+      if (previousNotifications) {
+        queryClient.setQueryData<NotificationsResponse>(["notifications"], {
+          ...previousNotifications,
+          data: [],
+        });
+      }
+
+      if (previousCount) {
+        queryClient.setQueryData<{ data: number }>(["unread-count"], {
+          data: 0,
+        });
+      }
+
+      return { previousNotifications, previousCount };
+    },
+    onError: (_err, _variables, context) => {
+      if (context?.previousNotifications) {
+        queryClient.setQueryData(
+          ["notifications"],
+          context.previousNotifications,
+        );
+      }
+      if (context?.previousCount) {
+        queryClient.setQueryData(["unread-count"], context.previousCount);
+      }
+      toast.error("Failed to clear notifications");
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
@@ -190,6 +257,12 @@ const Notifications = () => {
           color: "text-red-500",
           bgColor: "bg-red-500/10",
         };
+      case "Message":
+        return {
+          icon: <FiMessageSquare />,
+          color: "text-indigo-500",
+          bgColor: "bg-indigo-500/10",
+        };
       case "Info":
       default:
         return {
@@ -212,19 +285,38 @@ const Notifications = () => {
               <h1 className="text-2xl sm:text-3xl font-bold text-(--color-text)">
                 Notifications
               </h1>
-              {unreadCount > 0 && (
-                <span className="px-2.5 py-0.5 bg-blue-600 text-white text-sm font-bold rounded-full animate-in fade-in zoom-in duration-300">
+              {unreadCount >= 0 && (
+                <span
+                  className={`px-2.5 py-0.5 text-white text-sm font-bold rounded-full animate-in fade-in zoom-in duration-300 ${unreadCount > 0 ? "bg-blue-600" : "bg-gray-400"}`}
+                >
                   {unreadCount}
                 </span>
               )}
             </div>
-            <button 
-              onClick={() => markAllAsReadMutation.mutate()}
-              disabled={markAllAsReadMutation.isPending || notifications.every(n => n.isRead)}
-              className="text-blue-500 font-bold text-sm hover:text-blue-600 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-            >
-              {markAllAsReadMutation.isPending ? "Marking..." : "Mark all as read"}
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => markAllAsReadMutation.mutate()}
+                disabled={
+                  markAllAsReadMutation.isPending ||
+                  notifications.every((n) => n.isRead)
+                }
+                className="text-blue-500 font-bold text-sm hover:text-blue-600 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {markAllAsReadMutation.isPending
+                  ? "Marking..."
+                  : "Mark all as read"}
+              </button>
+
+              {notifications.length > 0 && (
+                <button
+                  onClick={() => clearAllMutation.mutate()}
+                  disabled={clearAllMutation.isPending}
+                  className="text-red-500 font-bold text-sm hover:text-red-600 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {clearAllMutation.isPending ? "Clearing..." : "Clear all"}
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-col gap-5">
@@ -243,7 +335,7 @@ const Notifications = () => {
               notifications.map((notification) => {
                 const config = getIconConfig(notification.type);
                 return (
-                  <div 
+                  <div
                     key={notification.id}
                     onClick={() => {
                       if (!notification.isRead) {

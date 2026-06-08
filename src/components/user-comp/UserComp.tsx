@@ -21,7 +21,7 @@ function UserComp() {
   const fullName = userProfile?.fullName || userProfile?.name || "User";
   let imageUrl = userProfile?.imageUrl;
 
-  if (imageUrl.length === 26) {
+  if (imageUrl?.length === 26) {
     imageUrl = "";
   }
 

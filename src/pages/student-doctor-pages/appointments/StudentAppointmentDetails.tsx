@@ -31,8 +31,11 @@ const StudentAppointmentDetails = () => {
   const navigate = useNavigate();
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
-
   const role = useSelector((state: any) => state.auth.role);
+  const endpoint =
+    role === "studentDoctor"
+      ? "StudentDoctor/appointments/"
+      : "Receptionist/dashboard/appointments/";
 
   const {
     data: appointment,
@@ -42,18 +45,15 @@ const StudentAppointmentDetails = () => {
   } = useQuery<AppointmentDetails, Error>({
     queryKey: ["appointmentDetails", id],
     queryFn: async () => {
-      const response = await axios.get(
-        `${backendUrl}Receptionist/dashboard/appointments/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await axios.get(`${backendUrl}${endpoint}${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.data.succeeded) {
         throw new Error(
-          response.data.message || "Failed to fetch appointment details"
+          response.data.message || "Failed to fetch appointment details",
         );
       }
 
@@ -145,7 +145,8 @@ const StudentAppointmentDetails = () => {
                     {appointment.patientName}
                   </h3>
                   <p className="text-sm text-(--color-text-light) font-medium">
-                    Mode: {appointment.mode} • Payment: {appointment.paymentStatus}
+                    Mode: {appointment.mode} • Payment:{" "}
+                    {appointment.paymentStatus}
                   </p>
                 </div>
                 <div className="flex flex-col gap-2">

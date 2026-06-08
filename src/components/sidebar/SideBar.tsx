@@ -42,13 +42,14 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
 
     Cookies.remove("patientsView");
 
-
     navigate("/");
   };
 
   const linkStyle = ({ isActive }: { isActive: boolean }) =>
-    `flex items-center ${toggled ? "justify-center" : ""
-    } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${isActive ? "bg-(--color-bg-blue) text-(--color-text-blue)" : ""
+    `flex items-center ${
+      toggled ? "justify-center" : ""
+    } gap-3 text-(--color-text) px-3 py-2.5 rounded-lg hover:bg-(--color-bg-link-hover) ${
+      isActive ? "bg-(--color-bg-blue) text-(--color-text-blue)" : ""
     }`;
 
   return (
@@ -105,8 +106,9 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
       <div className="p-2 border-t border-border">
         <button
           onClick={handleLogout}
-          className={`flex items-center ${toggled ? "justify-center" : ""
-            } gap-2 px-3 py-2.5 w-full text-start text-sm font-medium bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) rounded-lg`}
+          className={`flex items-center ${
+            toggled ? "justify-center" : ""
+          } gap-2 px-3 py-2.5 w-full text-start text-sm font-medium bg-(--color-bg-link) hover:bg-(--color-bg-link-hover) rounded-lg`}
         >
           <FiLogOut className="w-5 h-5 shrink-0 text-(--color-text)" />
           {!toggled && (
@@ -148,6 +150,11 @@ const sidebarDataRole = {
   doctor: [
     { icon: LayoutDashboard, label: "Dashboard", path: "/doctor" },
     { icon: Calendar, label: "Schedule", path: "/doctor-schedule" },
+    {
+      icon: Calendar,
+      label: "Appointments",
+      path: "/doctor-appointments-dashboard",
+    },
     { icon: Users, label: "Patients", path: "/doctor-patients" },
     { icon: Scan, label: "Scans", path: "/scan/upload" },
     { icon: FileText, label: "Reports", path: "/doctor-reports" },

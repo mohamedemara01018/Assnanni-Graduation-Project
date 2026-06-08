@@ -28,12 +28,16 @@ export const roleRoutePaths = {
     "doctor-learning-sessions/create",
     "doctor-learning-sessions/:id",
     "doctor/student-record-approvals",
+    "doctor-appointments-dashboard",
+    "appointments/doctor-appointments/:id",
   ],
   studentDoctor: [
     "/student-doctor",
     "student-notification",
     "contact-supervisor",
     "student-doctor/create-medical-record/:id",
+    "add-prescrption/:patientId",
+    "student-doctor/my-prescriptions",
     "student-doctor/medical-record-drafts",
     "student-doctor/training-sessions",
     "student-doctor/medical-record-drafts/:draftId",
@@ -52,7 +56,7 @@ export const roleRoutePaths = {
     "patient-profile/edit",
     "appointments",
     "prescriptions",
-    "medical-history"
+    "medical-history",
   ],
 };
 
@@ -126,13 +130,13 @@ export const sharedRoutePaths = [
     allowedRoles: ["doctor", "patient"],
   },
   {
-    path: 'my-feedbacks',
+    path: "my-feedbacks",
     allowedRoles: ["patient"],
   },
   {
-    path: 'my-doctors',
+    path: "my-doctors",
     allowedRoles: ["patient"],
-  }
+  },
 ];
 
 // Public route paths (accessible without authentication)

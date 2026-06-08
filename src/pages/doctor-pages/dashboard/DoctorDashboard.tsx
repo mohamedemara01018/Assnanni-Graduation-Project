@@ -96,7 +96,9 @@ const DoctorDashboard = () => {
       reset();
     },
     onError: (err: any) => {
-      toast.error(err.response?.data?.message || "Failed to add allergy record");
+      toast.error(
+        err.response?.data?.message || "Failed to add allergy record",
+      );
     },
   });
 
@@ -244,7 +246,7 @@ const DoctorDashboard = () => {
           </div>
           <div className="flex gap-6 max-md:flex-col">
             <FirstDiv />
-            <SecondDiv dashboardData={dashboardData.raw} />
+            <SecondDiv />
           </div>
         </div>
       </div>
@@ -275,7 +277,9 @@ const DoctorDashboard = () => {
                 </label>
                 <input
                   type="text"
-                  {...register("name", { required: "Allergy name is required" })}
+                  {...register("name", {
+                    required: "Allergy name is required",
+                  })}
                   placeholder="e.g. Penicillin, Peanuts"
                   className="w-full bg-gray-50/50 dark:bg-gray-800/20 border border-(--color-border) rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-(--color-text)"
                 />
@@ -370,4 +374,3 @@ const DoctorDashboard = () => {
 };
 
 export default DoctorDashboard;
-

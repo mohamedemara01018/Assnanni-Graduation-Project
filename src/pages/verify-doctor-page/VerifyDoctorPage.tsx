@@ -5,6 +5,8 @@ import { LuUpload } from "react-icons/lu";
 import { IoPersonCircleOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
 import axios from "axios";
+import Cookies from "js-cookie";
+import { useQuery } from "@tanstack/react-query";
 import { useLocation, useNavigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/store/store";
@@ -69,17 +71,66 @@ function VerifyDoctorPage() {
   const [profileImagePreview, setProfileImagePreview] = useState<string | null>(
     null,
   );
+  const [selectedLanguages, setSelectedLanguages] = useState<string[]>([]);
+  const [showOtherInput, setShowOtherInput] = useState(false);
+  const [otherLanguageText, setOtherLanguageText] = useState("");
+
+  const { data: specializations = [] } = useQuery<{ id: number; name: string }[]>({
+    queryKey: ["specializations", backendUrl],
+    enabled: Boolean(backendUrl),
+    queryFn: async () => {
+      const token = Cookies.get("jwtToken");
+      const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
+      const response = await axios.get(
+        `${backendUrl}Specializations/GetAllSpecializations`,
+        { headers },
+      );
+      return Array.isArray(response.data)
+        ? response.data
+        : response.data?.data || [];
+    },
+  });
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<Inputs>({
     defaultValues: {
       Gender: "Male",
     },
   });
+
+  const handleSelectLanguage = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selected = e.target.value;
+    if (selected === "Other") {
+      setShowOtherInput(true);
+    } else if (selected && !selectedLanguages.includes(selected)) {
+      const updated = [...selectedLanguages, selected];
+      setSelectedLanguages(updated);
+      setValue("Languages", updated.join(", "), { shouldValidate: true });
+    }
+    e.target.value = "";
+  };
+
+  const handleAddOtherLanguage = () => {
+    const trimmed = otherLanguageText.trim();
+    if (trimmed && !selectedLanguages.includes(trimmed)) {
+      const updated = [...selectedLanguages, trimmed];
+      setSelectedLanguages(updated);
+      setValue("Languages", updated.join(", "), { shouldValidate: true });
+    }
+    setOtherLanguageText("");
+    setShowOtherInput(false);
+  };
+
+  const handleRemoveLanguage = (lang: string) => {
+    const updated = selectedLanguages.filter((l) => l !== lang);
+    setSelectedLanguages(updated);
+    setValue("Languages", updated.join(", "), { shouldValidate: true });
+  };
 
   const profileImageFile = watch("Image");
   const certificateFile = watch(
@@ -135,7 +186,11 @@ function VerifyDoctorPage() {
     formData.append(key, Number.isFinite(value ?? NaN) ? String(value) : "0");
   };
 
-  const appendFiles = (formData: FormData, key: string, fileList?: FileList) => {
+  const appendFiles = (
+    formData: FormData,
+    key: string,
+    fileList?: FileList,
+  ) => {
     const file = fileList?.[0];
     if (file) {
       formData.append(key, file);
@@ -222,11 +277,14 @@ function VerifyDoctorPage() {
         dispatch(setToken(token));
       }
 
-      toast.success(
-        isStudentDoctor
+      const successMessage =
+        response.data?.data?.message ||
+        response.data?.message ||
+        (isStudentDoctor
           ? "Student doctor verification submitted successfully."
-          : "Doctor verification submitted successfully.",
-      );
+          : "Doctor verification submitted successfully.");
+
+      toast.success(successMessage);
       navigator("/");
     } catch (error: any) {
       const errorMessage = axios.isAxiosError(error)
@@ -239,9 +297,7 @@ function VerifyDoctorPage() {
           : "Verification failed";
 
       toast.error(
-        typeof errorMessage === "string"
-          ? errorMessage
-          : "Verification failed",
+        typeof errorMessage === "string" ? errorMessage : "Verification failed",
       );
     } finally {
       setIsSubmitting(false);
@@ -273,7 +329,7 @@ function VerifyDoctorPage() {
         >
           {!isStudentDoctor ? (
             <>
-              <div className="rounded-2xl border border-[#00AFE5]/15 bg-[#00AFE5]/5 p-4">
+              <div className="rounded-2xl border border-[#00AFE5]/15 bg-[#00AFE5]/5 p-4 hidden">
                 <p className="text-sm font-medium text-(--color-text)">
                   Doctor ID
                 </p>
@@ -331,21 +387,25 @@ function VerifyDoctorPage() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="specializationId" className={labelClass}>
-                    Specialization ID
+                    Specialization
                   </label>
-                  <input
+                  <select
                     id="specializationId"
-                    type="number"
-                    placeholder="1"
                     className={`${inputClass} ${
                       errors.SpecializationId && "border-red-500"
                     }`}
                     {...register("SpecializationId", {
-                      required: "You must provide your specialization id",
-                      setValueAs: (value) =>
-                        value === "" ? 0 : Number(value),
+                      required: "You must select your specialization",
+                      setValueAs: (value) => (value === "" ? 0 : Number(value)),
                     })}
-                  />
+                  >
+                    <option value="">Select Specialization</option>
+                    {specializations.map((spec) => (
+                      <option key={spec.id} value={spec.id}>
+                        {spec.name}
+                      </option>
+                    ))}
+                  </select>
                   {errors.SpecializationId && (
                     <p className={errorClass}>
                       {errors.SpecializationId.message}
@@ -366,8 +426,7 @@ function VerifyDoctorPage() {
                     }`}
                     {...register("YearsOfExperience", {
                       required: "You must provide your years of experience",
-                      setValueAs: (value) =>
-                        value === "" ? 0 : Number(value),
+                      setValueAs: (value) => (value === "" ? 0 : Number(value)),
                     })}
                   />
                   {errors.YearsOfExperience && (
@@ -594,8 +653,7 @@ function VerifyDoctorPage() {
                     }`}
                     {...register("ConsultationPrice", {
                       required: "You must provide your consultation price",
-                      setValueAs: (value) =>
-                        value === "" ? 0 : Number(value),
+                      setValueAs: (value) => (value === "" ? 0 : Number(value)),
                     })}
                   />
                   {errors.ConsultationPrice && (
@@ -609,17 +667,94 @@ function VerifyDoctorPage() {
                   <label htmlFor="languages" className={labelClass}>
                     Languages
                   </label>
-                  <input
+                  
+                  {/* Selected languages displayed as ovals/badges above the input */}
+                  <div className="flex flex-wrap gap-2 mb-2 min-h-[42px] p-2 rounded-xl border border-dashed border-(--color-border) bg-linear-to-br from-[#00AFE5]/5 to-transparent items-center">
+                    {selectedLanguages.length === 0 ? (
+                      <span className="text-xs text-gray-400 italic px-2">No languages selected yet.</span>
+                    ) : (
+                      selectedLanguages.map((lang) => (
+                        <span
+                          key={lang}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-[#00AFE5]/10 px-3 py-1 text-sm font-semibold text-[#00AFE5]"
+                        >
+                          {lang}
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveLanguage(lang)}
+                            className="flex h-4 w-4 items-center justify-center rounded-full hover:bg-[#00AFE5]/20 text-xs font-bold transition-colors"
+                          >
+                            &times;
+                          </button>
+                        </span>
+                      ))
+                    )}
+                  </div>
+
+                  <select
                     id="languages"
-                    type="text"
-                    placeholder="Arabic, English"
                     className={`${inputClass} ${
                       errors.Languages && "border-red-500"
                     }`}
+                    onChange={handleSelectLanguage}
+                    defaultValue=""
+                  >
+                    <option value="" disabled>Select a language...</option>
+                    <option value="Arabic">Arabic</option>
+                    <option value="English">English</option>
+                    <option value="French">French</option>
+                    <option value="German">German</option>
+                    <option value="Spanish">Spanish</option>
+                    <option value="Italian">Italian</option>
+                    <option value="Russian">Russian</option>
+                    <option value="Chinese">Chinese</option>
+                    <option value="Japanese">Japanese</option>
+                    <option value="Turkish">Turkish</option>
+                    <option value="Other">Other...</option>
+                  </select>
+
+                  {showOtherInput && (
+                    <div className="mt-3 flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Type language and click Add..."
+                        className={inputClass}
+                        value={otherLanguageText}
+                        onChange={(e) => setOtherLanguageText(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            handleAddOtherLanguage();
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddOtherLanguage}
+                        className="rounded-xl bg-[#00AFE5] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500 transition-colors"
+                      >
+                        Add
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowOtherInput(false);
+                          setOtherLanguageText("");
+                        }}
+                        className="rounded-xl border border-(--color-border) px-4 py-2 text-sm font-semibold text-(--color-text) hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  )}
+
+                  <input
+                    type="hidden"
                     {...register("Languages", {
-                      required: "You must provide at least one language",
+                      required: "You must select at least one language",
                     })}
                   />
+
                   {errors.Languages && (
                     <p className={errorClass}>{errors.Languages.message}</p>
                   )}
@@ -731,8 +866,7 @@ function VerifyDoctorPage() {
                     }`}
                     {...register("YearsOfStudy", {
                       required: "You must provide your years of study",
-                      setValueAs: (value) =>
-                        value === "" ? 0 : Number(value),
+                      setValueAs: (value) => (value === "" ? 0 : Number(value)),
                     })}
                   />
                   {errors.YearsOfStudy && (

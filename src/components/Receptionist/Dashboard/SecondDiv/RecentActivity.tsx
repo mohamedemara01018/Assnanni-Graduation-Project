@@ -37,7 +37,7 @@ const RecentActivity = () => {
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
 
-  const { data: activities, isLoading } = useQuery<Activity[]>({
+  let { data: activities, isLoading } = useQuery<Activity[]>({
     queryKey: ["recent-activity"],
     queryFn: async () => {
       const response = await axios.get(
@@ -52,6 +52,7 @@ const RecentActivity = () => {
     },
   });
 
+  activities = activities?.slice(0, 6) ?? [];
   return (
     <div className="bg-(--color-surface) p-8 rounded-2xl border border-(--color-border) shadow-sm w-full">
       <h2 className="text-xl font-bold text-(--color-text) mb-8">
@@ -99,4 +100,3 @@ const RecentActivity = () => {
 };
 
 export default RecentActivity;
-
