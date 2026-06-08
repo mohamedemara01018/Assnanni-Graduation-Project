@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router";
 import {
-  MessageSquare,
   Send,
   X,
   Minimize2,
@@ -160,6 +159,7 @@ export default function ChatbotWidget() {
     if (!text.trim()) return;
 
     const userMsg: Message = {
+      // eslint-disable-next-line react-hooks/purity
       id: Date.now().toString(),
       sender: "user",
       text,
@@ -173,7 +173,7 @@ export default function ChatbotWidget() {
     // Simulated Bot thinking
     setTimeout(() => {
       const normalizedQuery = text.toLowerCase().trim();
-      let matched = KNOWLEDGE_BASE.find((kb) =>
+      const matched = KNOWLEDGE_BASE.find((kb) =>
         kb.keywords.some((keyword) => normalizedQuery.includes(keyword))
       );
 
@@ -224,9 +224,9 @@ export default function ChatbotWidget() {
         <button
           onClick={toggleOpen}
           aria-label="Open support chat"
-          className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 rounded-full shadow-[0_4px_20px_rgba(37,99,235,0.45)] hover:shadow-[0_4px_25px_rgba(37,99,235,0.65)] hover:scale-110 active:scale-95 text-white transition-all duration-300 border border-white/10 group cursor-pointer"
+          className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 rounded-full shadow-[0_4px_20px_rgba(37,99,235,0.45)] hover:shadow-[0_4px_25px_rgba(37,99,235,0.65)] hover:scale-110 active:scale-95 text-white transition-all duration-300 border border-white/10 group cursor-pointer"
         >
-          <MessageSquare className="w-6 h-6 transition-transform duration-300 group-hover:rotate-12" />
+          <Bot className="w-6 h-6 transition-transform duration-300 group-hover:rotate-12" />
           <span className="absolute top-0 right-0 flex h-3.5 w-3.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white dark:border-gray-900"></span>
@@ -237,14 +237,13 @@ export default function ChatbotWidget() {
       {/* Chat window container */}
       {isOpen && (
         <div
-          className={`fixed bottom-6 right-6 z-50 flex flex-col bg-(--color-surface) border border-(--color-border) shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 ${
-            isMaximized
+          className={`fixed bottom-6 right-6 z-50 flex flex-col bg-(--color-surface) border border-(--color-border) shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 ${isMaximized
               ? "w-[calc(100vw-3rem)] h-[calc(100vh-3rem)] max-w-4xl max-h-[800px]"
               : "w-[380px] h-[580px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)]"
-          }`}
+            }`}
         >
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 text-white select-none">
+          <div className="flex items-center justify-between px-4 py-3 bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 text-white select-none">
             <div className="flex items-center space-x-3">
               <div className="relative flex items-center justify-center w-9 h-9 bg-white/10 rounded-full border border-white/10">
                 <Bot className="w-5 h-5" />
@@ -288,9 +287,8 @@ export default function ChatbotWidget() {
             {messages.map((msg) => (
               <div key={msg.id} className="flex flex-col">
                 <div
-                  className={`flex max-w-[85%] ${
-                    msg.sender === "user" ? "ml-auto" : "mr-auto"
-                  }`}
+                  className={`flex max-w-[85%] ${msg.sender === "user" ? "ml-auto" : "mr-auto"
+                    }`}
                 >
                   {msg.sender === "bot" && (
                     <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-2 shrink-0 mt-0.5 text-blue-600 dark:text-blue-400">
@@ -299,11 +297,10 @@ export default function ChatbotWidget() {
                   )}
                   <div className="flex flex-col space-y-1">
                     <div
-                      className={`px-3.5 py-2.5 text-sm shadow-sm leading-relaxed ${
-                        msg.sender === "user"
+                      className={`px-3.5 py-2.5 text-sm shadow-sm leading-relaxed ${msg.sender === "user"
                           ? "bg-blue-600 text-white rounded-2xl rounded-tr-none"
                           : "bg-(--color-surface) text-(--color-text) border border-(--color-border) rounded-2xl rounded-tl-none"
-                      }`}
+                        }`}
                     >
                       <p className="whitespace-pre-wrap">{msg.text}</p>
 
@@ -325,9 +322,8 @@ export default function ChatbotWidget() {
                       )}
                     </div>
                     <span
-                      className={`text-[9px] text-gray-400 px-1 ${
-                        msg.sender === "user" ? "text-right" : "text-left ml-8"
-                      }`}
+                      className={`text-[9px] text-gray-400 px-1 ${msg.sender === "user" ? "text-right" : "text-left ml-8"
+                        }`}
                     >
                       {msg.timestamp}
                     </span>

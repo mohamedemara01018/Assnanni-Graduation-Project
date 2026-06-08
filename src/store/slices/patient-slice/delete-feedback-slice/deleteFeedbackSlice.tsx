@@ -6,14 +6,11 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 
-export interface EditFeedbackDto {
-    feedbackId: number;
+export interface DeleteFeedbackDto {
     appointmentId: number;
-    rating: number;
-    comment: string;
 }
 
-export interface EditFeedbackState {
+export interface DeleteFeedbackState {
     loading: boolean;
     success: boolean;
     error: string | null;
@@ -22,23 +19,22 @@ export interface EditFeedbackState {
 
 // ─── Thunk ────────────────────────────────────────────────────────────────────
 
-export const fetchEditFeedback = createAsyncThunk<
+export const fetchDeleteFeedback = createAsyncThunk<
     any,
-    EditFeedbackDto,
+    DeleteFeedbackDto,
     { rejectValue: string }
 >(
-    "editFeedbackSlice/fetchEditFeedback",
-    async (feedbackData, { rejectWithValue }) => {
+    "deleteFeedbackSlice/fetchDeleteFeedback",
+    async ({ appointmentId }, { rejectWithValue }) => {
         const cookieToken = Cookies.get("jwtToken");
 
         try {
-            const response = await fetch(`${backendUrl}FeedBacks`, {
-                method: "PUT",
+            const response = await fetch(`${backendUrl}FeedBacks/${appointmentId}`, {
+                method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${cookieToken}`,
                 },
-                body: JSON.stringify(feedbackData),
             });
 
             const text = await response.text();
@@ -59,15 +55,15 @@ export const fetchEditFeedback = createAsyncThunk<
 
 // ─── Slice ────────────────────────────────────────────────────────────────────
 
-const initialState: EditFeedbackState = {
+const initialState: DeleteFeedbackState = {
     loading: false,
     success: false,
     error: null,
     message: null,
 };
 
-export const editFeedbackSlice = createSlice({
-    name: "editFeedbackSlice",
+export const deleteFeedbackSlice = createSlice({
+    name: "deleteFeedbackSlice",
     initialState,
     reducers: {
         resetEditFeedbackStatus: (state) => {
@@ -79,18 +75,18 @@ export const editFeedbackSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-            .addCase(fetchEditFeedback.pending, (state) => {
+            .addCase(fetchDeleteFeedback.pending, (state) => {
                 state.loading = true;
                 state.success = false;
                 state.error = null;
                 state.message = null;
             })
-            .addCase(fetchEditFeedback.fulfilled, (state, action) => {
+            .addCase(fetchDeleteFeedback.fulfilled, (state, action) => {
                 state.loading = false;
                 state.success = action.payload?.succeeded ?? true;
                 state.message = action.payload?.data || "Feedback updated successfully";
             })
-            .addCase(fetchEditFeedback.rejected, (state, action) => {
+            .addCase(fetchDeleteFeedback.rejected, (state, action) => {
                 state.loading = false;
                 state.success = false;
                 state.error = action.payload as string;
@@ -98,8 +94,8 @@ export const editFeedbackSlice = createSlice({
     },
 });
 
-export const { resetEditFeedbackStatus } = editFeedbackSlice.actions;
+export const { resetEditFeedbackStatus } = deleteFeedbackSlice.actions;
 
-export const editFeedbackState = (state: RootState) => state.editFeedbackSlice;
+export const deleteFeedbackState = (state: RootState) => state.deleteFeedbackSlice;
 
-export default editFeedbackSlice.reducer;
+export default deleteFeedbackSlice.reducer;

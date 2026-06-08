@@ -255,13 +255,7 @@ function PatientPage() {
                   <p className="text-sm text-blue-900 dark:text-blue-300 font-medium">Find a Doctor</p>
                   <p className="text-xs text-blue-700 dark:text-blue-400 mt-1">Search and book</p>
                 </Link>
-                <Link
-                  to="/scan/upload"
-                  className="block p-3 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors"
-                >
-                  <p className="text-sm text-green-900 dark:text-green-300 font-medium">Upload Scan</p>
-                  <p className="text-xs text-green-700 dark:text-green-400 mt-1">AI-assisted analysis</p>
-                </Link>
+
                 <Link
                   to="/Prescriptions"
                   className="block p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"

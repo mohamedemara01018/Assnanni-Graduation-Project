@@ -3,10 +3,10 @@ import { useNavigate, useParams } from "react-router";
 import {
   Calendar,
   Clock,
-  CheckCircle,
   FileText,
   ArrowLeft,
   CreditCard,
+
 } from "lucide-react";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import { useDispatch, useSelector } from "react-redux";
@@ -36,6 +36,7 @@ import {
 import { toast } from "react-toastify";
 import DoctorDetails from "@/components/doctor-details/DoctorDetails";
 import { formatTime, parseDate } from "@/lib/utils";
+import ConfirmationModal from "@/components/confirmation-modal/ConfirmationModal";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -80,80 +81,8 @@ function SectionCard({
   );
 }
 
-// ─── Confirmation Screen ─────────────────────────────────────────────────────
+// ─── Confirmation Modal ──────────────────────────────────────────────────────
 
-function ConfirmationScreen({
-  doctorName,
-  selectedDate,
-  selectedTime,
-  paymentMethod,
-}: {
-  doctorName?: string;
-  selectedDate: string;
-  selectedTime: string;
-  paymentMethod: string;
-}) {
-  return (
-    <div className="flex items-center justify-center py-12 px-4">
-      <div
-        className="max-w-md w-full rounded-2xl border p-8 text-center"
-        style={{
-          backgroundColor: "var(--color-surface)",
-          borderColor: "var(--color-border)",
-        }}
-      >
-        {/* Icon */}
-        <div
-          className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
-          style={{ backgroundColor: "rgba(22, 163, 74, 0.12)" }}
-        >
-          <CheckCircle
-            className="w-10 h-10"
-            style={{ color: "var(--color-success)" }}
-          />
-        </div>
-
-        <h2
-          className="text-2xl font-semibold mb-4"
-          style={{ color: "var(--color-text)" }}
-        >
-          Appointment Confirmed!
-        </h2>
-
-        <div className="space-y-1 mb-6">
-          <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
-            Your appointment with
-          </p>
-          <p className="text-base font-medium" style={{ color: "var(--color-text)" }}>
-            {doctorName || "your doctor"}
-          </p>
-          <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
-            {selectedDate} at {selectedTime}
-          </p>
-          <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
-            Payment:{" "}
-            <span className="font-medium" style={{ color: "var(--color-text)" }}>
-              {paymentMethod === "Cash" ? "Cash at Clinic" : paymentMethod || "—"}
-            </span>
-          </p>
-        </div>
-
-        {/* Info banner */}
-        <div
-          className="rounded-lg p-4 border"
-          style={{
-            backgroundColor: "var(--color-bg-blue)",
-            borderColor: "var(--color-primary-lighter)",
-          }}
-        >
-          <p className="text-xs" style={{ color: "var(--color-text-blue)" }}>
-            A confirmation email has been sent to your registered email address.
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
@@ -197,7 +126,6 @@ export default function AppointmentBookingPage() {
     error: errorBookAppointment,
   } = useSelector(bookAppointmentState) as AppointmentBookingState;
 
-  // ── Validate id ──
   const validId = isValidDoctorId(id);
 
   useEffect(() => {
@@ -235,15 +163,17 @@ export default function AppointmentBookingPage() {
 
       toast.success("Booking successful: " + resultAction.message);
       setShowConfirmation(true);
-
-      setTimeout(() => navigate("/dashboard/patient"), 2000);
     } catch (err) {
       console.error("Booking failed:", err);
       toast.error("Booking failed: " + (err as string));
     }
   };
 
-  // ── Guard: invalid route id ──
+  const handleConfirmationClose = () => {
+    setShowConfirmation(false);
+    setTimeout(() => navigate("/dashboard/patient"), 100);
+  };
+
   if (!validId) {
     return (
       <DashboardLayout pageTitle="Book Appointment">
@@ -252,105 +182,145 @@ export default function AppointmentBookingPage() {
     );
   }
 
-  // ── Confirmation screen ──
-  if (showConfirmation) {
-    const inner = (
-      <ConfirmationScreen
-        doctorName={doctorDetails?.name}
-        selectedDate={selectedDate}
-        selectedTime={selectedTime}
-        paymentMethod={paymentMethod}
-      />
-    );
+  const pageContent = (
+    <div>
+      {/* Back button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center gap-2 mb-6 text-sm transition-colors hover:opacity-80"
+        style={{ color: "var(--color-text-light)" }}
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back
+      </button>
 
-    return role === "patient" ? (
-      <DashboardLayout pageTitle="Appointment Confirmed">{inner}</DashboardLayout>
-    ) : (
-      <div className="w-11/12 m-auto">{inner}</div>
-    );
-  }
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* ── Left: Booking Form ── */}
+        <div className="lg:col-span-2 space-y-6">
 
-  // ── Main form ──
-  return (
-    <DashboardLayout pageTitle="Book Appointment">
-      <div>
-        {/* Back button */}
-        <button
-          onClick={() => navigate(-1)}
-          className="flex items-center gap-2 mb-6 text-sm transition-colors hover:opacity-80"
-          style={{ color: "var(--color-text-light)" }}
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back
-        </button>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* ── Left: Booking Form ── */}
-          <div className="lg:col-span-2 space-y-6">
-
-            {/* Page header */}
-            <SectionCard>
-              <h1
-                className="text-2xl font-semibold mb-1"
-                style={{ color: "var(--color-text)" }}
-              >
-                Schedule Appointment
-              </h1>
-              <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
-                Book your consultation
-                {doctorDetails?.name ? ` with ${doctorDetails.name}` : ""}
-              </p>
-            </SectionCard>
-
-            {/* Appointment Type */}
-            <SectionCard title="Appointment Type">
-              <select
-                className="w-full p-3 rounded-lg border text-sm outline-none transition-colors"
-                style={{
-                  backgroundColor: "var(--color-bg)",
-                  borderColor: appointmentType
-                    ? "var(--color-primary)"
-                    : "var(--color-border)",
-                  color: appointmentType
-                    ? "var(--color-text)"
-                    : "var(--color-text-light)",
-                }}
-                value={appointmentType}
-                onChange={(e) => setAppointmentType(e.target.value)}
-              >
-                <option value="">Select Appointment Type</option>
-                <option value="Consultation">Consultation</option>
-                <option value="FollowUp">Follow Up</option>
-                <option value="Checkup">Checkup</option>
-                <option value="Emergency">Emergency</option>
-              </select>
-            </SectionCard>
-
-            {/* Date Selection */}
-            <SectionCard
-              title="Select Date"
-              icon={<Calendar className="w-4 h-4" />}
+          {/* Page header */}
+          <SectionCard>
+            <h1
+              className="text-2xl font-semibold mb-1"
+              style={{ color: "var(--color-text)" }}
             >
-              {loadingDates ? (
+              Schedule Appointment
+            </h1>
+            <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
+              Book your consultation
+              {doctorDetails?.name ? ` with ${doctorDetails.name}` : ""}
+            </p>
+          </SectionCard>
+
+          {/* Appointment Type */}
+          <SectionCard title="Appointment Type">
+            <select
+              className="w-full p-3 rounded-lg border text-sm outline-none transition-colors"
+              style={{
+                backgroundColor: "var(--color-bg)",
+                borderColor: appointmentType
+                  ? "var(--color-primary)"
+                  : "var(--color-border)",
+                color: appointmentType
+                  ? "var(--color-text)"
+                  : "var(--color-text-light)",
+              }}
+              value={appointmentType}
+              onChange={(e) => setAppointmentType(e.target.value)}
+            >
+              <option value="">Select Appointment Type</option>
+              <option value="Consultation">Consultation</option>
+              <option value="FollowUp">Follow Up</option>
+              <option value="Checkup">Checkup</option>
+              <option value="Emergency">Emergency</option>
+            </select>
+          </SectionCard>
+
+          {/* Date Selection */}
+          <SectionCard
+            title="Select Date"
+            icon={<Calendar className="w-4 h-4" />}
+          >
+            {loadingDates ? (
+              <MiniLoading />
+            ) : errorDates ? (
+              <Error message={errorDates} />
+            ) : !availableDates?.length ? (
+              <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
+                No available dates.
+              </p>
+            ) : (
+              <div className="grid grid-cols-3 gap-3">
+                {availableDates.map((slot, index) => {
+                  const parsed = parseDate(slot.date);
+                  const isSelected = selectedDate === slot.date;
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setSelectedDate(slot.date);
+                        setSelectedTime("");
+                        setSlotId("");
+                      }}
+                      className="p-3 rounded-lg border-2 transition-colors text-center"
+                      style={{
+                        borderColor: isSelected
+                          ? "var(--color-primary)"
+                          : "var(--color-border)",
+                        backgroundColor: isSelected
+                          ? "var(--color-bg-blue)"
+                          : "var(--color-bg)",
+                      }}
+                    >
+                      <Calendar
+                        className="w-4 h-4 mx-auto mb-1"
+                        style={{
+                          color: isSelected
+                            ? "var(--color-primary)"
+                            : "var(--color-text-light)",
+                        }}
+                      />
+                      <p
+                        className="text-xs font-medium"
+                        style={{
+                          color: isSelected
+                            ? "var(--color-text-blue)"
+                            : "var(--color-text)",
+                        }}
+                      >
+                        {parsed.fullLabel}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </SectionCard>
+
+          {/* Time Selection */}
+          {selectedDate && (
+            <SectionCard
+              title="Select Time"
+              icon={<Clock className="w-4 h-4" />}
+            >
+              {loadingSlots ? (
                 <MiniLoading />
-              ) : errorDates ? (
-                <Error message={errorDates} />
-              ) : !availableDates?.length ? (
+              ) : errorSlots ? (
+                <Error message={errorSlots} />
+              ) : !availableSlots?.length ? (
                 <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
-                  No available dates.
+                  No time slots available for this date.
                 </p>
               ) : (
-                <div className="grid grid-cols-3 gap-3">
-                  {availableDates.map((slot, index) => {
-                    const parsed = parseDate(slot.date);
-                    const isSelected = selectedDate === slot.date;
+                <div className="grid grid-cols-4 gap-3">
+                  {availableSlots.map((slot, index) => {
+                    const isSelected = selectedTime === slot.startTime;
                     return (
                       <button
                         key={index}
                         onClick={() => {
-                          setSelectedDate(slot.date);
-                          setSelectedTime("");
-                          setSlotId("");
+                          setSelectedTime(slot.startTime);
+                          setSlotId(String(slot.id));
                         }}
                         className="p-3 rounded-lg border-2 transition-colors text-center"
                         style={{
@@ -362,7 +332,7 @@ export default function AppointmentBookingPage() {
                             : "var(--color-bg)",
                         }}
                       >
-                        <Calendar
+                        <Clock
                           className="w-4 h-4 mx-auto mb-1"
                           style={{
                             color: isSelected
@@ -378,7 +348,7 @@ export default function AppointmentBookingPage() {
                               : "var(--color-text)",
                           }}
                         >
-                          {parsed.fullLabel}
+                          {formatTime(slot.startTime)}
                         </p>
                       </button>
                     );
@@ -386,147 +356,104 @@ export default function AppointmentBookingPage() {
                 </div>
               )}
             </SectionCard>
+          )}
 
-            {/* Time Selection — only shown after a date is picked */}
-            {selectedDate && (
-              <SectionCard
-                title="Select Time"
-                icon={<Clock className="w-4 h-4" />}
-              >
-                {loadingSlots ? (
-                  <MiniLoading />
-                ) : errorSlots ? (
-                  <Error message={errorSlots} />
-                ) : !availableSlots?.length ? (
-                  <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
-                    No time slots available for this date.
-                  </p>
-                ) : (
-                  <div className="grid grid-cols-4 gap-3">
-                    {availableSlots.map((slot, index) => {
-                      const isSelected = selectedTime === slot.startTime;
-                      return (
-                        <button
-                          key={index}
-                          onClick={() => {
-                            setSelectedTime(slot.startTime);
-                            setSlotId(String(slot.id));
-                          }}
-                          className="p-3 rounded-lg border-2 transition-colors text-center"
-                          style={{
-                            borderColor: isSelected
-                              ? "var(--color-primary)"
-                              : "var(--color-border)",
-                            backgroundColor: isSelected
-                              ? "var(--color-bg-blue)"
-                              : "var(--color-bg)",
-                          }}
-                        >
-                          <Clock
-                            className="w-4 h-4 mx-auto mb-1"
-                            style={{
-                              color: isSelected
-                                ? "var(--color-primary)"
-                                : "var(--color-text-light)",
-                            }}
-                          />
-                          <p
-                            className="text-xs font-medium"
-                            style={{
-                              color: isSelected
-                                ? "var(--color-text-blue)"
-                                : "var(--color-text)",
-                            }}
-                          >
-                            {formatTime(slot.startTime)}
-                          </p>
-                        </button>
-                      );
-                    })}
-                  </div>
-                )}
-              </SectionCard>
-            )}
+          {/* Notes */}
+          <SectionCard
+            title="Reason for Visit"
+            icon={<FileText className="w-4 h-4" />}
+          >
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={4}
+              maxLength={500}
+              className="w-full px-4 py-3 rounded-lg border text-sm resize-none outline-none transition-colors"
+              style={{
+                backgroundColor: "var(--color-bg)",
+                borderColor: "var(--color-border)",
+                color: "var(--color-text)",
+              }}
+              onFocus={(e) =>
+                (e.currentTarget.style.borderColor = "var(--color-primary)")
+              }
+              onBlur={(e) =>
+                (e.currentTarget.style.borderColor = "var(--color-border)")
+              }
+              placeholder="Describe your symptoms or reason for consultation (optional)..."
+            />
+            <div className="flex justify-between mt-1">
+              <p className="text-xs" style={{ color: "var(--color-text-light)" }}>
+                Helps the doctor prepare for your appointment
+              </p>
+              <p className="text-xs" style={{ color: "var(--color-text-light)" }}>
+                {notes.length}/500
+              </p>
+            </div>
+          </SectionCard>
 
-            {/* Notes */}
-            <SectionCard
-              title="Reason for Visit"
-              icon={<FileText className="w-4 h-4" />}
+          {/* Payment Method */}
+          <SectionCard
+            title="Payment Method"
+            icon={<CreditCard className="w-4 h-4" />}
+          >
+            <select
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+              className="w-full p-3 rounded-lg border text-sm outline-none transition-colors"
+              style={{
+                backgroundColor: "var(--color-bg)",
+                borderColor: paymentMethod
+                  ? "var(--color-primary)"
+                  : "var(--color-border)",
+                color: paymentMethod
+                  ? "var(--color-text)"
+                  : "var(--color-text-light)",
+              }}
             >
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={4}
-                maxLength={500}
-                className="w-full px-4 py-3 rounded-lg border text-sm resize-none outline-none transition-colors"
-                style={{
-                  backgroundColor: "var(--color-bg)",
-                  borderColor: "var(--color-border)",
-                  color: "var(--color-text)",
-                }}
-                onFocus={(e) =>
-                  (e.currentTarget.style.borderColor = "var(--color-primary)")
-                }
-                onBlur={(e) =>
-                  (e.currentTarget.style.borderColor = "var(--color-border)")
-                }
-                placeholder="Describe your symptoms or reason for consultation (optional)..."
-              />
-              <div className="flex justify-between mt-1">
-                <p className="text-xs" style={{ color: "var(--color-text-light)" }}>
-                  Helps the doctor prepare for your appointment
-                </p>
-                <p className="text-xs" style={{ color: "var(--color-text-light)" }}>
-                  {notes.length}/500
-                </p>
-              </div>
-            </SectionCard>
-
-            {/* Payment Method */}
-            <SectionCard
-              title="Payment Method"
-              icon={<CreditCard className="w-4 h-4" />}
-            >
-              <select
-                value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-                className="w-full p-3 rounded-lg border text-sm outline-none transition-colors"
-                style={{
-                  backgroundColor: "var(--color-bg)",
-                  borderColor: paymentMethod
-                    ? "var(--color-primary)"
-                    : "var(--color-border)",
-                  color: paymentMethod
-                    ? "var(--color-text)"
-                    : "var(--color-text-light)",
-                }}
-              >
-                <option value="">Select Payment Method</option>
-                <option value="Cash">Cash at Clinic</option>
-                <option value="CreditCard">Credit Card</option>
-                <option value="VodafoneCash">Vodafone Cash</option>
-                <option value="BankTransfer">Bank Transfer</option>
-                <option value="Insurance">Insurance</option>
-                <option value="OnlinePayment">Online Payment</option>
-              </select>
-            </SectionCard>
-          </div>
-
-          {/* ── Right: Doctor summary + confirm ── */}
-          <DoctorDetails
-            doctorDetails={doctorDetails}
-            loadingDoctorDetails={loadingDoctorDetails}
-            errorDoctorDetails={errorDoctorDetails}
-            selectedDate={selectedDate}
-            selectedTime={selectedTime}
-            handleBooking={handleBooking}
-            paymentMethod={paymentMethod}
-            appointmentType={appointmentType}
-            loadingBookAppointment={loadingBookAppointment}
-            errorBookAppointment={errorBookAppointment}
-          />
+              <option value="">Select Payment Method</option>
+              <option value="Cash">Cash at Clinic</option>
+              <option value="CreditCard">Credit Card</option>
+              <option value="VodafoneCash">Vodafone Cash</option>
+              <option value="BankTransfer">Bank Transfer</option>
+              <option value="Insurance">Insurance</option>
+              <option value="OnlinePayment">Online Payment</option>
+            </select>
+          </SectionCard>
         </div>
+
+        {/* ── Right: Doctor summary + confirm ── */}
+        <DoctorDetails
+          doctorDetails={doctorDetails}
+          loadingDoctorDetails={loadingDoctorDetails}
+          errorDoctorDetails={errorDoctorDetails}
+          selectedDate={selectedDate}
+          selectedTime={selectedTime}
+          handleBooking={handleBooking}
+          paymentMethod={paymentMethod}
+          appointmentType={appointmentType}
+          loadingBookAppointment={loadingBookAppointment}
+          errorBookAppointment={errorBookAppointment}
+        />
       </div>
-    </DashboardLayout>
+
+      {/* ── Confirmation Modal ── */}
+      {showConfirmation && (
+        <ConfirmationModal
+          doctorName={doctorDetails?.name}
+          selectedDate={selectedDate}
+          selectedTime={selectedTime}
+          paymentMethod={paymentMethod}
+          appointmentType={appointmentType}
+          onClose={handleConfirmationClose}
+        />
+      )}
+    </div>
+  );
+
+  return role === "patient" ? (
+    <DashboardLayout pageTitle="Book Appointment">{pageContent}</DashboardLayout>
+  ) : (
+    <div className="w-11/12 m-auto">{pageContent}</div>
   );
 }

@@ -21,7 +21,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { NotFound } from "@/components/notfound/NotFound";
 
-const MedicalHistory = () => {
+const MedicalHistoryInDoctorDashboard = () => {
   const role = useSelector((state: RootState) => state.auth.role);
   const { id } = useParams();
   const navigate = useNavigate();
@@ -128,7 +128,7 @@ const MedicalHistory = () => {
       console.error("Error fetching medical history:", error);
       toast.error(
         (error as any)?.response?.data?.message ||
-          "Failed to load medical history",
+        "Failed to load medical history",
       );
     }
   }, [isSuccess, isError, error, data]);
@@ -137,11 +137,9 @@ const MedicalHistory = () => {
 
   const handleDownload = (item: MedicalHistoryItem) => {
     // Simulate downloading the record as a text file
-    const content = `Medical Record: ${item.title}\nDoctor: ${
-      item.doctorName
-    }\nDate: ${item.date}\nType: ${item.type}\n\nDescription:\n${
-      item.description
-    }\n\nAttachments: ${item.attachments.map((a) => a.fileName).join(", ")}`;
+    const content = `Medical Record: ${item.title}\nDoctor: ${item.doctorName
+      }\nDate: ${item.date}\nType: ${item.type}\n\nDescription:\n${item.description
+      }\n\nAttachments: ${item.attachments.map((a) => a.fileName).join(", ")}`;
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -297,7 +295,7 @@ const MedicalHistory = () => {
                         title="Add Attachment"
                       >
                         {uploadAttachmentMutation.isPending &&
-                        activeRecordId === item.id ? (
+                          activeRecordId === item.id ? (
                           <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                         ) : (
                           <HiOutlinePaperClip className="text-2xl" />
@@ -364,4 +362,5 @@ const MedicalHistory = () => {
   );
 };
 
-export default MedicalHistory;
+
+export default MedicalHistoryInDoctorDashboard

@@ -32,9 +32,9 @@ import Error from "@/components/error/Error";
 import { RescheduleAppointmentModal } from "@/components/reschedule-appointment-modal/RescheduleAppointmentModal";
 import { CancelAppointmentModal } from "@/components/cancel-appointment-modal/CancelAppointmentModal";
 import { NotFound } from "@/components/notfound/NotFound";
-import { GiveFeedbackModal } from "@/components/give-feedback-modal/GiveFeedbackModal";
 import { formatTime, parseDate } from "@/lib/utils";
 import Pagination from "@/components/pagination/Pagination";
+import { FeedbackModal } from "@/components/feedback-modal/FeedbackModal";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -297,6 +297,7 @@ function AppointmentsPage() {
                 const cfg = getStatusCfg(appointment.status);
                 const isCancelled = appointment.status.toLowerCase() === "cancelled";
                 const isCompleted = appointment.status.toLowerCase() === "completed";
+                const isMissed = appointment.status.toLowerCase() === "NoShow";
 
                 return (
                   <div
@@ -377,7 +378,7 @@ function AppointmentsPage() {
                             View
                           </Link>
 
-                          {!isCancelled && !isCompleted && (
+                          {!isCancelled && !isCompleted && isMissed && (
                             <>
                               <span className="w-px h-3 bg-(--color-border)" />
                               <button
@@ -453,7 +454,7 @@ function AppointmentsPage() {
             }}
             appointment={selectedAppointment}
           />
-          <GiveFeedbackModal
+          <FeedbackModal
             isOpen={showFeedback}
             onClose={closeFeedback}
             doctor={{
@@ -461,8 +462,7 @@ function AppointmentsPage() {
               name: selectedAppointment.doctorName,
               specialty: selectedAppointment.doctorSpecialty ?? "",
               image: selectedAppointment.doctorImage ?? "",
-            }}
-          />
+            }} mode={"add"} appointmentId={Number(selectedAppointment.id)} />
         </>
       )}
 

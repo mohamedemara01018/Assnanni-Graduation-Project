@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, Link } from "react-router";
 import {
     ArrowLeft,
     Calendar,
@@ -293,12 +293,11 @@ export default function AppointmentDetailsPage() {
                                     )}
 
                                     <div>
-                                        <h3
-                                            className="font-semibold text-lg"
-                                            style={{ color: "var(--color-text)" }}
-                                        >
+                                        <Link
+                                            to={`/doctors-list/${doctor.id}`}
+                                            className="font-semibold text-lg text:(--color-text) hover:underline hover:text-(--color-text-blue)">
                                             {doctor.name}
-                                        </h3>
+                                        </Link>
                                         <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
                                             {doctor.specialization}
                                         </p>
@@ -490,9 +489,7 @@ export default function AppointmentDetailsPage() {
                 isOpen={showRescheduleModal}
                 onClose={() => {
                     setShowRescheduleModal(false);
-                    refetch();
                 }}
-                // Re-fetch after successful reschedule so status updates without a page refresh
 
                 appointment={{
                     id: String(data.id),
@@ -510,7 +507,6 @@ export default function AppointmentDetailsPage() {
                 isOpen={isCancelOpen}
                 onClose={() => {
                     setIsCancelOpen(false);
-                    refetch();
                 }}
                 // Re-fetch after successful cancel so status updates without a page refresh
                 appointment={{
