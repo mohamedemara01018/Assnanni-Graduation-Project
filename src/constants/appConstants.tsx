@@ -48,6 +48,7 @@ import ScheduleAppointment from "../pages/receptionist-pages/appointments/Schedu
 import CheckIn from "../pages/receptionist-pages/appointments/CheckIn";
 import RescheduleAppointment from "../pages/receptionist-pages/appointments/RescheduleAppointment";
 import RegisterPatient from "../pages/receptionist-pages/patients/RegisterPatient";
+import OnlinePaymentPage from "../pages/online-payment-page/OnlinePaymentPage";
 import Settings from "../pages/doctor-pages/settings/Settings";
 import ProfileSettings from "../components/Doctor/Settings/SettingsDetails/ProfileSettings";
 import SecuritySettings from "../components/Doctor/Settings/SettingsDetails/SecuritySettings";
@@ -180,6 +181,9 @@ export const routeElements = {
   "": <ProfileSettings />,
   security: <SecuritySettings />,
   notifications: <NotificationPreferences />,
+
+  // Payment routes
+  "online-payment": <OnlinePaymentPage />,
 
   // Public routes
   "/appointments": <AppointmentsPage />,

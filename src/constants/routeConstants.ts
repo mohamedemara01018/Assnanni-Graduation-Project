@@ -94,6 +94,16 @@ export const sharedRoutePaths = [
     ],
   },
   {
+    path: "online-payment",
+    allowedRoles: [
+      "doctor",
+      "patient",
+      "receptionist",
+      "studentDoctor",
+      "admin",
+    ],
+  },
+  {
     path: "student-settings",
     allowedRoles: ["studentDoctor"],
     children: ["", "security", "notifications"],
@@ -142,6 +152,7 @@ export const sharedRoutePaths = [
 // Public route paths (accessible without authentication)
 export const publicRoutePaths = [
   "/appointments",
+
   "/doctors-list",
   "/doctors-list/:id",
   "/appointments/booking/:id",
