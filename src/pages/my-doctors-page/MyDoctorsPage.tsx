@@ -34,7 +34,7 @@ function formatDate(iso: string) {
 function InfoPill({ icon: Icon, value }: { icon: any; value?: string | null }) {
     if (!value) return null;
     return (
-        <span className="inline-flex items-center gap-1 text-[11px] text-(--color-text-light) bg-(--color-bg) border border-(--color-border) rounded-md px-2 py-0.5">
+        <span className="inline-flex items-center gap-1 text-[11px] text-(--color-text-light) bg-(--color-bg) border border-border rounded-md px-2 py-0.5">
             <Icon className="w-3 h-3 shrink-0" />
             {value}
         </span>
@@ -49,7 +49,7 @@ export default function MyDoctorsPage() {
     const [pageSize, setPageSize] = useState(10);
     const [selectedDoctor, setSelectedDoctor] = useState<MyDoctor | null>(null);
     const [showFeedback, setShowFeedback] = useState(false);
-    const [itemIdx, setItemIdx] = useState<number>(-1);
+    // const [itemIdx, setItemIdx] = useState<number>(-1);
 
     const dispatch: AppDispatch = useDispatch();
     const { data, loading, error } = useSelector(myDoctorsState) as MyDoctorsState;
@@ -58,10 +58,10 @@ export default function MyDoctorsPage() {
         dispatch(fetchMyDoctors({ search, pageNumber, pageSize }));
     }, [dispatch, search, pageNumber, pageSize]);
 
-    const openFeedback = (doctor: MyDoctor, itemIdx: number) => {
+    const openFeedback = (doctor: MyDoctor) => {
         setSelectedDoctor(doctor);
         setShowFeedback(true);
-        setItemIdx(itemIdx)
+        // setItemIdx(itemIdx)
     };
 
     const closeFeedback = () => {
@@ -86,7 +86,7 @@ export default function MyDoctorsPage() {
                         </p>
                     </div>
                     {!loading && !error && (
-                        <span className="text-xs text-(--color-text-light) bg-(--color-bg) border border-(--color-border) rounded-lg px-3 py-1.5">
+                        <span className="text-xs text-(--color-text-light) bg-(--color-bg) border border-border rounded-lg px-3 py-1.5">
                             <span className="font-semibold text-(--color-text)">{data.totalCount}</span> doctor{data.totalCount !== 1 ? 's' : ''}
                         </span>
                     )}
@@ -94,7 +94,7 @@ export default function MyDoctorsPage() {
 
                 {/* ── Search bar ────────────────────────────────────────────── */}
                 <div
-                    className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-4"
+                    className="rounded-2xl border border-border bg-(--color-surface) p-4"
                     style={{ boxShadow: 'var(--shadow)' }}
                 >
                     <div className="relative">
@@ -104,7 +104,7 @@ export default function MyDoctorsPage() {
                             value={search}
                             onChange={(e) => { setSearch(e.target.value); setPageNumber(1); }}
                             placeholder="Search by name, specialty, or clinic…"
-                            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-(--color-border) bg-(--color-bg) text-(--color-text) text-sm placeholder:text-(--color-text-light) outline-none focus:border-(--color-primary) transition-colors"
+                            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-border bg-(--color-bg) text-(--color-text) text-sm placeholder:text-(--color-text-light) outline-none focus:border-primary transition-colors"
                         />
                     </div>
                 </div>
@@ -129,11 +129,11 @@ export default function MyDoctorsPage() {
                     <>
                         {/* ── Doctors grid ──────────────────────────────────── */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            {data.items?.map((doctor, idx) => (
+                            {data.items?.map((doctor) => (
                                 <DoctorCard
                                     key={doctor.doctorId}
                                     doctor={doctor}
-                                    onFeedback={() => openFeedback(doctor, idx)}
+                                    onFeedback={() => openFeedback(doctor)}
                                 />
                             ))}
                         </div>
@@ -177,7 +177,7 @@ function DoctorCard({ doctor, onFeedback }: { doctor: MyDoctor; onFeedback: () =
 
     return (
         <div
-            className="group flex flex-col rounded-2xl border border-(--color-border) bg-(--color-surface) overflow-hidden transition-all duration-200 hover:border-primary/30 hover:shadow-md"
+            className="group flex flex-col rounded-2xl border border-border bg-(--color-surface) overflow-hidden transition-all duration-200 hover:border-primary/30 hover:shadow-md"
             style={{ boxShadow: 'var(--shadow)' }}
         >
             {/* ── Top section ──────────────────────────────────────────────── */}
@@ -188,11 +188,11 @@ function DoctorCard({ doctor, onFeedback }: { doctor: MyDoctor; onFeedback: () =
                         <img
                             src={doctor.imageUrl}
                             alt={doctor.name}
-                            className="w-16 h-16 rounded-full object-cover ring-2 ring-(--color-border)"
+                            className="w-16 h-16 rounded-full object-cover ring-2 ring-border"
                         />
                     ) : (
                         <div className="w-16 h-16 rounded-xl bg-(--color-bg-blue) border border-(--color-primary)/20 flex items-center justify-center">
-                            <User className="w-7 h-7 text-(--color-primary)" />
+                            <User className="w-7 h-7 text-primary" />
                         </div>
                     )}
                 </div>
@@ -201,7 +201,7 @@ function DoctorCard({ doctor, onFeedback }: { doctor: MyDoctor; onFeedback: () =
                 <div className="min-w-0 flex-1 space-y-1.5">
                     <Link
                         to={`/doctors-list/${doctor.doctorId}`}
-                        className="text-sm font-semibold text-(--color-text) hover:text-(--color-primary) transition-colors truncate block"
+                        className="text-sm font-semibold text-(--color-text) hover:text-primary transition-colors truncate block"
                     >
                         {doctor.name ? `Dr. ${doctor.name}` : 'Unknown'}
                     </Link>
@@ -222,7 +222,7 @@ function DoctorCard({ doctor, onFeedback }: { doctor: MyDoctor; onFeedback: () =
                             </span>
                         )}
                         {doctor.experienceYears > 0 && (
-                            <span className="inline-flex items-center gap-1 text-[11px] text-(--color-text-light) bg-(--color-bg) border border-(--color-border) rounded-md px-2 py-0.5">
+                            <span className="inline-flex items-center gap-1 text-[11px] text-(--color-text-light) bg-(--color-bg) border border-border rounded-md px-2 py-0.5">
                                 <Award className="w-3 h-3" />
                                 {doctor.experienceYears} yr{doctor.experienceYears !== 1 ? 's' : ''}
                             </span>
@@ -232,7 +232,7 @@ function DoctorCard({ doctor, onFeedback }: { doctor: MyDoctor; onFeedback: () =
             </div>
 
             {/* ── Stats row ────────────────────────────────────────────────── */}
-            <div className="mx-5 mb-4 grid grid-cols-2 gap-2 rounded-xl bg-(--color-bg) border border-(--color-border) p-3">
+            <div className="mx-5 mb-4 grid grid-cols-2 gap-2 rounded-xl bg-(--color-bg) border border-border p-3">
                 <div>
                     <p className="text-[10px] uppercase tracking-widest text-(--color-text-light) mb-0.5">Last Visit</p>
                     <p className="text-xs font-medium text-(--color-text)">{formatDate(doctor.lastAppointmentDate)}</p>
@@ -260,7 +260,7 @@ function DoctorCard({ doctor, onFeedback }: { doctor: MyDoctor; onFeedback: () =
             {/* ── Last feedback snippet ─────────────────────────────────────── */}
             {lastFeedback?.comment && (
                 <div className="mx-5 mb-4 flex items-start gap-2 rounded-xl bg-(--color-bg-blue) border border-(--color-primary)/20 px-3 py-2.5">
-                    <Star className="w-3 h-3 text-(--color-primary) mt-0.5 shrink-0 fill-(--color-primary)" />
+                    <Star className="w-3 h-3 text-primary mt-0.5 shrink-0 fill-primary" />
                     <p className="text-[11px] text-(--color-text-light) line-clamp-2 leading-relaxed">
                         "{lastFeedback.comment}"
                     </p>
@@ -269,12 +269,12 @@ function DoctorCard({ doctor, onFeedback }: { doctor: MyDoctor; onFeedback: () =
 
             {/* ── Prescriptions preview ─────────────────────────────────────── */}
             {hasPrescriptions && (
-                <div className="mx-5 mb-4 rounded-xl border border-(--color-border) bg-(--color-surface) divide-y divide-(--color-border) overflow-hidden">
+                <div className="mx-5 mb-4 rounded-xl border border-border bg-(--color-surface) divide-y divide-border overflow-hidden">
                     <div className="px-3 py-2 flex items-center justify-between">
                         <p className="text-[10px] uppercase tracking-widest font-medium text-(--color-text-light)">Latest Prescription</p>
                         <Link
                             to={`/prescriptions`}
-                            className="text-[10px] text-(--color-primary) hover:text-(--color-primary-light) flex items-center gap-0.5"
+                            className="text-[10px] text-primary hover:text-(--color-primary-light) flex items-center gap-0.5"
                         >
                             View all <ChevronRight className="w-3 h-3" />
                         </Link>
@@ -284,7 +284,7 @@ function DoctorCard({ doctor, onFeedback }: { doctor: MyDoctor; onFeedback: () =
                             <p className="text-xs font-medium text-(--color-text) truncate">{rx.diagnosis}</p>
                             <div className="flex flex-wrap gap-1">
                                 {rx.items.slice(0, 3).map((item, i) => (
-                                    <span key={i} className="text-[10px] bg-(--color-bg) border border-(--color-border) text-(--color-text-light) rounded-md px-1.5 py-0.5">
+                                    <span key={i} className="text-[10px] bg-(--color-bg) border border-border text-(--color-text-light) rounded-md px-1.5 py-0.5">
                                         {item.medicationName} · {item.dosage}
                                     </span>
                                 ))}
@@ -298,10 +298,10 @@ function DoctorCard({ doctor, onFeedback }: { doctor: MyDoctor; onFeedback: () =
             )}
 
             {/* ── Actions ──────────────────────────────────────────────────── */}
-            <div className="mt-auto px-5 pb-4 flex items-center gap-2 pt-3 border-t border-(--color-border)">
+            <div className="mt-auto px-5 pb-4 flex items-center gap-2 pt-3 border-t border-border">
                 <Link
                     to={`/appointments/booking/${doctor.doctorId}`}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-(--color-primary) text-white text-xs font-medium hover:bg-(--color-primary-dark) active:scale-95 transition-all duration-150"
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-primary text-white text-xs font-medium hover:bg-(--color-primary-dark) active:scale-95 transition-all duration-150"
                 >
                     <CalendarCheck className="w-3.5 h-3.5" />
                     Book Appointment
@@ -315,7 +315,7 @@ function DoctorCard({ doctor, onFeedback }: { doctor: MyDoctor; onFeedback: () =
                 </Link> */}
                 {!lastFeedback && <button
                     onClick={onFeedback}
-                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-(--color-border) text-(--color-text-light) hover:border-amber-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-all duration-150 cursor-pointer"
+                    className="flex h-9 w-9 items-center justify-center rounded-xl border border-border text-(--color-text-light) hover:border-amber-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-all duration-150 cursor-pointer"
                     title="Leave feedback"
                 >
                     <Star className="w-3.5 h-3.5" />
