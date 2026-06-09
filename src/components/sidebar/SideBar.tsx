@@ -39,6 +39,7 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
     dispatch(logout());
     dispatch(clearEmail());
     Cookies.remove("patientsView");
+
     navigate("/");
   };
 
@@ -54,18 +55,22 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
       .filter(Boolean)
       .join(" ");
 
-  const navItems =
-    sidebarDataRole[role as keyof typeof sidebarDataRole] ?? [];
+  const navItems = sidebarDataRole[role as keyof typeof sidebarDataRole] ?? [];
 
   return (
-    <div className="flex flex-col h-full" style={{ background: "var(--color-surface)" }}>
-
+    <div
+      className="flex flex-col h-full"
+      style={{ background: "var(--color-surface)" }}
+    >
       {/* ── Logo / header ─────────────────────────────────── */}
       <div
         className="relative flex items-center justify-between h-16 px-4 shrink-0"
         style={{ borderBottom: "1px solid var(--color-border)" }}
       >
-        <Link to="/" className="flex justify-center items-center w-full gap-2 min-w-0">
+        <Link
+          to="/"
+          className="flex justify-center items-center w-full gap-2 min-w-0"
+        >
           {!toggled && (
             <img
               src={Logo}
@@ -118,7 +123,12 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
         {navItems.map((item, idx) => {
           const Icon = item.icon;
           return (
-            <NavLink key={idx} to={item.path} className={linkStyle} title={toggled ? item.label : undefined}>
+            <NavLink
+              key={idx}
+              to={item.path}
+              className={linkStyle}
+              title={toggled ? item.label : undefined}
+            >
               {({ isActive }) => (
                 <>
                   {/* active left bar */}
@@ -130,11 +140,11 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
                   )}
                   <Icon
                     className="w-[18px] h-[18px] shrink-0 transition-colors duration-150"
-                    style={{ color: isActive ? "var(--color-primary)" : undefined }}
+                    style={{
+                      color: isActive ? "var(--color-primary)" : undefined,
+                    }}
                   />
-                  {!toggled && (
-                    <span className="truncate">{item.label}</span>
-                  )}
+                  {!toggled && <span className="truncate">{item.label}</span>}
                 </>
               )}
             </NavLink>
@@ -195,6 +205,11 @@ const sidebarDataRole = {
   doctor: [
     { icon: LayoutDashboard, label: "Dashboard", path: "/doctor" },
     { icon: Calendar, label: "Schedule", path: "/doctor-schedule" },
+    {
+      icon: Calendar,
+      label: "Appointments",
+      path: "/doctor-appointments-dashboard",
+    },
     { icon: Users, label: "Patients", path: "/doctor-patients" },
     { icon: Scan, label: "Scans", path: "/scan/upload" },
     { icon: FileText, label: "Reports", path: "/doctor-reports" },

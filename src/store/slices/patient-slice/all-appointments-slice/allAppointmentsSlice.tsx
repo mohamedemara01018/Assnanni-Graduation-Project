@@ -4,8 +4,7 @@ import Cookies from "js-cookie";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-
-export type AppointmentStatus = 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'Missed';
+export type AppointmentStatus = 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'Rescheduled' | 'Missed';
 export type AppointmentMode = 'Online' | 'InClinic';
 export type AppointmentType = 'FollowUp' | 'Checkup' | 'Consultation' | 'Emergency';
 
@@ -15,15 +14,14 @@ export interface Appointment {
     doctorName: string;
     doctorImage: string;
     specialty: string;
-    type: AppointmentType;       // Fixed typo from AppointmentStatus
-    date: string;                // e.g., "2026-06-10"
-    time: string;                // e.g., "09:30:00"
+    type: AppointmentType;       
+    date: string;                
+    time: string;                
     status: AppointmentStatus;
-    mode: AppointmentMode;       // Replaced 'any' with a strict union type
-    isFeedbackGiven: boolean;    // Added missing property from your JSON
+    mode: AppointmentMode;       
+    isFeedbackGiven: boolean;    
 }
 
-// New interface matching your paginated server data object
 export interface PaginatedAppointments {
     items: Appointment[];
     pageNumber: number;
@@ -42,7 +40,7 @@ export interface AppointmentsData {
     completed: number;
     cancelled: number;
     missedAppointments: number;
-    appointments: PaginatedAppointments; // Updated from Appointment[] to match the structure
+    appointments: PaginatedAppointments; 
 }
 
 export interface AppointmentsState {
@@ -51,7 +49,6 @@ export interface AppointmentsState {
     error: string | null;
 }
 
-// Example updated initialState matching these new interfaces
 const initialState: AppointmentsState = {
     data: {
         total: 0,
@@ -76,12 +73,36 @@ const initialState: AppointmentsState = {
 };
 
 interface AppointmentsFilter {
-    search: string,
+    search: string;
     BookingType: string;
     AppointmentStatus: string;
     PageNumber: number;
     PageSize: number;
 }
+
+// Helper to normalize backend payload data safely matching PaginatedAppointments schema
+const normalizeAppointmentsData = (payload: any): AppointmentsData => {
+    const raw = payload?.data ?? payload ?? {};
+    
+    return {
+        total: Number(raw.total ?? 0),
+        upcoming: Number(raw.upcoming ?? 0),
+        completed: Number(raw.completed ?? 0),
+        cancelled: Number(raw.cancelled ?? 0),
+        missedAppointments: Number(raw.missedAppointments ?? 0),
+        appointments: {
+            items: Array.isArray(raw.appointments?.items) ? raw.appointments.items : [],
+            pageNumber: Number(raw.appointments?.pageNumber ?? 1),
+            pageSize: Number(raw.appointments?.pageSize ?? 10),
+            totalCount: Number(raw.appointments?.totalCount ?? 0),
+            totalPages: Number(raw.appointments?.totalPages ?? 1),
+            hasNextPage: Boolean(raw.appointments?.hasNextPage ?? false),
+            hasPreviousPage: Boolean(raw.appointments?.hasPreviousPage ?? false),
+            nextPageNumber: raw.appointments?.nextPageNumber ?? null,
+            previousPageNumber: raw.appointments?.previousPageNumber ?? null,
+        }
+    };
+};
 
 export const fetchAllAppointments = createAsyncThunk(
     'allAppointmentSlice/fetchAllAppointments',
@@ -94,6 +115,7 @@ export const fetchAllAppointments = createAsyncThunk(
                 queryParams.append(key, String(value));
             }
         });
+
         try {
             const response = await fetch(
                 `${backendUrl}Patient/my-appointments-dashboard?${queryParams.toString()}`,
@@ -106,13 +128,13 @@ export const fetchAllAppointments = createAsyncThunk(
 
             const json = await response.json();
 
-            if (!response.ok) {
+            if (!response.ok || !json.succeeded) {
                 return rejectWithValue(
                     json?.message || json?.error || "Request failed"
                 );
             }
 
-            return json; // This payload matches the structure of initialState.data
+            return json; 
         } catch (err: any) {
             return rejectWithValue(err.message || "Something went wrong");
         }
@@ -123,6 +145,11 @@ export const allAppointmentsSlice = createSlice({
     name: 'allAppointmentsSlice',
     initialState,
     reducers: {
+        clearAppointmentsState: (state) => {
+            state.data = initialState.data;
+            state.loading = false;
+            state.error = null;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -132,7 +159,7 @@ export const allAppointmentsSlice = createSlice({
             })
             .addCase(fetchAllAppointments.fulfilled, (state, action) => {
                 state.loading = false;
-                state.data = action.payload?.data;
+                state.data = normalizeAppointmentsData(action.payload);
             })
             .addCase(fetchAllAppointments.rejected, (state, action) => {
                 state.loading = false;
@@ -141,8 +168,7 @@ export const allAppointmentsSlice = createSlice({
     }
 });
 
-
-// state
-export const allAppointmentsState = (state: RootState) => state.allAppointmentsSlice
+export const { clearAppointmentsState } = allAppointmentsSlice.actions;
+export const allAppointmentsState = (state: RootState) => state.allAppointmentsSlice;
 
 export default allAppointmentsSlice.reducer;

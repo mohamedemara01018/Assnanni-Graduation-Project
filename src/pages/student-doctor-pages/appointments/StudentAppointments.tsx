@@ -1,6 +1,7 @@
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import Card from "../../../components/Student Doctor/appointments/Card";
 import AppointmentsCard from "../../../components/Student Doctor/appointments/AppointmentsCard";
+
 import { FaRegClock } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
 import { IoMdCloseCircleOutline } from "react-icons/io";
@@ -31,6 +32,10 @@ interface StudentAppointmentsResponse {
   completed: number;
   cancelled: number;
   appointments: AppointmentAPI[];
+  // pagination (if backend supports it)
+  pageNumber?: number;
+  pageSize?: number;
+  totalCount?: number;
 }
 
 interface ApiResponse<T> {
@@ -49,33 +54,42 @@ const StudentAppointments = () => {
   const [bookingType, setBookingType] = useState("");
   const [appointmentStatus, setAppointmentStatus] = useState("");
 
-  const { data: responseBody, isLoading, isError, error, isSuccess } = useQuery<
-    ApiResponse<StudentAppointmentsResponse>,
-    Error
-  >({
-    queryKey: ["studentAppointments", role, search, bookingType, appointmentStatus],
+  const {
+    data: responseBody,
+    isLoading,
+    isError,
+    error,
+    isSuccess,
+  } = useQuery<ApiResponse<StudentAppointmentsResponse>, Error>({
+    queryKey: [
+      "studentAppointments",
+      role,
+      search,
+      bookingType,
+      appointmentStatus,
+    ],
+
     queryFn: async () => {
       const endpoint =
         role === "studentDoctor"
           ? "StudentDoctor/appointments-dashboard"
           : "Receptionist/dashboard/appointments";
 
-      const response = await axios.get(
-        `${backendUrl}${endpoint}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            search: search || undefined,
-            BookingType: bookingType || undefined,
-            AppointmentStatus: appointmentStatus || undefined,
-          },
-        }
-      );
+      const response = await axios.get(`${backendUrl}${endpoint}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          search: search || undefined,
+          BookingType: bookingType || undefined,
+          AppointmentStatus: appointmentStatus || undefined,
+        },
+      });
 
       if (!response.data.succeeded) {
-        throw new Error(response.data.message || "Failed to fetch appointments");
+        throw new Error(
+          response.data.message || "Failed to fetch appointments",
+        );
       }
 
       return response.data;
@@ -94,7 +108,9 @@ const StudentAppointments = () => {
     if (isError && error) {
       const err = error as any;
       toast.error(
-        err.response?.data?.message || err.message || "Failed to load appointments"
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to load appointments",
       );
     }
   }, [isError, error]);
@@ -109,10 +125,10 @@ const StudentAppointments = () => {
       apiApp.status === "Confirmed"
         ? "Upcoming"
         : apiApp.status === "Completed"
-        ? "Completed"
-        : apiApp.status === "Cancelled"
-        ? "Cancelled"
-        : (apiApp.status as any),
+          ? "Completed"
+          : apiApp.status === "Cancelled"
+            ? "Cancelled"
+            : (apiApp.status as any),
     meetingType: apiApp.mode === "Online" ? "Video Call" : "In-Person",
   });
 
@@ -210,7 +226,10 @@ const StudentAppointments = () => {
             </div>
           ) : appointments.length > 0 ? (
             appointments.map((appointment) => (
-              <AppointmentsCard key={appointment.id} appointment={appointment} />
+              <AppointmentsCard
+                key={appointment.id}
+                appointment={appointment}
+              />
             ))
           ) : (
             <div className="flex flex-col items-center justify-center py-20 bg-(--color-surface) rounded-2xl border border-dashed border-(--color-border)">

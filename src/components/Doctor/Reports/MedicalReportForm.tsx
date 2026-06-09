@@ -5,7 +5,6 @@ import {
   FiAlertCircle,
   // FiActivity,
   FiClock,
-  FiPhone,
   FiArrowLeft,
 } from "react-icons/fi";
 import { useNavigate, useSearchParams } from "react-router";
@@ -15,13 +14,14 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
-// import { BeatLoader } from "react-spinners";
+
 import AllergyForm from "./AllergyForm";
 
 const MedicalReportForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const patientId = searchParams.get("patientId");
+  const medicalRecordId = searchParams.get("medicalRecordId");
   const [isAllergyFormOpen, setIsAllergyFormOpen] = useState(false);
 
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
@@ -42,18 +42,8 @@ const MedicalReportForm = () => {
     durationInDays: 0,
   });
 
-  const [emergencyContact, setEmergencyContact] = useState({
-    name: "",
-    relationship: "",
-    phone: "",
-  });
-
-  // const addCondition = () => {
-  //   if (newCondition.condition && newCondition.date) {
-  //     setHistory([...history, newCondition]);
-  //     setNewCondition({ condition: "", date: "", status: "Ongoing" });
-  //   }
-  // };
+  const [diagnosis, setDiagnosis] = useState("");
+  const [notes, setNotes] = useState("");
 
   const addPrescription = () => {
     if (newPrescription.medicationName && newPrescription.dosage) {
@@ -74,6 +64,21 @@ const MedicalReportForm = () => {
         return;
       }
 
+      if (!medicalRecordId) {
+        toast.error("Medical record ID is missing");
+        return;
+      }
+
+      if (!diagnosis.trim()) {
+        toast.error("Diagnosis is required");
+        return;
+      }
+
+      if (!notes.trim()) {
+        toast.error("Notes are required");
+        return;
+      }
+
       if (prescriptions.length === 0) {
         toast.warning("Please add at least one prescription");
         return;
@@ -81,7 +86,10 @@ const MedicalReportForm = () => {
 
       const requestBody = {
         patientId: Number(patientId),
+        medicalRecordId: Number(medicalRecordId),
         items: prescriptions,
+        diagnosis: diagnosis.trim(),
+        notes: notes.trim(),
       };
 
       const response = await axios.post(
@@ -134,6 +142,44 @@ const MedicalReportForm = () => {
             </div>
 
             <div className="p-8 space-y-12">
+              <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    Diagnosis
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Enter diagnosis..."
+                    className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-400"
+                    value={diagnosis}
+                    onChange={(e) => setDiagnosis(e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    Medical Record ID
+                  </label>
+                  <input
+                    type="text"
+                    value={medicalRecordId || ""}
+                    disabled
+                    className="bg-gray-100 border border-gray-200 rounded-xl px-4 py-3 text-sm cursor-not-allowed text-gray-500 font-medium"
+                  />
+                </div>
+                <div className="flex flex-col gap-2 md:col-span-2">
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    Notes
+                  </label>
+                  <textarea
+                    rows={4}
+                    placeholder="Enter notes..."
+                    className="bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-400 outline-none transition-all resize-none"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                  />
+                </div>
+              </section>
+
               {/* Allergies Section */}
               <section>
                 <div className="flex items-center justify-between mb-6">
@@ -257,69 +303,6 @@ const MedicalReportForm = () => {
                   >
                     Add Prescription
                   </button>
-                </div>
-              </section>
-
-              {/* Emergency Contact Section */}
-              <section>
-                <div className="flex items-center gap-2 mb-6 text-purple-600">
-                  <FiPhone className="text-xl" />
-                  <h3 className="font-bold text-lg">Emergency Contact</h3>
-                </div>
-                <div className="bg-gray-50 border border-gray-100 p-8 rounded-2xl">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div className="flex flex-col gap-2">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                        Full Name
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="John Doe"
-                        className="bg-transparent border-b border-gray-200 py-2 font-bold text-gray-900 outline-none focus:border-purple-400 transition-colors"
-                        value={emergencyContact.name}
-                        onChange={(e) =>
-                          setEmergencyContact({
-                            ...emergencyContact,
-                            name: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                        Relationship
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Spouse"
-                        className="bg-transparent border-b border-gray-200 py-2 font-bold text-gray-900 outline-none focus:border-purple-400 transition-colors"
-                        value={emergencyContact.relationship}
-                        onChange={(e) =>
-                          setEmergencyContact({
-                            ...emergencyContact,
-                            relationship: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                        Phone Number
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="+1 (555) 000-0000"
-                        className="bg-transparent border-b border-gray-200 py-2 font-bold text-gray-900 outline-none focus:border-purple-400 transition-colors"
-                        value={emergencyContact.phone}
-                        onChange={(e) =>
-                          setEmergencyContact({
-                            ...emergencyContact,
-                            phone: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
-                  </div>
                 </div>
               </section>
             </div>

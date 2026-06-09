@@ -1,18 +1,14 @@
 import QuickActions from "./QuickActions";
 import Verification from "./Verification ";
-import Week from "./Week";
+
 import { GrAlert } from "react-icons/gr";
 
-interface SecondDivProps {
-  dashboardData?: Record<string, unknown>;
-}
-
-const SecondDiv = ({ dashboardData }: SecondDivProps) => {
+const SecondDiv = () => {
   return (
     <div className="flex-1 flex flex-col gap-6">
       <QuickActions />
       <Verification />
-      <Week dashboardData={dashboardData} />
+
       <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex gap-3 items-start">
         <GrAlert className="text-yellow-600 text-xl mt-0.5" />
         <div>

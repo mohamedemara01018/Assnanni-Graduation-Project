@@ -15,7 +15,6 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import { useRef, useState } from "react";
 import type { MedicalHistoryItem } from "@/interfaces/doctorInterfaces";
-import { useMyProfile } from "@/hooks/useMyProfile";
 import { HiOutlinePaperClip } from "react-icons/hi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Cookies from "js-cookie";
@@ -30,33 +29,6 @@ const MedicalHistoryInDoctorDashboard = () => {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeRecordId, setActiveRecordId] = useState<number | null>(null);
-
-  const { data: profileData } = useMyProfile();
-  const doctorName = profileData?.fullName;
-
-  const { data: appointmentData } = useQuery({
-    queryKey: ["CheckAppointment", id],
-    queryFn: async () => {
-      const response = await axios.get(
-        `${backendUrl}Patient/appointments?patientId=${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      return response.data;
-    },
-    enabled: !!id && !!token && role === "doctor",
-  });
-
-  const appointments = appointmentData?.data?.appointments?.items || [];
-
-  const doctorAppointment = appointments.find(
-    (app: any) => app.doctorName === doctorName && app.status === "Confirmed",
-  );
-
-  const appointmentId = doctorAppointment?.appointmentId;
 
   const { data, isLoading, isError, error, isSuccess } = useQuery({
     queryKey: ["PatientMedicalHistory", id, role],
@@ -134,6 +106,16 @@ const MedicalHistoryInDoctorDashboard = () => {
   }, [isSuccess, isError, error, data]);
 
   const history: MedicalHistoryItem[] = data?.data || [];
+  const latestMedicalRecordId = history.reduce<number | null>((latest, item) => {
+    if (latest === null) return item.id;
+
+    const latestRecord = history.find((record) => record.id === latest);
+    if (!latestRecord) return item.id;
+
+    return new Date(item.date).getTime() > new Date(latestRecord.date).getTime()
+      ? item.id
+      : latest;
+  }, null);
 
   const handleDownload = (item: MedicalHistoryItem) => {
     // Simulate downloading the record as a text file
@@ -237,13 +219,14 @@ const MedicalHistoryInDoctorDashboard = () => {
             <button
               onClick={() =>
                 navigate(
-                  `/doctor-patients/${id}/medical-history/add?appointmentId=${appointmentId}`,
+                  `/doctor-reports/generate-new-report?patientId=${id || 0}&medicalRecordId=${latestMedicalRecordId || 0}`,
                 )
               }
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95 mt-10 cursor-pointer"
+              disabled={!latestMedicalRecordId}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-blue-100 active:scale-95 mt-10 cursor-pointer"
             >
               <FiPlus className="text-xl" />
-              <span>Add New Record</span>
+              <span>Add Prescription</span>
             </button>
           )}
         </div>

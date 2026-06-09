@@ -30,8 +30,10 @@ import Notifications from "../pages/doctor-pages/notifications/Notifications";
 import LearningSessions from "../pages/doctor-pages/learning-sessions/LearningSessions";
 import CreateLearningSession from "../pages/doctor-pages/learning-sessions/CreateLearningSession";
 import SessionDetails from "../pages/doctor-pages/learning-sessions/SessionDetails";
+import AllAppointments from "../pages/doctor-pages/appointments/AllAppointments";
 import StudentAppointments from "../pages/student-doctor-pages/appointments/StudentAppointments";
-import StudentAppointmentDetails from "../pages/student-doctor-pages/appointments/StudentAppointmentDetails";
+import AppointmentDetails from "../pages/doctor-pages/appointments/AppointmentDetails";
+
 import StudentDoctorDashboard from "../pages/student-doctor-pages/dashboard/StudentDoctorDashboard";
 
 import ContactSupervisor from "../pages/student-doctor-pages/supervisor/ContactSupervisor";
@@ -40,11 +42,14 @@ import MedicalRecordDrafts from "../pages/student-doctor-pages/medical-records/M
 import TrainingSessions from "../pages/student-doctor-pages/training-sessions/TrainingSessions";
 import MedicalRecordDraftDetails from "../pages/student-doctor-pages/medical-records/MedicalRecordDraftDetails";
 import UpdateMedicalRecordDraft from "../pages/student-doctor-pages/medical-records/UpdateMedicalRecordDraft";
+import AddPrescriptionPage from "../pages/student-doctor-pages/prescriptions/AddPrescriptionPage";
+import MyPrescriptionsPage from "../pages/student-doctor-pages/prescriptions/MyPrescriptionsPage";
 import ReceptionistDashboard from "../pages/receptionist-pages/dashboard/ReceptionistDashboard";
 import ScheduleAppointment from "../pages/receptionist-pages/appointments/ScheduleAppointment";
 import CheckIn from "../pages/receptionist-pages/appointments/CheckIn";
 import RescheduleAppointment from "../pages/receptionist-pages/appointments/RescheduleAppointment";
 import RegisterPatient from "../pages/receptionist-pages/patients/RegisterPatient";
+import OnlinePaymentPage from "../pages/online-payment-page/OnlinePaymentPage";
 import Settings from "../pages/doctor-pages/settings/Settings";
 import ProfileSettings from "../components/Doctor/Settings/SettingsDetails/ProfileSettings";
 import SecuritySettings from "../components/Doctor/Settings/SettingsDetails/SecuritySettings";
@@ -60,6 +65,9 @@ import ProfilePage from "../pages/profile-page/ProfilePage";
 import PrescriptionsPage from "@/pages/prescriptions-page/PrescriptionsPage";
 import MyFeedbackPage from "@/pages/my-feedbacks-page/MyFeedbacksPage";
 import MyDoctorsPage from "@/pages/my-doctors-page/MyDoctorsPage";
+
+import StudentAppointmentDetails from "@/pages/student-doctor-pages/appointments/StudentAppointmentDetails";
+
 import MedicalHistory from "@/pages/medical-history-page/MedicalHistoryPage";
 
 // ProtectedRoute component for role-based access control
@@ -104,7 +112,7 @@ export const homePageByRole = {
 export const routeElements = {
   // Patient routes
   "/patient": <PatientPage />,
-  'prescriptions': <PrescriptionsPage />,
+  prescriptions: <PrescriptionsPage />,
   // Admin routes
   "/admin": <AdminPage />,
   users: <UsersPage />,
@@ -114,9 +122,8 @@ export const routeElements = {
   analytics: <AnalyticsPage />,
   "ai-models": <AIModelsPage />,
   "medical-history": <MedicalHistory />,
-  'my-feedbacks': <MyFeedbackPage />,
-  'my-doctors': <MyDoctorsPage />,
-
+  "my-feedbacks": <MyFeedbackPage />,
+  "my-doctors": <MyDoctorsPage />,
 
   // Doctor routes
   "/doctor": <DoctorDashboard />,
@@ -138,7 +145,10 @@ export const routeElements = {
   "scan/analysis/:scanId": <ScanDetails />,
   notification: <Notifications />,
   "doctor-appointments": <StudentAppointments />,
+  "appointments/doctor-appointments/:id": <AppointmentDetails />,
   "doctor-appointments/:id": <StudentAppointmentDetails />,
+  "doctor-appointments-dashboard": <AllAppointments />,
+
   "doctor-learning-sessions": <LearningSessions />,
   "doctor-learning-sessions/create": <CreateLearningSession />,
   "doctor-learning-sessions/:id": <SessionDetails />,
@@ -149,10 +159,16 @@ export const routeElements = {
   "student-notification": <Notifications />,
   "contact-supervisor": <ContactSupervisor />,
   "student-doctor/create-medical-record/:id": <CreateMedicalRecord />,
+  "add-prescrption/:patientId": <AddPrescriptionPage />,
+  "student-doctor/my-prescriptions": <MyPrescriptionsPage />,
   "student-doctor/medical-record-drafts": <MedicalRecordDrafts />,
   "student-doctor/training-sessions": <TrainingSessions />,
-  "student-doctor/medical-record-drafts/:draftId": <MedicalRecordDraftDetails />,
-  "student-doctor/medical-record-drafts/update/:draftId": <UpdateMedicalRecordDraft />,
+  "student-doctor/medical-record-drafts/:draftId": (
+    <MedicalRecordDraftDetails />
+  ),
+  "student-doctor/medical-record-drafts/update/:draftId": (
+    <UpdateMedicalRecordDraft />
+  ),
 
   // Receptionist routes
   "/receptionist": <ReceptionistDashboard />,
@@ -167,6 +183,9 @@ export const routeElements = {
   "": <ProfileSettings />,
   security: <SecuritySettings />,
   notifications: <NotificationPreferences />,
+
+  // Payment routes
+  "online-payment": <OnlinePaymentPage />,
 
   // Public routes
   "/appointments": <AppointmentsPage />,

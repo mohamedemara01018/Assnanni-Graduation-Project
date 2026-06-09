@@ -1,16 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import {
-  Calendar,
-  Clock,
-  FileText,
-  ArrowLeft,
-  CreditCard,
-
-} from "lucide-react";
+import { Calendar, Clock, FileText, ArrowLeft, CreditCard } from "lucide-react";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch } from "@/store/store";
+import type { AppDispatch, RootState } from "@/store/store";
+import axios from "axios";
+import Cookies from "js-cookie";
 import {
   availableDatesState,
   fetchAvailableDates,
@@ -21,7 +16,7 @@ import {
   fetchAvailableSlots,
   type ScheduleSlotsState,
 } from "@/store/slices/patient-slice/available-slots-slice/availableSlotsSlice";
-import Error from "@/components/error/Error";
+import ErrorDisplay from "@/components/error/Error";
 import MiniLoading from "@/components/mini-loading/MiniLoading";
 import {
   doctorBookingDetailsState,
@@ -31,6 +26,7 @@ import {
 import {
   bookAppointmentState,
   fetchBookAppointment,
+  type AppointmentBookingResponse,
   type AppointmentBookingState,
 } from "@/store/slices/patient-slice/book-appointment-slice/bookAppointmentSlice";
 import { toast } from "react-toastify";
@@ -45,6 +41,99 @@ function isValidDoctorId(id: string | undefined): id is string {
   const n = Number(id);
   return Number.isInteger(n) && n > 0;
 }
+
+interface CreatePaymentPayload {
+  appointmentId: number;
+  patientId: number;
+  amount: number;
+  currency: string;
+  idempotencyKey: string;
+  createdBy: string;
+}
+
+function getStripeCheckoutUrl(payload: unknown): string | null {
+  console.log(payload);
+  if (!payload || typeof payload !== "object") return null;
+
+  const findUrl = (value: unknown, depth = 0): string | null => {
+    if (depth > 6 || value == null) return null;
+
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (
+        trimmed.startsWith("http") &&
+        (trimmed.includes("stripe.com") || trimmed.includes("checkout"))
+      ) {
+        return trimmed;
+      }
+      return null;
+    }
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        const found = findUrl(item, depth + 1);
+        if (found) return found;
+      }
+      return null;
+    }
+
+    if (typeof value === "object") {
+      const record = value as Record<string, unknown>;
+      const preferredKeys = [
+        "checkoutUrl",
+        "checkoutSessionUrl",
+        "sessionUrl",
+        "stripeCheckoutUrl",
+        "paymentUrl",
+        "redirectUrl",
+        "url",
+        "stripeUrl",
+        "checkout_url",
+        "session_url",
+      ];
+
+      for (const key of preferredKeys) {
+        const candidate = record[key];
+        if (typeof candidate === "string" && candidate.startsWith("http")) {
+          return candidate;
+        }
+      }
+
+      for (const nestedValue of Object.values(record)) {
+        const found = findUrl(nestedValue, depth + 1);
+        if (found) return found;
+      }
+    }
+
+    return null;
+  };
+
+  return findUrl(payload);
+}
+
+function isPaymentCreateSuccess(payload: unknown): boolean {
+  if (!payload || typeof payload !== "object") return false;
+
+  const record = payload as Record<string, unknown>;
+  if (record.succeeded === true || record.isSuccess === true) return true;
+
+  if (
+    typeof record.status === "string" &&
+    ["success", "succeeded", "created"].includes(record.status.toLowerCase())
+  ) {
+    return true;
+  }
+
+  if (record.data && typeof record.data === "object") {
+    return isPaymentCreateSuccess(record.data);
+  }
+
+  return false;
+}
+
+type StripePaymentResult =
+  | { type: "redirect" }
+  | { type: "success"; message: string };
 
 // ─── Section Card wrapper ────────────────────────────────────────────────────
 
@@ -83,7 +172,6 @@ function SectionCard({
 
 // ─── Confirmation Modal ──────────────────────────────────────────────────────
 
-
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function AppointmentBookingPage() {
@@ -98,10 +186,15 @@ export default function AppointmentBookingPage() {
   const [notes, setNotes] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
   const [appointmentType, setAppointmentType] = useState("");
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
-  const { role } = useSelector(
-    (state: { auth: { role: string } }) => state.auth
-  );
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
+  const {
+    role,
+    id: userId,
+    name,
+    email,
+  } = useSelector((state: RootState) => state.auth);
 
   const {
     data: availableDates,
@@ -121,10 +214,8 @@ export default function AppointmentBookingPage() {
     error: errorDoctorDetails,
   } = useSelector(doctorBookingDetailsState) as DoctorBookingDetailsState;
 
-  const {
-    loading: loadingBookAppointment,
-    error: errorBookAppointment,
-  } = useSelector(bookAppointmentState) as AppointmentBookingState;
+  const { loading: loadingBookAppointment, error: errorBookAppointment } =
+    useSelector(bookAppointmentState) as AppointmentBookingState;
 
   const validId = isValidDoctorId(id);
 
@@ -139,6 +230,57 @@ export default function AppointmentBookingPage() {
     dispatch(fetchAvailableSlots({ date: selectedDate, id }));
   }, [dispatch, id, selectedDate, validId]);
 
+  const startStripePayment = async (
+    booking: AppointmentBookingResponse,
+  ): Promise<StripePaymentResult> => {
+    const token = Cookies.get("jwtToken");
+    if (!token) {
+      throw new Error("Unauthorized: missing token");
+    }
+
+    const amount = doctorDetails?.consultationFee;
+    if (!amount || amount <= 0) {
+      throw new Error("Invalid consultation fee for this doctor");
+    }
+
+    const paymentPayload: CreatePaymentPayload = {
+      appointmentId: booking.appointmentId,
+      patientId: booking.patientId,
+      amount,
+      currency: "USD",
+      idempotencyKey: crypto.randomUUID(),
+      createdBy: userId || name || email || role || "patient",
+    };
+
+    const response = await axios.post(
+      `${backendUrl}payments/create`,
+      paymentPayload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    console.log(response);
+
+    const checkoutUrl = getStripeCheckoutUrl(response.data);
+    if (checkoutUrl) {
+      window.location.assign(checkoutUrl);
+      return { type: "redirect" };
+    }
+
+    const apiMessage =
+      (response.data as { message?: string })?.message ||
+      "Payment created successfully";
+
+    if (isPaymentCreateSuccess(response.data) || response.status === 200) {
+      return { type: "success", message: apiMessage };
+    }
+
+    throw new Error(apiMessage || "Unable to start Stripe checkout session");
+  };
+
   const handleBooking = async () => {
     if (!doctorDetails?.doctorId || !slotId) return;
     if (!appointmentType) {
@@ -151,21 +293,40 @@ export default function AppointmentBookingPage() {
     }
 
     try {
-      const resultAction = await dispatch(
+      const booking = await dispatch(
         fetchBookAppointment({
           appointmentType,
           paymentMethod,
           doctorId: String(doctorDetails.doctorId),
           scheduleSlotId: String(slotId),
           notes,
-        })
+        }),
       ).unwrap();
 
-      toast.success("Booking successful: " + resultAction.message);
+      if (paymentMethod === "OnlinePayment") {
+        setIsProcessingPayment(true);
+        toast.info("Redirecting to secure Stripe payment...");
+        const paymentResult = await startStripePayment(booking);
+
+        if (paymentResult.type === "redirect") {
+          return;
+        }
+
+        toast.success(paymentResult.message);
+        setShowConfirmation(true);
+        return;
+      }
+
+      toast.success("Booking successful: " + booking.message);
       setShowConfirmation(true);
     } catch (err) {
       console.error("Booking failed:", err);
-      toast.error("Booking failed: " + (err as string));
+      const message = axios.isAxiosError(err)
+        ? err.response?.data?.message || err.message
+        : (err as Error)?.message || String(err);
+      toast.error("Booking failed: " + message);
+    } finally {
+      setIsProcessingPayment(false);
     }
   };
 
@@ -177,7 +338,7 @@ export default function AppointmentBookingPage() {
   if (!validId) {
     return (
       <DashboardLayout pageTitle="Book Appointment">
-        <Error message="Invalid doctor ID. Please check the URL and try again." />
+        <ErrorDisplay message="Invalid doctor ID. Please check the URL and try again." />
       </DashboardLayout>
     );
   }
@@ -197,7 +358,6 @@ export default function AppointmentBookingPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* ── Left: Booking Form ── */}
         <div className="lg:col-span-2 space-y-6">
-
           {/* Page header */}
           <SectionCard>
             <h1
@@ -244,9 +404,12 @@ export default function AppointmentBookingPage() {
             {loadingDates ? (
               <MiniLoading />
             ) : errorDates ? (
-              <Error message={errorDates} />
+              <ErrorDisplay message={errorDates} />
             ) : !availableDates?.length ? (
-              <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
+              <p
+                className="text-sm"
+                style={{ color: "var(--color-text-light)" }}
+              >
                 No available dates.
               </p>
             ) : (
@@ -306,9 +469,12 @@ export default function AppointmentBookingPage() {
               {loadingSlots ? (
                 <MiniLoading />
               ) : errorSlots ? (
-                <Error message={errorSlots} />
+                <ErrorDisplay message={errorSlots} />
               ) : !availableSlots?.length ? (
-                <p className="text-sm" style={{ color: "var(--color-text-light)" }}>
+                <p
+                  className="text-sm"
+                  style={{ color: "var(--color-text-light)" }}
+                >
                   No time slots available for this date.
                 </p>
               ) : (
@@ -383,10 +549,16 @@ export default function AppointmentBookingPage() {
               placeholder="Describe your symptoms or reason for consultation (optional)..."
             />
             <div className="flex justify-between mt-1">
-              <p className="text-xs" style={{ color: "var(--color-text-light)" }}>
+              <p
+                className="text-xs"
+                style={{ color: "var(--color-text-light)" }}
+              >
                 Helps the doctor prepare for your appointment
               </p>
-              <p className="text-xs" style={{ color: "var(--color-text-light)" }}>
+              <p
+                className="text-xs"
+                style={{ color: "var(--color-text-light)" }}
+              >
                 {notes.length}/500
               </p>
             </div>
@@ -432,7 +604,7 @@ export default function AppointmentBookingPage() {
           handleBooking={handleBooking}
           paymentMethod={paymentMethod}
           appointmentType={appointmentType}
-          loadingBookAppointment={loadingBookAppointment}
+          loadingBookAppointment={loadingBookAppointment || isProcessingPayment}
           errorBookAppointment={errorBookAppointment}
         />
       </div>
@@ -452,7 +624,9 @@ export default function AppointmentBookingPage() {
   );
 
   return role === "patient" ? (
-    <DashboardLayout pageTitle="Book Appointment">{pageContent}</DashboardLayout>
+    <DashboardLayout pageTitle="Book Appointment">
+      {pageContent}
+    </DashboardLayout>
   ) : (
     <div className="w-11/12 m-auto">{pageContent}</div>
   );

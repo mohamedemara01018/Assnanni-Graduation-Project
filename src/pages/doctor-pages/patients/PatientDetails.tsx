@@ -20,7 +20,6 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
-import GenerateReport from "@/components/Doctor/Reports/GenerateReport";
 import { FiPlus } from "react-icons/fi";
 
 interface PersonalInfo {
@@ -155,10 +154,6 @@ const PatientDetails = () => {
 
   const patient = data?.data as PatientData;
   const patientScans = (scansData?.data as PatientScan[]) || [];
-  const confirmedAppointment = patient?.appointments?.find(
-    (app) => app.status === "Confirmed",
-  );
-  const appointmentId = confirmedAppointment?.appointmentId;
 
   if (isLoading) {
     return (
@@ -214,14 +209,7 @@ const PatientDetails = () => {
             Patient ID: {id}
           </p>
         </div>
-        {patient.appointments.length > 0 && (
-          <div className=" mb-6 bg-(--color-surface) rounded-2xl border border-(--color-border)   ">
-            <GenerateReport
-              patientId={id ? Number(id) : undefined}
-              appointmentId={appointmentId}
-            />
-          </div>
-        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left Column - Personal Details */}
           <div className="lg:col-span-1">

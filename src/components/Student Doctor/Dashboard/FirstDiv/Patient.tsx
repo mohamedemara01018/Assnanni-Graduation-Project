@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import LazyImage from "@/components/ui/LazyImage";
 import { FaUserMd, FaRegClock } from "react-icons/fa";
 import { BsFileMedical } from "react-icons/bs";
+import { FaPrescriptionBottleMedical } from "react-icons/fa6";
 import { NavLink } from "react-router";
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
   lastInteractionDate?: string;
   children?: ReactNode;
   showCreateMedicalRecord?: boolean;
+  showPrescriptionButton?: boolean;
 }
 
 const Patient = ({
@@ -22,6 +24,7 @@ const Patient = ({
   lastInteractionDate,
   children,
   showCreateMedicalRecord = true,
+  showPrescriptionButton = true,
 }: Props) => {
   let firstCharacter: string = " ";
   if (name && typeof name === "string" && name.startsWith("Dr.")) {
@@ -29,7 +32,9 @@ const Patient = ({
   } else if (name) {
     firstCharacter = name.charAt(0);
   }
-
+  if (imageUrl?.length === 26) {
+    imageUrl = "";
+  }
   const formattedDate = lastInteractionDate
     ? new Date(lastInteractionDate).toLocaleDateString("en-US", {
         month: "short",
@@ -83,15 +88,26 @@ const Patient = ({
           )}
         </div>
       </div>
-      {showCreateMedicalRecord && (
-        <div className="flex flex-col items-end gap-2">
-          <NavLink
-            to={`/student-doctor/create-medical-record/${id}`}
-            className="p-2.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all duration-300 shadow-sm cursor-pointer"
-            title="Create Medical Record"
-          >
-            <BsFileMedical className="text-xl" />
-          </NavLink>
+      {(showCreateMedicalRecord || showPrescriptionButton) && (
+        <div className="flex  items-end gap-2">
+          {showCreateMedicalRecord && (
+            <NavLink
+              to={`/student-doctor/create-medical-record/${id}`}
+              className="p-2.5 bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all duration-300 shadow-sm cursor-pointer"
+              title="Create Medical Record"
+            >
+              <BsFileMedical className="text-xl" />
+            </NavLink>
+          )}
+          {showPrescriptionButton && (
+            <NavLink
+              to={`/add-prescrption/${id}`}
+              className="p-2.5 bg-violet-50 text-violet-600 hover:bg-violet-600 hover:text-white rounded-xl transition-all duration-300 shadow-sm cursor-pointer"
+              title="Add Prescription"
+            >
+              <FaPrescriptionBottleMedical className="text-xl" />
+            </NavLink>
+          )}
         </div>
       )}
     </div>

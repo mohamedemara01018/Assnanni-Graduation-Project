@@ -6,9 +6,16 @@ const QuickActions = () => {
       <h1 className="text-xl mb-2 text-(--color-text) pb-2 border-b-2 border-gray-300 ">
         Quick Actions
       </h1>
-      <NavLink to={"/doctor-schedule"} className={"bg-blue-100 rounded-lg p-4"}>
-        <h3 className="text-blue-900 font-normal">View Schedule</h3>
-        <p className="text-sm font-light text-blue-700">Observation times</p>
+      <NavLink
+        to={"/student-doctor/my-prescriptions"}
+        className={"bg-green-100 rounded-lg p-4"}
+      >
+        <div className="flex items-center gap-2">
+          <h3 className="text-green-900 font-normal">View My Prescriptions</h3>
+        </div>
+        <p className="text-sm font-light text-green-700">
+          Review your prescription history
+        </p>
       </NavLink>
 
       <NavLink
