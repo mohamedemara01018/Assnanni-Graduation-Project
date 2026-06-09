@@ -27,7 +27,9 @@ import addFeedbackReducer from './slices/patient-slice/add-feedback-slice/addFee
 import editFeedbackReducer from './slices/patient-slice/edit-feedback-slice/editFeedbackSlice';
 import deleteFeedbackReducer from './slices/patient-slice/delete-feedback-slice/deleteFeedbackSlice'
 import medicalHistoryReducer from './slices/patient-slice/medical-history-slice/medicalHistorySlice'
-
+import rejectedDoctorsReducer from './slices/admin-slice/rejected-doctors-slice/rejectedDoctorsSlic'
+import verifiedDoctorsReducer from './slices/admin-slice/verified-doctors-slice/verifiedDoctorSlice';
+import toggleStatusUsersReducer from './slices/admin-slice/toggle-status-users-slice/toggleStatusUsersSlice'
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -41,6 +43,9 @@ export const store = configureStore({
     searchPendingDoctorSlice: searchPendingDoctorReducer,
     approvePendingDoctorSlice: approvePendingDoctorReducer,
     rejectPendingDoctorSlice: rejectPendingDoctorReducer,
+    rejectedDoctorsSlice: rejectedDoctorsReducer,
+    verifiedDoctorsSlice: verifiedDoctorsReducer,
+    toggleStatusUsersSlice: toggleStatusUsersReducer,
 
 
     // patient dashoard

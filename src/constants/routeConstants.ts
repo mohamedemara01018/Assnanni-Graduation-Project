@@ -5,6 +5,7 @@ export const roleRoutePaths = {
     "users",
     "add-user",
     "verify-doctors",
+    "admin-doctors",
     "analytics",
     "ai-models",
   ],
