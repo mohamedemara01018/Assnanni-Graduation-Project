@@ -4,9 +4,9 @@ import Cookies from "js-cookie";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-
-export type AppointmentStatus = 'upcoming' | 'completed' | 'cancelled';
-
+export type AppointmentStatus = 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'Rescheduled' | 'Missed';
+export type AppointmentMode = 'Online' | 'InClinic';
+export type AppointmentType = 'FollowUp' | 'Checkup' | 'Consultation' | 'Emergency';
 
 export interface Appointment {
     id: number;
@@ -14,11 +14,24 @@ export interface Appointment {
     doctorName: string;
     doctorImage: string;
     specialty: string;
-    type: AppointmentStatus;
-    date: string;
-    time: string;
+    type: AppointmentType;       
+    date: string;                
+    time: string;                
     status: AppointmentStatus;
-    mode: any;
+    mode: AppointmentMode;       
+    isFeedbackGiven: boolean;    
+}
+
+export interface PaginatedAppointments {
+    items: Appointment[];
+    pageNumber: number;
+    pageSize: number;
+    totalCount: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    nextPageNumber: number | null;
+    previousPageNumber: number | null;
 }
 
 export interface AppointmentsData {
@@ -27,7 +40,7 @@ export interface AppointmentsData {
     completed: number;
     cancelled: number;
     missedAppointments: number;
-    appointments: Appointment[];
+    appointments: PaginatedAppointments; 
 }
 
 export interface AppointmentsState {
@@ -36,28 +49,6 @@ export interface AppointmentsState {
     error: string | null;
 }
 
-const normalizeAppointmentsData = (payload: unknown): AppointmentsData => {
-    const raw = (payload ?? {}) as Partial<AppointmentsData> & {
-        appointments?: unknown;
-    };
-
-    const appointmentsSource = raw.appointments;
-    const appointments = Array.isArray(appointmentsSource)
-        ? appointmentsSource
-        : Array.isArray((appointmentsSource as unknown as { items?: unknown } | undefined)?.items)
-            ? ((appointmentsSource as unknown as { items: Appointment[] }).items)
-            : [];
-
-    return {
-        total: Number(raw.total ?? appointments.length),
-        upcoming: Number(raw.upcoming ?? 0),
-        completed: Number(raw.completed ?? 0),
-        cancelled: Number(raw.cancelled ?? 0),
-        missedAppointments: Number(raw.missedAppointments ?? 0),
-        appointments,
-    };
-};
-
 const initialState: AppointmentsState = {
     data: {
         total: 0,
@@ -65,17 +56,53 @@ const initialState: AppointmentsState = {
         completed: 0,
         cancelled: 0,
         missedAppointments: 0,
-        appointments: [],
+        appointments: {
+            items: [],
+            pageNumber: 1,
+            pageSize: 10,
+            totalCount: 0,
+            totalPages: 1,
+            hasNextPage: false,
+            hasPreviousPage: false,
+            nextPageNumber: null,
+            previousPageNumber: null,
+        },
     },
     loading: false,
     error: null,
 };
 
 interface AppointmentsFilter {
-    search: string,
+    search: string;
     BookingType: string;
     AppointmentStatus: string;
+    PageNumber: number;
+    PageSize: number;
 }
+
+// Helper to normalize backend payload data safely matching PaginatedAppointments schema
+const normalizeAppointmentsData = (payload: any): AppointmentsData => {
+    const raw = payload?.data ?? payload ?? {};
+    
+    return {
+        total: Number(raw.total ?? 0),
+        upcoming: Number(raw.upcoming ?? 0),
+        completed: Number(raw.completed ?? 0),
+        cancelled: Number(raw.cancelled ?? 0),
+        missedAppointments: Number(raw.missedAppointments ?? 0),
+        appointments: {
+            items: Array.isArray(raw.appointments?.items) ? raw.appointments.items : [],
+            pageNumber: Number(raw.appointments?.pageNumber ?? 1),
+            pageSize: Number(raw.appointments?.pageSize ?? 10),
+            totalCount: Number(raw.appointments?.totalCount ?? 0),
+            totalPages: Number(raw.appointments?.totalPages ?? 1),
+            hasNextPage: Boolean(raw.appointments?.hasNextPage ?? false),
+            hasPreviousPage: Boolean(raw.appointments?.hasPreviousPage ?? false),
+            nextPageNumber: raw.appointments?.nextPageNumber ?? null,
+            previousPageNumber: raw.appointments?.previousPageNumber ?? null,
+        }
+    };
+};
 
 export const fetchAllAppointments = createAsyncThunk(
     'allAppointmentSlice/fetchAllAppointments',
@@ -88,6 +115,7 @@ export const fetchAllAppointments = createAsyncThunk(
                 queryParams.append(key, String(value));
             }
         });
+
         try {
             const response = await fetch(
                 `${backendUrl}Patient/my-appointments-dashboard?${queryParams.toString()}`,
@@ -100,13 +128,13 @@ export const fetchAllAppointments = createAsyncThunk(
 
             const json = await response.json();
 
-            if (!response.ok) {
+            if (!response.ok || !json.succeeded) {
                 return rejectWithValue(
                     json?.message || json?.error || "Request failed"
                 );
             }
 
-            return json; // This payload matches the structure of initialState.data
+            return json; 
         } catch (err: any) {
             return rejectWithValue(err.message || "Something went wrong");
         }
@@ -117,6 +145,11 @@ export const allAppointmentsSlice = createSlice({
     name: 'allAppointmentsSlice',
     initialState,
     reducers: {
+        clearAppointmentsState: (state) => {
+            state.data = initialState.data;
+            state.loading = false;
+            state.error = null;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -126,7 +159,7 @@ export const allAppointmentsSlice = createSlice({
             })
             .addCase(fetchAllAppointments.fulfilled, (state, action) => {
                 state.loading = false;
-                state.data = normalizeAppointmentsData(action.payload?.data ?? action.payload);
+                state.data = normalizeAppointmentsData(action.payload);
             })
             .addCase(fetchAllAppointments.rejected, (state, action) => {
                 state.loading = false;
@@ -135,8 +168,7 @@ export const allAppointmentsSlice = createSlice({
     }
 });
 
-
-// state
-export const allAppointmentsState = (state: RootState) => state.allAppointmentsSlice
+export const { clearAppointmentsState } = allAppointmentsSlice.actions;
+export const allAppointmentsState = (state: RootState) => state.allAppointmentsSlice;
 
 export default allAppointmentsSlice.reducer;

@@ -6,6 +6,7 @@ import AdminPage from "../pages/admin-page/AdminPage";
 import AddUserPage from "../pages/add-user-page/AddUserPage";
 import UsersPage from "../pages/users-page/UsersPage";
 import VerifyDoctorsPage from "../pages/verify-doctors-page/VerifyDoctorsPage";
+import AdminDoctorsPage from "../pages/admin-doctors-page/AdminDoctorsPage";
 import AnalyticsPage from "../pages/analytics-page/AnalyticsPage";
 import AIModelsPage from "../pages/ai-models-page/AIModelsPage";
 import DoctorDashboard from "../pages/doctor-pages/dashboard/DoctorDashboard";
@@ -117,6 +118,7 @@ export const routeElements = {
   users: <UsersPage />,
   "add-user": <AddUserPage />,
   "verify-doctors": <VerifyDoctorsPage />,
+  "admin-doctors": <AdminDoctorsPage />,
   analytics: <AnalyticsPage />,
   "ai-models": <AIModelsPage />,
   "medical-history": <MedicalHistory />,

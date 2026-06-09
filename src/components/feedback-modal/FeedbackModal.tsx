@@ -23,6 +23,7 @@ export interface FeedbackModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSaved?: () => void;
+  onSuccess?: () => void;
   mode: "add" | "edit";
   appointmentId: number;
   /** Required only for edit mode */
@@ -80,7 +81,7 @@ function StarRow({
 // ─── Modal ────────────────────────────────────────────────────────────────────
 
 export function FeedbackModal({
-  isOpen, onClose, onSaved,
+  isOpen, onClose, onSaved, onSuccess,
   mode, appointmentId, feedbackId,
   initialRating = 0, initialComment = "",
   doctor,
@@ -141,10 +142,11 @@ export function FeedbackModal({
     onClose();
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (rating === 0) return;
     if (mode === "add") {
-      dispatch(fetchAddFeedback({ appointmentId, rating, comment }));
+      await dispatch(fetchAddFeedback({ appointmentId, rating, comment }));
+      onSuccess?.();
     } else {
       if (!feedbackId) return;
       dispatch(fetchEditFeedback({ feedbackId, appointmentId, rating, comment }));

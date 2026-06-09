@@ -74,6 +74,10 @@ const STATUS_CONFIG: Record<StatusKey, { pill: string; dot: string }> = {
     pill: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50",
     dot: "bg-red-400",
   },
+  // rescheduled: {
+  //   pill: "bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800/50",
+  //   dot: "bg-purple-400",
+  // },
   noshow: {
     pill: "bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/50",
     dot: "bg-yellow-400",
@@ -90,6 +94,7 @@ const TABS = [
   { label: "Upcoming", value: "upcoming" },
   { label: "Completed", value: "completed" },
   { label: "Cancelled", value: "cancelled" },
+  // { label: "Rescheduled", value: "rescheduled" },
   { label: "Missed", value: "Missed" },
 ];
 
@@ -109,8 +114,8 @@ function AppointmentsPage() {
 
   const dispatch: AppDispatch = useDispatch();
   const { data, loading, error } = useSelector(allAppointmentsState);
-  const appointments = Array.isArray(data?.appointments)
-    ? data.appointments
+  const appointments = Array.isArray(data?.appointments.items)
+    ? data?.appointments.items
     : [];
 
   useEffect(() => {
@@ -119,9 +124,11 @@ function AppointmentsPage() {
         search,
         AppointmentStatus: appointmentStatus,
         BookingType: "",
-      }),
+        PageNumber: pageNumber,
+        PageSize: pageSize,
+      })
     );
-  }, [dispatch, search, appointmentStatus]);
+  }, [dispatch, search, appointmentStatus, pageNumber, pageSize]);
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -131,7 +138,9 @@ function AppointmentsPage() {
         search,
         AppointmentStatus: appointmentStatus,
         BookingType: "",
-      }),
+        PageNumber: pageNumber,
+        PageSize: pageSize,
+      })
     );
 
   const buildSelected = (appt: any): SelectedAppointment => ({
@@ -229,7 +238,7 @@ function AppointmentsPage() {
           </div>
           <Link
             to="/doctors-list"
-            className="flex items-center gap-2 bg-(--color-primary) hover:bg-(--color-primary-light) active:scale-95 transition-all duration-150 px-4 py-2.5 rounded-xl text-white text-sm font-medium"
+            className="flex items-center gap-2 bg-primary hover:bg-(--color-primary-light) active:scale-95 transition-all duration-150 px-4 py-2.5 rounded-xl text-white text-sm font-medium"
           >
             <FaPlus className="w-3 h-3" />
             Book Appointment
@@ -265,7 +274,7 @@ function AppointmentsPage() {
         </div>
 
         {/* ── Search + Tabs ── */}
-        <div className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-4 space-y-3 shadow-sm">
+        <div className="rounded-2xl border border-border bg-(--color-surface) p-4 space-y-3 shadow-sm">
           <SearchInput style="w-full" setSearch={setSearch} />
           <div className="flex items-center gap-1.5 flex-wrap pt-1">
             {TABS.map((tab) => {
@@ -274,11 +283,10 @@ function AppointmentsPage() {
                 <button
                   key={tab.value}
                   onClick={() => setAppointmentStatus(tab.value)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-all duration-150 cursor-pointer ${
-                    active
-                      ? "bg-(--color-primary) text-white border-(--color-primary)"
-                      : "bg-(--color-bg) text-(--color-text-light) border-(--color-border) hover:border-gray-300 dark:hover:border-gray-600"
-                  }`}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-all duration-150 cursor-pointer ${active
+                    ? "bg-primary text-white border-primary"
+                    : "bg-(--color-bg) text-(--color-text-light) border-border hover:border-gray-300 dark:hover:border-gray-600"
+                    }`}
                 >
                   {tab.label}
                 </button>
@@ -297,7 +305,7 @@ function AppointmentsPage() {
             <Error message={error} />
           </div>
         ) : appointments.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 px-8 text-center rounded-2xl border border-(--color-border) bg-(--color-surface) shadow-sm">
+          <div className="flex flex-col items-center justify-center py-16 px-8 text-center rounded-2xl border border-border bg-(--color-surface) shadow-sm">
             <NotFound
               message="No appointments found"
               subMessage="Try adjusting your filters or book a new visit"
@@ -306,7 +314,7 @@ function AppointmentsPage() {
         ) : (
           <>
             <div className="space-y-3">
-              {appointments.map((appointment, index) => {
+              {appointments && appointments?.map((appointment, index) => {
                 const cfg = getStatusCfg(appointment.status);
                 const isCancelled =
                   appointment.status.toLowerCase() === "cancelled";
@@ -317,18 +325,18 @@ function AppointmentsPage() {
                 return (
                   <div
                     key={appointment.id ?? index}
-                    className="group flex items-start justify-between gap-4 px-5 py-4 rounded-2xl border border-(--color-border) bg-(--color-surface) hover:border-(--color-primary) transition-all duration-150 shadow-sm"
+                    className="group flex items-start justify-between gap-4 px-5 py-4 rounded-2xl border border-border bg-(--color-surface) hover:border-primary transition-all duration-150 shadow-sm"
                   >
                     {/* Avatar + info */}
                     <div className="flex items-start gap-4 min-w-0">
                       {/* Avatar with status dot */}
                       <div className="relative shrink-0">
                         {appointment.doctorImage?.trim() &&
-                        !imageErrors[appointment.id] ? (
+                          !imageErrors[appointment.id] ? (
                           <LazyImage
                             src={appointment.doctorImage}
                             alt={appointment.doctorName}
-                            className="w-12 h-12 rounded-full object-cover ring-2 ring-(--color-border)"
+                            className="w-12 h-12 rounded-full object-cover ring-2 ring-border"
                             onError={() =>
                               setImageErrors((prev) => ({
                                 ...prev,
@@ -338,7 +346,7 @@ function AppointmentsPage() {
                           />
                         ) : (
                           <div className="w-12 h-12 rounded-full bg-(--color-bg-blue) border border-primary/20 flex items-center justify-center">
-                            <User className="w-6 h-6 text-(--color-primary)" />
+                            <User className="w-6 h-6 text-primary" />
                           </div>
                         )}
                         <span
@@ -365,19 +373,19 @@ function AppointmentsPage() {
                         {/* Meta pills */}
                         <div className="flex items-center gap-1.5 flex-wrap">
                           {appointment.date && (
-                            <span className="inline-flex items-center gap-1 text-[11px] text-(--color-text-light) bg-(--color-bg) border border-(--color-border) rounded-md px-2 py-0.5">
+                            <span className="inline-flex items-center gap-1 text-[11px] text-(--color-text-light) bg-(--color-bg) border border-border rounded-md px-2 py-0.5">
                               <Calendar className="w-3 h-3 shrink-0" />
                               {parseDate(appointment.date).fullLabel}
                             </span>
                           )}
                           {appointment.time && (
-                            <span className="inline-flex items-center gap-1 text-[11px] text-(--color-text-light) bg-(--color-bg) border border-(--color-border) rounded-md px-2 py-0.5">
+                            <span className="inline-flex items-center gap-1 text-[11px] text-(--color-text-light) bg-(--color-bg) border border-border rounded-md px-2 py-0.5">
                               <Clock className="w-3 h-3 shrink-0" />
                               {formatTime(appointment.time)}
                             </span>
                           )}
                           {appointment.type && (
-                            <span className="inline-flex items-center gap-1 text-[11px] text-(--color-text-light) bg-(--color-bg) border border-(--color-border) rounded-md px-2 py-0.5">
+                            <span className="inline-flex items-center gap-1 text-[11px] text-(--color-text-light) bg-(--color-bg) border border-border rounded-md px-2 py-0.5">
                               <MapPin className="w-3 h-3 shrink-0" />
                               {appointment.type}
                             </span>
@@ -388,7 +396,7 @@ function AppointmentsPage() {
                         <div className="flex items-center gap-3 pt-0.5">
                           <Link
                             to={`/appointments/${appointment.id}`}
-                            className="inline-flex items-center gap-1 text-xs font-medium text-(--color-primary) hover:text-(--color-primary-light) transition-colors"
+                            className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-(--color-primary-light) transition-colors"
                           >
                             <Eye className="w-3 h-3" />
                             View
@@ -396,7 +404,7 @@ function AppointmentsPage() {
 
                           {!isCancelled && !isCompleted && isMissed && (
                             <>
-                              <span className="w-px h-3 bg-(--color-border)" />
+                              <span className="w-px h-3 bg-border" />
                               <button
                                 onClick={() => openReschedule(appointment)}
                                 className="inline-flex items-center gap-1 text-xs font-medium text-(--color-text-light) hover:text-(--color-text) transition-colors cursor-pointer"
@@ -404,7 +412,7 @@ function AppointmentsPage() {
                                 <RefreshCw className="w-3 h-3" />
                                 Reschedule
                               </button>
-                              <span className="w-px h-3 bg-(--color-border)" />
+                              <span className="w-px h-3 bg-border" />
                               <button
                                 onClick={() => openCancel(appointment)}
                                 className="inline-flex items-center gap-1 text-xs font-medium text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors cursor-pointer"
@@ -415,9 +423,9 @@ function AppointmentsPage() {
                             </>
                           )}
 
-                          {isCompleted && (
+                          {isCompleted && !appointment.isFeedbackGiven && (
                             <>
-                              <span className="w-px h-3 bg-(--color-border)" />
+                              <span className="w-px h-3 bg-border" />
                               <button
                                 onClick={() => openFeedback(appointment)}
                                 className="inline-flex items-center gap-1 text-xs font-medium transition-colors cursor-pointer"
@@ -440,7 +448,7 @@ function AppointmentsPage() {
                         <CiClock2 className="w-3 h-3" />
                         <span className="capitalize">{appointment.status}</span>
                       </span>
-                      <ChevronRight className="w-3.5 h-3.5 text-(--color-border) opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+                      <ChevronRight className="w-3.5 h-3.5 text-border opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
                     </div>
                   </div>
                 );
@@ -473,6 +481,9 @@ function AppointmentsPage() {
           <FeedbackModal
             isOpen={showFeedback}
             onClose={closeFeedback}
+            onSuccess={() => {
+              refetch();
+            }}
             doctor={{
               id: selectedAppointment.id,
               name: selectedAppointment.doctorName,

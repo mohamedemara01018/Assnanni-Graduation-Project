@@ -22,6 +22,8 @@ export interface Prescription {
 }
 
 export interface DoctorFeedback {
+    feedbackId: string,
+    appointmentId: string,
     rating: number;
     comment: string;
     createdAt: string; // ISO DateTime
