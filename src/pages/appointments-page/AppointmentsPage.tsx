@@ -69,6 +69,10 @@ const STATUS_CONFIG: Record<StatusKey, { pill: string; dot: string }> = {
     pill: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50",
     dot: "bg-red-400",
   },
+  // rescheduled: {
+  //   pill: "bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800/50",
+  //   dot: "bg-purple-400",
+  // },
   noshow: {
     pill: "bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800/50",
     dot: "bg-yellow-400",
@@ -85,6 +89,7 @@ const TABS = [
   { label: "Upcoming", value: "upcoming" },
   { label: "Completed", value: "completed" },
   { label: "Cancelled", value: "cancelled" },
+  // { label: "Rescheduled", value: "rescheduled" },
   { label: "Missed", value: "Missed" },
 ];
 
@@ -104,7 +109,8 @@ function AppointmentsPage() {
 
   const dispatch: AppDispatch = useDispatch();
   const { data, loading, error } = useSelector(allAppointmentsState);
-  const appointments = data?.appointments ?? [];
+  const appointments = data.appointments.items;
+  console.log(appointments)
 
   useEffect(() => {
     dispatch(
@@ -112,9 +118,11 @@ function AppointmentsPage() {
         search,
         AppointmentStatus: appointmentStatus,
         BookingType: "",
+        PageNumber: pageNumber,
+        PageSize: pageSize,
       })
     );
-  }, [dispatch, search, appointmentStatus]);
+  }, [dispatch, search, appointmentStatus, pageNumber, pageSize]);
 
   // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -124,6 +132,8 @@ function AppointmentsPage() {
         search,
         AppointmentStatus: appointmentStatus,
         BookingType: "",
+        PageNumber: pageNumber,
+        PageSize: pageSize,
       })
     );
 
@@ -238,7 +248,7 @@ function AppointmentsPage() {
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
+                    <p className=" text-sm text-gray-600 dark:text-gray-400">{stat.label}</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
                       {stat.value}
                     </p>
@@ -293,7 +303,7 @@ function AppointmentsPage() {
         ) : (
           <>
             <div className="space-y-3">
-              {appointments.map((appointment, index) => {
+              {appointments && appointments?.map((appointment, index) => {
                 const cfg = getStatusCfg(appointment.status);
                 const isCancelled = appointment.status.toLowerCase() === "cancelled";
                 const isCompleted = appointment.status.toLowerCase() === "completed";
@@ -399,7 +409,7 @@ function AppointmentsPage() {
                             </>
                           )}
 
-                          {isCompleted && (
+                          {isCompleted && !appointment.isFeedbackGiven && (
                             <>
                               <span className="w-px h-3 bg-(--color-border)" />
                               <button
@@ -457,6 +467,9 @@ function AppointmentsPage() {
           <FeedbackModal
             isOpen={showFeedback}
             onClose={closeFeedback}
+            onSuccess={() => {
+              refetch();
+            }}
             doctor={{
               id: selectedAppointment.id,
               name: selectedAppointment.doctorName,
@@ -467,7 +480,7 @@ function AppointmentsPage() {
       )}
 
       {/* Pagination */}
-      {!error && !loading && data.appointments.length > 0 && (
+      {!error && !loading && appointments.length > 0 && (
         <Pagination
           pageNumber={pageNumber}
           pageSize={pageSize}

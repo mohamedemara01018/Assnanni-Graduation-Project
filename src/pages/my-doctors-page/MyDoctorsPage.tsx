@@ -12,6 +12,7 @@ import {
     myDoctorsState,
     fetchMyDoctors,
     type MyDoctor,
+    type MyDoctorsState,
 } from '@/store/slices/patient-slice/my-doctors-slice/myDoctorsSlice';
 import Pagination from '@/components/pagination/Pagination';
 import MiniLoading from '@/components/mini-loading/MiniLoading';
@@ -48,23 +49,29 @@ export default function MyDoctorsPage() {
     const [pageSize, setPageSize] = useState(10);
     const [selectedDoctor, setSelectedDoctor] = useState<MyDoctor | null>(null);
     const [showFeedback, setShowFeedback] = useState(false);
+    const [itemIdx, setItemIdx] = useState<number>(-1);
 
     const dispatch: AppDispatch = useDispatch();
-    const { data, loading, error } = useSelector(myDoctorsState);
-
+    const { data, loading, error } = useSelector(myDoctorsState) as MyDoctorsState;
+    console.log(data)
     useEffect(() => {
         dispatch(fetchMyDoctors({ search, pageNumber, pageSize }));
     }, [dispatch, search, pageNumber, pageSize]);
 
-    const openFeedback = (doctor: MyDoctor) => {
+    const openFeedback = (doctor: MyDoctor, itemIdx: number) => {
         setSelectedDoctor(doctor);
         setShowFeedback(true);
+        setItemIdx(itemIdx)
     };
 
     const closeFeedback = () => {
         setShowFeedback(false);
         setSelectedDoctor(null);
     };
+
+    const refetch = () => {
+        dispatch(fetchMyDoctors({ search, pageNumber, pageSize }));
+    }
 
     return (
         <DashboardLayout pageTitle="My Doctors">
@@ -122,11 +129,11 @@ export default function MyDoctorsPage() {
                     <>
                         {/* ── Doctors grid ──────────────────────────────────── */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            {data.items?.map((doctor) => (
+                            {data.items?.map((doctor, idx) => (
                                 <DoctorCard
                                     key={doctor.doctorId}
                                     doctor={doctor}
-                                    onFeedback={() => openFeedback(doctor)}
+                                    onFeedback={() => openFeedback(doctor, idx)}
                                 />
                             ))}
                         </div>
@@ -149,6 +156,7 @@ export default function MyDoctorsPage() {
                     <FeedbackModal
                         isOpen={showFeedback}
                         onClose={closeFeedback}
+                        onSuccess={() => refetch()}
                         doctor={{
                             id: String(selectedDoctor.doctorId),
                             name: selectedDoctor.name,
@@ -265,7 +273,7 @@ function DoctorCard({ doctor, onFeedback }: { doctor: MyDoctor; onFeedback: () =
                     <div className="px-3 py-2 flex items-center justify-between">
                         <p className="text-[10px] uppercase tracking-widest font-medium text-(--color-text-light)">Latest Prescription</p>
                         <Link
-                            to={`/doctors-list/${doctor.doctorId}`}
+                            to={`/prescriptions`}
                             className="text-[10px] text-(--color-primary) hover:text-(--color-primary-light) flex items-center gap-0.5"
                         >
                             View all <ChevronRight className="w-3 h-3" />
@@ -305,13 +313,13 @@ function DoctorCard({ doctor, onFeedback }: { doctor: MyDoctor; onFeedback: () =
                 >
                     <MessageSquare className="w-3.5 h-3.5" />
                 </Link> */}
-                <button
+                {!lastFeedback && <button
                     onClick={onFeedback}
                     className="flex h-9 w-9 items-center justify-center rounded-xl border border-(--color-border) text-(--color-text-light) hover:border-amber-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/10 transition-all duration-150 cursor-pointer"
                     title="Leave feedback"
                 >
                     <Star className="w-3.5 h-3.5" />
-                </button>
+                </button>}
             </div>
         </div>
     );

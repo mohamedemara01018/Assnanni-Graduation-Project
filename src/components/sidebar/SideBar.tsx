@@ -173,6 +173,7 @@ const sidebarDataRole = {
   admin: [
     { icon: LayoutDashboard, label: "Dashboard", path: "/admin" },
     { icon: Users, label: "Users", path: "/users" },
+    { icon: Stethoscope, label: "Doctors", path: "/admin-doctors" },
     { icon: FileText, label: "Analytics", path: "/analytics" },
     { icon: Brain, label: "AI Models", path: "/ai-models" },
     { icon: Users, label: "Notifications", path: "/notification" },

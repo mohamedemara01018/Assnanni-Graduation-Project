@@ -5,8 +5,9 @@ import Cookies from "js-cookie";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 
-export type AppointmentStatus = 'upcoming' | 'completed' | 'cancelled';
-
+export type AppointmentStatus = 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled' | 'Missed';
+export type AppointmentMode = 'Online' | 'InClinic';
+export type AppointmentType = 'FollowUp' | 'Checkup' | 'Consultation' | 'Emergency';
 
 export interface Appointment {
     id: number;
@@ -14,11 +15,25 @@ export interface Appointment {
     doctorName: string;
     doctorImage: string;
     specialty: string;
-    type: AppointmentStatus;
-    date: string;
-    time: string;
+    type: AppointmentType;       // Fixed typo from AppointmentStatus
+    date: string;                // e.g., "2026-06-10"
+    time: string;                // e.g., "09:30:00"
     status: AppointmentStatus;
-    mode: any;
+    mode: AppointmentMode;       // Replaced 'any' with a strict union type
+    isFeedbackGiven: boolean;    // Added missing property from your JSON
+}
+
+// New interface matching your paginated server data object
+export interface PaginatedAppointments {
+    items: Appointment[];
+    pageNumber: number;
+    pageSize: number;
+    totalCount: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    nextPageNumber: number | null;
+    previousPageNumber: number | null;
 }
 
 export interface AppointmentsData {
@@ -27,7 +42,7 @@ export interface AppointmentsData {
     completed: number;
     cancelled: number;
     missedAppointments: number;
-    appointments: Appointment[];
+    appointments: PaginatedAppointments; // Updated from Appointment[] to match the structure
 }
 
 export interface AppointmentsState {
@@ -36,6 +51,7 @@ export interface AppointmentsState {
     error: string | null;
 }
 
+// Example updated initialState matching these new interfaces
 const initialState: AppointmentsState = {
     data: {
         total: 0,
@@ -43,7 +59,17 @@ const initialState: AppointmentsState = {
         completed: 0,
         cancelled: 0,
         missedAppointments: 0,
-        appointments: [],
+        appointments: {
+            items: [],
+            pageNumber: 1,
+            pageSize: 10,
+            totalCount: 0,
+            totalPages: 1,
+            hasNextPage: false,
+            hasPreviousPage: false,
+            nextPageNumber: null,
+            previousPageNumber: null,
+        },
     },
     loading: false,
     error: null,
@@ -53,6 +79,8 @@ interface AppointmentsFilter {
     search: string,
     BookingType: string;
     AppointmentStatus: string;
+    PageNumber: number;
+    PageSize: number;
 }
 
 export const fetchAllAppointments = createAsyncThunk(
