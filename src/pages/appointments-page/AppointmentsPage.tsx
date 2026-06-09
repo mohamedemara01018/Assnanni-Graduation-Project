@@ -11,7 +11,7 @@ import {
   CheckCircle, XCircle, AlertCircle,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
-import type { AppDispatch } from "@/store/store";com
+import type { AppDispatch } from "@/store/store";
 import {
   allAppointmentsState, fetchAllAppointments, type AppointmentStatus,
 } from "@/store/slices/patient-slice/all-appointments-slice/allAppointmentsSlice";
