@@ -140,7 +140,7 @@ const MyPrescriptionsPage = () => {
 
       if (!response.data?.isSuccess) {
         throw new Error(
-          response?.message ||
+          response?.data.message ||
             response.data?.error ||
             "Failed to load prescriptions",
         );

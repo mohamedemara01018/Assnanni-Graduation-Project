@@ -18,7 +18,6 @@ interface Props {
 }
 
 const Patient = ({
-  id,
   appointmentId,
   name = "",
   doctorName,
