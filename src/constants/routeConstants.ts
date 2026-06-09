@@ -25,6 +25,7 @@ export const roleRoutePaths = {
     "receptionist-access/add",
     "scan/upload",
     "scan/analysis/:scanId",
+    "scan/analysis/:scanId/treatment-recommendation",
     "doctor-learning-sessions",
     "doctor-learning-sessions/create",
     "doctor-learning-sessions/:id",

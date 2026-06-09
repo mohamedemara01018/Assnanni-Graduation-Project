@@ -219,6 +219,7 @@ const FirstDiv = () => {
               <Patient
                 key={patient.patientId || `patient-${i}`}
                 id={patient.patientId}
+                appointmentId={patient.appointmentId}
                 name={patient.patientName}
                 doctorName={patient.doctorName}
                 imageUrl={patient.imageUrl}

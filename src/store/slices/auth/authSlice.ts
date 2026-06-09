@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
+import { clearAllCookies } from "@/utils/cookieUtils";
 
 interface AuthState {
   token: string | null;
@@ -52,8 +53,7 @@ const getAuthFromToken = (token: string) => {
   );
   const tokenExpirationDate = getTokenExpirationDate(decoded.exp);
   if (tokenExpirationDate && tokenExpirationDate.getTime() <= Date.now()) {
-    Cookies.remove("jwtToken");
-    Cookies.remove("userProfile");
+    clearAllCookies();
     throw new Error("Token expired");
   }
 
@@ -173,8 +173,14 @@ const authSlice = createSlice({
         state.fullName = null;
         state.email = null;
         state.expiresAt = null;
-        Cookies.remove("jwtToken");
-        Cookies.remove("userProfile");
+        clearAllCookies();
+        Cookies.remove('_stripe_mid');
+        Cookies.remove('_stripe_sid');
+        Cookies.remove('cid');
+        Cookies.remove('docs.prefs');
+        Cookies.remove('machine_identifier');
+        Cookies.remove('private_machine_identifier');
+        Cookies.remove('recent-views');
       }
     },
     logout: (state) => {
@@ -187,8 +193,14 @@ const authSlice = createSlice({
       state.phoneNumber = null;
       state.profileImageUrl = null;
       state.expiresAt = null;
-      Cookies.remove("jwtToken");
-      Cookies.remove("userProfile");
+      clearAllCookies();
+      Cookies.remove('_stripe_mid');
+      Cookies.remove('_stripe_sid');
+      Cookies.remove('cid');
+      Cookies.remove('docs.prefs');
+      Cookies.remove('machine_identifier');
+      Cookies.remove('private_machine_identifier');
+      Cookies.remove('recent-views');
     },
   },
   extraReducers: (builder) => {

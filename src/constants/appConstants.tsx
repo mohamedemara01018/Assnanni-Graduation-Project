@@ -26,6 +26,7 @@ import ReceptionistAccess from "../components/Doctor/ReceptionistAccess/Receptio
 import AddReceptionist from "../components/Doctor/ReceptionistAccess/AddReceptionist";
 import Scan from "../pages/doctor-pages/Scan/Scan";
 import ScanDetails from "../pages/doctor-pages/scans/ScanDetails";
+import TreatmentRecommendation from "../pages/doctor-pages/scans/TreatmentRecommendation";
 import Notifications from "../pages/doctor-pages/notifications/Notifications";
 import LearningSessions from "../pages/doctor-pages/learning-sessions/LearningSessions";
 import CreateLearningSession from "../pages/doctor-pages/learning-sessions/CreateLearningSession";
@@ -143,6 +144,7 @@ export const routeElements = {
   "receptionist-access/add": <AddReceptionist />,
   "scan/upload": <Scan />,
   "scan/analysis/:scanId": <ScanDetails />,
+  "scan/analysis/:scanId/treatment-recommendation": <TreatmentRecommendation />,
   notification: <Notifications />,
   "doctor-appointments": <StudentAppointments />,
   "appointments/doctor-appointments/:id": <AppointmentDetails />,

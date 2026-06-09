@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import { logout } from "@/store/slices/auth/authSlice";
 import { clearEmail } from "@/store/slices/email/emailSlice";
-import Cookies from "js-cookie";
 
 interface SideBarProp {
   collapsed: boolean;
@@ -38,7 +37,6 @@ function SideBar({ collapsed, setCollapsed, toggled, onToggle }: SideBarProp) {
   const handleLogout = () => {
     dispatch(logout());
     dispatch(clearEmail());
-    Cookies.remove("patientsView");
 
     navigate("/");
   };
