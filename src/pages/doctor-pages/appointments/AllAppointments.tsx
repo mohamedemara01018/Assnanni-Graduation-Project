@@ -404,7 +404,7 @@ const AllAppointments = () => {
                               className="font-medium text-sm text-green-600 cursor-pointer hover:text-green-700"
                               onClick={async () => {
                                 try {
-                                  await axios.post(
+                                  await axios.patch(
                                     `${backendUrl}Receptionist/${app.appointmentId}/confirm`,
                                     {},
                                     {

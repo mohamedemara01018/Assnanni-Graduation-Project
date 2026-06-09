@@ -7,12 +7,18 @@ import LazyImage from "@/components/ui/LazyImage";
 
 interface Props {
   appointment: AppointmentData;
+  onConfirm?: (id: number | string) => void;
+  isConfirming?: boolean;
 }
 
 import { useSelector } from "react-redux";
 import type { AppointmentData } from "@/interfaces/studentInterfaces";
 
-function AppointmentsCard({ appointment }: Props) {
+function AppointmentsCard({
+  appointment,
+  onConfirm,
+  isConfirming = false,
+}: Props) {
   const { id, name, desc, date, time, meetingType, status, address, imageUrl } =
     appointment;
 
@@ -32,6 +38,8 @@ function AppointmentsCard({ appointment }: Props) {
         return "bg-emerald-50 text-emerald-600 border-emerald-100";
       case "Cancelled":
         return "bg-red-50 text-red-600 border-red-100";
+      case "Pending":
+        return "bg-yellow-50 text-yellow-600 border-yellow-100";
       default:
         return "bg-gray-50 text-gray-600 border-gray-100";
     }
@@ -119,6 +127,16 @@ function AppointmentsCard({ appointment }: Props) {
               >
                 View Details
               </NavLink>
+
+              {role === "receptionist" && status === "Pending" && onConfirm && (
+                <button
+                  onClick={() => onConfirm(id)}
+                  disabled={isConfirming}
+                  className="px-3 py-1 bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white text-xs font-bold rounded-full transition-all shadow-sm shadow-green-100 cursor-pointer"
+                >
+                  {isConfirming ? "Confirming..." : "Confirm"}
+                </button>
+              )}
 
               {role === "receptionist" && (
                 <>

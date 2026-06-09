@@ -7,7 +7,7 @@ import { FaSearch } from "react-icons/fa";
 import { IoMdCloseCircleOutline } from "react-icons/io";
 import { SlCalender } from "react-icons/sl";
 import { FaRegCheckCircle } from "react-icons/fa";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
@@ -46,6 +46,7 @@ interface ApiResponse<T> {
 }
 
 const StudentAppointments = () => {
+  const queryClient = useQueryClient();
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
   const role = useSelector((state: RootState) => state.auth.role);
@@ -97,6 +98,37 @@ const StudentAppointments = () => {
     enabled: !!token && !!backendUrl,
   });
 
+  const confirmAppointmentMutation = useMutation({
+    mutationFn: async (appointmentId: number) => {
+      const response = await axios.patch(
+        `${backendUrl}Receptionist/${appointmentId}/confirm`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (response.data?.succeeded === false) {
+        throw new Error(response.data.message || "Failed to confirm appointment");
+      }
+
+      return response.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data?.message || "Appointment confirmed successfully");
+      queryClient.invalidateQueries({ queryKey: ["studentAppointments"] });
+    },
+    onError: (err: any) => {
+      toast.error(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to confirm appointment",
+      );
+    },
+  });
+
   // Success and failure toast notifications
   useEffect(() => {
     if (isSuccess && responseBody) {
@@ -124,11 +156,13 @@ const StudentAppointments = () => {
     status:
       apiApp.status === "Confirmed"
         ? "Upcoming"
-        : apiApp.status === "Completed"
-          ? "Completed"
-          : apiApp.status === "Cancelled"
-            ? "Cancelled"
-            : (apiApp.status as any),
+        : apiApp.status === "Pending"
+          ? "Pending"
+          : apiApp.status === "Completed"
+            ? "Completed"
+            : apiApp.status === "Cancelled"
+              ? "Cancelled"
+              : (apiApp.status as AppointmentData["status"]),
     meetingType: apiApp.mode === "Online" ? "Video Call" : "In-Person",
   });
 
@@ -229,6 +263,12 @@ const StudentAppointments = () => {
               <AppointmentsCard
                 key={appointment.id}
                 appointment={appointment}
+                onConfirm={
+                  role === "receptionist"
+                    ? (id) => confirmAppointmentMutation.mutate(Number(id))
+                    : undefined
+                }
+                isConfirming={confirmAppointmentMutation.isPending}
               />
             ))
           ) : (

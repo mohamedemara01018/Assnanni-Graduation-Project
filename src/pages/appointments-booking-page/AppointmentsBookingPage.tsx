@@ -51,89 +51,12 @@ interface CreatePaymentPayload {
   createdBy: string;
 }
 
-function getStripeCheckoutUrl(payload: unknown): string | null {
-  console.log(payload);
-  if (!payload || typeof payload !== "object") return null;
-
-  const findUrl = (value: unknown, depth = 0): string | null => {
-    if (depth > 6 || value == null) return null;
-
-    if (typeof value === "string") {
-      const trimmed = value.trim();
-      if (
-        trimmed.startsWith("http") &&
-        (trimmed.includes("stripe.com") || trimmed.includes("checkout"))
-      ) {
-        return trimmed;
-      }
-      return null;
-    }
-
-    if (Array.isArray(value)) {
-      for (const item of value) {
-        const found = findUrl(item, depth + 1);
-        if (found) return found;
-      }
-      return null;
-    }
-
-    if (typeof value === "object") {
-      const record = value as Record<string, unknown>;
-      const preferredKeys = [
-        "checkoutUrl",
-        "checkoutSessionUrl",
-        "sessionUrl",
-        "stripeCheckoutUrl",
-        "paymentUrl",
-        "redirectUrl",
-        "url",
-        "stripeUrl",
-        "checkout_url",
-        "session_url",
-      ];
-
-      for (const key of preferredKeys) {
-        const candidate = record[key];
-        if (typeof candidate === "string" && candidate.startsWith("http")) {
-          return candidate;
-        }
-      }
-
-      for (const nestedValue of Object.values(record)) {
-        const found = findUrl(nestedValue, depth + 1);
-        if (found) return found;
-      }
-    }
-
-    return null;
-  };
-
-  return findUrl(payload);
+interface PaymentCreateResponse {
+  clientSecret: string;
+  paymentId: string;
+  message?: string;
+  success?: boolean;
 }
-
-function isPaymentCreateSuccess(payload: unknown): boolean {
-  if (!payload || typeof payload !== "object") return false;
-
-  const record = payload as Record<string, unknown>;
-  if (record.succeeded === true || record.isSuccess === true) return true;
-
-  if (
-    typeof record.status === "string" &&
-    ["success", "succeeded", "created"].includes(record.status.toLowerCase())
-  ) {
-    return true;
-  }
-
-  if (record.data && typeof record.data === "object") {
-    return isPaymentCreateSuccess(record.data);
-  }
-
-  return false;
-}
-
-type StripePaymentResult =
-  | { type: "redirect" }
-  | { type: "success"; message: string };
 
 // ─── Section Card wrapper ────────────────────────────────────────────────────
 
@@ -232,7 +155,7 @@ export default function AppointmentBookingPage() {
 
   const startStripePayment = async (
     booking: AppointmentBookingResponse,
-  ): Promise<StripePaymentResult> => {
+  ): Promise<void> => {
     const token = Cookies.get("jwtToken");
     if (!token) {
       throw new Error("Unauthorized: missing token");
@@ -252,7 +175,7 @@ export default function AppointmentBookingPage() {
       createdBy: userId || name || email || role || "patient",
     };
 
-    const response = await axios.post(
+    const response = await axios.post<PaymentCreateResponse>(
       `${backendUrl}payments/create`,
       paymentPayload,
       {
@@ -262,23 +185,20 @@ export default function AppointmentBookingPage() {
         },
       },
     );
-    console.log(response);
 
-    const checkoutUrl = getStripeCheckoutUrl(response.data);
-    if (checkoutUrl) {
-      window.location.assign(checkoutUrl);
-      return { type: "redirect" };
+    const { clientSecret, paymentId } = response.data;
+    if (!clientSecret) {
+      throw new Error("No clientSecret received from payment API");
     }
 
-    const apiMessage =
-      (response.data as { message?: string })?.message ||
-      "Payment created successfully";
-
-    if (isPaymentCreateSuccess(response.data) || response.status === 200) {
-      return { type: "success", message: apiMessage };
-    }
-
-    throw new Error(apiMessage || "Unable to start Stripe checkout session");
+    // Navigate to the Stripe payment page with the clientSecret
+    const params = new URLSearchParams({
+      clientSecret,
+      paymentId,
+      amount: String(amount),
+      appointmentId: String(booking.appointmentId),
+    });
+    navigate(`/online-payment?${params.toString()}`);
   };
 
   const handleBooking = async () => {
@@ -305,15 +225,8 @@ export default function AppointmentBookingPage() {
 
       if (paymentMethod === "OnlinePayment") {
         setIsProcessingPayment(true);
-        toast.info("Redirecting to secure Stripe payment...");
-        const paymentResult = await startStripePayment(booking);
-
-        if (paymentResult.type === "redirect") {
-          return;
-        }
-
-        toast.success(paymentResult.message);
-        setShowConfirmation(true);
+        toast.info("Redirecting to secure payment page...");
+        await startStripePayment(booking);
         return;
       }
 

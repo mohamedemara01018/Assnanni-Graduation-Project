@@ -1,262 +1,510 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
-import { FiCreditCard, FiLock, FiCheckCircle, FiArrowLeft } from "react-icons/fi";
+import { useNavigate, useSearchParams, NavLink } from "react-router";
+import {
+  FiCheckCircle,
+  FiArrowLeft,
+  FiAlertCircle,
+  FiLock,
+} from "react-icons/fi";
 import { toast } from "react-toastify";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/store/store";
-import Cookies from "js-cookie";
-import axios from "axios";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import { NavLink } from "react-router";
+import { loadStripe } from "@stripe/stripe-js";
+import {
+  Elements,
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
 
-interface PaymentFormData {
-  appointmentId: number;
-  patientId: number;
+// ─── Stripe Setup ────────────────────────────────────────────────────────────
+const stripePromise = loadStripe(
+  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || ""
+);
+
+// ─── Shared Stripe Element Styles ────────────────────────────────────────────
+const ELEMENT_STYLE = {
+  base: {
+    fontSize: "16px",
+    color: "#1f2937",
+    fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+    fontSmoothing: "antialiased",
+    "::placeholder": {
+      color: "#9ca3af",
+    },
+  },
+  invalid: {
+    color: "#ef4444",
+    iconColor: "#ef4444",
+  },
+};
+
+// ─── Checkout Form ──────────────────────────────────────────────────────────
+
+interface CheckoutFormProps {
   amount: number;
-  currency: string;
-  idempotencyKey: string;
-  createdBy: string;
+  appointmentId: number;
+  paymentId: string;
 }
 
-const OnlinePaymentPage = () => {
-  const [searchParams] = useSearchParams();
+function CheckoutForm({ amount, appointmentId, paymentId }: CheckoutFormProps) {
+  const stripe = useStripe();
+  const elements = useElements();
   const navigate = useNavigate();
-  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
-  const token = Cookies.get("jwtToken");
-  const { id: userId, role } = useSelector((state: RootState) => state.auth);
 
   const [isProcessing, setIsProcessing] = useState(false);
-  const [cardNumber, setCardNumber] = useState("");
-  const [expiryDate, setExpiryDate] = useState("");
-  const [cvv, setCvv] = useState("");
-  const [cardHolderName, setCardHolderName] = useState("");
-
-  // Get appointment details from URL params
-  const appointmentId = Number(searchParams.get("appointmentId")) || 0;
-  const patientId = Number(searchParams.get("patientId")) || 0;
-  const amount = Number(searchParams.get("amount")) || 0;
-
-  const formatCardNumber = (value: string) => {
-    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
-    const matches = v.match(/\d{4,16}/g);
-    const match = (matches && matches[0]) || "";
-    const parts = [];
-    for (let i = 0, len = match.length; i < len; i += 4) {
-      parts.push(match.substring(i, i + 4));
-    }
-    if (parts.length) {
-      return parts.join(" ");
-    } else {
-      return v;
-    }
-  };
-
-  const formatExpiryDate = (value: string) => {
-    const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
-    if (v.length >= 2) {
-      return v.substring(0, 2) + "/" + v.substring(2, 4);
-    }
-    return v;
-  };
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isPaymentComplete, setIsPaymentComplete] = useState(false);
+  const [email, setEmail] = useState("");
+  const [nameOnCard, setNameOnCard] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!stripe || !elements) {
+      return;
+    }
+
+    if (!email.trim()) {
+      setErrorMessage("Please enter your email address.");
+      return;
+    }
+    if (!nameOnCard.trim()) {
+      setErrorMessage("Please enter the name on your card.");
+      return;
+    }
+
     setIsProcessing(true);
+    setErrorMessage(null);
 
     try {
-      const paymentData: PaymentFormData = {
-        appointmentId,
-        patientId,
-        amount,
-        currency: "USD",
-        idempotencyKey: Date.now().toString(),
-        createdBy: userId || role || "system",
-      };
-
-      const response = await axios.post(
-        `${backendUrl}payments/create`,
-        paymentData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (response.data.succeeded || response.status === 200) {
-        toast.success("Payment processed successfully!");
-        // Redirect based on role or to appointments
-        navigate("/appointments");
-      } else {
-        toast.error(response.data.message || "Payment processing failed");
+      const cardNumberElement = elements.getElement(CardNumberElement);
+      if (!cardNumberElement) {
+        throw new Error("Card element not found.");
       }
-    } catch (error: any) {
-      console.error("Payment error:", error);
-      toast.error(
-        error.response?.data?.message || "Payment processing failed. Please try again.",
+
+      const { error, paymentIntent } = await stripe.confirmCardPayment(
+        // The clientSecret is passed via Elements provider options
+        // We need to get it from the URL params — but confirmCardPayment
+        // uses the clientSecret from the Elements context automatically
+        // when using PaymentElement. For CardElement, we pass it explicitly.
+        new URLSearchParams(window.location.search).get("clientSecret") || "",
+        {
+          payment_method: {
+            card: cardNumberElement,
+            billing_details: {
+              name: nameOnCard,
+              email: email,
+            },
+          },
+        }
       );
+
+      if (error) {
+        setErrorMessage(
+          error.message || "An error occurred while processing your payment."
+        );
+        toast.error(error.message || "Payment failed");
+      } else if (paymentIntent && paymentIntent.status === "succeeded") {
+        setIsPaymentComplete(true);
+        toast.success("Payment completed successfully!");
+      } else if (paymentIntent && paymentIntent.status === "requires_action") {
+        toast.info("Additional authentication required...");
+      } else {
+        toast.info("Payment is being processed...");
+        setIsPaymentComplete(true);
+      }
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "An unexpected error occurred.";
+      setErrorMessage(message);
+      toast.error(message);
     } finally {
       setIsProcessing(false);
     }
   };
 
+  // ── Success State ──
+  if (isPaymentComplete) {
+    return (
+      <div className="text-center py-16">
+        <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+          <FiCheckCircle className="text-green-500 text-4xl" />
+        </div>
+        <h2 className="text-2xl font-semibold text-(--color-text) mb-2">
+          Payment Successful!
+        </h2>
+        <p className="text-(--color-text-light) mb-2">
+          Your appointment has been confirmed and payment processed.
+        </p>
+        <p className="text-sm text-(--color-text-light) mb-8">
+          Appointment ID:{" "}
+          <span className="font-medium text-(--color-text)">
+            {appointmentId}
+          </span>{" "}
+          &bull; Payment ID:{" "}
+          <span className="font-medium text-(--color-text)">{paymentId}</span>
+        </p>
+        <button
+          onClick={() => navigate("/dashboard/patient")}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg text-sm font-semibold transition-all cursor-pointer"
+        >
+          Go to Dashboard
+        </button>
+      </div>
+    );
+  }
+
+  // ── Payment Form ──
+  return (
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <h2
+        className="text-xl font-semibold mb-6"
+        style={{ color: "var(--color-text)" }}
+      >
+        Pay with card
+      </h2>
+
+      {/* Email */}
+      <div>
+        <label
+          className="block text-sm font-medium mb-1.5"
+          style={{ color: "var(--color-text)" }}
+        >
+          Email
+        </label>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="example@gmail.com"
+          required
+          className="w-full border rounded-lg px-4 py-3 text-sm outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+          style={{
+            backgroundColor: "var(--color-bg)",
+            borderColor: "var(--color-border)",
+            color: "var(--color-text)",
+          }}
+        />
+      </div>
+
+      {/* Card Information */}
+      <div>
+        <label
+          className="block text-sm font-medium mb-1.5"
+          style={{ color: "var(--color-text)" }}
+        >
+          Card information
+        </label>
+        <div
+          className="border rounded-t-lg px-4 py-3.5"
+          style={{
+            backgroundColor: "var(--color-bg)",
+            borderColor: "var(--color-border)",
+          }}
+        >
+          <CardNumberElement
+            options={{
+              style: ELEMENT_STYLE,
+              showIcon: true,
+              placeholder: "1234 1234 1234 1234",
+            }}
+          />
+        </div>
+        <div className="flex">
+          <div
+            className="flex-1 border-l border-b border-r-0 rounded-bl-lg px-4 py-3.5"
+            style={{
+              backgroundColor: "var(--color-bg)",
+              borderColor: "var(--color-border)",
+            }}
+          >
+            <CardExpiryElement
+              options={{
+                style: ELEMENT_STYLE,
+                placeholder: "MM / YY",
+              }}
+            />
+          </div>
+          <div
+            className="flex-1 border rounded-br-lg border-t-0 px-4 py-3.5"
+            style={{
+              backgroundColor: "var(--color-bg)",
+              borderColor: "var(--color-border)",
+            }}
+          >
+            <CardCvcElement
+              options={{
+                style: ELEMENT_STYLE,
+                placeholder: "CVC",
+              }}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Name on card */}
+      <div>
+        <label
+          className="block text-sm font-medium mb-1.5"
+          style={{ color: "var(--color-text)" }}
+        >
+          Name on card
+        </label>
+        <input
+          type="text"
+          value={nameOnCard}
+          onChange={(e) => setNameOnCard(e.target.value)}
+          placeholder="Full name on card"
+          required
+          className="w-full border rounded-lg px-4 py-3 text-sm outline-none transition-all focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
+          style={{
+            backgroundColor: "var(--color-bg)",
+            borderColor: "var(--color-border)",
+            color: "var(--color-text)",
+          }}
+        />
+      </div>
+
+      {/* Error message */}
+      {errorMessage && (
+        <div
+          className="rounded-lg p-3 flex items-start gap-2 text-sm"
+          style={{
+            backgroundColor: "rgba(239, 68, 68, 0.08)",
+            color: "#ef4444",
+            border: "1px solid rgba(239, 68, 68, 0.2)",
+          }}
+        >
+          <FiAlertCircle className="mt-0.5 shrink-0" />
+          <span>{errorMessage}</span>
+        </div>
+      )}
+
+      {/* Pay Button */}
+      <button
+        type="submit"
+        disabled={!stripe || isProcessing}
+        className="w-full text-white px-6 py-3.5 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+        style={{
+          background: isProcessing
+            ? "#8b8bf5"
+            : "linear-gradient(to right, #7c3aed, #6366f1)",
+        }}
+      >
+        {isProcessing ? (
+          <>
+            <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+            Processing...
+          </>
+        ) : (
+          <>Pay ${amount.toFixed(2)}</>
+        )}
+      </button>
+    </form>
+  );
+}
+
+// ─── Page ────────────────────────────────────────────────────────────────────
+
+const OnlinePaymentPage = () => {
+  const [searchParams] = useSearchParams();
+
+  const clientSecret = searchParams.get("clientSecret") || "";
+  const paymentId = searchParams.get("paymentId") || "";
+  const appointmentId = Number(searchParams.get("appointmentId")) || 0;
+  const amount = Number(searchParams.get("amount")) || 0;
+
+  // Handle redirect-back from Stripe 3D Secure
+  const redirectStatus = searchParams.get("redirect_status");
+  const statusParam = searchParams.get("status");
+  const isRedirectSuccess =
+    redirectStatus === "succeeded" || statusParam === "success";
+
+  // No clientSecret and not a redirect → error
+  if (!clientSecret && !isRedirectSuccess) {
+    return (
+      <DashboardLayout pageTitle="Online Payment">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center max-w-md">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+              <FiAlertCircle className="text-red-500 text-2xl" />
+            </div>
+            <h2
+              className="text-xl font-semibold mb-2"
+              style={{ color: "var(--color-text)" }}
+            >
+              No Payment Session Found
+            </h2>
+            <p
+              className="text-sm mb-6"
+              style={{ color: "var(--color-text-light)" }}
+            >
+              Please book an appointment first and select online payment.
+            </p>
+            <NavLink
+              to="/appointments"
+              className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 transition text-sm font-medium"
+            >
+              <FiArrowLeft />
+              Go to Appointments
+            </NavLink>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  // Redirect-back success state
+  if (isRedirectSuccess && !clientSecret) {
+    return (
+      <DashboardLayout pageTitle="Online Payment">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center max-w-md">
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <FiCheckCircle className="text-green-500 text-4xl" />
+            </div>
+            <h2
+              className="text-2xl font-semibold mb-2"
+              style={{ color: "var(--color-text)" }}
+            >
+              Payment Successful!
+            </h2>
+            <p
+              className="text-sm mb-8"
+              style={{ color: "var(--color-text-light)" }}
+            >
+              Your appointment has been confirmed and payment processed.
+            </p>
+            <NavLink
+              to="/dashboard/patient"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg text-sm font-semibold transition-all"
+            >
+              Go to Dashboard
+            </NavLink>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout pageTitle="Online Payment">
-      <div className="-mt-6 -ml-6 bg-(--color-bg) rounded-2xl min-h-screen">
-        <div className="p-6">
-          <NavLink
-            to="/appointments"
-            className="flex items-center gap-2 text-blue-600 hover:text-blue-800 transition mb-6 text-sm w-fit group"
+      <div className="min-h-[80vh] flex items-start justify-center pt-4">
+        <div className="w-full max-w-5xl flex flex-col lg:flex-row gap-0 rounded-2xl overflow-hidden shadow-lg border"
+          style={{
+            borderColor: "var(--color-border)",
+            backgroundColor: "var(--color-surface)",
+          }}
+        >
+          {/* ── Left: Payment Summary ── */}
+          <div
+            className="lg:w-[45%] p-8 lg:p-10 flex flex-col justify-between"
+            style={{ backgroundColor: "var(--color-bg)" }}
           >
-            <FiArrowLeft className="group-hover:-translate-x-1 transition-transform" />
-            Back to Appointments
-          </NavLink>
+            <div>
+              <NavLink
+                to="/appointments"
+                className="inline-flex items-center gap-2 text-sm mb-8 transition-colors hover:opacity-70"
+                style={{ color: "var(--color-text-light)" }}
+              >
+                <FiArrowLeft className="w-4 h-4" />
+                Back
+              </NavLink>
 
-          <div className="flex flex-col mb-8">
-            <h1 className="text-3xl text-(--color-text) font-semibold font-sans tracking-tight">
-              Secure Online Payment
-            </h1>
-            <p className="text-(--color-text-light) font-light text-base mt-2">
-              Complete your payment securely using Stripe
-            </p>
-          </div>
+              <p
+                className="text-sm font-medium mb-1"
+                style={{ color: "var(--color-text-light)" }}
+              >
+                Medical Consultation
+              </p>
+              <p
+                className="text-4xl font-bold mb-1"
+                style={{ color: "var(--color-text)" }}
+              >
+                ${amount.toFixed(2)}
+              </p>
+              <p
+                className="text-sm"
+                style={{ color: "var(--color-text-light)" }}
+              >
+                Appointment #{appointmentId}
+              </p>
 
-          <div className="max-w-4xl">
-            <div className="bg-(--color-surface) border border-gray-100 dark:border-gray-800 rounded-2xl shadow-sm overflow-hidden">
-              {/* Payment Summary */}
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
-                <h2 className="text-lg font-semibold mb-4">Payment Summary</h2>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-sm opacity-90">Appointment ID</p>
-                    <p className="text-xl font-bold">{appointmentId || "N/A"}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm opacity-90">Amount to Pay</p>
-                    <p className="text-3xl font-bold">${amount.toFixed(2)}</p>
-                  </div>
+              <div
+                className="mt-8 pt-6 space-y-3"
+                style={{ borderTop: "1px solid var(--color-border)" }}
+              >
+                <div className="flex justify-between text-sm">
+                  <span style={{ color: "var(--color-text-light)" }}>
+                    Consultation fee
+                  </span>
+                  <span
+                    className="font-medium"
+                    style={{ color: "var(--color-text)" }}
+                  >
+                    ${amount.toFixed(2)}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span style={{ color: "var(--color-text-light)" }}>
+                    Payment ID
+                  </span>
+                  <span
+                    className="font-mono text-xs"
+                    style={{ color: "var(--color-text-light)" }}
+                  >
+                    {paymentId.slice(0, 8)}...
+                  </span>
+                </div>
+                <div
+                  className="flex justify-between text-sm pt-3 font-semibold"
+                  style={{
+                    borderTop: "1px solid var(--color-border)",
+                    color: "var(--color-text)",
+                  }}
+                >
+                  <span>Total due</span>
+                  <span>${amount.toFixed(2)}</span>
                 </div>
               </div>
-
-              <div className="p-8">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Card Holder Name */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-(--color-text)">
-                      Card Holder Name
-                    </label>
-                    <input
-                      type="text"
-                      value={cardHolderName}
-                      onChange={(e) => setCardHolderName(e.target.value)}
-                      placeholder="John Doe"
-                      required
-                      className="w-full bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                    />
-                  </div>
-
-                  {/* Card Number */}
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-(--color-text)">
-                      Card Number
-                    </label>
-                    <div className="relative">
-                      <FiCreditCard className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                      <input
-                        type="text"
-                        value={cardNumber}
-                        onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                        placeholder="1234 5678 9012 3456"
-                        maxLength={19}
-                        required
-                        className="w-full bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* Expiry Date */}
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-medium text-(--color-text)">
-                        Expiry Date
-                      </label>
-                      <input
-                        type="text"
-                        value={expiryDate}
-                        onChange={(e) => setExpiryDate(formatExpiryDate(e.target.value))}
-                        placeholder="MM/YY"
-                        maxLength={5}
-                        required
-                        className="w-full bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                      />
-                    </div>
-
-                    {/* CVV */}
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-sm font-medium text-(--color-text)">
-                        CVV
-                      </label>
-                      <div className="relative">
-                        <FiLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input
-                          type="text"
-                          value={cvv}
-                          onChange={(e) => setCvv(e.target.value.replace(/[^0-9]/g, ""))}
-                          placeholder="123"
-                          maxLength={4}
-                          required
-                          className="w-full bg-gray-50/50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-xl pl-11 pr-4 py-3 text-sm text-(--color-text) focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Security Notice */}
-                  <div className="bg-green-50/50 border border-green-100 dark:bg-green-900/10 dark:border-green-900/20 rounded-2xl p-5">
-                    <div className="flex items-start gap-3">
-                      <FiCheckCircle className="text-green-500 mt-0.5 shrink-0" />
-                      <div>
-                        <h3 className="text-green-800 dark:text-green-400 font-semibold mb-1 text-sm">
-                          Secure Payment
-                        </h3>
-                        <p className="text-xs text-green-700/80 dark:text-green-500/80 leading-relaxed">
-                          Your payment information is encrypted and secure. We use Stripe
-                          to process payments safely.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    disabled={isProcessing}
-                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-6 py-4 rounded-xl text-sm font-semibold transition-all shadow-md shadow-blue-500/20 active:scale-[0.98] flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    {isProcessing ? (
-                      <>
-                        <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                        Processing Payment...
-                      </>
-                    ) : (
-                      <>
-                        <FiLock className="text-lg" />
-                        Pay ${amount.toFixed(2)} Securely
-                      </>
-                    )}
-                  </button>
-                </form>
-              </div>
             </div>
 
-            {/* Stripe Badge */}
-            <div className="flex justify-center mt-6">
-              <div className="flex items-center gap-2 text-gray-500 text-sm">
-                <span>Powered by</span>
-                <span className="font-semibold text-gray-700">Stripe</span>
-              </div>
+            <div
+              className="mt-10 flex items-center gap-2 text-xs"
+              style={{ color: "var(--color-text-light)" }}
+            >
+              <FiLock className="w-3 h-3" />
+              <span>
+                Powered by{" "}
+                <span className="font-semibold" style={{ color: "var(--color-text)" }}>
+                  stripe
+                </span>
+              </span>
+              <span className="mx-1">|</span>
+              <span>Terms</span>
+              <span>Privacy</span>
             </div>
+          </div>
+
+          {/* ── Right: Card Form ── */}
+          <div className="lg:w-[55%] p-8 lg:p-10">
+            <Elements
+              stripe={stripePromise}
+              options={{
+                clientSecret,
+                appearance: {
+                  theme: "stripe",
+                },
+              }}
+            >
+              <CheckoutForm
+                amount={amount}
+                appointmentId={appointmentId}
+                paymentId={paymentId}
+              />
+            </Elements>
           </div>
         </div>
       </div>

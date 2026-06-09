@@ -6,7 +6,7 @@ export interface AppointmentData {
   time: string;
   meetingType: "In-Person" | "Video Call" | "Phone Call";
   address?: string;
-  status: "Upcoming" | "Completed" | "Cancelled";
+  status: "Upcoming" | "Completed" | "Cancelled" | "Pending";
   imageUrl?: string;
 }
 
