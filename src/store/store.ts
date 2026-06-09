@@ -29,7 +29,8 @@ import deleteFeedbackReducer from './slices/patient-slice/delete-feedback-slice/
 import medicalHistoryReducer from './slices/patient-slice/medical-history-slice/medicalHistorySlice'
 import rejectedDoctorsReducer from './slices/admin-slice/rejected-doctors-slice/rejectedDoctorsSlic'
 import verifiedDoctorsReducer from './slices/admin-slice/verified-doctors-slice/verifiedDoctorSlice';
-import toggleStatusUsersReducer from './slices/admin-slice/toggle-status-users-slice/toggleStatusUsersSlice'
+import toggleStatusUsersReducer from './slices/admin-slice/toggle-status-users-slice/toggleStatusUsersSlice';
+import createPaymentReducer from './slices/patient-slice/create-payment-slice/createPaymentSlice';
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -67,7 +68,8 @@ export const store = configureStore({
     addFeedbackSlice: addFeedbackReducer,
     editFeedbackSlice: editFeedbackReducer,
     deleteFeedbackSlice: deleteFeedbackReducer,
-    medicalHistorySlice: medicalHistoryReducer
+    medicalHistorySlice: medicalHistoryReducer,
+    createPaymentSlice: createPaymentReducer
   },
 });
 
