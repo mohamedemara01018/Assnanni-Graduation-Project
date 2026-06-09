@@ -197,7 +197,7 @@ const FirstDiv = () => {
 
   const confirmAppointmentMutation = useMutation({
     mutationFn: async (id: string | number) => {
-      await axios.post(`${backendUrl}Receptionist/${id}/confirm`, {}, config);
+      await axios.patch(`${backendUrl}Receptionist/${id}/confirm`, {}, config);
     },
     onSuccess: () => {
       toast.success("Appointment confirmed successfully");
