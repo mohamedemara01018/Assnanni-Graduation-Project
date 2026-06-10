@@ -15,6 +15,26 @@ import {
   CornerDownLeft,
 } from "lucide-react";
 
+interface TriageState {
+  has_pain: boolean;
+  pain_location: string;
+  pain_type: string;
+  pain_intensity: number;
+  pain_duration: string;
+  pain_triggers: string[];
+  has_swelling: boolean;
+  swelling_severity: string;
+  has_fever: boolean;
+  difficulty_opening: boolean;
+  has_trauma: boolean;
+  has_broken_tooth: boolean;
+  previous_root_canal: boolean;
+  last_visit: string;
+  recent_extraction: boolean;
+  [key: string]: boolean | string | number | string[];
+}
+// import DentalTriage from "./DentalTriage";
+
 interface Message {
   id: string;
   sender: "user" | "bot";
@@ -22,6 +42,7 @@ interface Message {
   timestamp: string;
   link?: string;
   linkText?: string;
+  options?: string[]; // Add this for button options
 }
 
 const QUICK_ACTIONS = [
@@ -29,73 +50,219 @@ const QUICK_ACTIONS = [
     label: "Book Appointment",
     icon: Calendar,
     keyword: "book appointment",
-    color: "bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:hover:bg-blue-900/30 dark:text-blue-400 border-blue-100 dark:border-blue-800/40",
+    color:
+      "bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:hover:bg-blue-900/30 dark:text-blue-400 border-blue-100 dark:border-blue-800/40",
   },
   {
-    label: "Scan with AI",
+    label: "Symbols Analyses",
     icon: Activity,
-    keyword: "scan teeth",
-    color: "bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:hover:bg-purple-900/30 dark:text-purple-400 border-purple-100 dark:border-purple-800/40",
+    keyword: "Analyse your symptoms",
+    color:
+      "bg-purple-50 hover:bg-purple-100 text-purple-700 dark:bg-purple-900/20 dark:hover:bg-purple-900/30 dark:text-purple-400 border-purple-100 dark:border-purple-800/40",
   },
   {
     label: "FAQs & Info",
     icon: HelpCircle,
     keyword: "faq",
-    color: "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/30 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/40",
+    color:
+      "bg-emerald-50 hover:bg-emerald-100 text-emerald-700 dark:bg-emerald-900/20 dark:hover:bg-emerald-900/30 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/40",
   },
   {
     label: "Support Desk",
     icon: LifeBuoy,
     keyword: "support",
-    color: "bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:hover:bg-amber-900/30 dark:text-amber-400 border-amber-100 dark:border-amber-800/40",
+    color:
+      "bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:hover:bg-amber-900/30 dark:text-amber-400 border-amber-100 dark:border-amber-800/40",
   },
 ];
 
-const KNOWLEDGE_BASE: Array<{ keywords: string[]; answer: string; link?: string; linkText?: string }> = [
+const KNOWLEDGE_BASE: Array<{
+  keywords: string[];
+  answer: string;
+  link?: string;
+  linkText?: string;
+}> = [
   {
     keywords: ["hello", "hi", "hey", "greetings", "anyone there"],
-    answer: "Hello! I am Assnani's AI Assistant. I am here to help you navigate our dental platform. You can ask me about booking appointments, uploading medical scans for AI analysis, checking pricing, or registering accounts!",
+    answer:
+      "Hello! I am Assnani's AI Assistant. I am here to help you navigate our dental platform. You can ask me about booking appointments, uploading medical scans for AI analysis, checking pricing, or registering accounts!",
   },
   {
-    keywords: ["appointment", "book", "schedule", "reserve", "doctor", "dentist", "visit"],
-    answer: "Booking a dental appointment is easy! Browse our certified doctor list, select a doctor that fits your needs, choose an available time slot, and confirm. Would you like to view our available doctors?",
+    keywords: [
+      "appointment",
+      "book",
+      "schedule",
+      "reserve",
+      "doctor",
+      "dentist",
+      "visit",
+    ],
+    answer:
+      "Booking a dental appointment is easy! Browse our certified doctor list, select a doctor that fits your needs, choose an available time slot, and confirm. Would you like to view our available doctors?",
     link: "/doctors-list",
     linkText: "View Doctors List 📅",
   },
   {
-    keywords: ["scan", "upload", "xray", "x-ray", "mri", "ct", "dicom", "image", "analysis", "ai model"],
-    answer: "Assnani uses state-of-the-art AI models to analyze dental X-rays, MRIs, and CT scans in formats like DICOM, JPEG, and PNG. Analyses usually complete within 2-5 minutes with over 90% accuracy. You can upload your scan now:",
-    link: "/scan/upload",
+    keywords: [
+      "Analyse",
+      "symptom",
+      "xray",
+      "x-ray",
+      "mri",
+      "ct",
+      "dicom",
+      "image",
+      "analysis",
+      "ai model",
+    ],
+    answer:
+      "Assnani uses state-of-the-art AI models to analyze dental X-rays, MRIs, and CT scans in formats like DICOM, JPEG, and PNG. Analyses usually complete within 2-5 minutes with over 90% accuracy. You can upload your scan now:",
+    link: "/dental-chatbot",
     linkText: "Upload Scan & Analyze 🧬",
   },
   {
-    keywords: ["register", "signup", "sign up", "create account", "account", "profile"],
-    answer: "You can create an account on Assnani as a Patient, Doctor, Student Doctor, or Receptionist. Make sure to verify your email after signing up. Click below to start registration:",
+    keywords: [
+      "register",
+      "signup",
+      "sign up",
+      "create account",
+      "account",
+      "profile",
+    ],
+    answer:
+      "You can create an account on Assnani as a Patient, Doctor, Student Doctor, or Receptionist. Make sure to verify your email after signing up. Click below to start registration:",
     link: "/register",
     linkText: "Go to Registration Screen 🔐",
   },
   {
     keywords: ["support", "contact", "phone", "email", "help", "chat", "live"],
-    answer: "Need direct assistance? You can contact our support team at support@assnani.com or call +1 (555) 123-4567 (Mon-Fri, 9 AM - 6 PM EST). Alternatively, write a message on our support page:",
+    answer:
+      "Need direct assistance? You can contact our support team at support@assnani.com or call +1 (555) 123-4567 (Mon-Fri, 9 AM - 6 PM EST). Alternatively, write a message on our support page:",
     link: "/support",
     linkText: "Send Support Message ✉️",
   },
   {
     keywords: ["faq", "questions", "how it works"],
-    answer: "We have answers for most common questions in our FAQ page. Check it out here:",
+    answer:
+      "We have answers for most common questions in our FAQ page. Check it out here:",
     link: "/faq",
     linkText: "Browse FAQ Center 💡",
   },
   {
-    keywords: ["payment", "billing", "insurance", "price", "fee", "cost", "receipt"],
-    answer: "We support major credit/debit cards and digital payment options. For patient safety and records transparency, your payments generate automated receipts sent to your email. You can manage bills in your profile details.",
+    keywords: [
+      "payment",
+      "billing",
+      "insurance",
+      "price",
+      "fee",
+      "cost",
+      "receipt",
+    ],
+    answer:
+      "We support major credit/debit cards and digital payment options. For patient safety and records transparency, your payments generate automated receipts sent to your email. You can manage bills in your profile details.",
     link: "/support",
     linkText: "Inquire about billing 💳",
   },
 ];
-
+const TRIAGE_QUESTIONS = [
+  {
+    id: "has_pain",
+    question: "Do you currently have dental pain or discomfort?",
+    type: "yesno",
+    options: ["Yes", "No"],
+  },
+  {
+    id: "pain_location",
+    question: "Where exactly is the pain located?",
+    type: "select",
+    options: ["Upper Right", "Upper Left", "Lower Right", "Lower Left"],
+  },
+  {
+    id: "pain_type",
+    question: "What does the pain feel like?",
+    type: "select",
+    options: [
+      "Throbbing/pulsating",
+      "Sharp/piercing",
+      "Temperature sensitivity",
+      "Dull ache",
+    ],
+  },
+  {
+    id: "pain_intensity",
+    question: "How intense is it right now? (0–10)",
+    type: "range",
+    options: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+  },
+  {
+    id: "pain_duration",
+    question: "How long has this been going on?",
+    type: "select",
+    options: ["Started today", "1–3 days", "3–7 days", "More than a week"],
+  },
+  {
+    id: "has_swelling",
+    question: "Do you notice any visible swelling (gum/face)?",
+    type: "yesno",
+    options: ["Yes", "No"],
+  },
+  {
+    id: "swelling_severity",
+    question: "If yes, how would you describe the swelling?",
+    type: "select",
+    options: ["Mild", "Moderate", "Severe (asymmetrical face)"],
+  },
+  {
+    id: "has_fever",
+    question: "Do you have a fever?",
+    type: "yesno",
+    options: ["Yes", "No"],
+  },
+  {
+    id: "difficulty_opening",
+    question: "Do you have difficulty opening your mouth (trismus)?",
+    type: "yesno",
+    options: ["Yes", "No"],
+  },
+  {
+    id: "has_trauma",
+    question: "Have you had recent maxillofacial trauma?",
+    type: "yesno",
+    options: ["Yes", "No"],
+  },
+  {
+    id: "has_broken_tooth",
+    question: "Do you have a structural fracture or broken tooth?",
+    type: "yesno",
+    options: ["Yes", "No"],
+  },
+  {
+    id: "previous_root_canal",
+    question: "Have you had a prior root canal on the treatment site?",
+    type: "yesno",
+    options: ["Yes", "No"],
+  },
+  {
+    id: "recent_extraction",
+    question: "Is this in a recent extraction socket area?",
+    type: "yesno",
+    options: ["Yes", "No"],
+  },
+  {
+    id: "last_visit",
+    question: "When was your last dental clinic visit?",
+    type: "select",
+    options: [
+      "Less than 6 months ago",
+      "6–12 months ago",
+      "Over 1 year ago",
+      "Never",
+    ],
+  },
+];
 const DEFAULT_RESPONSE = {
-  answer: "I'm not sure I understand that completely. I specialize in dental healthcare and Assnani features. You can try asking about 'booking appointments', 'uploading X-rays', or browse our FAQs:",
+  answer:
+    "I'm not sure I understand that completely. I specialize in dental healthcare and Assnani features. You can try asking about 'booking appointments', 'uploading X-rays', or browse our FAQs:",
   link: "/faq",
   linkText: "Go to FAQ Page 💡",
 };
@@ -106,8 +273,12 @@ export default function ChatbotWidget() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputVal, setInputVal] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const [triageState, setTriageState] = useState<TriageState | null>(null);
+  const [triageStep, setTriageStep] = useState(0);
+  const [isInTriage, setIsInTriage] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const messageIdCounter = useRef(0);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Load history from localStorage on mount
   useEffect(() => {
@@ -124,7 +295,10 @@ export default function ChatbotWidget() {
         id: "welcome",
         sender: "bot",
         text: "Hi! Welcome to Assnani. I am your smart dental assistant. How can I help you today? Feel free to ask a question or select one of the options below.",
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
       };
       setMessages([welcomeMsg]);
     }
@@ -154,16 +328,133 @@ export default function ChatbotWidget() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
+  const submitTriageData = async (data: TriageState) => {
+    setIsTyping(true);
+    console.log(data);
+    const loadingMsg: Message = {
+      id: `${Date.now()}-${messageIdCounter.current++}`,
+      sender: "bot",
+      text: "Analyzing your symptoms...",
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+    setMessages((prev) => [...prev, loadingMsg]);
+
+    try {
+      const BACKEND_URL = "https://0xker-multimodal-chatbot.hf.space";
+      const response = await fetch(`${BACKEND_URL}/api/analyze-symptoms`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const result = await response.json();
+      console.log(result);
+      setMessages((prev) => prev.filter((msg) => msg.id !== loadingMsg.id));
+
+      const botMsg: Message = {
+        id: `${Date.now()}-${messageIdCounter.current++}`,
+        sender: "bot",
+        text: `Analysis Complete!\n\n${result.risk_emoji || "🔴"} Risk Level: ${result.risk_level || "Unknown"}\nScore: ${result.score || "N/A"}\nX-ray Recommended: ${result.xray_recommended ? "Yes" : "No"}\n\n${result.recommendation || "Based on your symptoms, we recommend scheduling an appointment for a thorough evaluation."}\n\n🏠 Home Care Instructions:\n${result.home_care?.map((item: string) => `\n• ${item}`).join("") || "\n• No specific home care instructions provided."}`,
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        link: "/doctors-list",
+        linkText: "View Available Dentists 📅",
+      };
+      setMessages((prev) => [...prev, botMsg]);
+    } catch (error) {
+      console.error("Analysis failed:", error);
+      setMessages((prev) => prev.filter((msg) => msg.id !== loadingMsg.id));
+
+      const errorMsg: Message = {
+        id: `${Date.now()}-${messageIdCounter.current++}`,
+        sender: "bot",
+        text: "I apologize, but I encountered an error analyzing your symptoms. Please try again or contact our support team for assistance.",
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+      setMessages((prev) => [...prev, errorMsg]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
 
   const handleSend = (text: string) => {
     if (!text.trim()) return;
+    if (isInTriage && triageState) {
+      const userMsg: Message = {
+        id: `${Date.now()}-${messageIdCounter.current++}`,
+        sender: "user",
+        text,
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+      setMessages((prev) => [...prev, userMsg]);
+      setInputVal("");
+      setIsTyping(true);
+
+      const currentQuestion = TRIAGE_QUESTIONS[triageStep];
+      const updatedState = { ...triageState };
+
+      // Store the answer based on question type
+      if (currentQuestion.type === "yesno") {
+        updatedState[currentQuestion.id as keyof TriageState] = text
+          .toLowerCase()
+          .includes("yes");
+      } else if (currentQuestion.type === "number") {
+        updatedState[currentQuestion.id as keyof TriageState] =
+          parseInt(text) || 0;
+      } else {
+        updatedState[currentQuestion.id as keyof TriageState] = text;
+      }
+
+      setTriageState(updatedState);
+
+      // Move to next question or finish
+      if (triageStep < TRIAGE_QUESTIONS.length - 1) {
+        const nextStep = triageStep + 1;
+        setTriageStep(nextStep);
+        const nextQuestion = TRIAGE_QUESTIONS[nextStep];
+
+        setTimeout(() => {
+          const botMsg: Message = {
+            id: `${Date.now()}-${messageIdCounter.current++}`,
+            sender: "bot",
+            text: nextQuestion.question,
+            timestamp: new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            options: nextQuestion.options,
+          };
+          setMessages((prev) => [...prev, botMsg]);
+          setIsTyping(false);
+        }, 500);
+        return;
+      } else {
+        // All questions answered - submit to API
+        setIsInTriage(false);
+        submitTriageData(updatedState);
+        return;
+      }
+    } // Add this closing brace
 
     const userMsg: Message = {
       // eslint-disable-next-line react-hooks/purity
-      id: Date.now().toString(),
+      id: `${Date.now()}-${messageIdCounter.current++}`,
       sender: "user",
       text,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
     };
 
     setMessages((prev) => [...prev, userMsg]);
@@ -174,18 +465,23 @@ export default function ChatbotWidget() {
     setTimeout(() => {
       const normalizedQuery = text.toLowerCase().trim();
       const matched = KNOWLEDGE_BASE.find((kb) =>
-        kb.keywords.some((keyword) => normalizedQuery.includes(keyword))
+        kb.keywords.some((keyword) => normalizedQuery.includes(keyword)),
       );
 
       const responseText = matched ? matched.answer : DEFAULT_RESPONSE.answer;
       const responseLink = matched ? matched.link : DEFAULT_RESPONSE.link;
-      const responseLinkText = matched ? matched.linkText : DEFAULT_RESPONSE.linkText;
+      const responseLinkText = matched
+        ? matched.linkText
+        : DEFAULT_RESPONSE.linkText;
 
       const botMsg: Message = {
-        id: (Date.now() + 1).toString(),
+        id: `${Date.now()}-${messageIdCounter.current++}`,
         sender: "bot",
         text: responseText,
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
         link: responseLink,
         linkText: responseLinkText,
       };
@@ -196,16 +492,21 @@ export default function ChatbotWidget() {
   };
 
   const handleClearHistory = () => {
-    if (confirm("Are you sure you want to clear your chat history?")) {
-      const welcomeMsg: Message = {
-        id: "welcome",
-        sender: "bot",
-        text: "Hi! Welcome to Assnani. I am your smart dental assistant. How can I help you today? Feel free to ask a question or select one of the options below.",
-        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      };
-      setMessages([welcomeMsg]);
-      localStorage.removeItem("assnani_chat_history");
-    }
+    const welcomeMsg: Message = {
+      id: "welcome",
+      sender: "bot",
+      text: "Hi! Welcome to Assnani. I am your smart dental assistant. How can I help you today? Feel free to ask a question or select one of the options below.",
+      timestamp: new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    };
+    setMessages([welcomeMsg]);
+    localStorage.removeItem("assnani_chat_history");
+
+    setTriageState(null);
+    setTriageStep(0);
+    setIsInTriage(false);
   };
 
   const toggleOpen = () => {
@@ -219,7 +520,6 @@ export default function ChatbotWidget() {
 
   return (
     <>
-      {/* Floating Action Button */}
       {!isOpen && (
         <button
           onClick={toggleOpen}
@@ -234,15 +534,14 @@ export default function ChatbotWidget() {
         </button>
       )}
 
-      {/* Chat window container */}
       {isOpen && (
         <div
-          className={`fixed bottom-6 right-6 z-50 flex flex-col bg-(--color-surface) border border-(--color-border) shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 ${isMaximized
+          className={`fixed bottom-6 right-6 z-50 flex flex-col bg-(--color-surface) border border-(--color-border) shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 ${
+            isMaximized
               ? "w-[calc(100vw-3rem)] h-[calc(100vh-3rem)] max-w-4xl max-h-[800px]"
               : "w-[380px] h-[580px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)]"
-            }`}
+          }`}
         >
-          {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 text-white select-none">
             <div className="flex items-center space-x-3">
               <div className="relative flex items-center justify-center w-9 h-9 bg-white/10 rounded-full border border-white/10">
@@ -254,7 +553,9 @@ export default function ChatbotWidget() {
                   <span>Assnani Assistant</span>
                   <Sparkles className="w-3 h-3 text-yellow-300 fill-yellow-300" />
                 </h4>
-                <p className="text-[10px] text-blue-100">Usually replies instantly</p>
+                <p className="text-[10px] text-blue-100">
+                  Usually replies instantly
+                </p>
               </div>
             </div>
             <div className="flex items-center space-x-1">
@@ -270,7 +571,11 @@ export default function ChatbotWidget() {
                 title={isMaximized ? "Restore size" : "Maximize chat"}
                 className="p-1.5 hover:bg-white/10 rounded-md transition-colors text-white/80 hover:text-white max-sm:hidden"
               >
-                {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                {isMaximized ? (
+                  <Minimize2 className="w-4 h-4" />
+                ) : (
+                  <Maximize2 className="w-4 h-4" />
+                )}
               </button>
               <button
                 onClick={toggleOpen}
@@ -282,13 +587,11 @@ export default function ChatbotWidget() {
             </div>
           </div>
 
-          {/* Messages body */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50 dark:bg-gray-950/20">
             {messages.map((msg) => (
               <div key={msg.id} className="flex flex-col">
                 <div
-                  className={`flex max-w-[85%] ${msg.sender === "user" ? "ml-auto" : "mr-auto"
-                    }`}
+                  className={`flex max-w-[85%] ${msg.sender === "user" ? "ml-auto" : "mr-auto"}`}
                 >
                   {msg.sender === "bot" && (
                     <div className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mr-2 shrink-0 mt-0.5 text-blue-600 dark:text-blue-400">
@@ -297,10 +600,11 @@ export default function ChatbotWidget() {
                   )}
                   <div className="flex flex-col space-y-1">
                     <div
-                      className={`px-3.5 py-2.5 text-sm shadow-sm leading-relaxed ${msg.sender === "user"
+                      className={`px-3.5 py-2.5 text-sm shadow-sm leading-relaxed ${
+                        msg.sender === "user"
                           ? "bg-blue-600 text-white rounded-2xl rounded-tr-none"
                           : "bg-(--color-surface) text-(--color-text) border border-(--color-border) rounded-2xl rounded-tl-none"
-                        }`}
+                      }`}
                     >
                       <p className="whitespace-pre-wrap">{msg.text}</p>
 
@@ -309,10 +613,7 @@ export default function ChatbotWidget() {
                           <Link
                             to={msg.link}
                             onClick={() => {
-                              // On mobile, automatically close layout to let them see the screen
-                              if (window.innerWidth < 640) {
-                                setIsOpen(false);
-                              }
+                              if (window.innerWidth < 640) setIsOpen(false);
                             }}
                             className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/40 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-400 rounded-lg text-xs font-medium transition-all"
                           >
@@ -320,17 +621,30 @@ export default function ChatbotWidget() {
                           </Link>
                         </div>
                       )}
+                      {msg.options && (
+                        <div className="mt-3 pt-2.5 border-t border-(--color-border) dark:border-gray-800 flex flex-wrap gap-2">
+                          {msg.options.map((option, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => handleSend(option)}
+                              className="px-3 py-1.5 bg-purple-50 hover:bg-purple-100 dark:bg-purple-900/40 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-400 rounded-lg text-xs font-medium transition-all"
+                            >
+                              {option}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <span
-                      className={`text-[9px] text-gray-400 px-1 ${msg.sender === "user" ? "text-right" : "text-left ml-8"
-                        }`}
+                      className={`text-[9px] text-gray-400 px-1 ${
+                        msg.sender === "user" ? "text-right" : "text-left ml-8"
+                      }`}
                     >
                       {msg.timestamp}
                     </span>
                   </div>
                 </div>
 
-                {/* Show Quick Action Cards below the welcome message if the user hasn't chatted much */}
                 {msg.id === "welcome" && messages.length <= 2 && (
                   <div className="grid grid-cols-2 gap-2 mt-4 ml-8">
                     {QUICK_ACTIONS.map((action) => {
@@ -338,7 +652,43 @@ export default function ChatbotWidget() {
                       return (
                         <button
                           key={action.label}
-                          onClick={() => handleSend(action.keyword)}
+                          onClick={() => {
+                            if (action.label === "Symbols Analyses") {
+                              setIsInTriage(true);
+                              setTriageStep(0);
+                              setTriageState({
+                                has_pain: false,
+                                pain_location: "",
+                                pain_type: "",
+                                pain_intensity: 0,
+                                pain_duration: "",
+                                pain_triggers: [],
+                                has_swelling: false,
+                                swelling_severity: "",
+                                has_fever: false,
+                                difficulty_opening: false,
+                                has_trauma: false,
+                                has_broken_tooth: false,
+                                previous_root_canal: false,
+                                last_visit: "",
+                                recent_extraction: false,
+                              });
+                              const firstQuestion = TRIAGE_QUESTIONS[0];
+                              const botMsg: Message = {
+                                id: Date.now().toString(),
+                                sender: "bot",
+                                text: firstQuestion.question,
+                                timestamp: new Date().toLocaleTimeString([], {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }),
+                                options: firstQuestion.options,
+                              };
+                              setMessages((prev) => [...prev, botMsg]);
+                            } else {
+                              handleSend(action.keyword);
+                            }
+                          }}
                           className={`flex items-center space-x-2 p-2.5 border rounded-xl text-left transition-all text-xs font-medium group cursor-pointer ${action.color}`}
                         >
                           <Icon className="w-4 h-4 shrink-0 transition-transform group-hover:scale-110" />
@@ -357,16 +707,24 @@ export default function ChatbotWidget() {
                   <Bot className="w-3.5 h-3.5" />
                 </div>
                 <div className="flex items-center space-x-1 bg-(--color-surface) border border-(--color-border) px-4 py-3.5 rounded-2xl rounded-tl-none shadow-sm">
-                  <span className="w-2.5 h-2.5 bg-blue-400 dark:bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></span>
-                  <span className="w-2.5 h-2.5 bg-blue-400 dark:bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></span>
-                  <span className="w-2.5 h-2.5 bg-blue-400 dark:bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                  <span
+                    className="w-2.5 h-2.5 bg-blue-400 dark:bg-blue-600 rounded-full animate-bounce"
+                    style={{ animationDelay: "0ms" }}
+                  ></span>
+                  <span
+                    className="w-2.5 h-2.5 bg-blue-400 dark:bg-blue-600 rounded-full animate-bounce"
+                    style={{ animationDelay: "150ms" }}
+                  ></span>
+                  <span
+                    className="w-2.5 h-2.5 bg-blue-400 dark:bg-blue-600 rounded-full animate-bounce"
+                    style={{ animationDelay: "300ms" }}
+                  ></span>
                 </div>
               </div>
             )}
             <div ref={chatEndRef} />
           </div>
 
-          {/* Input Footer */}
           <form
             onSubmit={(e) => {
               e.preventDefault();

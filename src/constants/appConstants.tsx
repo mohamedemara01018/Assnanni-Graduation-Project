@@ -70,6 +70,7 @@ import MyDoctorsPage from "@/pages/my-doctors-page/MyDoctorsPage";
 import StudentAppointmentDetails from "@/pages/student-doctor-pages/appointments/StudentAppointmentDetails";
 
 import MedicalHistory from "@/pages/medical-history-page/MedicalHistoryPage";
+import ChatBot from "@/components/chatbot/Chatbot";
 
 // ProtectedRoute component for role-based access control
 export const ProtectedRoute = ({
@@ -161,7 +162,7 @@ export const routeElements = {
   "student-notification": <Notifications />,
   "contact-supervisor": <ContactSupervisor />,
   "student-doctor/create-medical-record/:id": <CreateMedicalRecord />,
-  "add-prescrption/:patientId": <AddPrescriptionPage />,
+  "add-prescrption/:patientId/:medicalRecordId": <AddPrescriptionPage />,
   "student-doctor/my-prescriptions": <MyPrescriptionsPage />,
   "student-doctor/medical-record-drafts": <MedicalRecordDrafts />,
   "student-doctor/training-sessions": <TrainingSessions />,
@@ -174,6 +175,7 @@ export const routeElements = {
 
   // Receptionist routes
   "/receptionist": <ReceptionistDashboard />,
+  "dental-chatbot": <ChatBot />,
   "/receptionist/schedule-appointment": <ScheduleAppointment />,
   "/receptionist/:id/check-in": <CheckIn />,
   "/receptionist/reschedule/:id": <RescheduleAppointment />,

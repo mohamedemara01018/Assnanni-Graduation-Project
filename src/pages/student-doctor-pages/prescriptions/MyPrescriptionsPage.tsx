@@ -31,19 +31,17 @@ type Prescription = {
 };
 
 type MyPrescriptionsResponse = {
-  isSuccess: boolean;
-  status: string;
-  error: string;
-  value: Prescription[];
+  succeeded: boolean;
   message: string;
+  data: Prescription[];
+  meta: null;
 };
 
 type PrescriptionDetailsResponse = {
-  isSuccess: boolean;
-  status: string;
-  error: string;
-  value: Prescription;
+  succeeded: boolean;
   message: string;
+  data: Prescription;
+  meta: null;
 };
 
 type UpdatePrescriptionForm = {
@@ -138,7 +136,7 @@ const MyPrescriptionsPage = () => {
         },
       );
 
-      if (!response.data?.isSuccess) {
+      if (!response.data?.succeeded) {
         throw new Error(
           response?.data.message ||
             response.data?.error ||
@@ -152,8 +150,8 @@ const MyPrescriptionsPage = () => {
   });
 
   const prescriptions = useMemo(
-    () => (response?.value?.length ? response.value : demoPrescriptions),
-    [response?.value],
+    () => (response?.data?.length ? response.data : demoPrescriptions),
+    [response?.data],
   );
 
   const selectedPrescriptionQuery = useQuery<PrescriptionDetailsResponse>({
@@ -166,7 +164,7 @@ const MyPrescriptionsPage = () => {
         },
       );
 
-      if (!response.data?.isSuccess) {
+      if (!response.data?.succeeded) {
         throw new Error(
           response.data?.message ||
             response.data?.error ||
@@ -194,7 +192,7 @@ const MyPrescriptionsPage = () => {
           },
         );
 
-        if (!response.data?.isSuccess) {
+        if (!response.data?.succeeded) {
           throw new Error(
             response.data?.message ||
               response.data?.error ||
@@ -212,8 +210,8 @@ const MyPrescriptionsPage = () => {
     },
   );
 
-  const detailsPrescription = selectedPrescriptionQuery.data?.value;
-  const updatePrescription = selectedUpdatePrescriptionQuery.data?.value;
+  const detailsPrescription = selectedPrescriptionQuery.data?.data;
+  const updatePrescription = selectedUpdatePrescriptionQuery.data?.data;
 
   const updateForm = useForm<UpdatePrescriptionForm>({
     defaultValues: {
@@ -242,7 +240,7 @@ const MyPrescriptionsPage = () => {
         prescriptionId: updatePrescription.prescriptionId,
         notes: updatePrescription.notes ?? "",
         items: updatePrescription.items?.length
-          ? updatePrescription.items.map((item) => ({
+          ? updatePrescription.items.map((item: PrescriptionItem) => ({
               medicationName: item.medicationName ?? "",
               dosage: item.dosage ?? "",
               frequency: item.frequency ?? "",
@@ -528,28 +526,30 @@ const MyPrescriptionsPage = () => {
                       Items
                     </h3>
                     <div className="space-y-3">
-                      {detailsPrescription.items.map((item) => (
-                        <div
-                          key={
-                            item.itemId ??
-                            `${item.medicationName}-${item.dosage}`
-                          }
-                          className="p-4 rounded-2xl border border-(--color-border) bg-gray-50/50 dark:bg-gray-800/20"
-                        >
-                          <p className="font-bold text-(--color-text)">
-                            {item.medicationName}
-                          </p>
-                          <p className="text-sm text-(--color-text-light)">
-                            Dosage: {item.dosage}
-                          </p>
-                          <p className="text-sm text-(--color-text-light)">
-                            Frequency: {item.frequency}
-                          </p>
-                          <p className="text-sm text-(--color-text-light)">
-                            Duration: {item.durationInDays} days
-                          </p>
-                        </div>
-                      ))}
+                      {detailsPrescription.items.map(
+                        (item: PrescriptionItem) => (
+                          <div
+                            key={
+                              item.itemId ??
+                              `${item.medicationName}-${item.dosage}`
+                            }
+                            className="p-4 rounded-2xl border border-(--color-border) bg-gray-50/50 dark:bg-gray-800/20"
+                          >
+                            <p className="font-bold text-(--color-text)">
+                              {item.medicationName}
+                            </p>
+                            <p className="text-sm text-(--color-text-light)">
+                              Dosage: {item.dosage}
+                            </p>
+                            <p className="text-sm text-(--color-text-light)">
+                              Frequency: {item.frequency}
+                            </p>
+                            <p className="text-sm text-(--color-text-light)">
+                              Duration: {item.durationInDays} days
+                            </p>
+                          </div>
+                        ),
+                      )}
                     </div>
                   </div>
                 </>

@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import LazyImage from "@/components/ui/LazyImage";
 import { FaUserMd, FaRegClock } from "react-icons/fa";
 import { BsFileMedical } from "react-icons/bs";
-import { FaPrescriptionBottleMedical } from "react-icons/fa6";
 import { NavLink } from "react-router";
 
 interface Props {
@@ -98,15 +97,6 @@ const Patient = ({
               title="Create Medical Record"
             >
               <BsFileMedical className="text-xl" />
-            </NavLink>
-          )}
-          {showPrescriptionButton && (
-            <NavLink
-              to={`/add-prescrption/${appointmentId}`}
-              className="p-2.5 bg-violet-50 text-violet-600 hover:bg-violet-600 hover:text-white rounded-xl transition-all duration-300 shadow-sm cursor-pointer"
-              title="Add Prescription"
-            >
-              <FaPrescriptionBottleMedical className="text-xl" />
             </NavLink>
           )}
         </div>

@@ -5,7 +5,7 @@ import type { RootState } from "@/store/store";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, NavLink } from "react-router";
 import { useEffect } from "react";
 import {
   BsArrowLeft,
@@ -15,10 +15,12 @@ import {
   BsHourglassSplit,
 } from "react-icons/bs";
 import { ScaleLoader } from "react-spinners";
+import { FaPrescriptionBottleMedical } from "react-icons/fa6";
 
 interface DraftDetail {
   id: number;
   appointmentId: number;
+  patientId: number;
   title: string;
   notes: string;
   diagnosis: string;
@@ -43,7 +45,7 @@ const MedicalRecordDraftDetails = () => {
         `${backendUrl}StudentDoctor/medical-record-drafts/${draftId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       return response.data;
     },
@@ -54,7 +56,9 @@ const MedicalRecordDraftDetails = () => {
   // Handle toast notifications
   useEffect(() => {
     if (isSuccess && responseBody) {
-      toast.success(responseBody.message || "Draft details loaded successfully");
+      toast.success(
+        responseBody.message || "Draft details loaded successfully",
+      );
     }
   }, [isSuccess, responseBody]);
 
@@ -62,7 +66,8 @@ const MedicalRecordDraftDetails = () => {
     if (isError && error) {
       const err = error as any;
       toast.error(
-        err.response?.data?.message || "Failed to load draft details from server. Showing offline details."
+        err.response?.data?.message ||
+          "Failed to load draft details from server. Showing offline details.",
       );
     }
   }, [isError, error]);
@@ -71,12 +76,14 @@ const MedicalRecordDraftDetails = () => {
   const fallbackDetail: DraftDetail = {
     id: parseInt(draftId || "3"),
     appointmentId: parseInt(draftId || "3"),
+    patientId: 0,
     title: "aaaaaaaaa",
     notes: "aaaaaaaaaaaaaaaaaaaaa",
     diagnosis: "aaaaaaaaaaaa",
   };
 
-  const draft: DraftDetail = responseBody?.data || (isError ? fallbackDetail : null);
+  const draft: DraftDetail =
+    responseBody?.data || (isError ? fallbackDetail : null);
 
   return (
     <DashboardLayout pageTitle="Draft Record Details">
@@ -128,12 +135,24 @@ const MedicalRecordDraftDetails = () => {
                   </div>
                 )}
                 <button
-                  onClick={() => navigate(`/student-doctor/medical-record-drafts/update/${draft.id}`)}
+                  onClick={() =>
+                    navigate(
+                      `/student-doctor/medical-record-drafts/update/${draft.id}`,
+                    )
+                  }
                   className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-blue-500/10 cursor-pointer flex items-center gap-1.5 active:scale-95"
                 >
                   <BsPencilSquare size={13} />
                   Update Draft
                 </button>
+
+                <NavLink
+                  to={`/add-prescrption/${draft.patientId}/${draft.id}`}
+                  className="p-2.5 bg-violet-50 text-violet-600 hover:bg-violet-600 hover:text-white rounded-xl transition-all duration-300 shadow-sm cursor-pointer"
+                  title="Add Prescription"
+                >
+                  <FaPrescriptionBottleMedical className="text-xl" />
+                </NavLink>
               </div>
             </div>
 
@@ -192,7 +211,8 @@ const MedicalRecordDraftDetails = () => {
               Draft Not Found
             </h2>
             <p className="text-sm text-(--color-text-light) max-w-sm leading-relaxed">
-              We couldn't retrieve the details for this draft record. It might have been deleted or submitted already.
+              We couldn't retrieve the details for this draft record. It might
+              have been deleted or submitted already.
             </p>
           </div>
         )}

@@ -38,7 +38,7 @@ export const roleRoutePaths = {
     "student-notification",
     "contact-supervisor",
     "student-doctor/create-medical-record/:id",
-    "add-prescrption/:patientId",
+    "add-prescrption/:patientId/:medicalRecordId",
     "student-doctor/my-prescriptions",
     "student-doctor/medical-record-drafts",
     "student-doctor/training-sessions",
@@ -97,6 +97,16 @@ export const sharedRoutePaths = [
   },
   {
     path: "online-payment",
+    allowedRoles: [
+      "doctor",
+      "patient",
+      "receptionist",
+      "studentDoctor",
+      "admin",
+    ],
+  },
+  {
+    path: "dental-chatbot",
     allowedRoles: [
       "doctor",
       "patient",
