@@ -250,11 +250,10 @@ const ScanDetails = () => {
       console.log("FormData:", formData);
       const response = await axios.post(
         `${backendUrl}Scans/treatment-recommendation`,
-        { formFile: file },
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
           },
           onUploadProgress: (event) => {
             const total = event.total || 0;
