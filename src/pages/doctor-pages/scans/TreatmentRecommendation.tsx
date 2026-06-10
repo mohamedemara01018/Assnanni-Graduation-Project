@@ -32,12 +32,12 @@ export const treatmentRecommendationQueryKey = (scanId?: string) =>
   ["TreatmentRecommendation", scanId] as const;
 
 const formatClassName = (key: string) =>
-  key?.replace(/_/g, " ")?.replace(/\b\w/g, (char) => char.toUpperCase()) ||
-  key ||
-  "";
+  (key || "")
+    ?.replace(/_/g, " ")
+    ?.replace(/\b\w/g, (char) => char.toUpperCase()) || "";
 
 const injectPatientNameIntoReport = (report: string, patientName?: string) => {
-  if (!patientName || !report) return report;
+  if (!patientName || !report) return report || "";
   return report.replace(/\[Patient Name[^\]]*\]/gi, patientName);
 };
 
