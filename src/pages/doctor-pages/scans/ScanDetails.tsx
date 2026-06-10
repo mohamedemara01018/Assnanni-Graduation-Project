@@ -227,10 +227,11 @@ const ScanDetails = () => {
       const imageResponse = await axios.get(imageUrl, {
         responseType: "blob",
       });
-
+      console.log(imageResponse);
       setGenerationProgress(28);
 
       const extension = scan.fileUrl.split(".").pop()?.split("?")[0] || "jpg";
+      console.log(extension);
       const file = new File(
         [imageResponse.data],
         `scan-${scan.scanId}.${extension}`,
