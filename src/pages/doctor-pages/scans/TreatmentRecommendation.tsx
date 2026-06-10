@@ -1,6 +1,10 @@
-import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useLocation, useNavigate, useParams } from "react-router";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import Cookies from "js-cookie";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import { IoArrowBack } from "react-icons/io5";
 import {
@@ -10,6 +14,7 @@ import {
 } from "react-icons/hi2";
 import { LuUser, LuScanLine } from "react-icons/lu";
 import { resolveAssetUrl } from "@/utils/resolveAssetUrl";
+import { toast } from "react-toastify";
 
 export interface TreatmentRecommendationData {
   by_Class: Record<string, number>;
@@ -47,6 +52,11 @@ const TreatmentRecommendation = () => {
   const location = useLocation();
   const locationState =
     location.state as TreatmentRecommendationLocationState | null;
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
+  const token = Cookies.get("jwtToken");
+
+  const [manualUploadMode, setManualUploadMode] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const { data: cachedState } = useQuery({
     queryKey: treatmentRecommendationQueryKey(scanId),
@@ -57,6 +67,41 @@ const TreatmentRecommendation = () => {
 
   const state = cachedState ?? locationState;
   const recommendation = state?.recommendation;
+
+  const retryRecommendationMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append("formFile", file);
+
+      const response = await axios.post(
+        `${backendUrl}Scans/treatment-recommendation`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      return response.data;
+    },
+    onSuccess: (response) => {
+      if (!response.succeeded) {
+        toast.error(
+          response.message || "Failed to get treatment recommendation",
+        );
+        return;
+      }
+
+      window.location.reload();
+    },
+    onError: (err: any) => {
+      toast.error(
+        err.response?.data?.message || "Failed to get treatment recommendation",
+      );
+    },
+  });
 
   useEffect(() => {
     const style = document.createElement("style");
@@ -186,9 +231,59 @@ const TreatmentRecommendation = () => {
 
         {recommendation.error && (
           <div className="mb-8 p-5 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-2xl">
-            <p className="text-sm font-bold text-red-700 dark:text-red-400">
+            <p className="text-sm font-bold text-red-700 dark:text-red-400 mb-4">
               {recommendation.error}
             </p>
+            {!manualUploadMode && (
+              <button
+                onClick={() => setManualUploadMode(true)}
+                className="text-sm font-bold text-red-700 dark:text-red-400 underline hover:text-red-800 dark:hover:text-red-300"
+              >
+                Upload image manually to retry
+              </button>
+            )}
+            {manualUploadMode && (
+              <div className="mt-4 space-y-3">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setUploadedFile(file);
+                    }
+                  }}
+                  className="text-sm text-gray-600 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-red-100 dark:file:bg-red-800 file:text-red-700 dark:file:text-red-300 hover:file:bg-red-200 dark:hover:file:bg-red-700"
+                />
+                {uploadedFile && (
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() =>
+                        retryRecommendationMutation.mutate(uploadedFile)
+                      }
+                      disabled={retryRecommendationMutation.isPending}
+                      className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-xl font-bold transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                    >
+                      <HiOutlineSparkles className="text-lg" />
+                      <span>
+                        {retryRecommendationMutation.isPending
+                          ? "Generating..."
+                          : "Retry with uploaded image"}
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setManualUploadMode(false);
+                        setUploadedFile(null);
+                      }}
+                      className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-2 py-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 

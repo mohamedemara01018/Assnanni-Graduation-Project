@@ -85,8 +85,6 @@ const ScanDetails = () => {
   const [generationStage, setGenerationStage] = useState<
     "idle" | "loading-image" | "uploading" | "analyzing"
   >("idle");
-  const [manualUploadMode, setManualUploadMode] = useState(false);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const analyzingProgressRef = useRef<number | null>(null);
 
   const clearAnalyzingProgress = () => {
@@ -219,33 +217,26 @@ const ScanDetails = () => {
 
   const treatmentRecommendationMutation = useMutation({
     mutationFn: async () => {
-      let file: File;
+      if (!scan?.fileUrl) throw new Error("Scan image not available");
 
-      if (manualUploadMode) {
-        if (!uploadedFile) throw new Error("Please upload an image file");
-        file = uploadedFile;
-      } else {
-        if (!scan?.fileUrl) throw new Error("Scan image not available");
+      setGenerationStage("loading-image");
+      setGenerationProgress(12);
 
-        setGenerationStage("loading-image");
-        setGenerationProgress(12);
+      const imageUrl = resolveFetchableAssetUrl(scan.fileUrl);
+      console.log("Image URL:", imageUrl);
+      const imageResponse = await axios.get(imageUrl, {
+        responseType: "blob",
+      });
+      console.log(imageResponse);
+      setGenerationProgress(28);
 
-        const imageUrl = resolveFetchableAssetUrl(scan.fileUrl);
-        console.log("Image URL:", imageUrl);
-        const imageResponse = await axios.get(imageUrl, {
-          responseType: "blob",
-        });
-        console.log(imageResponse);
-        setGenerationProgress(28);
-
-        const extension = scan.fileUrl.split(".").pop()?.split("?")[0] || "jpg";
-        console.log(extension);
-        file = new File(
-          [imageResponse.data],
-          `scan-${scan.scanId}.${extension}`,
-          { type: imageResponse.data.type || "image/jpeg" },
-        );
-      }
+      const extension = scan.fileUrl.split(".").pop()?.split("?")[0] || "jpg";
+      console.log(extension);
+      const file = new File(
+        [imageResponse.data],
+        `scan-${scan.scanId}.${extension}`,
+        { type: imageResponse.data.type || "image/jpeg" },
+      );
 
       const formData = new FormData();
       formData.append("formFile", file);
@@ -323,7 +314,6 @@ const ScanDetails = () => {
       toast.error(
         err.response?.data?.message || "Failed to get treatment recommendation",
       );
-      setManualUploadMode(true);
     },
   });
 
@@ -438,7 +428,7 @@ const ScanDetails = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            {scan.fileUrl && !manualUploadMode && (
+            {scan.fileUrl && (
               <button
                 onClick={() => treatmentRecommendationMutation.mutate()}
                 disabled={treatmentRecommendationMutation.isPending}
@@ -451,45 +441,6 @@ const ScanDetails = () => {
                     : "Treatment Recommendations"}
                 </span>
               </button>
-            )}
-
-            {manualUploadMode && (
-              <div className="flex items-center gap-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-2xl p-4">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setUploadedFile(file);
-                    }
-                  }}
-                  className="text-sm text-gray-600 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-100 dark:file:bg-amber-800 file:text-amber-700 dark:file:text-amber-300 hover:file:bg-amber-200 dark:hover:file:bg-amber-700"
-                />
-                {uploadedFile && (
-                  <button
-                    onClick={() => treatmentRecommendationMutation.mutate()}
-                    disabled={treatmentRecommendationMutation.isPending}
-                    className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-xl font-bold transition-all active:scale-95 cursor-pointer disabled:opacity-50"
-                  >
-                    <HiOutlineSparkles className="text-lg" />
-                    <span>
-                      {treatmentRecommendationMutation.isPending
-                        ? "Generating..."
-                        : "Generate"}
-                    </span>
-                  </button>
-                )}
-                <button
-                  onClick={() => {
-                    setManualUploadMode(false);
-                    setUploadedFile(null);
-                  }}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-2 py-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
             )}
 
             {canShowReview && (
