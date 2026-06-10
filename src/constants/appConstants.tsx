@@ -21,11 +21,13 @@ import ManageSupervisioning from "../pages/doctor-pages/supervisioning/ManageSup
 import ViewSupervisioningRequest from "../pages/doctor-pages/supervisioning/ViewSupervisioningRequest";
 import AssignStudentDoctor from "../pages/doctor-pages/supervisioning/AssignStudentDoctor";
 import StudentRecordApprovals from "../pages/doctor-pages/supervisioning/StudentRecordApprovals";
+import StudentPrescriptionsApprovalPage from "../pages/doctor-pages/student-prescriptions-approval/StudentPrescriptionsApprovalPage";
 import MedicalReportForm from "../components/Doctor/Reports/MedicalReportForm";
 import ReceptionistAccess from "../components/Doctor/ReceptionistAccess/ReceptionistAccess";
 import AddReceptionist from "../components/Doctor/ReceptionistAccess/AddReceptionist";
 import Scan from "../pages/doctor-pages/Scan/Scan";
 import ScanDetails from "../pages/doctor-pages/scans/ScanDetails";
+import TreatmentRecommendation from "../pages/doctor-pages/scans/TreatmentRecommendation";
 import Notifications from "../pages/doctor-pages/notifications/Notifications";
 import LearningSessions from "../pages/doctor-pages/learning-sessions/LearningSessions";
 import CreateLearningSession from "../pages/doctor-pages/learning-sessions/CreateLearningSession";
@@ -69,6 +71,7 @@ import MyDoctorsPage from "@/pages/my-doctors-page/MyDoctorsPage";
 import StudentAppointmentDetails from "@/pages/student-doctor-pages/appointments/StudentAppointmentDetails";
 
 import MedicalHistory from "@/pages/medical-history-page/MedicalHistoryPage";
+import ChatBot from "@/components/chatbot/Chatbot";
 
 // ProtectedRoute component for role-based access control
 export const ProtectedRoute = ({
@@ -143,6 +146,7 @@ export const routeElements = {
   "receptionist-access/add": <AddReceptionist />,
   "scan/upload": <Scan />,
   "scan/analysis/:scanId": <ScanDetails />,
+  "scan/analysis/:scanId/treatment-recommendation": <TreatmentRecommendation />,
   notification: <Notifications />,
   "doctor-appointments": <StudentAppointments />,
   "appointments/doctor-appointments/:id": <AppointmentDetails />,
@@ -153,13 +157,14 @@ export const routeElements = {
   "doctor-learning-sessions/create": <CreateLearningSession />,
   "doctor-learning-sessions/:id": <SessionDetails />,
   "doctor/student-record-approvals": <StudentRecordApprovals />,
+  "doctor/student-prescriptions-approval": <StudentPrescriptionsApprovalPage />,
 
   // Student Doctor routes
   "/student-doctor": <StudentDoctorDashboard />,
   "student-notification": <Notifications />,
   "contact-supervisor": <ContactSupervisor />,
   "student-doctor/create-medical-record/:id": <CreateMedicalRecord />,
-  "add-prescrption/:patientId": <AddPrescriptionPage />,
+  "add-prescrption/:patientId/:medicalRecordId": <AddPrescriptionPage />,
   "student-doctor/my-prescriptions": <MyPrescriptionsPage />,
   "student-doctor/medical-record-drafts": <MedicalRecordDrafts />,
   "student-doctor/training-sessions": <TrainingSessions />,
@@ -172,6 +177,7 @@ export const routeElements = {
 
   // Receptionist routes
   "/receptionist": <ReceptionistDashboard />,
+  "dental-chatbot": <ChatBot />,
   "/receptionist/schedule-appointment": <ScheduleAppointment />,
   "/receptionist/:id/check-in": <CheckIn />,
   "/receptionist/reschedule/:id": <RescheduleAppointment />,

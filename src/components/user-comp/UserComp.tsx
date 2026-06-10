@@ -45,8 +45,6 @@ function UserComp() {
     dispatch(logout());
     dispatch(clearEmail());
 
-    Cookies.remove("patientsView");
-
     setShowUserMenu(false);
 
     navigate("/");

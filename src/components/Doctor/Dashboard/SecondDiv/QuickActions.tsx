@@ -97,6 +97,19 @@ const QuickActions = () => {
           Review clinical documentations
         </p>
       </NavLink>
+      <NavLink
+        to={"/doctor/student-prescriptions-approval"}
+        className={
+          "bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 transition rounded-lg p-4"
+        }
+      >
+        <h3 className="text-rose-900 dark:text-rose-300 font-semibold text-sm">
+          Prescription Approvals
+        </h3>
+        <p className="text-xs font-light text-rose-700 dark:text-rose-400 mt-1">
+          Review student prescriptions
+        </p>
+      </NavLink>
     </div>
   );
 };

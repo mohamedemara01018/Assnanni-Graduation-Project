@@ -132,17 +132,16 @@ const FirstDiv = () => {
     useQuery<ReceptionistDashboardData>({
       queryKey: ["ReceptionistDashboardFirstDiv"],
       queryFn: async () => {
-        const [
-          queueRes,
-          appointmentsRes,
-          recentPatientsRes,
-          checkedInRes,
-        ] = await Promise.all([
-          axios.get(`${backendUrl}Receptionist/patient-queue`, config),
-          axios.get(`${backendUrl}Receptionist/today-appointments`, config),
-          axios.get(`${backendUrl}Receptionist/recent-patients`, config),
-          axios.get(`${backendUrl}Receptionist/checked-in-appointments`, config),
-        ]);
+        const [queueRes, appointmentsRes, recentPatientsRes, checkedInRes] =
+          await Promise.all([
+            axios.get(`${backendUrl}Receptionist/patient-queue`, config),
+            axios.get(`${backendUrl}Receptionist/today-appointments`, config),
+            axios.get(`${backendUrl}Receptionist/recent-patients`, config),
+            axios.get(
+              `${backendUrl}Receptionist/checked-in-appointments`,
+              config,
+            ),
+          ]);
 
         return {
           patientQueue: getResponseData<PatientInQueue[]>(queueRes.data),
@@ -197,7 +196,7 @@ const FirstDiv = () => {
 
   const confirmAppointmentMutation = useMutation({
     mutationFn: async (id: string | number) => {
-      await axios.post(`${backendUrl}Receptionist/${id}/confirm`, {}, config);
+      await axios.patch(`${backendUrl}Receptionist/${id}/confirm`, {}, config);
     },
     onSuccess: () => {
       toast.success("Appointment confirmed successfully");
@@ -321,7 +320,7 @@ const FirstDiv = () => {
             View All
           </NavLink>
         </div>
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 max-h-96 overflow-y-auto">
           {todayAppointments.length > 0 ? (
             todayAppointments.map((app) => (
               <AppointmentCard
@@ -415,8 +414,8 @@ const FirstDiv = () => {
                                 {appointment.patientName}
                               </h3>
                               <p className="text-xs text-(--color-text-light) font-medium mt-1">
-                                Appointment #{appointment.appointmentId} | Patient ID:{" "}
-                                {appointment.patientId}
+                                Appointment #{appointment.appointmentId} |
+                                Patient ID: {appointment.patientId}
                               </p>
                               <p className="text-xs text-(--color-text-light) font-medium mt-1">
                                 Date: {appointment.date} | Start:{" "}

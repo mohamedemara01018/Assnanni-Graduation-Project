@@ -15,7 +15,17 @@ export default defineConfig({
       "/api": {
         target: "https://asnani.runasp.net",
         changeOrigin: true,
-        secure: false, // especially if the backend has SSL issues
+        secure: false,
+      },
+      "/Uploads": {
+        target: "https://asnani.runasp.net",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/uploads": {
+        target: "https://asnani.runasp.net",
+        changeOrigin: true,
+        secure: false,
       },
     },
   },

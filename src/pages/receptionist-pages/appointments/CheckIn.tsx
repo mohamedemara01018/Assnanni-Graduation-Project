@@ -3,16 +3,17 @@ import { BsCalendar3, BsCash, BsCheckCircleFill } from "react-icons/bs";
 import { LuUser, LuFileText } from "react-icons/lu";
 import { HiOutlineClock } from "react-icons/hi2";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/store";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface AppointmentInfo {
   id: number;
+  patientId: number;
   status: string;
   date: string;
   time: string;
@@ -26,19 +27,44 @@ interface AppointmentInfo {
   paymentStatus: string;
 }
 
+interface AppointmentDetailsResponse {
+  succeeded: boolean;
+  message: string;
+  data: AppointmentInfo;
+  meta: null;
+}
+
+const getIdempotencyCookieKey = (appointmentId: string | number) =>
+  `receptionist-pay-idempotency-${appointmentId}`;
+
 const CheckIn = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
 
   const [cashReceived, setCashReceived] = useState(false);
   const [notes, setNotes] = useState("");
+  const [idempotencyKey, setIdempotencyKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+    const cookieKey = getIdempotencyCookieKey(id);
+    const existing = Cookies.get(cookieKey);
+    if (existing) {
+      setIdempotencyKey(existing);
+      return;
+    }
+    const key = crypto.randomUUID();
+    Cookies.set(cookieKey, key, { expires: 1 });
+    setIdempotencyKey(key);
+  }, [id]);
 
   const { data: appointmentData, isLoading } = useQuery({
     queryKey: ["AppointmentDetails", id],
     queryFn: async () => {
-      const response = await axios.get(
+      const response = await axios.get<AppointmentDetailsResponse>(
         `${backendUrl}Receptionist/dashboard/appointments/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -46,16 +72,54 @@ const CheckIn = () => {
       );
       return response.data;
     },
-    enabled: !!id,
+    enabled: !!id && !!token,
+  });
+
+  useEffect(() => {
+    if (appointmentData?.data?.paymentStatus === "Paid") {
+      setCashReceived(true);
+    }
+  }, [appointmentData?.data?.paymentStatus]);
+
+  const payCashMutation = useMutation({
+    mutationFn: async () => {
+      const appt = appointmentData?.data;
+      if (!appt) throw new Error("Appointment data not loaded");
+      if (!idempotencyKey) throw new Error("Idempotency key not available");
+
+      await axios.post(
+        `${backendUrl}payments/cash`,
+        {
+          appointmentId: appt.id,
+          patientId: appt.patientId,
+          amount: Number(consultationPrice),
+          idempotencyKey,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+    },
+    onSuccess: () => {
+      toast.success("Payment completed successfully");
+      setCashReceived(true);
+      queryClient.invalidateQueries({ queryKey: ["AppointmentDetails", id] });
+    },
+    onError: (err: any) => {
+      toast.error(err.response?.data?.message || "Payment failed");
+    },
   });
 
   const checkInMutation = useMutation({
     mutationFn: async () => {
+      const isPaid =
+        appointmentData?.data?.paymentStatus === "Paid" || cashReceived;
+
       await axios.post(
         `${backendUrl}Receptionist/checkin/${id}`,
         {
-          paymentStatus: cashReceived ? "Paid" : "Pending",
-          notes: notes,
+          paymentStatus: isPaid ? "Paid" : "Pending",
+          notes,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -71,7 +135,27 @@ const CheckIn = () => {
     },
   });
 
-  const appointment = appointmentData?.data as AppointmentInfo;
+  const { data: consultationPriceData } = useQuery({
+    queryKey: ["ConsultationPrice"],
+    queryFn: async () => {
+      const response = await axios.get(
+        `${backendUrl}Doctors/consultation-price`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      return response.data as {
+        succeeded: boolean;
+        message: string;
+        data: number;
+        meta: any;
+      };
+    },
+    enabled: !!backendUrl,
+  });
+
+  const consultationPrice = consultationPriceData?.data ?? 100;
+  const appointment = appointmentData?.data;
 
   if (isLoading) {
     return (
@@ -86,6 +170,7 @@ const CheckIn = () => {
   if (!appointment) return null;
 
   const initials = appointment.patientName
+
     .split(" ")
     .map((n) => n[0])
     .join("")
@@ -133,12 +218,19 @@ const CheckIn = () => {
                   <h3 className="text-xl font-bold text-(--color-text)">
                     {appointment.patientName}
                   </h3>
-                  <span className="px-3 py-1 rounded-full bg-yellow-50 text-yellow-600 border border-yellow-100 text-[10px] font-bold uppercase tracking-wider">
+                  <span
+                    className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                      appointment.status === "Confirmed"
+                        ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                        : "bg-yellow-50 text-yellow-600 border-yellow-100"
+                    }`}
+                  >
                     {appointment.status}
                   </span>
                 </div>
                 <p className="text-sm text-(--color-text-light) font-medium">
-                  Appointment ID: {appointment.id}
+                  Patient ID: {appointment.patientId} · Appointment ID:{" "}
+                  {appointment.id}
                 </p>
               </div>
             </div>
@@ -203,13 +295,45 @@ const CheckIn = () => {
                 </div>
               </div>
 
-              <div className="flex gap-4 md:col-span-2">
+              {appointment.location && (
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-500 flex items-center justify-center border border-sky-100">
+                    <LuFileText size={20} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-(--color-text-light) font-medium mb-0.5">
+                      Location
+                    </p>
+                    <p className="text-sm font-bold text-(--color-text)">
+                      {appointment.location}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center border border-amber-100">
+                  <BsCash size={20} />
+                </div>
+                <div>
+                  <p className="text-xs text-(--color-text-light) font-medium mb-0.5">
+                    Consultation Price
+                  </p>
+                  <p className="text-sm font-bold text-(--color-text)">
+                    {consultationPrice !== undefined
+                      ? `$${consultationPrice}`
+                      : "Loading..."}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4 ">
                 <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center border border-blue-100">
                   <BsCash size={20} />
                 </div>
                 <div>
                   <p className="text-xs text-(--color-text-light) font-medium mb-1">
-                    Status
+                    Payment Status
                   </p>
                   <span
                     className={`px-3 py-1 rounded-full border text-[10px] font-bold ${
@@ -227,9 +351,22 @@ const CheckIn = () => {
 
           {/* Payment Status Section */}
           <div className="bg-(--color-surface) p-8 rounded-2xl border border-(--color-border) shadow-sm">
-            <h2 className="text-lg font-bold text-(--color-text) mb-6">
-              Payment Status
-            </h2>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <h2 className="text-lg font-bold text-(--color-text)">
+                Payment Status
+              </h2>
+              {appointment.paymentStatus === "Pending" && (
+                <button
+                  onClick={() => payCashMutation.mutate()}
+                  disabled={payCashMutation.isPending || !idempotencyKey}
+                  className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/20 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+                >
+                  {payCashMutation.isPending
+                    ? "Processing..."
+                    : `Pay $${consultationPrice}`}
+                </button>
+              )}
+            </div>
             <div
               className={`p-6 rounded-2xl border-2 transition-all cursor-pointer flex items-center gap-4 ${
                 cashReceived

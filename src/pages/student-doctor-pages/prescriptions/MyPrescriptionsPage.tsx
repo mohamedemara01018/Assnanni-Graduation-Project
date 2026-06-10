@@ -31,19 +31,17 @@ type Prescription = {
 };
 
 type MyPrescriptionsResponse = {
-  isSuccess: boolean;
-  status: string;
-  error: string;
-  value: Prescription[];
+  succeeded: boolean;
   message: string;
+  data: Prescription[];
+  meta: null;
 };
 
 type PrescriptionDetailsResponse = {
-  isSuccess: boolean;
-  status: string;
-  error: string;
-  value: Prescription;
+  succeeded: boolean;
   message: string;
+  data: Prescription;
+  meta: null;
 };
 
 type UpdatePrescriptionForm = {
@@ -138,9 +136,11 @@ const MyPrescriptionsPage = () => {
         },
       );
 
-      if (!response.data?.isSuccess) {
+      if (!response.data?.succeeded) {
         throw new Error(
-          response.data?.message || response.data?.error || "Failed to load prescriptions",
+          response?.data.message ||
+            response.data?.error ||
+            "Failed to load prescriptions",
         );
       }
 
@@ -150,8 +150,8 @@ const MyPrescriptionsPage = () => {
   });
 
   const prescriptions = useMemo(
-    () => (response?.value?.length ? response.value : demoPrescriptions),
-    [response?.value],
+    () => (response?.data?.length ? response.data : demoPrescriptions),
+    [response?.data],
   );
 
   const selectedPrescriptionQuery = useQuery<PrescriptionDetailsResponse>({
@@ -164,9 +164,11 @@ const MyPrescriptionsPage = () => {
         },
       );
 
-      if (!response.data?.isSuccess) {
+      if (!response.data?.succeeded) {
         throw new Error(
-          response.data?.message || response.data?.error || "Failed to load prescription details",
+          response.data?.message ||
+            response.data?.error ||
+            "Failed to load prescription details",
         );
       }
 
@@ -179,33 +181,37 @@ const MyPrescriptionsPage = () => {
       activeModal === "details",
   });
 
-  const selectedUpdatePrescriptionQuery = useQuery<PrescriptionDetailsResponse>({
-    queryKey: ["student-prescription-update", selectedPrescriptionId],
-    queryFn: async () => {
-      const response = await axios.get(
-        `${backendUrl}StudentDoctor/prescriptions/${selectedPrescriptionId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-
-      if (!response.data?.isSuccess) {
-        throw new Error(
-          response.data?.message || response.data?.error || "Failed to load prescription details",
+  const selectedUpdatePrescriptionQuery = useQuery<PrescriptionDetailsResponse>(
+    {
+      queryKey: ["student-prescription-update", selectedPrescriptionId],
+      queryFn: async () => {
+        const response = await axios.get(
+          `${backendUrl}StudentDoctor/prescriptions/${selectedPrescriptionId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
         );
-      }
 
-      return response.data;
+        if (!response.data?.succeeded) {
+          throw new Error(
+            response.data?.message ||
+              response.data?.error ||
+              "Failed to load prescription details",
+          );
+        }
+
+        return response.data;
+      },
+      enabled:
+        !!token &&
+        !!backendUrl &&
+        !!selectedPrescriptionId &&
+        activeModal === "update",
     },
-    enabled:
-      !!token &&
-      !!backendUrl &&
-      !!selectedPrescriptionId &&
-      activeModal === "update",
-  });
+  );
 
-  const detailsPrescription = selectedPrescriptionQuery.data?.value;
-  const updatePrescription = selectedUpdatePrescriptionQuery.data?.value;
+  const detailsPrescription = selectedPrescriptionQuery.data?.data;
+  const updatePrescription = selectedUpdatePrescriptionQuery.data?.data;
 
   const updateForm = useForm<UpdatePrescriptionForm>({
     defaultValues: {
@@ -234,7 +240,7 @@ const MyPrescriptionsPage = () => {
         prescriptionId: updatePrescription.prescriptionId,
         notes: updatePrescription.notes ?? "",
         items: updatePrescription.items?.length
-          ? updatePrescription.items.map((item) => ({
+          ? updatePrescription.items.map((item: PrescriptionItem) => ({
               medicationName: item.medicationName ?? "",
               dosage: item.dosage ?? "",
               frequency: item.frequency ?? "",
@@ -249,7 +255,9 @@ const MyPrescriptionsPage = () => {
     if (isError && error) {
       const err = error as any;
       toast.error(
-        err.response?.data?.message || err.message || "Failed to load prescriptions",
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to load prescriptions",
       );
     }
   }, [isError, error]);
@@ -311,7 +319,11 @@ const MyPrescriptionsPage = () => {
       });
     },
     onError: (err: any) => {
-      toast.error(err.response?.data?.message || err.message || "Failed to update prescription");
+      toast.error(
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to update prescription",
+      );
     },
   });
 
@@ -458,7 +470,9 @@ const MyPrescriptionsPage = () => {
                   Prescription Details
                 </h2>
                 <p className="text-sm text-(--color-text-light)">
-                  {selectedPrescriptionId ? `Prescription #${selectedPrescriptionId}` : "Selected prescription"}
+                  {selectedPrescriptionId
+                    ? `Prescription #${selectedPrescriptionId}`
+                    : "Selected prescription"}
                 </p>
               </div>
               <button
@@ -512,25 +526,30 @@ const MyPrescriptionsPage = () => {
                       Items
                     </h3>
                     <div className="space-y-3">
-                      {detailsPrescription.items.map((item) => (
-                        <div
-                          key={item.itemId ?? `${item.medicationName}-${item.dosage}`}
-                          className="p-4 rounded-2xl border border-(--color-border) bg-gray-50/50 dark:bg-gray-800/20"
-                        >
-                          <p className="font-bold text-(--color-text)">
-                            {item.medicationName}
-                          </p>
-                          <p className="text-sm text-(--color-text-light)">
-                            Dosage: {item.dosage}
-                          </p>
-                          <p className="text-sm text-(--color-text-light)">
-                            Frequency: {item.frequency}
-                          </p>
-                          <p className="text-sm text-(--color-text-light)">
-                            Duration: {item.durationInDays} days
-                          </p>
-                        </div>
-                      ))}
+                      {detailsPrescription.items.map(
+                        (item: PrescriptionItem) => (
+                          <div
+                            key={
+                              item.itemId ??
+                              `${item.medicationName}-${item.dosage}`
+                            }
+                            className="p-4 rounded-2xl border border-(--color-border) bg-gray-50/50 dark:bg-gray-800/20"
+                          >
+                            <p className="font-bold text-(--color-text)">
+                              {item.medicationName}
+                            </p>
+                            <p className="text-sm text-(--color-text-light)">
+                              Dosage: {item.dosage}
+                            </p>
+                            <p className="text-sm text-(--color-text-light)">
+                              Frequency: {item.frequency}
+                            </p>
+                            <p className="text-sm text-(--color-text-light)">
+                              Duration: {item.durationInDays} days
+                            </p>
+                          </div>
+                        ),
+                      )}
                     </div>
                   </div>
                 </>
@@ -553,7 +572,9 @@ const MyPrescriptionsPage = () => {
                   Update Prescription
                 </h2>
                 <p className="text-sm text-(--color-text-light)">
-                  {selectedPrescriptionId ? `Prescription #${selectedPrescriptionId}` : "Selected prescription"}
+                  {selectedPrescriptionId
+                    ? `Prescription #${selectedPrescriptionId}`
+                    : "Selected prescription"}
                 </p>
               </div>
               <button
@@ -580,7 +601,9 @@ const MyPrescriptionsPage = () => {
                   })}
                   rows={4}
                   className={`w-full px-4 py-3 rounded-xl border ${
-                    updateErrors.notes ? "border-red-500" : "border-(--color-border)"
+                    updateErrors.notes
+                      ? "border-red-500"
+                      : "border-(--color-border)"
                   } bg-(--color-bg) text-(--color-text) focus:ring-2 focus:ring-violet-500/20 outline-none transition-all text-sm resize-none`}
                   placeholder="Update the prescription notes"
                 />

@@ -26,12 +26,16 @@ type PrescriptionFormValues = {
 };
 
 const AddPrescriptionPage = () => {
-  const { patientId } = useParams<{ patientId: string }>();
+  const { patientId, medicalRecordId } = useParams<{
+    patientId: string;
+    medicalRecordId: string;
+  }>();
   const navigate = useNavigate();
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
 
   const parsedPatientId = Number(patientId);
+  const parsedMedicalRecordId = Number(medicalRecordId);
 
   const {
     register,
@@ -63,7 +67,11 @@ const AddPrescriptionPage = () => {
       toast.error("Invalid patient id");
       navigate(-1);
     }
-  }, [navigate, parsedPatientId]);
+    if (!Number.isFinite(parsedMedicalRecordId)) {
+      toast.error("Invalid medical record id");
+      navigate(-1);
+    }
+  }, [navigate, parsedPatientId, parsedMedicalRecordId]);
 
   const mutation = useMutation({
     mutationFn: async (data: PrescriptionFormValues) => {
@@ -71,6 +79,7 @@ const AddPrescriptionPage = () => {
         `${backendUrl}StudentDoctor/prescriptions`,
         {
           patientId: parsedPatientId,
+          medicalRecordId: parsedMedicalRecordId,
           diagnosis: data.diagnosis,
           notes: data.notes,
           items: data.items.map((item) => ({
@@ -126,6 +135,10 @@ const AddPrescriptionPage = () => {
                 Patient ID:{" "}
                 <span className="font-mono text-violet-500 font-bold">
                   {patientId}
+                </span>
+                {" | Medical Record ID: "}
+                <span className="font-mono text-violet-500 font-bold">
+                  {medicalRecordId}
                 </span>
               </p>
             </div>
