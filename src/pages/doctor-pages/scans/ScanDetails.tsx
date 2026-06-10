@@ -244,12 +244,13 @@ const ScanDetails = () => {
       formData.append("formFile", file);
       console.log("File:", file);
       console.log("FormData file:", file.name, file.size, file.type);
+      console.log("new");
       setGenerationStage("uploading");
       setGenerationProgress(35);
       console.log("FormData:", formData);
       const response = await axios.post(
         `${backendUrl}Scans/treatment-recommendation`,
-        { formFIle: file },
+        { formFile: file },
         {
           headers: {
             Authorization: `Bearer ${token}`,
