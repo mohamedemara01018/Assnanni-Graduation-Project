@@ -100,28 +100,34 @@ const MedicalHistoryInDoctorDashboard = () => {
       console.error("Error fetching medical history:", error);
       toast.error(
         (error as any)?.response?.data?.message ||
-        "Failed to load medical history",
+          "Failed to load medical history",
       );
     }
   }, [isSuccess, isError, error, data]);
 
   const history: MedicalHistoryItem[] = data?.data || [];
-  const latestMedicalRecordId = history.reduce<number | null>((latest, item) => {
-    if (latest === null) return item.id;
+  const latestMedicalRecordId = history.reduce<number | null>(
+    (latest, item) => {
+      if (latest === null) return item.id;
 
-    const latestRecord = history.find((record) => record.id === latest);
-    if (!latestRecord) return item.id;
+      const latestRecord = history.find((record) => record.id === latest);
+      if (!latestRecord) return item.id;
 
-    return new Date(item.date).getTime() > new Date(latestRecord.date).getTime()
-      ? item.id
-      : latest;
-  }, null);
+      return new Date(item.date).getTime() >
+        new Date(latestRecord.date).getTime()
+        ? item.id
+        : latest;
+    },
+    null,
+  );
 
   const handleDownload = (item: MedicalHistoryItem) => {
     // Simulate downloading the record as a text file
-    const content = `Medical Record: ${item.title}\nDoctor: ${item.doctorName
-      }\nDate: ${item.date}\nType: ${item.type}\n\nDescription:\n${item.description
-      }\n\nAttachments: ${item.attachments.map((a) => a.fileName).join(", ")}`;
+    const content = `Medical Record: ${item.title}\nDoctor: ${
+      item.doctorName
+    }\nDate: ${item.date}\nType: ${item.type}\n\nDescription:\n${
+      item.description
+    }\n\nAttachments: ${item.attachments.map((a) => a.fileName).join(", ")}`;
     const blob = new Blob([content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -215,6 +221,7 @@ const MedicalHistoryInDoctorDashboard = () => {
               <span>Back</span>
             </button>
           </div>
+
           {role === "doctor" && (
             <button
               onClick={() =>
@@ -278,7 +285,7 @@ const MedicalHistoryInDoctorDashboard = () => {
                         title="Add Attachment"
                       >
                         {uploadAttachmentMutation.isPending &&
-                          activeRecordId === item.id ? (
+                        activeRecordId === item.id ? (
                           <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" />
                         ) : (
                           <HiOutlinePaperClip className="text-2xl" />
@@ -345,5 +352,4 @@ const MedicalHistoryInDoctorDashboard = () => {
   );
 };
 
-
-export default MedicalHistoryInDoctorDashboard
+export default MedicalHistoryInDoctorDashboard;
