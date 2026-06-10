@@ -81,7 +81,7 @@ const SecuritySettings = () => {
 
   return (
     <div className="m-4 lg:ml-0 p-4 bg-(--color-surface) rounded-2xl">
-      <h1 className="text-2xl font-thin text-(--color-text) mb-8">
+      <h1 className="text-2xl font-thin text-(--color-text) mb-8 max-sm:text-base">
         Security Settings
       </h1>
       <div>
@@ -89,14 +89,14 @@ const SecuritySettings = () => {
           <div className="flex flex-col gap-1">
             <label
               htmlFor="oldPassword"
-              className="text-lg text-(--color-text)"
+              className="text-lg text-(--color-text) max-sm:text-sm"
             >
               Current Password
             </label>
             <input
               type="password"
               id="oldPassword"
-              className={inputClassName(Boolean(errors.oldPassword))}
+              className={`${inputClassName(Boolean(errors.oldPassword))} max-sm:text-xs`}
               placeholder="Current Password"
               {...register("oldPassword", {
                 required: "Current password is required",
@@ -111,7 +111,7 @@ const SecuritySettings = () => {
           <div className="flex flex-col gap-1">
             <label
               htmlFor="newPassword"
-              className="text-lg text-(--color-text)"
+              className="text-lg text-(--color-text) max-sm:text-sm"
             >
               New Password
             </label>
@@ -119,7 +119,7 @@ const SecuritySettings = () => {
               type="password"
               id="newPassword"
               placeholder="New Password"
-              className={inputClassName(Boolean(errors.newPassword))}
+              className={`${inputClassName(Boolean(errors.newPassword))} max-sm:text-xs`}
               {...register("newPassword", {
                 required: "New password is required",
                 minLength: {
@@ -137,7 +137,7 @@ const SecuritySettings = () => {
           <div className="flex flex-col gap-1">
             <label
               htmlFor="confirmedPassword"
-              className="text-lg text-(--color-text)"
+              className="text-lg text-(--color-text) max-sm:text-sm"
             >
               Confirm New Password
             </label>
@@ -145,7 +145,7 @@ const SecuritySettings = () => {
               type="password"
               id="confirmedPassword"
               placeholder="Confirm New Password"
-              className={inputClassName(Boolean(errors.confirmedPassword))}
+              className={`${inputClassName(Boolean(errors.confirmedPassword))} max-sm:text-xs`}
               {...register("confirmedPassword", {
                 required: "Please confirm your new password",
               })}
@@ -159,7 +159,7 @@ const SecuritySettings = () => {
           <button
             type="submit"
             disabled={changePasswordMutation.isPending}
-            className="mt-6 mb-4 bg-blue-500 font-semibold text-white w-fit m-auto py-2 px-4 rounded-md hover:bg-blue-500/90 cursor-pointer disabled:cursor-not-allowed disabled:bg-blue-300"
+            className="mt-6 mb-4 bg-blue-500 font-semibold text-white w-fit m-auto py-2 px-4 rounded-md hover:bg-blue-500/90 cursor-pointer disabled:cursor-not-allowed disabled:bg-blue-300 max-sm:text-sm"
           >
             {changePasswordMutation.isPending
               ? "Updating..."

@@ -280,27 +280,27 @@ const Notifications = () => {
           <div className="flex justify-between items-center mb-10 pb-6 border-b border-(--color-border)">
             <div className="flex items-center gap-3">
               <div className="p-3 bg-blue-500/10 rounded-xl text-blue-500">
-                <FiBell className="text-2xl" />
+                <FiBell className="text-2xl max-sm:text-xl" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-(--color-text)">
+              <h1 className="text-xl sm:text-3xl font-bold text-(--color-text)">
                 Notifications
               </h1>
               {unreadCount >= 0 && (
                 <span
-                  className={`px-2.5 py-0.5 text-white text-sm font-bold rounded-full animate-in fade-in zoom-in duration-300 ${unreadCount > 0 ? "bg-blue-600" : "bg-gray-400"}`}
+                  className={`px-2.5 py-0.5 max-sm:px-1  text-white text-sm font-bold rounded-full animate-in max-sm:text-sm fade-in zoom-in duration-300 ${unreadCount > 0 ? "bg-blue-600" : "bg-gray-400"}`}
                 >
                   {unreadCount}
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center max-sm:flex-col gap-4 max-sm:gap-1">
               <button
                 onClick={() => markAllAsReadMutation.mutate()}
                 disabled={
                   markAllAsReadMutation.isPending ||
                   notifications.every((n) => n.isRead)
                 }
-                className="text-blue-500 font-bold text-sm hover:text-blue-600 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                className="text-blue-500 font-bold text-sm hover:text-blue-600 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed max-sm:text-xs"
               >
                 {markAllAsReadMutation.isPending
                   ? "Marking..."
@@ -311,7 +311,7 @@ const Notifications = () => {
                 <button
                   onClick={() => clearAllMutation.mutate()}
                   disabled={clearAllMutation.isPending}
-                  className="text-red-500 font-bold text-sm hover:text-red-600 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="text-red-500 font-bold text-sm hover:text-red-600 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed max-sm:text-xs"
                 >
                   {clearAllMutation.isPending ? "Clearing..." : "Clear all"}
                 </button>

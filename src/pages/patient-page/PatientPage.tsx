@@ -18,7 +18,7 @@ import {
   patientDashboardState,
   type DashboardState,
 } from "@/store/slices/patient-slice/patient-dashboard-slice/patientDashboardSlice";
-import type { AppDispatch } from "@/store/store";
+import type { AppDispatch, RootState } from "@/store/store";
 import { useEffect, useState } from "react";
 import Error from "@/components/error/Error";
 import Loading from "@/components/loading/Loading";
@@ -62,6 +62,7 @@ const getStatusCfg = (status: string) =>
   STATUS_CONFIG[status.toLowerCase() as StatusKey] ?? STATUS_CONFIG.upcoming;
 
 function PatientPage() {
+  const { fullName } = useSelector((state: RootState) => state.auth);
   const dispatch: AppDispatch = useDispatch();
   const { data, loading, error }: DashboardState = useSelector(
     patientDashboardState,
@@ -82,8 +83,10 @@ function PatientPage() {
     <DashboardLayout pageTitle={"Patient dashboard"}>
       <>
         <div>
-          <h1 className="text-3xl text-(--color-text)">Welcome Back, John</h1>
-          <p className=" text-(--color-text-light)">
+          <h1 className="text-3xl text-(--color-text) max-sm:text-xl">
+            Welcome Back, {fullName || "Patient"}
+          </h1>
+          <p className=" text-(--color-text-light) max-sm:text-sm">
             Here's your health dashboard overview
           </p>
         </div>
@@ -123,11 +126,13 @@ function PatientPage() {
         <div className="flex gap-8 max-lg:flex-col">
           <div className="flex flex-col gap-6 flex-1 lg:flex-5 ">
             <CardComp>
-              <div className="flex items-center justify-between gap-4 w-full">
-                <h2 className="text-xl">Upcoming Appointments</h2>
+              <div className="flex items-center justify-between gap-4 w-full max-sm:gap-2">
+                <h2 className="text-xl max-sm:text-base">
+                  Upcoming Appointments
+                </h2>
                 <Link
                   to={"/doctors-list"}
-                  className="text-(--color-primary) hover:text-(--color-primary-light) transition duration-200"
+                  className="text-(--color-primary) hover:text-(--color-primary-light) transition duration-200 max-sm:text-sm"
                 >
                   Book New
                 </Link>
@@ -142,13 +147,13 @@ function PatientPage() {
                       <Link
                         key={appointment.id}
                         to={`/appointments/${appointment.id}`}
-                        className="flex items-center justify-between gap-4 p-4 bg-(--color-bg-link)  hover:bg-(--color-bg-link-hover) rounded-md transition duration-150"
+                        className="flex items-center justify-between gap-4 p-4 bg-(--color-bg-link)  hover:bg-(--color-bg-link-hover) rounded-md transition duration-150 max-sm:gap-2 max-sm:p-2"
                       >
                         {/* Avatar + info */}
-                        <div className="flex items-start gap-3 min-w-0">
+                        <div className="flex items-start gap-3 min-w-0 max-sm:gap-2">
                           {/* Avatar with status dot */}
                           <div className="relative shrink-0">
-                            <div className="w-15 h-15 rounded-full overflow-hidden">
+                            <div className="w-15 h-15 rounded-full overflow-hidden max-sm:w-12 max-sm:h-12">
                               <DoctorAvatar
                                 src={String(appointment.doctorImage)}
                                 alt={appointment.doctorName}
@@ -207,10 +212,10 @@ function PatientPage() {
             </CardComp>
             <CardComp>
               <div className="flex items-center justify-between gap-4 w-full">
-                <h2 className="text-xl">Available Doctors</h2>
+                <h2 className="text-xl max-sm:text-base">Available Doctors</h2>
                 <Link
                   to={"/doctors-list"}
-                  className="text-(--color-primary) hover:text-(--color-primary-light) transition duration-200"
+                  className="text-(--color-primary) hover:text-(--color-primary-light) transition duration-200 max-sm:text-sm"
                 >
                   View All
                 </Link>
@@ -272,8 +277,8 @@ function PatientPage() {
 
           <div className="flex flex-1 max-md:flex-wrap lg:flex-2 lg:flex-col gap-4 ">
             {/* Quick Actions */}
-            <div className="bg-(--color-surface) rounded-xl border p-6">
-              <h3 className="text-lg text-gray-900 dark:text-white mb-4">
+            <div className="bg-(--color-surface) rounded-xl border p-6 max-sm:w-full max-sm:mb-4">
+              <h3 className="text-lg text-gray-900 dark:text-white mb-4 max-sm:text-base">
                 Quick Actions
               </h3>
               <div className="space-y-2">
@@ -300,7 +305,7 @@ function PatientPage() {
                     View medications
                   </p>
                 </Link>
-                <Link
+                {/* <Link
                   to="/payment-methods"
                   className="block p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors"
                 >
@@ -310,15 +315,15 @@ function PatientPage() {
                   <p className="text-xs text-orange-700 dark:text-orange-400 mt-1">
                     Manage cards
                   </p>
-                </Link>
+                </Link> */}
               </div>
             </div>
 
             <CardComp>
-              <h3 className="text-lg text-gray-900 dark:text-white mb-4">
+              <h3 className="text-lg text-gray-900 dark:text-white mb-4 max-sm:text-base">
                 Recent Activity
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-4 max-sm:w-full">
                 {data.recentActivities.length <= 0 ? (
                   <NotFound subMessage="No recent activity" />
                 ) : (

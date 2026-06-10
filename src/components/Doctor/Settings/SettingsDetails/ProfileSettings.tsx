@@ -115,25 +115,31 @@ const ProfileSettings = () => {
 
   return (
     <div className="m-4 lg:ml-0 p-4 bg-(--color-surface) rounded-2xl">
-      <h1 className="text-2xl font-thin text-(--color-text) mb-8">
+      <h1 className="text-2xl font-thin text-(--color-text) mb-8 max-sm:text-base">
         Profile Settings
       </h1>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-col gap-1">
-          <label htmlFor="fullName" className="text-lg text-(--color-text)">
+          <label
+            htmlFor="fullName"
+            className="text-lg text-(--color-text) max-sm:text-sm"
+          >
             Full Name
           </label>
           <input
             type="text"
             id="fullName"
             readOnly
-            className="w-full bg-(--color-border) px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none text-(--color-text-light) cursor-not-allowed"
+            className="w-full bg-(--color-border) px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none text-(--color-text-light) cursor-not-allowed max-sm:text-xs"
             placeholder={isLoading ? "Loading..." : "John Doe"}
             {...register("fullName")}
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label htmlFor="email" className="text-lg text-(--color-text)">
+          <label
+            htmlFor="email"
+            className="text-lg text-(--color-text) max-sm:text-sm"
+          >
             Email
           </label>
           <input
@@ -141,19 +147,22 @@ const ProfileSettings = () => {
             id="email"
             readOnly
             placeholder={isLoading ? "Loading..." : "doe@gmail.com"}
-            className="w-full bg-(--color-border) px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none text-(--color-text-light) cursor-not-allowed"
+            className="w-full bg-(--color-border) px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none text-(--color-text-light) cursor-not-allowed max-sm:text-xs"
             {...register("email")}
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label htmlFor="phone" className="text-lg text-(--color-text)">
+          <label
+            htmlFor="phone"
+            className="text-lg text-(--color-text) max-sm:text-sm"
+          >
             Phone
           </label>
           <input
             type="tel"
             id="phone"
             placeholder="+1 2323232"
-            className={`w-full bg-(--color-border) px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 text-(--color-text-light) ${
+            className={`w-full bg-(--color-border) px-3 py-2 text-sm border rounded-md shadow-sm focus:outline-none focus:ring-blue-500 text-(--color-text-light) max-sm:text:xs ${
               errors.phoneNumber
                 ? "border-red-500 focus:border-red-500"
                 : "border-gray-300 focus:border-blue-500"
@@ -175,7 +184,7 @@ const ProfileSettings = () => {
         <button
           type="submit"
           disabled={updateProfileMutation.isPending}
-          className="mt-6 mb-4 bg-blue-500 font-semibold text-white w-fit m-auto py-2 px-4 rounded-md hover:bg-blue-500/90 cursor-pointer disabled:cursor-not-allowed disabled:bg-blue-300"
+          className="mt-6 mb-4 bg-blue-500 font-semibold text-white w-fit m-auto py-2 px-4 rounded-md hover:bg-blue-500/90 cursor-pointer disabled:cursor-not-allowed disabled:bg-blue-300 max-sm:text-sm"
         >
           {updateProfileMutation.isPending ? "Saving..." : "Save Changes"}
         </button>

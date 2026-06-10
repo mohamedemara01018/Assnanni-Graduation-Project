@@ -19,7 +19,7 @@ const SideBar = () => {
             }`}
           >
             <CgProfile />
-            <p>Profile</p>
+            <p className="max-sm:text-base">Profile</p>
           </NavLink>
         </li>
         <li>
