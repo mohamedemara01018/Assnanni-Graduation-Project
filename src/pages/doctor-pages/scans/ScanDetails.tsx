@@ -199,6 +199,7 @@ const ScanDetails = () => {
       );
     },
     onSuccess: () => {
+      toast.success("Review submitted successfully");
       setHasSubmittedReview(true);
       setIsReviewModalOpen(false);
       resetReview();
@@ -236,10 +237,6 @@ const ScanDetails = () => {
         { type: imageResponse.data.type || "image/jpeg" },
       );
 
-      if (!file || file.size === 0) {
-        throw new Error("Failed to create file from scan image");
-      }
-
       const formData = new FormData();
       formData.append("formFile", file);
       console.log("File:", file);
@@ -254,6 +251,7 @@ const ScanDetails = () => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
           },
           onUploadProgress: (event) => {
             const total = event.total || 0;
@@ -274,7 +272,7 @@ const ScanDetails = () => {
           },
         },
       );
-      console.log(response);
+
       return response.data;
     },
     onSuccess: (response) => {
@@ -301,6 +299,8 @@ const ScanDetails = () => {
         treatmentRecommendationQueryKey(scanId),
         cacheData,
       );
+
+      toast.success("Treatment recommendation generated successfully");
 
       window.setTimeout(() => {
         resetGenerationProgress();
@@ -338,6 +338,7 @@ const ScanDetails = () => {
       );
     },
     onSuccess: () => {
+      toast.success("Review session started");
       queryClient.invalidateQueries({ queryKey: ["ScanDetails", scanId] });
     },
     onError: (err: any) => {
@@ -362,6 +363,12 @@ const ScanDetails = () => {
     scan?.status?.toLowerCase() === "complete" ||
     scan?.status?.toLowerCase() === "completed";
   const canShowReview = isCompletedStatus || hasSubmittedReview;
+
+  useEffect(() => {
+    if (scanReviewQuery.isSuccess && isViewReviewOpen) {
+      toast.success("Review loaded successfully");
+    }
+  }, [isViewReviewOpen, scanReviewQuery.isSuccess]);
 
   useEffect(() => {
     if (scanReviewQuery.isError && isViewReviewOpen) {
