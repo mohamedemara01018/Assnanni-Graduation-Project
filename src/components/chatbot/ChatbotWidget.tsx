@@ -447,7 +447,6 @@ export default function ChatbotWidget() {
     } // Add this closing brace
 
     const userMsg: Message = {
-      // eslint-disable-next-line react-hooks/purity
       id: `${Date.now()}-${messageIdCounter.current++}`,
       sender: "user",
       text,
