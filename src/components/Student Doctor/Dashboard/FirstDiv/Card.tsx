@@ -20,21 +20,26 @@ const Card = ({
   onMarkViewed,
   isMarkingViewed,
 }: Props) => {
+  console.log(children);
   return (
     <div className="flex bg-(--color-bg) justify-between p-4 items-center rounded-xl border border-(--color-border)/50 hover:border-(--color-border) transition-all shadow-sm">
-      <div className="flex gap-4 items-center flex-1">
+      <div className="flex gap-4 items-center flex-1 ">
         <div
           className={
             color === "blue"
-              ? "text-2xl text-blue-700 p-2.5 bg-blue-100 rounded-lg dark:bg-blue-900/30 dark:text-blue-400"
-              : "text-2xl text-violet-700 p-2.5 bg-violet-100 rounded-lg dark:bg-violet-900/30 dark:text-violet-400"
+              ? "text-2xl text-blue-700 p-2.5 bg-blue-100 rounded-lg dark:bg-blue-900/30 dark:text-blue-400 max-sm:p-1"
+              : "text-2xl text-violet-700 p-2.5 bg-violet-100 rounded-lg dark:bg-violet-900/30 dark:text-violet-400 max-sm:p-1 max-sm:bg-transparent max-sm:drop-shadow-2xl drop-shadow-violet-300"
           }
         >
           {logo}
         </div>
         <div className="flex-1">
-          <h1 className="text-base font-semibold text-(--color-text) line-clamp-1">{title}</h1>
-          <div className="text-(--color-text-light) text-xs mt-1">{children}</div>
+          <h1 className="text-base font-semibold text-(--color-text) line-clamp-1">
+            {title}
+          </h1>
+          <div className="text-(--color-text-light) text-xs mt-1 ">
+            {children}
+          </div>
         </div>
       </div>
       <div className="flex flex-col items-end gap-2 ml-4 min-w-fit">
