@@ -67,8 +67,8 @@ const TreatmentRecommendation = () => {
   const { data: cachedState } = useQuery({
     queryKey: treatmentRecommendationQueryKey(scanId),
     queryFn: async (): Promise<TreatmentRecommendationCache | null> => null,
-    staleTime: Infinity,
-    gcTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const state = cachedState ?? locationState;
