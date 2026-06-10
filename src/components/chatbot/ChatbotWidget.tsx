@@ -330,7 +330,7 @@ export default function ChatbotWidget() {
   }, [messages, isTyping]);
   const submitTriageData = async (data: TriageState) => {
     setIsTyping(true);
-    console.log(data);
+
     const loadingMsg: Message = {
       id: `${Date.now()}-${messageIdCounter.current++}`,
       sender: "bot",
@@ -350,7 +350,7 @@ export default function ChatbotWidget() {
         body: JSON.stringify(data),
       });
       const result = await response.json();
-      console.log(result);
+
       setMessages((prev) => prev.filter((msg) => msg.id !== loadingMsg.id));
 
       const botMsg: Message = {
