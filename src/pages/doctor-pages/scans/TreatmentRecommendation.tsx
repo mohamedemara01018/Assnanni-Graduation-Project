@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate, useParams } from "react-router";
 import axios from "axios";
 import { useSelector } from "react-redux";
@@ -13,7 +13,10 @@ import {
   HiOutlineSparkles,
 } from "react-icons/hi2";
 import { LuUser, LuScanLine } from "react-icons/lu";
-import { resolveAssetUrl } from "@/utils/resolveAssetUrl";
+import {
+  resolveAssetUrl,
+  resolveFetchableAssetUrl,
+} from "@/utils/resolveAssetUrl";
 import { toast } from "react-toastify";
 
 export interface TreatmentRecommendationData {
@@ -29,6 +32,7 @@ export interface TreatmentRecommendationCache {
   patientName: string;
   patientId: number;
   scanId: number;
+  fileUrl?: string;
 }
 
 export type TreatmentRecommendationLocationState = TreatmentRecommendationCache;
@@ -54,9 +58,11 @@ const TreatmentRecommendation = () => {
     location.state as TreatmentRecommendationLocationState | null;
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
   const token = Cookies.get("jwtToken");
+  const queryClient = useQueryClient();
 
   const [manualUploadMode, setManualUploadMode] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [progress, setProgress] = useState(0);
 
   const { data: cachedState } = useQuery({
     queryKey: treatmentRecommendationQueryKey(scanId),
@@ -67,6 +73,65 @@ const TreatmentRecommendation = () => {
 
   const state = cachedState ?? locationState;
   const recommendation = state?.recommendation;
+  const fileUrl = state?.fileUrl;
+
+  const generateRecommendationMutation = useMutation({
+    mutationFn: async (fileUrl: string) => {
+      const imageUrl = resolveFetchableAssetUrl(fileUrl);
+      const imageResponse = await axios.get(imageUrl, {
+        responseType: "blob",
+      });
+
+      const extension = fileUrl.split(".").pop()?.split("?")[0] || "jpg";
+      const file = new File(
+        [imageResponse.data],
+        `scan-${state?.scanId}.${extension}`,
+        { type: imageResponse.data.type || "image/jpeg" },
+      );
+
+      const formData = new FormData();
+      formData.append("formFile", file);
+
+      const response = await axios.post(
+        `${backendUrl}Scans/treatment-recommendation`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      return response.data;
+    },
+    onSuccess: (response) => {
+      if (!response.succeeded) {
+        toast.error(
+          response.message || "Failed to get treatment recommendation",
+        );
+        return;
+      }
+
+      const cacheData: TreatmentRecommendationCache = {
+        recommendation: response.data,
+        patientName: state?.patientName || "",
+        patientId: state?.patientId || 0,
+        scanId: state?.scanId || 0,
+        fileUrl: fileUrl,
+      };
+
+      queryClient.setQueryData(
+        treatmentRecommendationQueryKey(scanId),
+        cacheData,
+      );
+    },
+    onError: (err: any) => {
+      toast.error(
+        err.response?.data?.message || "Failed to get treatment recommendation",
+      );
+    },
+  });
 
   const retryRecommendationMutation = useMutation({
     mutationFn: async (file: File) => {
@@ -94,7 +159,21 @@ const TreatmentRecommendation = () => {
         return;
       }
 
-      window.location.reload();
+      const cacheData: TreatmentRecommendationCache = {
+        recommendation: response.data,
+        patientName: state?.patientName || "",
+        patientId: state?.patientId || 0,
+        scanId: state?.scanId || 0,
+      };
+
+      queryClient.setQueryData(
+        treatmentRecommendationQueryKey(scanId),
+        cacheData,
+      );
+
+      setManualUploadMode(false);
+      setUploadedFile(null);
+      toast.success("Treatment recommendation generated successfully");
     },
     onError: (err: any) => {
       toast.error(
@@ -136,20 +215,77 @@ const TreatmentRecommendation = () => {
     window.print();
   };
 
+  useEffect(() => {
+    if (!recommendation && fileUrl && !manualUploadMode) {
+      setProgress(0);
+      generateRecommendationMutation.mutate(fileUrl);
+    }
+  }, [recommendation, fileUrl]);
+
+  useEffect(() => {
+    if (generateRecommendationMutation.isPending) {
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 95) return prev;
+          return prev + Math.random() * 5;
+        });
+      }, 500);
+
+      return () => clearInterval(interval);
+    } else {
+      setProgress(0);
+    }
+  }, [generateRecommendationMutation.isPending]);
+
   if (!recommendation) {
     return (
       <DashboardLayout pageTitle="Treatment Recommendation">
         <div className="p-8 text-center max-w-lg mx-auto">
-          <p className="text-(--color-text-light) font-medium mb-6">
-            No treatment recommendation data found. Please generate one from the
-            scan details page.
-          </p>
-          <button
-            onClick={() => navigate(`/scan/analysis/${scanId}`)}
-            className="text-blue-600 font-bold hover:underline"
-          >
-            Back to Scan Details
-          </button>
+          {generateRecommendationMutation.isPending ? (
+            <div className="space-y-6">
+              <div className="w-16 h-16 mx-auto rounded-full bg-teal-50 dark:bg-teal-900/20 text-teal-600 flex items-center justify-center">
+                <HiOutlineSparkles size={32} className="animate-pulse" />
+              </div>
+              <div>
+                <p className="text-(--color-text) font-bold text-lg mb-2">
+                  Generating Treatment Recommendations
+                </p>
+                <p className="text-(--color-text-light) font-medium">
+                  AI is analyzing the scan and generating personalized treatment
+                  plan...
+                </p>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-(--color-text-light) font-medium">
+                    Progress
+                  </span>
+                  <span className="text-teal-600 dark:text-teal-400 font-bold">
+                    {Math.round(progress)}%
+                  </span>
+                </div>
+                <div className="h-3 w-full rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-300 ease-out"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <p className="text-(--color-text-light) font-medium mb-6">
+                No treatment recommendation data found. Please generate one from
+                the scan details page.
+              </p>
+              <button
+                onClick={() => navigate(`/scan/analysis/${scanId}`)}
+                className="text-blue-600 font-bold hover:underline"
+              >
+                Back to Scan Details
+              </button>
+            </>
+          )}
         </div>
       </DashboardLayout>
     );

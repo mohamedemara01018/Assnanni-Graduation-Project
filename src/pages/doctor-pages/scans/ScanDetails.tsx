@@ -14,16 +14,13 @@ import {
 import { LuUser, LuScanLine, LuSquareCheck } from "react-icons/lu";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { TreatmentRecommendationCache } from "./TreatmentRecommendation";
 import { treatmentRecommendationQueryKey } from "./TreatmentRecommendation";
 import { useForm } from "react-hook-form";
 import { FiPlus } from "react-icons/fi";
 import { LuClipboardList } from "react-icons/lu";
-import {
-  resolveAssetUrl,
-  resolveFetchableAssetUrl,
-} from "@/utils/resolveAssetUrl";
+import { resolveAssetUrl } from "@/utils/resolveAssetUrl";
 interface ScanDetection {
   className: string;
   confidence: number;
@@ -81,34 +78,6 @@ const ScanDetails = () => {
   const [isViewReviewOpen, setIsViewReviewOpen] = useState(false);
   const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
-  const [generationProgress, setGenerationProgress] = useState(0);
-  const [generationStage, setGenerationStage] = useState<
-    "idle" | "loading-image" | "uploading" | "analyzing"
-  >("idle");
-  const analyzingProgressRef = useRef<number | null>(null);
-
-  const clearAnalyzingProgress = () => {
-    if (analyzingProgressRef.current) {
-      window.clearInterval(analyzingProgressRef.current);
-      analyzingProgressRef.current = null;
-    }
-  };
-
-  const resetGenerationProgress = () => {
-    clearAnalyzingProgress();
-    setGenerationStage("idle");
-    setGenerationProgress(0);
-  };
-
-  const startAnalyzingProgress = () => {
-    clearAnalyzingProgress();
-    setGenerationStage("analyzing");
-    analyzingProgressRef.current = window.setInterval(() => {
-      setGenerationProgress((prev) => (prev >= 95 ? prev : prev + 1));
-    }, 350);
-  };
-
-  useEffect(() => () => clearAnalyzingProgress(), []);
 
   const {
     register: registerReview,
@@ -215,119 +184,24 @@ const ScanDetails = () => {
     reviewMutation.mutate(data);
   };
 
-  const treatmentRecommendationMutation = useMutation({
-    mutationFn: async () => {
-      if (!scan?.fileUrl) throw new Error("Scan image not available");
+  const handleGenerateTreatment = () => {
+    const cacheData: TreatmentRecommendationCache = {
+      recommendation: null as any,
+      patientName: scan.patientName,
+      patientId: scan.patientId,
+      scanId: scan.scanId,
+      fileUrl: scan.fileUrl,
+    };
 
-      setGenerationStage("loading-image");
-      setGenerationProgress(12);
+    queryClient.setQueryData(
+      treatmentRecommendationQueryKey(scanId),
+      cacheData,
+    );
 
-      const imageUrl = resolveFetchableAssetUrl(scan.fileUrl);
-      console.log("Image URL:", imageUrl);
-      const imageResponse = await axios.get(imageUrl, {
-        responseType: "blob",
-      });
-      console.log(imageResponse);
-      setGenerationProgress(28);
-
-      const extension = scan.fileUrl.split(".").pop()?.split("?")[0] || "jpg";
-      console.log(extension);
-      const file = new File(
-        [imageResponse.data],
-        `scan-${scan.scanId}.${extension}`,
-        { type: imageResponse.data.type || "image/jpeg" },
-      );
-
-      const formData = new FormData();
-      formData.append("formFile", file);
-      console.log("File:", file);
-      console.log("FormData file:", file.name, file.size, file.type);
-      console.log("new");
-      setGenerationStage("uploading");
-      setGenerationProgress(35);
-      console.log("FormData:", formData);
-      console.log(Object.fromEntries(formData));
-      const response = await axios.post(
-        `${backendUrl}Scans/treatment-recommendation`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data",
-          },
-          onUploadProgress: (event) => {
-            const total = event.total || 0;
-            if (!total) {
-              setGenerationStage("analyzing");
-              startAnalyzingProgress();
-              return;
-            }
-
-            const uploadPercent = Math.round((event.loaded / total) * 100);
-            setGenerationProgress(35 + Math.round(uploadPercent * 0.35));
-
-            if (event.loaded >= total) {
-              setGenerationStage("analyzing");
-              startAnalyzingProgress();
-              setGenerationProgress((prev) => Math.max(prev, 72));
-            }
-          },
-        },
-      );
-
-      return response.data;
-    },
-    onSuccess: (response) => {
-      clearAnalyzingProgress();
-
-      if (!response.succeeded) {
-        resetGenerationProgress();
-        toast.error(
-          response.message || "Failed to get treatment recommendation",
-        );
-        return;
-      }
-
-      setGenerationProgress(100);
-
-      const cacheData: TreatmentRecommendationCache = {
-        recommendation: response.data,
-        patientName: scan.patientName,
-        patientId: scan.patientId,
-        scanId: scan.scanId,
-      };
-
-      queryClient.setQueryData(
-        treatmentRecommendationQueryKey(scanId),
-        cacheData,
-      );
-
-      toast.success("Treatment recommendation generated successfully");
-
-      window.setTimeout(() => {
-        resetGenerationProgress();
-        navigate(`/scan/analysis/${scanId}/treatment-recommendation`);
-      }, 400);
-    },
-    onError: (err: any) => {
-      resetGenerationProgress();
-      toast.error(
-        err.response?.data?.message || "Failed to get treatment recommendation",
-      );
-    },
-  });
-
-  const isGeneratingTreatment =
-    treatmentRecommendationMutation.isPending || generationStage !== "idle";
-
-  const generationStageLabel =
-    generationStage === "loading-image"
-      ? "Loading scan image..."
-      : generationStage === "uploading"
-        ? "Sending scan to AI model..."
-        : generationStage === "analyzing"
-          ? "AI is generating treatment recommendations..."
-          : "";
+    navigate(`/scan/analysis/${scanId}/treatment-recommendation`, {
+      state: cacheData,
+    });
+  };
 
   const startReviewMutation = useMutation({
     mutationFn: async () => {
@@ -430,16 +304,11 @@ const ScanDetails = () => {
           <div className="flex flex-wrap items-center gap-3">
             {scan.fileUrl && (
               <button
-                onClick={() => treatmentRecommendationMutation.mutate()}
-                disabled={treatmentRecommendationMutation.isPending}
-                className="flex items-center justify-center gap-2 bg-teal-50 hover:bg-teal-100 dark:bg-teal-900/10 dark:hover:bg-teal-900/20 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-800 px-6 py-4 rounded-2xl font-bold transition-all active:scale-95 cursor-pointer h-fit disabled:opacity-50"
+                onClick={handleGenerateTreatment}
+                className="flex items-center justify-center gap-2 bg-teal-50 hover:bg-teal-100 dark:bg-teal-900/10 dark:hover:bg-teal-900/20 text-teal-700 dark:text-teal-400 border border-teal-200 dark:border-teal-800 px-6 py-4 rounded-2xl font-bold transition-all active:scale-95 cursor-pointer h-fit"
               >
                 <HiOutlineSparkles className="text-xl" />
-                <span>
-                  {treatmentRecommendationMutation.isPending
-                    ? "Generating..."
-                    : "Treatment Recommendations"}
-                </span>
+                <span>Treatment Recommendations</span>
               </button>
             )}
 
@@ -483,35 +352,6 @@ const ScanDetails = () => {
             ) : null}
           </div>
         </div>
-
-        {isGeneratingTreatment && (
-          <div className="mb-8 p-6 bg-(--color-surface) rounded-3xl border border-teal-200 dark:border-teal-800 shadow-sm">
-            <div className="flex items-center justify-between gap-4 mb-3">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-900/20 text-teal-600 flex items-center justify-center">
-                  <HiOutlineSparkles size={20} className="animate-pulse" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-(--color-text)">
-                    Generating Treatment Recommendations
-                  </p>
-                  <p className="text-xs text-(--color-text-light) font-medium">
-                    {generationStageLabel}
-                  </p>
-                </div>
-              </div>
-              <span className="text-sm font-extrabold text-teal-700 dark:text-teal-400">
-                {generationProgress}%
-              </span>
-            </div>
-            <div className="h-3 w-full rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
-              <div
-                className="h-full rounded-full bg-linear-to-r from-teal-500 to-emerald-500 transition-all duration-300 ease-out"
-                style={{ width: `${generationProgress}%` }}
-              />
-            </div>
-          </div>
-        )}
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* Main Content - Image & Findings */}
