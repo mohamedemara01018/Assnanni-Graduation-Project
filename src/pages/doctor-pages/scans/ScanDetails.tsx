@@ -263,7 +263,7 @@ const ScanDetails = () => {
               startAnalyzingProgress();
               return;
             }
-            console.log(response);
+
             const uploadPercent = Math.round((event.loaded / total) * 100);
             setGenerationProgress(35 + Math.round(uploadPercent * 0.35));
 
@@ -275,7 +275,7 @@ const ScanDetails = () => {
           },
         },
       );
-
+      console.log(response);
       return response.data;
     },
     onSuccess: (response) => {
