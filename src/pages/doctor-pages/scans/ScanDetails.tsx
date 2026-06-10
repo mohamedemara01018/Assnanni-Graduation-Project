@@ -249,7 +249,7 @@ const ScanDetails = () => {
       console.log("FormData:", formData);
       const response = await axios.post(
         `${backendUrl}Scans/treatment-recommendation`,
-        formData,
+        { formFIle: file },
         {
           headers: {
             Authorization: `Bearer ${token}`,
