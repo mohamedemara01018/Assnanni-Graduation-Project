@@ -238,7 +238,7 @@ const ScanDetails = () => {
 
       const formData = new FormData();
       formData.append("formFile", file);
-
+      console.log("FormData:", formData);
       setGenerationStage("uploading");
       setGenerationProgress(35);
 
