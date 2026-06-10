@@ -37,7 +37,6 @@ const MedicalHistoryInDoctorDashboard = () => {
         role === "receptionist"
           ? `Receptionist/${id}/medical-history`
           : `Doctors/patient-medical-history/${id}`;
-
       const response = await axios.get(`${backendUrl}${endpoint}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -47,7 +46,7 @@ const MedicalHistoryInDoctorDashboard = () => {
     },
     enabled: !!id && !!token,
   });
-
+  console.log("hhh");
   const uploadAttachmentMutation = useMutation({
     mutationFn: async ({
       recordId,
@@ -120,7 +119,7 @@ const MedicalHistoryInDoctorDashboard = () => {
     },
     null,
   );
-
+  console.log(latestMedicalRecordId);
   const handleDownload = (item: MedicalHistoryItem) => {
     // Simulate downloading the record as a text file
     const content = `Medical Record: ${item.title}\nDoctor: ${
