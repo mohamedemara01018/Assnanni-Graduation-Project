@@ -223,7 +223,7 @@ const ScanDetails = () => {
       setGenerationProgress(12);
 
       const imageUrl = resolveFetchableAssetUrl(scan.fileUrl);
-
+      console.log("Image URL:", imageUrl);
       const imageResponse = await axios.get(imageUrl, {
         responseType: "blob",
       });
