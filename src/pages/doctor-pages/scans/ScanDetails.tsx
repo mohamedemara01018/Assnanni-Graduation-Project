@@ -224,18 +224,22 @@ const ScanDetails = () => {
 
       const imageUrl = resolveFetchableAssetUrl(scan.fileUrl);
       console.log("Image URL:", imageUrl);
-      const imageResponse = await axios.get(imageUrl, {
-        responseType: "blob",
+      const imageArray = await axios.get(imageUrl, {
+        responseType: "arraybuffer", // Use arraybuffer for both Browser and Node.js
       });
+
+      // Convert the ArrayBuffer response into a Blob
+      const imageResponse = new Blob([imageArray.data], { type: "image/jpeg" }); // Match your image type
+
       console.log(imageResponse);
       setGenerationProgress(28);
 
       const extension = scan.fileUrl.split(".").pop()?.split("?")[0] || "jpg";
       console.log(extension);
       const file = new File(
-        [imageResponse.data],
+        [imageResponse],
         `scan-${scan.scanId}.${extension}`,
-        { type: imageResponse.data.type || "image/jpeg" },
+        { type: imageResponse.type || "image/jpeg" },
       );
 
       const formData = new FormData();
