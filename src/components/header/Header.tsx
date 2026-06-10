@@ -6,7 +6,7 @@ import { List, X } from "lucide-react";
 import { useState } from "react";
 import UserComp from "../user-comp/UserComp";
 import type { RootState } from "@/store/store";
-import { useSelector } from 'react-redux'
+import { useSelector } from "react-redux";
 
 function Header() {
   // const [toggle, setToggle] = useState<boolean>(false)
@@ -26,7 +26,11 @@ function Header() {
       <div className=" wrapper   flex items-center justify-between py-4 ">
         <div className="flex items-center gap-7">
           <Link to={"/"} className="flex items-center gap-1">
-            <img src={logo} alt="" className=" h-15" />
+            <img
+              src={logo}
+              alt=""
+              className=" h-15 max-sm:w-30 max-sm:h-10 max-sm:translate-y-2 max-sm:mb-6"
+            />
             {/* <h1 className="text-2xl font-bold">Assnani</h1> */}
           </Link>
 
@@ -40,11 +44,12 @@ function Header() {
                         <NavLink
                           to={link.path}
                           className={({ isActive, isPending }) =>
-                            `px-4 py-2 block rounded-md  hover:bg-(--color-bg-link-hover) font-semibold ${isPending
-                              ? ""
-                              : isActive
-                                ? "bg-(--color-bg-blue) text-(--color-text-blue)"
-                                : "hover:bg-(--color-bg-link-hover)"
+                            `px-4 py-2 block rounded-md  hover:bg-(--color-bg-link-hover) font-semibold ${
+                              isPending
+                                ? ""
+                                : isActive
+                                  ? "bg-(--color-bg-blue) text-(--color-text-blue)"
+                                  : "hover:bg-(--color-bg-link-hover)"
                             }`
                           }
                         >
@@ -74,7 +79,7 @@ function Header() {
 
           <ThemeToggle />
 
-          {!isMobile && role == 'guest' && (
+          {!isMobile && role == "guest" && (
             <div className="flex items-center gap-2">
               <Link
                 to={"/login"}
@@ -90,7 +95,7 @@ function Header() {
               </Link>
             </div>
           )}
-          {role != 'guest' && <UserComp />}
+          {role != "guest" && <UserComp />}
         </div>
 
         {showMobileMenu && isMobile && (
@@ -104,11 +109,12 @@ function Header() {
                         <NavLink
                           to={link.path}
                           className={({ isActive, isPending }) =>
-                            `px-4 py-2 block rounded-md  hover:bg-(--color-bg-link-hover) font-semibold ${isPending
-                              ? ""
-                              : isActive
-                                ? "bg-(--color-bg-blue) text-(--color-text-blue)"
-                                : "hover:bg-(--color-bg-link-hover)"
+                            `px-4 py-2 block rounded-md  hover:bg-(--color-bg-link-hover) font-semibold ${
+                              isPending
+                                ? ""
+                                : isActive
+                                  ? "bg-(--color-bg-blue) text-(--color-text-blue)"
+                                  : "hover:bg-(--color-bg-link-hover)"
                             }`
                           }
                         >
@@ -119,8 +125,11 @@ function Header() {
                   })}
               </ul>
 
-              {role == 'guest' && (
-                <div className="flex flex-col pt-2 gap-2" onClick={() => setMobileMenu(false)}>
+              {role == "guest" && (
+                <div
+                  className="flex flex-col pt-2 gap-2"
+                  onClick={() => setMobileMenu(false)}
+                >
                   <Link
                     to={"/login"}
                     className="text-(--color-primary) hover:bg-black/5 hover:dark:bg-white/15 py-2 px-4 rounded-sm cursor-pointer transform duration-200"

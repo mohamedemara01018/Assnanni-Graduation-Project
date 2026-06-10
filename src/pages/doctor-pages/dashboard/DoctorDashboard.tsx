@@ -169,39 +169,39 @@ const DoctorDashboard = () => {
   return (
     <DashboardLayout pageTitle={"Doctor Dashboard"}>
       <div className=" -mt-6     bg-(--color-bg)  rounded-2xl">
-        <div className="flex justify-between items-center p-6 pb-2">
+        <div className="flex justify-between items-center p-6 pb-2 max-sm:flex-col max-sm:gap-4">
           <div>
-            <h1 className="text-2xl text-(--color-text) font-medium font-sans">
+            <h1 className="text-2xl text-(--color-text) font-medium font-sans max-sm:text-xl">
               Welcome, Dr. {fullName || authName || "Doctor"}!
             </h1>
-            <p className="text-(--color-text-light) font-thin text-sm text-shadow-2xs">
+            <p className="text-(--color-text-light) font-thin text-sm text-shadow-2xs max-sm:text-xs">
               Here's your practice overview for today
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col items-end mr-4">
-              <span className="text-[10px] text-(--color-text-light) font-bold uppercase tracking-widest">
+          <div className="flex items-center gap-3 max-sm:flex-col max-sm:gap-6 max-sm:mb-4">
+            <div className="flex gap-4 justify-center items-center  mr-4">
+              <span className="text-[10px] text-(--color-text-light) font-bold uppercase tracking-widest max-sm:text-sm">
                 Consultation Fee
               </span>
               <span className="text-xl font-black text-blue-600">
                 {isPriceLoading ? "..." : `$${priceData}`}
               </span>
+              <button
+                onClick={() => {
+                  setNewPrice(priceData || 0);
+                  setIsPriceModalOpen(true);
+                }}
+                className="bg-blue-50 text-blue-600 hover:bg-blue-100 p-2 rounded-xl transition-all active:scale-95 cursor-pointer border border-blue-100"
+                title="Update Price"
+              >
+                <Banknote size={20} />
+              </button>
             </div>
             <button
-              onClick={() => {
-                setNewPrice(priceData || 0);
-                setIsPriceModalOpen(true);
-              }}
-              className="bg-blue-50 text-blue-600 hover:bg-blue-100 p-2 rounded-xl transition-all active:scale-95 cursor-pointer border border-blue-100"
-              title="Update Price"
-            >
-              <Banknote size={20} />
-            </button>
-            <button
               onClick={() => setIsAllergyModalOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20 active:scale-95 cursor-pointer font-medium text-sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20 active:scale-95 cursor-pointer font-medium text-sm "
             >
-              <Plus size={18} /> Add Allergy Record
+              <Plus size={18} /> Add discoverd allergy
             </button>
           </div>
         </div>

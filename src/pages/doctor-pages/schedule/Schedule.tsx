@@ -187,7 +187,7 @@ const Schedule = () => {
   };
 
   return (
-    <DashboardLayout pageTitle={"Doctor Weekly Schedule"}>
+    <DashboardLayout pageTitle={"Weekly Schedule"}>
       <div className="flex flex-col gap-6 px-1">
         <div className="flex flex-col gap-1">
           <h1 className="text-2xl font-semibold text-(--color-text)">

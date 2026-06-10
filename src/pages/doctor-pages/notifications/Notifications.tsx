@@ -275,7 +275,7 @@ const Notifications = () => {
 
   return (
     <DashboardLayout pageTitle={"Notifications"}>
-      <div className="p-4 sm:p-10 bg-(--color-bg) min-h-screen">
+      <div className="p-1 sm:p-10 bg-(--color-bg) min-h-screen">
         <div className="max-w-4xl mx-auto">
           <div className="flex justify-between items-center mb-10 pb-6 border-b border-(--color-border)">
             <div className="flex items-center gap-3">
@@ -287,13 +287,13 @@ const Notifications = () => {
               </h1>
               {unreadCount >= 0 && (
                 <span
-                  className={`px-2.5 py-0.5 max-sm:px-1  text-white text-sm font-bold rounded-full animate-in max-sm:text-sm fade-in zoom-in duration-300 ${unreadCount > 0 ? "bg-blue-600" : "bg-gray-400"}`}
+                  className={`px-2.5 py-0.5 max-sm:px-2  text-white text-sm font-bold rounded-full animate-in max-sm:text-sm fade-in zoom-in duration-300 ${unreadCount > 0 ? "bg-blue-600" : "bg-gray-400"}`}
                 >
                   {unreadCount}
                 </span>
               )}
             </div>
-            <div className="flex items-center max-sm:flex-col gap-4 max-sm:gap-1">
+            <div className="flex items-center max-sm:flex-col gap-4 max-sm:gap-2">
               <button
                 onClick={() => markAllAsReadMutation.mutate()}
                 disabled={

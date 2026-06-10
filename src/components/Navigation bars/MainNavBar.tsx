@@ -15,7 +15,7 @@ const MainNavBar = () => {
           <img
             src={logo}
             alt="logo"
-            className="w-15 h-15 max-sm:w-10 max-sm:h-10"
+            className="w-15 h-15 max-sm:w-10 max-sm:h-10 "
           />
           <h1 className="text-3xl max-sm:text-xl font-semibold bg-linear-120 from-[#059d79] to-[#00ABEA] bg-clip-text text-transparent translate-2 max-sm:translate-1">
             Assnanii

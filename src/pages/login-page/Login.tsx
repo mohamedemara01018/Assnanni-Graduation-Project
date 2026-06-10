@@ -30,18 +30,24 @@ function Login() {
           <div className="grid grid-cols-2 gap-3 max-w-sm">
             <div className="rounded-2xl border border-(--color-border) bg-(--color-bg) p-5">
               <Shield className="w-7 h-7 text-(--color-primary) mb-3" />
-              <p className="text-sm font-medium text-(--color-text)">Secure Records</p>
+              <p className="text-sm font-medium text-(--color-text)">
+                Secure Records
+              </p>
             </div>
             <div className="rounded-2xl border border-(--color-border) bg-(--color-bg) p-5">
               <Briefcase className="w-7 h-7 text-emerald-600 dark:text-emerald-400 mb-3" />
-              <p className="text-sm font-medium text-(--color-text)">24/7 Available</p>
+              <p className="text-sm font-medium text-(--color-text)">
+                24/7 Available
+              </p>
             </div>
           </div>
 
           {/* Trust badge */}
           <div className="flex items-center justify-between bg-(--color-primary) rounded-2xl px-6 py-5 max-w-sm">
             <div className="text-white">
-              <p className="text-[10px] uppercase tracking-widest opacity-75 mb-0.5">Trusted by</p>
+              <p className="text-[10px] uppercase tracking-widest opacity-75 mb-0.5">
+                Trusted by
+              </p>
               <p className="text-2xl font-bold">12,000+ Specialists</p>
             </div>
             <Users2 className="w-10 h-10 text-white opacity-75" />
@@ -65,16 +71,22 @@ function Login() {
               >
                 Registration
               </Link>
-              <div className="flex-1 text-center py-2 rounded-lg text-sm font-semibold text-(--color-text) bg-(--color-surface) border border-(--color-border)"
-                style={{ boxShadow: "var(--shadow)" }}>
+              <div
+                className="flex-1 text-center py-2 rounded-lg text-sm font-semibold text-(--color-text) bg-(--color-surface) border border-(--color-border)"
+                style={{ boxShadow: "var(--shadow)" }}
+              >
                 Login
               </div>
             </div>
 
             {/* Heading */}
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-(--color-text) mb-1">Welcome back</h2>
-              <p className="text-sm text-(--color-text-light)">Enter your credentials to access your account</p>
+              <h2 className="text-2xl font-bold text-(--color-text) mb-1">
+                Welcome back
+              </h2>
+              <p className="text-sm text-(--color-text-light)">
+                Enter your credentials to access your account
+              </p>
             </div>
 
             {/* Form — real Redux + react-hook-form logic */}
@@ -83,7 +95,10 @@ function Login() {
             {/* Register link */}
             <p className="mt-6 text-center text-xs text-(--color-text-light)">
               Don't have an account?{" "}
-              <Link to="/register" className="font-semibold text-(--color-primary) hover:text-(--color-primary-light) transition-colors">
+              <Link
+                to="/register"
+                className="font-semibold text-(--color-primary) hover:text-(--color-primary-light) transition-colors"
+              >
                 Create Sanctuary Account
               </Link>
             </p>
@@ -91,7 +106,10 @@ function Login() {
 
           {/* Back home */}
           <div className="text-center">
-            <Link to="/" className="text-xs text-(--color-text-light) hover:text-(--color-text) transition-colors">
+            <Link
+              to="/"
+              className="text-xs text-(--color-text-light) hover:text-(--color-text) transition-colors"
+            >
               ← Back to home
             </Link>
           </div>

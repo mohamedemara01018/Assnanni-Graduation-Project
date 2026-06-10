@@ -64,7 +64,7 @@ const RecentReports = () => {
         </h3>
         <button
           onClick={handleViewAll}
-          className="text-(--color-primary) hover:text-(--color-primary-light) font-semibold text-sm transition-colors cursor-pointer"
+          className="text-(--color-primary) hover:text-(--color-primary-light) font-semibold text-sm transition-colors cursor-pointer max-sm:text-sm"
         >
           View All
         </button>
