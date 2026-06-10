@@ -723,7 +723,7 @@ function UsersPage() {
                             }}
                           >
                             <Shield className="w-3 h-3" />
-                            {user.role.replace("-", " ")}
+                            {user.role?.replace("-", " ") || "N/A"}
                           </span>
                         </td>
 
