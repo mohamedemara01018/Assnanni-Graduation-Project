@@ -77,18 +77,23 @@ export const fetchUserProfile = createAsyncThunk(
         auth: AuthState;
         config: { backendUrl: string };
       };
-      const response = await axios.get(`${state.config.backendUrl}Users/my-profile`, {
-        headers: {
-          Authorization: `Bearer ${state.auth.token}`,
+      const response = await axios.get(
+        `${state.config.backendUrl}Users/my-profile`,
+        {
+          headers: {
+            Authorization: `Bearer ${state.auth.token}`,
+          },
         },
-      });
+      );
       const profile = response.data.data;
       Cookies.set("userProfile", JSON.stringify(profile), {
         expires: state.auth.expiresAt ? new Date(state.auth.expiresAt) : 7,
       });
       return profile;
     } catch (error: any) {
-      return rejectWithValue(error.response?.data?.message || "Failed to fetch profile");
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch profile",
+      );
     }
   },
 );
@@ -173,14 +178,15 @@ const authSlice = createSlice({
         state.fullName = null;
         state.email = null;
         state.expiresAt = null;
+
+        Cookies.remove("_stripe_mid");
+        Cookies.remove("_stripe_sid");
+        Cookies.remove("cid");
+        Cookies.remove("docs.prefs");
+        Cookies.remove("machine_identifier");
+        Cookies.remove("private_machine_identifier");
+        Cookies.remove("recent-views");
         clearAllCookies();
-        Cookies.remove('_stripe_mid');
-        Cookies.remove('_stripe_sid');
-        Cookies.remove('cid');
-        Cookies.remove('docs.prefs');
-        Cookies.remove('machine_identifier');
-        Cookies.remove('private_machine_identifier');
-        Cookies.remove('recent-views');
       }
     },
     logout: (state) => {
@@ -194,13 +200,13 @@ const authSlice = createSlice({
       state.profileImageUrl = null;
       state.expiresAt = null;
       clearAllCookies();
-      Cookies.remove('_stripe_mid');
-      Cookies.remove('_stripe_sid');
-      Cookies.remove('cid');
-      Cookies.remove('docs.prefs');
-      Cookies.remove('machine_identifier');
-      Cookies.remove('private_machine_identifier');
-      Cookies.remove('recent-views');
+      Cookies.remove("_stripe_mid");
+      Cookies.remove("_stripe_sid");
+      Cookies.remove("cid");
+      Cookies.remove("docs.prefs");
+      Cookies.remove("machine_identifier");
+      Cookies.remove("private_machine_identifier");
+      Cookies.remove("recent-views");
     },
   },
   extraReducers: (builder) => {

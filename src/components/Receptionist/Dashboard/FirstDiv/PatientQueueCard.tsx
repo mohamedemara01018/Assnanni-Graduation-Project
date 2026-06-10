@@ -23,10 +23,12 @@ const PatientQueueCard = ({
 }: Props) => {
   const { id, name, doctorName, arrivalTime, status } = patient;
   const initials = name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase();
+    ? name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+    : "N/A";
 
   const statusStyles = {
     Waiting: "bg-yellow-50 text-yellow-600 border-yellow-100",
