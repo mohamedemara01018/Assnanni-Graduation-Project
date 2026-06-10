@@ -236,9 +236,13 @@ const ScanDetails = () => {
         { type: imageResponse.data.type || "image/jpeg" },
       );
 
+      if (!file || file.size === 0) {
+        throw new Error("Failed to create file from scan image");
+      }
+
       const formData = new FormData();
       formData.append("formFile", file);
-      console.log("FormData:", formData);
+      console.log("FormData file:", file.name, file.size, file.type);
       setGenerationStage("uploading");
       setGenerationProgress(35);
 
