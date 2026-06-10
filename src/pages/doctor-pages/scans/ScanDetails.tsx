@@ -246,7 +246,7 @@ const ScanDetails = () => {
       console.log("FormData file:", file.name, file.size, file.type);
       setGenerationStage("uploading");
       setGenerationProgress(35);
-
+      console.log("FormData:", formData);
       const response = await axios.post(
         `${backendUrl}Scans/treatment-recommendation`,
         formData,
