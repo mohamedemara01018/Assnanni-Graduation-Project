@@ -359,12 +359,6 @@ const ScanDetails = () => {
   const canShowReview = isCompletedStatus || hasSubmittedReview;
 
   useEffect(() => {
-    if (scanReviewQuery.isSuccess && isViewReviewOpen) {
-      toast.success("Review loaded successfully");
-    }
-  }, [isViewReviewOpen, scanReviewQuery.isSuccess]);
-
-  useEffect(() => {
     if (scanReviewQuery.isError && isViewReviewOpen) {
       toast.error("Failed to load review details");
     }

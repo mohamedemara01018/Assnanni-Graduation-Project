@@ -32,12 +32,12 @@ export const treatmentRecommendationQueryKey = (scanId?: string) =>
   ["TreatmentRecommendation", scanId] as const;
 
 const formatClassName = (key: string) =>
-  key
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+  key?.replace(/_/g, " ")?.replace(/\b\w/g, (char) => char.toUpperCase()) ||
+  key ||
+  "";
 
 const injectPatientNameIntoReport = (report: string, patientName?: string) => {
-  if (!patientName) return report;
+  if (!patientName || !report) return report;
   return report.replace(/\[Patient Name[^\]]*\]/gi, patientName);
 };
 
@@ -151,36 +151,36 @@ const TreatmentRecommendation = () => {
               <span>Print Report</span>
             </button>
 
-          {state && (
-            <>
-              <div className="flex items-center gap-3 px-5 py-3 bg-(--color-surface) border border-(--color-border) rounded-2xl print:hidden">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center border border-blue-100">
-                  <LuUser size={18} />
+            {state && (
+              <>
+                <div className="flex items-center gap-3 px-5 py-3 bg-(--color-surface) border border-(--color-border) rounded-2xl print:hidden">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center border border-blue-100">
+                    <LuUser size={18} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-(--color-text-light) uppercase tracking-wider">
+                      Patient
+                    </p>
+                    <p className="text-sm font-bold text-(--color-text)">
+                      {state.patientName}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[10px] font-bold text-(--color-text-light) uppercase tracking-wider">
-                    Patient
-                  </p>
-                  <p className="text-sm font-bold text-(--color-text)">
-                    {state.patientName}
-                  </p>
+                <div className="flex items-center gap-3 px-5 py-3 bg-(--color-surface) border border-(--color-border) rounded-2xl print:hidden">
+                  <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center border border-orange-100">
+                    <LuScanLine size={18} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-(--color-text-light) uppercase tracking-wider">
+                      Scan ID
+                    </p>
+                    <p className="text-sm font-bold text-(--color-text)">
+                      #{state.scanId}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-3 px-5 py-3 bg-(--color-surface) border border-(--color-border) rounded-2xl print:hidden">
-                <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center border border-orange-100">
-                  <LuScanLine size={18} />
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold text-(--color-text-light) uppercase tracking-wider">
-                    Scan ID
-                  </p>
-                  <p className="text-sm font-bold text-(--color-text)">
-                    #{state.scanId}
-                  </p>
-                </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
           </div>
         </div>
 

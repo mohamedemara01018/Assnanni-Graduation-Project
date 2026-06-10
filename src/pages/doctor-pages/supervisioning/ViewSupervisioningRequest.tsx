@@ -190,7 +190,7 @@ const ViewSupervisioningRequest = () => {
                         src={
                           student.proofImageUrl.startsWith("http")
                             ? student.proofImageUrl
-                            : backendUrl.replace("/api/", "/") +
+                            : backendUrl?.replace("/api/", "/") +
                               student.proofImageUrl
                         }
                         alt="Dental university proof"

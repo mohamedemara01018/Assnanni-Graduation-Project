@@ -156,10 +156,6 @@ const Schedule = () => {
   });
 
   useEffect(() => {
-    if (isWeeklyScheduleSuccess) {
-      toast.success("Weekly schedule loaded");
-    }
-
     if (isWeeklyScheduleError) {
       console.error("Failed to fetch weekly schedule:", weeklyScheduleError);
       toast.error(

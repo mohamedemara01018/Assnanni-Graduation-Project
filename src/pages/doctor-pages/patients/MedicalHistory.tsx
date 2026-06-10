@@ -127,7 +127,7 @@ const MedicalHistoryInDoctorDashboard = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${item.title.replace(/\s+/g, "_")}_Record.txt`;
+    link.download = `${item.title?.replace(/\s+/g, "_") || "record"}_Record.txt`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
