@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "@/store/store";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import { Pill, Calendar, Download, User } from "lucide-react";
+import { Calendar, Download, User } from "lucide-react";
 import { Link } from "react-router";
 
 import {
@@ -252,25 +252,19 @@ function PrescriptionCard({ prescription }: { prescription: Prescription }) {
                         <img
                             src={prescription.doctorImage}
                             alt={prescription.doctorName}
-                            className="w-12 h-12 rounded-xl object-cover shrink-0"
+                            className="w-12 h-12 rounded-full object-cover shrink-0"
                             style={{ border: "1.5px solid var(--color-border)" }}
                             onError={(e) => {
                                 (e.currentTarget as HTMLImageElement).style.display = "none";
                             }}
                         />
                     ) : (
-                        <div
-                            className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                            style={{
-                                backgroundColor: "rgba(22,163,74,0.1)",
-                                border: "1.5px solid rgba(22,163,74,0.2)",
-                            }}
-                        >
-                            <Pill className="w-5 h-5" style={{ color: "var(--color-success)" }} />
+                        <div className="w-12 h-12 rounded-full bg-(--color-bg-blue) border border-primary/20 flex items-center justify-center">
+                            <User className="w-6 h-6 text-(--color-primary)" />
                         </div>
                     )}
 
-                    <div className="space-y-1">
+                    <div className="space-  y-1">
                         <h3
                             className="text-base font-semibold"
                             style={{ color: "var(--color-text)" }}

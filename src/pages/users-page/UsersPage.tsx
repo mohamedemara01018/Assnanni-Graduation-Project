@@ -37,8 +37,8 @@ import { toast } from "react-toastify";
 import Pagination from "@/components/pagination/Pagination";
 import { fetchToggleUserStatus, resetToggleStatusState, selectToggleStatusState } from "@/store/slices/admin-slice/toggle-status-users-slice/toggleStatusUsersSlice";
 
-type UserRole = "" | "Doctor" | "Patient" | "Receptionist" | "Student" | "Admin";
-type UserGender = "" | "male" | "female";
+type UserRole = "" | "Doctor" | "Patient" | "Receptionist" | "Studentdoctor" | "Admin";
+type UserGender = "" | "Male" | "Female";
 
 // ─── Role config ──────────────────────────────────────────────────────────────
 
@@ -86,7 +86,6 @@ function UserDetailModal({
   onToggleStatus: () => void;
   toggling: boolean;
 }) {
-  const initials = user.fullName.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase();
   const roleStyle = getRoleStyle(user.role);
 
   return (
@@ -113,22 +112,9 @@ function UserDetailModal({
         >
           <div className="flex items-center gap-3">
             <div className="relative shrink-0">
-              {user.imageUrl ? (
-                <img
-                  src={user.imageUrl}
-                  alt={user.fullName}
-                  className="w-12 h-12 rounded-xl object-cover"
-                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-                />
-              ) : (
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg"
-                  style={{ background: "linear-gradient(135deg, var(--color-primary), var(--color-primary-light))" }}
-                >
-                  {initials}
-                </div>
-              )}
-              {/* Online dot */}
+              <div className="w-12 h-12">
+                <UserAvatar src={user.imageUrl} alt={user.fullName} />
+              </div>
               <span
                 className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2"
                 style={{
@@ -271,11 +257,12 @@ function UsersPage() {
     dispatch(fetchAdminUsers({
       SearchTerm: searchQuery,
       Role: filterRole,
-      gender: filterGender,
+      Gender: filterGender,
       PageNumber: pageNumber,
       PageSize: pageSize,
     }));
   }, [dispatch, searchQuery, filterRole, filterGender, pageNumber, pageSize]);
+  console.log(usersData)
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setPageNumber(1); }, [searchQuery, filterRole, filterGender]);
@@ -289,7 +276,7 @@ function UsersPage() {
       dispatch(fetchAdminUsers({
         SearchTerm: searchQuery,
         Role: filterRole,
-        gender: filterGender,
+        Gender: filterGender,
         PageNumber: pageNumber,
         PageSize: pageSize,
       }));
@@ -383,7 +370,7 @@ function UsersPage() {
                     { value: "", label: "All Roles" },
                     { value: "Patient", label: "Patient" },
                     { value: "Doctor", label: "Doctor" },
-                    { value: "Student", label: "Student Doctor" },
+                    { value: "Studentdoctor", label: "Student Doctor" },
                     { value: "Receptionist", label: "Receptionist" },
                     { value: "Admin", label: "Admin" },
                   ],

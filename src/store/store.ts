@@ -31,6 +31,7 @@ import rejectedDoctorsReducer from './slices/admin-slice/rejected-doctors-slice/
 import verifiedDoctorsReducer from './slices/admin-slice/verified-doctors-slice/verifiedDoctorSlice';
 import toggleStatusUsersReducer from './slices/admin-slice/toggle-status-users-slice/toggleStatusUsersSlice';
 import createPaymentReducer from './slices/patient-slice/create-payment-slice/createPaymentSlice';
+import adminDashboardReducer from './slices/admin-slice/admin-dashboard-slice/adminDashboardSlice'
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -38,6 +39,7 @@ export const store = configureStore({
     config: configReducer,
 
     // admin dashboard
+    adminDashboardSlice: adminDashboardReducer,
     summarySlice: summaryReducer,
     usersSlice: usersReducer,
     pendingDoctorsSlice: pendingDoctorReducer,
