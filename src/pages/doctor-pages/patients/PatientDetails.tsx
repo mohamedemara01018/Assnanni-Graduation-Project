@@ -241,7 +241,9 @@ const PatientDetails = () => {
                 <DetailItem
                   icon={<IoWaterOutline />}
                   label="Blood Type"
-                  value={patient.personalInfo.bloodType.replace("_", " ")}
+                  value={
+                    patient.personalInfo.bloodType?.replace("_", " ") || "N/A"
+                  }
                 />
 
                 {/* Emergency Contact section removed or kept if available in real data */}
