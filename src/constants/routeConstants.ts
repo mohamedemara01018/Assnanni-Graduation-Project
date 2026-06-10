@@ -32,6 +32,7 @@ export const roleRoutePaths = {
     "doctor/student-record-approvals",
     "doctor-appointments-dashboard",
     "appointments/doctor-appointments/:id",
+    "doctor/student-prescriptions-approval",
   ],
   studentDoctor: [
     "/student-doctor",

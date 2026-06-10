@@ -21,6 +21,7 @@ import ManageSupervisioning from "../pages/doctor-pages/supervisioning/ManageSup
 import ViewSupervisioningRequest from "../pages/doctor-pages/supervisioning/ViewSupervisioningRequest";
 import AssignStudentDoctor from "../pages/doctor-pages/supervisioning/AssignStudentDoctor";
 import StudentRecordApprovals from "../pages/doctor-pages/supervisioning/StudentRecordApprovals";
+import StudentPrescriptionsApprovalPage from "../pages/doctor-pages/student-prescriptions-approval/StudentPrescriptionsApprovalPage";
 import MedicalReportForm from "../components/Doctor/Reports/MedicalReportForm";
 import ReceptionistAccess from "../components/Doctor/ReceptionistAccess/ReceptionistAccess";
 import AddReceptionist from "../components/Doctor/ReceptionistAccess/AddReceptionist";
@@ -156,6 +157,7 @@ export const routeElements = {
   "doctor-learning-sessions/create": <CreateLearningSession />,
   "doctor-learning-sessions/:id": <SessionDetails />,
   "doctor/student-record-approvals": <StudentRecordApprovals />,
+  "doctor/student-prescriptions-approval": <StudentPrescriptionsApprovalPage />,
 
   // Student Doctor routes
   "/student-doctor": <StudentDoctorDashboard />,
