@@ -97,7 +97,7 @@ const ReceptionistAccess = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-receptionists"] });
-      toast.success("Shift updated successfully");
+
       setIsShiftModalOpen(false);
     },
     onError: (err: any) => {
@@ -152,12 +152,14 @@ const ReceptionistAccess = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-receptionists"] });
-      toast.success("Shift change rejected");
+
       setIsRejectModalOpen(false);
       setRejectionReason("");
     },
     onError: (err: any) => {
-      toast.error(err.response?.data?.message || "Failed to reject shift change");
+      toast.error(
+        err.response?.data?.message || "Failed to reject shift change",
+      );
     },
   });
 
@@ -555,7 +557,9 @@ const ReceptionistAccess = () => {
                   disabled={rejectShiftMutation.isPending}
                   className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-red-500/20 active:scale-95 cursor-pointer"
                 >
-                  {rejectShiftMutation.isPending ? "Rejecting..." : "Confirm Rejection"}
+                  {rejectShiftMutation.isPending
+                    ? "Rejecting..."
+                    : "Confirm Rejection"}
                 </button>
               </div>
             </form>

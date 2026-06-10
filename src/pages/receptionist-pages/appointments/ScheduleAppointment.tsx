@@ -107,7 +107,6 @@ const ScheduleAppointment = () => {
         },
       );
 
-      toast.success("Appointment scheduled successfully");
       reset(appointmentFormData);
       navigate("/");
     } catch (error) {

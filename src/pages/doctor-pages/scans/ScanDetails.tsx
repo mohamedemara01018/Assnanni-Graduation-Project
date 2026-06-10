@@ -199,7 +199,6 @@ const ScanDetails = () => {
       );
     },
     onSuccess: () => {
-      toast.success("Review submitted successfully");
       setHasSubmittedReview(true);
       setIsReviewModalOpen(false);
       resetReview();
@@ -230,8 +229,7 @@ const ScanDetails = () => {
 
       setGenerationProgress(28);
 
-      const extension =
-        scan.fileUrl.split(".").pop()?.split("?")[0] || "jpg";
+      const extension = scan.fileUrl.split(".").pop()?.split("?")[0] || "jpg";
       const file = new File(
         [imageResponse.data],
         `scan-${scan.scanId}.${extension}`,
@@ -299,8 +297,6 @@ const ScanDetails = () => {
         cacheData,
       );
 
-      toast.success("Treatment recommendation generated successfully");
-
       window.setTimeout(() => {
         resetGenerationProgress();
         navigate(`/scan/analysis/${scanId}/treatment-recommendation`);
@@ -309,8 +305,7 @@ const ScanDetails = () => {
     onError: (err: any) => {
       resetGenerationProgress();
       toast.error(
-        err.response?.data?.message ||
-          "Failed to get treatment recommendation",
+        err.response?.data?.message || "Failed to get treatment recommendation",
       );
     },
   });
@@ -338,7 +333,6 @@ const ScanDetails = () => {
       );
     },
     onSuccess: () => {
-      toast.success("Review session started");
       queryClient.invalidateQueries({ queryKey: ["ScanDetails", scanId] });
     },
     onError: (err: any) => {
@@ -542,7 +536,6 @@ const ScanDetails = () => {
                   onClick={() => setIsImageViewerOpen(true)}
                   className="max-h-[500px] rounded-2xl shadow-2xl object-contain border-4 border-white dark:border-gray-800 cursor-zoom-in"
                 />
-                
               </div>
             </div>
 

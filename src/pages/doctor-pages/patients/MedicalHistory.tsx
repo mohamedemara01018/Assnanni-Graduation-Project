@@ -69,7 +69,6 @@ const MedicalHistoryInDoctorDashboard = () => {
       );
     },
     onSuccess: () => {
-      toast.success("Attachment uploaded successfully");
       queryClient.invalidateQueries({
         queryKey: ["PatientMedicalHistory", id],
       });
@@ -92,9 +91,6 @@ const MedicalHistoryInDoctorDashboard = () => {
   };
 
   useEffect(() => {
-    if (isSuccess && data?.succeeded) {
-      toast.success(data?.message || "Medical history loaded successfully");
-    }
     if (isError) {
       console.error("Error fetching medical history:", error);
       toast.error(

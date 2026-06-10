@@ -91,7 +91,6 @@ const DoctorDashboard = () => {
       });
     },
     onSuccess: () => {
-      toast.success("Allergy record added successfully");
       setIsAllergyModalOpen(false);
       reset();
     },
@@ -139,7 +138,6 @@ const DoctorDashboard = () => {
       );
     },
     onSuccess: () => {
-      toast.success("Consultation price updated successfully");
       setIsPriceModalOpen(false);
       refetchPrice();
     },

@@ -178,10 +178,6 @@ const AllAppointments = () => {
           "Failed to load appointments",
       );
     }
-
-    if (isSuccess && response?.message) {
-      toast.success(response.message);
-    }
   }, [isError, error, isSuccess, response?.message]);
 
   const totalCount = dashboard?.appointments?.totalCount ?? 0;
@@ -414,9 +410,6 @@ const AllAppointments = () => {
                                     },
                                   );
 
-                                  toast.success(
-                                    "Appointment confirmed successfully",
-                                  );
                                   queryClient.invalidateQueries({
                                     queryKey: ["doctor-appointments-dashboard"],
                                   });

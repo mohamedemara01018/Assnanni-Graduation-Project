@@ -97,7 +97,6 @@ const AddPrescriptionPage = () => {
       );
     },
     onSuccess: () => {
-      toast.success("Prescription added successfully");
       navigate("/student-doctor");
     },
     onError: (error: any) => {

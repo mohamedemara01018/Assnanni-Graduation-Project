@@ -61,9 +61,6 @@ const FirstDiv = () => {
     : dummyPatients;
 
   useEffect(() => {
-    if (isSuccess && data) {
-      toast.success("Dashboard details loaded");
-    }
     if (isError) {
       console.error("Error fetching data for FirstDiv:", error);
       toast.error(error.message || "Failed to load dashboard details");

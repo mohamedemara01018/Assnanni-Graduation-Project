@@ -84,10 +84,6 @@ const ProfileSettings = () => {
       );
     },
     onSuccess: (response, variables) => {
-      const message = getResponseMessage(
-        response.data,
-        "Profile updated successfully.",
-      );
       const updatedProfile = normalizeMyProfile(getResponseData(response.data));
 
       queryClient.setQueryData<MyProfile>(
@@ -98,7 +94,6 @@ const ProfileSettings = () => {
           phoneNumber: updatedProfile.phoneNumber || variables.phoneNumber,
         }),
       );
-      toast.success(message);
     },
     onError: (error: unknown) => {
       const message = axios.isAxiosError(error)

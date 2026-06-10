@@ -279,7 +279,6 @@ const AddNewSlotPanel = () => {
       });
     },
     onSuccess: () => {
-      toast.success("New slot added successfully!");
       queryClient.invalidateQueries({ queryKey: ["DoctorSchedules"] });
       reset();
     },

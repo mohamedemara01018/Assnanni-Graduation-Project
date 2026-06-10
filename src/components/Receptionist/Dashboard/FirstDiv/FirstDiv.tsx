@@ -173,7 +173,6 @@ const FirstDiv = () => {
       );
     },
     onSuccess: () => {
-      toast.success("Patient added to queue successfully");
       setIsQueueModalOpen(false);
       setSelectedAppointmentId(null);
       queryClient.invalidateQueries({
@@ -199,7 +198,6 @@ const FirstDiv = () => {
       await axios.patch(`${backendUrl}Receptionist/${id}/confirm`, {}, config);
     },
     onSuccess: () => {
-      toast.success("Appointment confirmed successfully");
       queryClient.invalidateQueries({
         queryKey: ["ReceptionistDashboardFirstDiv"],
       });
@@ -258,10 +256,6 @@ const FirstDiv = () => {
   ).length;
 
   useEffect(() => {
-    if (isSuccess) {
-      toast.success("Receptionist dashboard details loaded");
-    }
-
     if (isError) {
       console.error("Failed to fetch receptionist dashboard details:", error);
       toast.error(error.message || "Failed to load receptionist dashboard");

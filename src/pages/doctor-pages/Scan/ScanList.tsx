@@ -36,7 +36,13 @@ const ScanList = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [priorityFilter, setPriorityFilter] = useState("all");
 
-  const { data: responseBody, isLoading, isError, error, isSuccess } = useQuery({
+  const {
+    data: responseBody,
+    isLoading,
+    isError,
+    error,
+    isSuccess,
+  } = useQuery({
     queryKey: ["MyScans"],
     queryFn: async () => {
       const response = await axios.get(`${backendUrl}Scans/my-scans`, {
@@ -50,17 +56,15 @@ const ScanList = () => {
   });
 
   // Handle toast notifications on query fetch
-  useEffect(() => {
-    if (isSuccess && responseBody) {
-      toast.success(responseBody.message || "Medical scans loaded successfully");
-    }
-  }, [isSuccess, responseBody]);
+  useEffect(() => {}, [isSuccess, responseBody]);
 
   useEffect(() => {
     if (isError && error) {
       const err = error as any;
       toast.error(
-        err.response?.data?.message || err.message || "Failed to load medical scans"
+        err.response?.data?.message ||
+          err.message ||
+          "Failed to load medical scans",
       );
     }
   }, [isError, error]);
@@ -228,7 +232,9 @@ const ScanList = () => {
                     </span>
                   </div>
                   <div className="flex justify-between text-xs font-semibold">
-                    <span className="text-(--color-text-light)">AI Status:</span>
+                    <span className="text-(--color-text-light)">
+                      AI Status:
+                    </span>
                     <span className="text-indigo-600 dark:text-indigo-400">
                       {scan.aiStatus}
                     </span>
@@ -273,13 +279,17 @@ const ScanList = () => {
       ) : (
         <div className="bg-(--color-surface) rounded-3xl border-2 border-dashed border-(--color-border) p-16 flex flex-col items-center text-center shadow-sm">
           <div className="w-20 h-20 bg-gray-50 dark:bg-gray-800/50 rounded-full flex items-center justify-center mb-6">
-            <BsFileEarmarkMedical size={40} className="text-(--color-text-light) opacity-25" />
+            <BsFileEarmarkMedical
+              size={40}
+              className="text-(--color-text-light) opacity-25"
+            />
           </div>
           <h2 className="text-xl font-bold text-(--color-text) mb-2">
             No Scans Found
           </h2>
           <p className="text-sm text-(--color-text-light) max-w-sm leading-relaxed">
-            There are no scan documents matching your query. Click upload to register a new one!
+            There are no scan documents matching your query. Click upload to
+            register a new one!
           </p>
         </div>
       )}

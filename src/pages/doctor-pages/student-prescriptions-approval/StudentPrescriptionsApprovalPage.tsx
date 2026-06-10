@@ -101,7 +101,6 @@ function StudentPrescriptionsApprovalPage() {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("Prescription approved successfully");
       queryClient.invalidateQueries({
         queryKey: ["student-prescriptions-approval"],
       });
@@ -127,7 +126,6 @@ function StudentPrescriptionsApprovalPage() {
       return response.data;
     },
     onSuccess: () => {
-      toast.success("Prescription rejected successfully");
       queryClient.invalidateQueries({
         queryKey: ["student-prescriptions-approval"],
       });

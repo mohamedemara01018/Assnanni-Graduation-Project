@@ -101,7 +101,6 @@ const ReceptionistDashboard = () => {
       );
     },
     onSuccess: () => {
-      toast.success("Shift change request submitted successfully");
       setIsModalOpen(false);
     },
     onError: (err: any) => {

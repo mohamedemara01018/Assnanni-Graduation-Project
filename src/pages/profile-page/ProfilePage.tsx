@@ -80,7 +80,7 @@ const ProfilePage = () => {
     },
     onSuccess: async () => {
       await dispatch(fetchUserProfile());
-      toast.success("Profile image updated successfully");
+
       queryClient.invalidateQueries({ queryKey: ["my-profile"] });
     },
     onError: () => {
@@ -97,7 +97,7 @@ const ProfilePage = () => {
     },
     onSuccess: async () => {
       await dispatch(fetchUserProfile());
-      toast.success("Profile image deleted successfully");
+
       queryClient.invalidateQueries({ queryKey: ["my-profile"] });
     },
     onError: () => {
