@@ -258,19 +258,23 @@ const StudentAppointmentDetails = () => {
           )}
 
           {/* Receptionist Actions */}
-          {role === "receptionist" && (
-            <div className="flex gap-4 mt-12 pt-10 border-t border-(--color-border)">
-              <NavLink
-                to={`/receptionist/reschedule/${appointment.id}`}
-                className="flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-sm hover:shadow-md active:scale-[0.98] text-center"
-              >
-                Reschedule
-              </NavLink>
-              <button className="flex-1 py-3 px-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.98]">
-                Cancel Appointment
-              </button>
-            </div>
-          )}
+          {role === "receptionist" &&
+            appointment.status !== "Cancelled" &&
+            appointment.status !== "Completed" && (
+              <div className="flex gap-4 mt-12 pt-10 border-t border-(--color-border)">
+                {appointment.status !== "Rescheduled" && (
+                  <NavLink
+                    to={`/receptionist/reschedule/${appointment.id}`}
+                    className="flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-sm hover:shadow-md active:scale-[0.98] text-center"
+                  >
+                    Reschedule
+                  </NavLink>
+                )}
+                <button className="flex-1 py-3 px-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.98]">
+                  Cancel Appointment
+                </button>
+              </div>
+            )}
         </div>
       </div>
     </DashboardLayout>
