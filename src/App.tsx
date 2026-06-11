@@ -52,6 +52,7 @@ import {
   routeElements,
 } from "./constants/appConstants";
 import { logout } from "./store/slices/auth/authSlice";
+import WaitingPage from "./pages/waiting-page/WaitingPage";
 // (Removed unused imports that caused TS6133 build failures)
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -84,11 +85,13 @@ function useEmailVerificationRedirect() {
   }, [pathname, navigate]);
 }
 
+
 function useSessionExpiry(token: string | null, expiresAt: number | null) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log(token)
     if (!token || !expiresAt) return;
 
     const timeUntilExpiry = expiresAt - Date.now();
@@ -124,14 +127,16 @@ function useSessionExpiry(token: string | null, expiresAt: number | null) {
   }, [dispatch, expiresAt, navigate, token]);
 }
 
+
 // ─── Route Groups ─────────────────────────────────────────────────────────────
 
 function PublicRoutes({ role }: { role: string }) {
+  console.log(role)
   return (
     <Route element={<PublicLayout />}>
       <Route path="/" element={<Landing />} />
 
-      {role === "guest" && <Route path="/login" element={<Login />} />}
+      {(role === "guest" || role == 'doctor_pendingapproval') && <Route path="/login" element={<Login />} />}
 
       <Route path="/register">
         <Route index element={<RoleSelection />} />
@@ -147,6 +152,9 @@ function PublicRoutes({ role }: { role: string }) {
           )}
         </Route>
       </Route>
+
+      <Route path="/waiting" element={<WaitingPage />} />
+
 
       <Route path="/verify-email" element={<VerifyEmailPage />} />
       <Route path="/verify-doctor" element={<VerifyDoctorPage />} />
@@ -240,10 +248,13 @@ const App = () => {
     (state: { auth: AuthState }) => state.auth,
   );
 
+
   useEmailVerificationRedirect();
   useSessionExpiry(token, expiresAt);
 
   const homePage = homePageByRole[role as keyof typeof homePageByRole];
+
+  console.log(role)
 
   return (
     <div className="min-h-screen w-full flex flex-col">

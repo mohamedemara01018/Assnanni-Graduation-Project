@@ -37,17 +37,10 @@ import {
 import type { AppDispatch } from "@/store/store";
 import Error from "@/components/error/Error";
 import { ScaleLoader } from "react-spinners";
-import {
-  fetchApprovePendingDoctor,
-  selectApprovePendingDoctor,
-  type ApprovePendingDoctorState,
-} from "@/store/slices/admin-slice/approve-pending-doctor-slice/approvePendingDoctorSlice";
 import { toast } from "react-toastify";
-import {
-  fetchRejectPendingDoctor,
-  selectRejectPendingDoctor,
-  type RejectPendingDoctorState,
-} from "@/store/slices/admin-slice/reject-pending-doctor-slice/rejectPendingDoctorSlice";
+import { selectVerifyDoctorState, verifyDoctorAccount, type VerifyDoctorState } from "@/store/slices/admin-slice/verify-doctor-account-slice/verifyDoctorAccountSlice";
+import { rejectDoctorAccount, selectRejectDoctorState, type RejectDoctorState } from "@/store/slices/admin-slice/reject-doctor-account-slice/rejectDoctorAccountSlice";
+
 
 // ─── Info Row (used in modal) ─────────────────────────────────────────────────
 
@@ -121,11 +114,11 @@ function DetailModal({
 }) {
   const doctorInitials = doctor.fullName
     ? doctor.fullName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase()
     : "";
 
   return (
@@ -414,15 +407,19 @@ export default function VerifyDoctorsPage() {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
 
+  // Core pending list state
   const { doctors, error, loading } = useSelector(
     selectSearchPendingDoctor,
   ) as SearchPendingDoctorState;
-  const approvedDoctor = useSelector(
-    selectApprovePendingDoctor,
-  ) as ApprovePendingDoctorState;
-  const rejectedDoctor = useSelector(
-    selectRejectPendingDoctor,
-  ) as RejectPendingDoctorState;
+
+  // Flattened structural states matching your updated slices
+  const verifyDoctorState = useSelector(
+    selectVerifyDoctorState,
+  ) as VerifyDoctorState;
+
+  const rejectDoctorState = useSelector(
+    selectRejectDoctorState,
+  ) as RejectDoctorState;
 
   useEffect(() => {
     dispatch(
@@ -443,13 +440,15 @@ export default function VerifyDoctorsPage() {
       }),
     );
 
-  const handleConfirmApprove = async (doctorId: string, note: string) => {
+  const handleConfirmApprove = async (doctorId: string) => {
     setSelectButton(doctorId);
     try {
-      const res = await dispatch(
-        fetchApprovePendingDoctor({ note, id: doctorId }),
+      // Corrected parameter signature to match verifyDoctorAccount slice (POST /api/Admin/verify-doctor/{doctorId})
+      await dispatch(
+        verifyDoctorAccount(Number(doctorId)),
       ).unwrap();
-      toast.success(res.message || "Doctor approved successfully");
+
+      toast.success("Doctor approved successfully");
       refetch();
       setShowDetailModal(false);
       setShowApproveModal(false);
@@ -464,10 +463,12 @@ export default function VerifyDoctorsPage() {
   const handleConfirmReject = async (doctorId: string, reason: string) => {
     setSelectButton(doctorId);
     try {
-      const res = await dispatch(
-        fetchRejectPendingDoctor({ reason, id: doctorId }),
+      // Bound correctly to match your payload template for rejectDoctorAccount (POST /api/Admin/reject-doctor/{doctorId})
+      await dispatch(
+        rejectDoctorAccount({ reason, doctorId: Number(doctorId) }),
       ).unwrap();
-      toast.success(res.message || "Doctor rejected successfully");
+
+      toast.success("Doctor rejected successfully");
       refetch();
       setShowDetailModal(false);
       setShowRejectModal(false);
@@ -650,7 +651,7 @@ export default function VerifyDoctorsPage() {
                       className="p-2 rounded-lg flex items-center gap-1.5 text-xs font-medium text-white transition-opacity hover:opacity-85 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-transform duration-100"
                       style={{ backgroundColor: "var(--color-success)" }}
                     >
-                      {isThisLoading && approvedDoctor.loading ? (
+                      {isThisLoading && verifyDoctorState.loading ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
                         <CheckCircle className="w-4 h-4" />
@@ -666,7 +667,7 @@ export default function VerifyDoctorsPage() {
                       className="p-2 rounded-lg flex items-center gap-1.5 text-xs font-medium text-white transition-opacity hover:opacity-85 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98] transition-transform duration-100"
                       style={{ backgroundColor: "#dc2626" }}
                     >
-                      {isThisLoading && rejectedDoctor.loading ? (
+                      {isThisLoading && rejectDoctorState.loading ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
                         <XCircle className="w-4 h-4" />
@@ -784,12 +785,12 @@ export default function VerifyDoctorsPage() {
             setShowApproveModal(false);
             setTargetDoctor(null);
           }}
-          onConfirm={(note) =>
-            handleConfirmApprove(targetDoctor.doctorId, note)
+          onConfirm={() =>
+            handleConfirmApprove(targetDoctor.doctorId)
           }
           doctor={targetDoctor}
           submitting={
-            selectButton === targetDoctor.doctorId && approvedDoctor.loading
+            selectButton === targetDoctor.doctorId && verifyDoctorState.loading
           }
         />
       )}
@@ -807,7 +808,7 @@ export default function VerifyDoctorsPage() {
           }
           doctor={targetDoctor}
           submitting={
-            selectButton === targetDoctor.doctorId && rejectedDoctor.loading
+            selectButton === targetDoctor.doctorId && rejectDoctorState.loading
           }
         />
       )}
@@ -836,11 +837,11 @@ function ApproveDoctorModal({
 
   const doctorInitials = doctor.fullName
     ? doctor.fullName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase()
     : "";
 
   if (!isOpen) return null;
@@ -998,11 +999,11 @@ function RejectDoctorModal({
 
   const doctorInitials = doctor.fullName
     ? doctor.fullName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase()
     : "";
 
   if (!isOpen) return null;

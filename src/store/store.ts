@@ -39,7 +39,10 @@ import deleteAIModelReducer from './slices/admin-slice/delete-aI-model-slice/del
 import createModelReducer from './slices/admin-slice/create-ai-model-slice/createAIModelSlice'
 import favoriteDoctorsReducer from './slices/patient-slice/favorites-slice/favoritesSlice'
 import deleteFavoriteReducer from './slices/patient-slice/remove-doctor-from-favorites-slice/removeDoctorFromFavoritesSlice'
-import addFavoriteReducer from './slices/patient-slice/add-doctor-to-favorites-slice/addDoctorToFavoritesSlice'
+import addFavoriteReducer from './slices/patient-slice/add-doctor-to-favorites-slice/addDoctorToFavoritesSlice';
+import verifyDoctorReducer from './slices/admin-slice/verify-doctor-account-slice/verifyDoctorAccountSlice';
+import rejectDoctorReducer from './slices/admin-slice/reject-doctor-account-slice/rejectDoctorAccountSlice'
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -62,6 +65,8 @@ export const store = configureStore({
     updateAIModelSlice: updateAIModelReducer,
     deleteAIModelSlice: deleteAIModelReducer,
     createModelSlice: createModelReducer,
+    verifyDoctorSlice: verifyDoctorReducer,
+    rejectDoctorSlice: rejectDoctorReducer,
 
 
     // patient dashoard

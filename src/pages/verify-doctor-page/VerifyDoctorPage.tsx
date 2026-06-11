@@ -247,6 +247,8 @@ function VerifyDoctorPage() {
     return formData;
   };
 
+  const role = useSelector((state: RootState) => state.auth.role);
+
   const buildStudentDoctorPayload = (data: Inputs) => {
     const formData = new FormData();
     appendText(formData, "Email", data.Email);
@@ -273,7 +275,7 @@ function VerifyDoctorPage() {
           "Content-Type": "multipart/form-data",
         },
       });
-
+      console.log('response', response)
       const token = response.data?.data?.token || response.data?.token;
       if (token) {
         dispatch(setToken(token));
@@ -287,13 +289,18 @@ function VerifyDoctorPage() {
           : "Doctor verification submitted successfully.");
 
       toast.success(successMessage);
-      navigator("/");
+      console.log('role', role)
+      if (!isStudentDoctor) {
+        navigator("/waiting");
+      } else {
+        navigator('/')
+      }
     } catch (error: any) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message ||
-          error.response?.data ||
-          error.message ||
-          "Verification failed"
+        error.response?.data ||
+        error.message ||
+        "Verification failed"
         : error instanceof Error
           ? error.message
           : "Verification failed";
@@ -351,9 +358,8 @@ function VerifyDoctorPage() {
                     id="medicalLicenseNumber"
                     type="text"
                     placeholder="12345678910111"
-                    className={`${inputClass} ${
-                      errors.MedicalLicenseNumber && "border-red-500"
-                    }`}
+                    className={`${inputClass} ${errors.MedicalLicenseNumber && "border-red-500"
+                      }`}
                     {...register("MedicalLicenseNumber", {
                       required: "You must provide your medical license number",
                     })}
@@ -373,9 +379,8 @@ function VerifyDoctorPage() {
                     id="nationalId"
                     type="text"
                     placeholder="National ID"
-                    className={`${inputClass} ${
-                      errors.NationalId && "border-red-500"
-                    }`}
+                    className={`${inputClass} ${errors.NationalId && "border-red-500"
+                      }`}
                     {...register("NationalId", {
                       required: "You must provide your national ID",
                     })}
@@ -393,9 +398,8 @@ function VerifyDoctorPage() {
                   </label>
                   <select
                     id="specializationId"
-                    className={`${inputClass} ${
-                      errors.SpecializationId && "border-red-500"
-                    }`}
+                    className={`${inputClass} ${errors.SpecializationId && "border-red-500"
+                      }`}
                     {...register("SpecializationId", {
                       required: "You must select your specialization",
                       setValueAs: (value) => (value === "" ? 0 : Number(value)),
@@ -423,9 +427,8 @@ function VerifyDoctorPage() {
                     id="yearsOfExperience"
                     type="number"
                     placeholder="5"
-                    className={`${inputClass} ${
-                      errors.YearsOfExperience && "border-red-500"
-                    }`}
+                    className={`${inputClass} ${errors.YearsOfExperience && "border-red-500"
+                      }`}
                     {...register("YearsOfExperience", {
                       required: "You must provide your years of experience",
                       setValueAs: (value) => (value === "" ? 0 : Number(value)),
@@ -448,9 +451,8 @@ function VerifyDoctorPage() {
                     id="clinicName"
                     type="text"
                     placeholder="Clinic name"
-                    className={`${inputClass} ${
-                      errors.ClinicName && "border-red-500"
-                    }`}
+                    className={`${inputClass} ${errors.ClinicName && "border-red-500"
+                      }`}
                     {...register("ClinicName", {
                       required: "You must provide your clinic name",
                     })}
@@ -468,9 +470,8 @@ function VerifyDoctorPage() {
                     id="clinicPhone"
                     type="text"
                     placeholder="01003010"
-                    className={`${inputClass} ${
-                      errors.ClinicPhone && "border-red-500"
-                    }`}
+                    className={`${inputClass} ${errors.ClinicPhone && "border-red-500"
+                      }`}
                     {...register("ClinicPhone", {
                       required: "You must provide your clinic phone",
                     })}
@@ -490,9 +491,8 @@ function VerifyDoctorPage() {
                     id="clinicAddress"
                     type="text"
                     placeholder="Street, city, area"
-                    className={`${inputClass} ${
-                      errors.ClinicAddress && "border-red-500"
-                    }`}
+                    className={`${inputClass} ${errors.ClinicAddress && "border-red-500"
+                      }`}
                     {...register("ClinicAddress", {
                       required: "You must provide your clinic address",
                     })}
@@ -592,9 +592,8 @@ function VerifyDoctorPage() {
                   </label>
                   <select
                     id="gender"
-                    className={`${inputClass} ${
-                      errors.Gender && "border-red-500"
-                    }`}
+                    className={`${inputClass} ${errors.Gender && "border-red-500"
+                      }`}
                     {...register("Gender", {
                       required: "You must provide your gender",
                     })}
@@ -650,9 +649,8 @@ function VerifyDoctorPage() {
                     type="number"
                     step="0.01"
                     placeholder="0"
-                    className={`${inputClass} ${
-                      errors.ConsultationPrice && "border-red-500"
-                    }`}
+                    className={`${inputClass} ${errors.ConsultationPrice && "border-red-500"
+                      }`}
                     {...register("ConsultationPrice", {
                       required: "You must provide your consultation price",
                       setValueAs: (value) => (value === "" ? 0 : Number(value)),
@@ -697,9 +695,8 @@ function VerifyDoctorPage() {
 
                   <select
                     id="languages"
-                    className={`${inputClass} ${
-                      errors.Languages && "border-red-500"
-                    }`}
+                    className={`${inputClass} ${errors.Languages && "border-red-500"
+                      }`}
                     onChange={handleSelectLanguage}
                     defaultValue=""
                   >
@@ -825,9 +822,8 @@ function VerifyDoctorPage() {
                     id="email"
                     type="email"
                     placeholder="john@example.com"
-                    className={`${inputClass} ${
-                      errors.Email && "border-red-500"
-                    }`}
+                    className={`${inputClass} ${errors.Email && "border-red-500"
+                      }`}
                     {...register("Email", {
                       required: "You must provide your email",
                     })}
@@ -845,9 +841,8 @@ function VerifyDoctorPage() {
                     id="nationalIdStudent"
                     type="text"
                     placeholder="12345678901234"
-                    className={`${inputClass} ${
-                      errors.NationalId && "border-red-500"
-                    }`}
+                    className={`${inputClass} ${errors.NationalId && "border-red-500"
+                      }`}
                     {...register("NationalId", {
                       required: "You must provide your national ID number",
                     })}
@@ -867,9 +862,8 @@ function VerifyDoctorPage() {
                     id="yearsOfStudy"
                     type="number"
                     placeholder="4"
-                    className={`${inputClass} ${
-                      errors.YearsOfStudy && "border-red-500"
-                    }`}
+                    className={`${inputClass} ${errors.YearsOfStudy && "border-red-500"
+                      }`}
                     {...register("YearsOfStudy", {
                       required: "You must provide your years of study",
                       setValueAs: (value) => (value === "" ? 0 : Number(value)),
@@ -888,9 +882,8 @@ function VerifyDoctorPage() {
                     id="university"
                     type="text"
                     placeholder="Cairo University"
-                    className={`${inputClass} ${
-                      errors.University && "border-red-500"
-                    }`}
+                    className={`${inputClass} ${errors.University && "border-red-500"
+                      }`}
                     {...register("University", {
                       required: "You must provide your university",
                     })}
@@ -910,9 +903,8 @@ function VerifyDoctorPage() {
                     id="supervisingNumber"
                     type="text"
                     placeholder="SUP-12345"
-                    className={`${inputClass} ${
-                      errors.SupervisingNumber && "border-red-500"
-                    }`}
+                    className={`${inputClass} ${errors.SupervisingNumber && "border-red-500"
+                      }`}
                     {...register("SupervisingNumber", {
                       required: "You must provide the supervising number",
                     })}

@@ -162,6 +162,10 @@ export const sharedRoutePaths = [
     path: "my-doctors",
     allowedRoles: ["patient"],
   },
+  {
+    path: '/wating',
+    allowedRoles: ['doctor_pendingapproval']
+  },
 ];
 
 // Public route paths (accessible without authentication)

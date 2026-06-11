@@ -12,10 +12,11 @@ import {
   User,
   CreditCard,
   DollarSign,
+  Loader2,
 } from "lucide-react";
 import { Link } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { AppDispatch, RootState } from "@/store/store";
 import { ScaleLoader } from "react-spinners";
 import Error from "@/components/error/Error";
@@ -26,15 +27,31 @@ import {
 } from "@/store/slices/admin-slice/pending-doctor-slice/pendingDoctorSlice";
 import { toast } from "react-toastify";
 import { getTimeAgo } from "@/lib/utils";
-import { fetchAdminDashboard, selectAdminDashboardState, type AdminDashboardState } from "@/store/slices/admin-slice/admin-dashboard-slice/adminDashboardSlice";
+import {
+  fetchAdminDashboard,
+  selectAdminDashboardState,
+  type AdminDashboardState,
+} from "@/store/slices/admin-slice/admin-dashboard-slice/adminDashboardSlice";
 import { NotFound } from "@/components/notfound/NotFound";
+import { resetVerifyDoctorState, selectVerifyDoctorState, verifyDoctorAccount } from "@/store/slices/admin-slice/verify-doctor-account-slice/verifyDoctorAccountSlice";
+import { rejectDoctorAccount, resetRejectDoctorState, selectRejectDoctorState } from "@/store/slices/admin-slice/reject-doctor-account-slice/rejectDoctorAccountSlice";
+
 
 function AdminPage() {
   const dispatch: AppDispatch = useDispatch();
-  const currentUserName = useSelector((state: RootState) => state.auth.fullName)?.split(' ')[0];
+  const currentUserName = useSelector((state: RootState) => state.auth.fullName)?.split(" ")[0];
 
-  const { data: adminDashboardData, loading: adminDashboardLoading, error: adminDashboardError } = useSelector(selectAdminDashboardState) as AdminDashboardState
-  const { pendingDoctors, loading: pendingDoctorLoaing, error: pendingDoctorError } = useSelector(selectPendingDoctor) as PendingDoctorState;
+  const { data: adminDashboardData, loading: adminDashboardLoading, error: adminDashboardError } =
+    useSelector(selectAdminDashboardState) as AdminDashboardState;
+  const { pendingDoctors, loading: pendingDoctorLoading, error: pendingDoctorError } =
+    useSelector(selectPendingDoctor) as PendingDoctorState;
+
+  const { loading: verifying } = useSelector(selectVerifyDoctorState);
+  const { loading: rejecting } = useSelector(selectRejectDoctorState);
+
+  // Track which doctor's button is active to show per-row spinner
+  const [activeApproveId, setActiveApproveId] = useState<number | null>(null);
+  const [activeRejectId, setActiveRejectId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,15 +61,43 @@ function AdminPage() {
           dispatch(fetchPendingDoctor()),
         ]);
       } catch (error: any) {
-        const errorMessage =
-          (typeof error === "string" ? error : error.message) ||
+        const msg = (typeof error === "string" ? error : error.message) ||
           "Failed to fetch summary & pending doctors";
-        toast.error(errorMessage);
+        toast.error(msg);
       }
     };
     fetchData();
   }, [dispatch]);
 
+  const refetchPending = () => dispatch(fetchPendingDoctor());
+
+  const handleApprove = async (doctorId: number) => {
+    setActiveApproveId(doctorId);
+    try {
+      await dispatch(verifyDoctorAccount(doctorId)).unwrap();
+      toast.success("Doctor approved successfully");
+      dispatch(resetVerifyDoctorState());
+      refetchPending();
+    } catch (err: any) {
+      toast.error(err || "Failed to approve doctor");
+    } finally {
+      setActiveApproveId(null);
+    }
+  };
+
+  const handleReject = async (doctorId: number) => {
+    setActiveRejectId(doctorId);
+    try {
+      await dispatch(rejectDoctorAccount({ doctorId, reason: "" })).unwrap();
+      toast.success("Doctor rejected successfully");
+      dispatch(resetRejectDoctorState());
+      refetchPending();
+    } catch (err: any) {
+      toast.error(err || "Failed to reject doctor");
+    } finally {
+      setActiveRejectId(null);
+    }
+  };
 
   return (
     <DashboardLayout pageTitle="Admin page">
@@ -78,53 +123,12 @@ function AdminPage() {
           <Error message={adminDashboardError} />
         ) : (
           <div className="grid max-sm:grid-cols-1 grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-            {/* Total Patients */}
-            <StatCard
-              Icon={Users}
-              label="Total Patients"
-              value={String(adminDashboardData?.totalPatients ?? 0)}
-              colorClass="text-blue-500 bg-blue-200"
-            />
-
-            {/* Total Doctors */}
-            <StatCard
-              Icon={ShieldCheck}
-              label="Total Doctors"
-              value={String(adminDashboardData?.totalDoctors ?? 0)}
-              colorClass="text-green-500 bg-green-200"
-            />
-
-            {/* Total Appointments */}
-            <StatCard
-              Icon={Calendars}
-              label="Total Appointments"
-              value={String(adminDashboardData?.totalAppointments ?? 0)}
-              colorClass="text-purple-500 bg-purple-200"
-            />
-
-            {/* Total Revenue */}
-            <StatCard
-              Icon={DollarSign}
-              label="Total Revenue"
-              value={`$${Number(adminDashboardData?.totalRevenue ?? 0)}`}
-              colorClass="text-orange-500 bg-orange-200"
-            />
-
-            {/* Today's Revenue */}
-            <StatCard
-              Icon={CreditCard}
-              label="Revenue Today"
-              value={`$${Number(adminDashboardData?.todayRevenue ?? 0)}`}
-              colorClass="text-red-500 bg-red-200"
-            />
-
-            {/* Month's Revenue */}
-            <StatCard
-              Icon={FileText}
-              label="Monthly Revenue"
-              value={`$${Number(adminDashboardData?.monthRevenue ?? 0)}`}
-              colorClass="text-indigo-500 bg-indigo-200"
-            />
+            <StatCard Icon={Users} label="Total Patients" value={String(adminDashboardData?.totalPatients ?? 0)} colorClass="text-blue-500 bg-blue-200" />
+            <StatCard Icon={ShieldCheck} label="Total Doctors" value={String(adminDashboardData?.totalDoctors ?? 0)} colorClass="text-green-500 bg-green-200" />
+            <StatCard Icon={Calendars} label="Total Appointments" value={String(adminDashboardData?.totalAppointments ?? 0)} colorClass="text-purple-500 bg-purple-200" />
+            <StatCard Icon={DollarSign} label="Total Revenue" value={`$${Number(adminDashboardData?.totalRevenue ?? 0)}`} colorClass="text-orange-500 bg-orange-200" />
+            <StatCard Icon={CreditCard} label="Revenue Today" value={`$${Number(adminDashboardData?.todayRevenue ?? 0)}`} colorClass="text-red-500 bg-red-200" />
+            <StatCard Icon={FileText} label="Monthly Revenue" value={`$${Number(adminDashboardData?.monthRevenue ?? 0)}`} colorClass="text-indigo-500 bg-indigo-200" />
           </div>
         )}
 
@@ -144,7 +148,7 @@ function AdminPage() {
             </div>
             <hr className="w-full" />
 
-            {pendingDoctorLoaing ? (
+            {pendingDoctorLoading ? (
               <div className="w-full flex items-center justify-center py-6">
                 <ScaleLoader color="#6d61ff" />
               </div>
@@ -154,96 +158,110 @@ function AdminPage() {
               <NotFound message="No verifications found" />
             ) : (
               <div className="w-full space-y-3">
-                {pendingDoctors.map((doctor) => (
-                  <div
-                    key={doctor.doctorId}
-                    className="rounded-2xl border p-4 space-y-3"
-                    style={{
-                      backgroundColor: "var(--color-surface)",
-                      borderColor: "var(--color-border)",
-                    }}
-                  >
-                    {/* Top row: avatar + name + actions */}
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex items-start gap-3">
-                        {/* Avatar */}
-                        <div
-                          className="w-12 h-12 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-white font-bold text-lg"
-                          style={{ backgroundColor: "var(--color-primary)" }}
-                        >
-                          {doctor.fullProfileImageUrl ? (
-                            <img
-                              src={doctor.fullProfileImageUrl}
-                              alt={doctor.fullName}
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                (e.currentTarget as HTMLImageElement).style.display = "none";
-                              }}
-                            />
-                          ) : (
-                            <div className="w-full h-full rounded-full bg-(--color-bg-blue) border border-primary/20 flex items-center justify-center">
-                              <User className="w-8 h-8 text-(--color-primary)" />
-                            </div>
-                          )}
-                        </div>
+                {pendingDoctors.map((doctor) => {
+                  const isApprovingThis = activeApproveId === Number(doctor.doctorId) && verifying;
+                  const isRejectingThis = activeRejectId === Number(doctor.doctorId) && rejecting;
 
-                        {/* Name + meta */}
-                        <div>
-                          <h3 className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>
-                            {doctor.fullName}
-                          </h3>
-                          <p className="text-xs mt-0.5" style={{ color: "var(--color-text-light)" }}>
-                            {doctor.clinicName} · {doctor.clinicLocation}
-                          </p>
-                          <div className="flex items-center gap-1.5 mt-1">
-                            <Clock className="w-3 h-3" style={{ color: "var(--color-text-light)" }} />
-                            <span className="text-xs" style={{ color: "var(--color-text-light)" }}>
-                              Submitted {getTimeAgo(doctor.createdAt)}
-                            </span>
+                  return (
+                    <div
+                      key={doctor.doctorId}
+                      className="rounded-2xl border p-4 space-y-3"
+                      style={{
+                        backgroundColor: "var(--color-surface)",
+                        borderColor: "var(--color-border)",
+                      }}
+                    >
+                      {/* Top row: avatar + name + actions */}
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-3">
+                          {/* Avatar */}
+                          <div
+                            className="w-12 h-12 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-white font-bold text-lg"
+                            style={{ backgroundColor: "var(--color-primary)" }}
+                          >
+                            {doctor.fullProfileImageUrl ? (
+                              <img
+                                src={doctor.fullProfileImageUrl}
+                                alt={doctor.fullName}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                                }}
+                              />
+                            ) : (
+                              <div className="w-full h-full rounded-full bg-(--color-bg-blue) border border-primary/20 flex items-center justify-center">
+                                <User className="w-8 h-8 text-(--color-primary)" />
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Name + meta */}
+                          <div>
+                            <h3 className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>
+                              {doctor.fullName}
+                            </h3>
+                            <p className="text-xs mt-0.5" style={{ color: "var(--color-text-light)" }}>
+                              {doctor.clinicName} · {doctor.clinicLocation}
+                            </p>
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <Clock className="w-3 h-3" style={{ color: "var(--color-text-light)" }} />
+                              <span className="text-xs" style={{ color: "var(--color-text-light)" }}>
+                                Submitted {getTimeAgo(doctor.createdAt)}
+                              </span>
+                            </div>
                           </div>
                         </div>
+
+                        {/* Actions — now wired to real slices */}
+                        <div className="flex items-center gap-2 shrink-0">
+                          <button
+                            onClick={() => handleApprove(Number(doctor.doctorId))}
+                            disabled={isApprovingThis || isRejectingThis}
+                            className="p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            style={{ backgroundColor: "rgba(22,163,74,0.1)", color: "#16a34a" }}
+                            onMouseEnter={(e) => { if (!isApprovingThis) e.currentTarget.style.backgroundColor = "rgba(22,163,74,0.2)"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(22,163,74,0.1)"; }}
+                            title="Approve"
+                          >
+                            {isApprovingThis
+                              ? <Loader2 className="w-4 h-4 animate-spin" />
+                              : <CheckCircle className="w-4 h-4" />
+                            }
+                          </button>
+
+                          <button
+                            onClick={() => handleReject(Number(doctor.doctorId))}
+                            disabled={isApprovingThis || isRejectingThis}
+                            className="p-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            style={{ backgroundColor: "rgba(220,38,38,0.08)", color: "#dc2626" }}
+                            onMouseEnter={(e) => { if (!isRejectingThis) e.currentTarget.style.backgroundColor = "rgba(220,38,38,0.15)"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "rgba(220,38,38,0.08)"; }}
+                            title="Reject"
+                          >
+                            {isRejectingThis
+                              ? <Loader2 className="w-4 h-4 animate-spin" />
+                              : <XCircle className="w-4 h-4" />
+                            }
+                          </button>
+                        </div>
                       </div>
 
-                      {/* Actions */}
-                      <div className="flex items-center gap-2 shrink-0">
-                        <Link
-                          to="/verify-doctors"
-                          className="p-2 rounded-lg transition-colors"
-                          style={{ backgroundColor: "rgba(22,163,74,0.1)", color: "#16a34a" }}
-                          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(22,163,74,0.2)")}
-                          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "rgba(22,163,74,0.1)")}
-                          title="Approve"
+                      {/* Certificate link */}
+                      {doctor.fullCertificateUrl && (
+                        <a
+                          href={doctor.fullCertificateUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-70"
+                          style={{ color: "var(--color-primary)" }}
                         >
-                          <CheckCircle className="w-4 h-4" />
-                        </Link>
-                        <Link
-                          to="/verify-doctors"
-                          className="p-2 rounded-lg transition-colors"
-                          style={{ backgroundColor: "rgba(220,38,38,0.08)", color: "#dc2626" }}
-                          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(220,38,38,0.15)")}
-                          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "rgba(220,38,38,0.08)")}
-                          title="Reject"
-                        >
-                          <XCircle className="w-4 h-4" />
-                        </Link>
-                      </div>
+                          <FileText className="w-3.5 h-3.5" />
+                          View Certificate
+                        </a>
+                      )}
                     </div>
-
-                    {/* Certificate link */}
-                    {doctor.fullCertificateUrl && (
-                      <a
-                        href={doctor.fullCertificateUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-70"
-                        style={{ color: "var(--color-primary)" }}
-                      >
-                        <FileText className="w-3.5 h-3.5" />
-                        View Certificate
-                      </a>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardComp>
@@ -281,8 +299,6 @@ function AdminPage() {
 }
 
 export default AdminPage;
-
-
 
 // ─── Quick Action ─────────────────────────────────────────────────────────────
 
