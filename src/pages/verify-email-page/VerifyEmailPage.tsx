@@ -77,6 +77,11 @@ function VerifyEmailPage() {
       toast.error(error.message);
     }
   };
+  const returnToRegister = () => {
+    dispatch(clearEmail());
+    Cookies.remove("needsVerification");
+    navigator("/register");
+  };
 
   return (
     <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 py-10">
@@ -140,12 +145,19 @@ function VerifyEmailPage() {
             Verify Email
           </button>
         </form>
-        <div className="mt-4 text-center">
-          <button
+        <div className="mt-4 text-center flex flex-col gap-2">
+          {/* <button
             type="button"
             className="cursor-pointer text-sm font-medium text-(--color-primary) transition-colors hover:text-(--color-primary-light)"
           >
             Didn't receive the code? Resend
+          </button> */}
+          <button
+            type="button"
+            className="cursor-pointer text-sm font-medium text-red-500 transition-colors hover:text-red-600"
+            onClick={() => returnToRegister()}
+          >
+            Wrong Email Address? return to register
           </button>
         </div>
       </div>
