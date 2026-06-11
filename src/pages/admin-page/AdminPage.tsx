@@ -2,26 +2,21 @@ import CardComp from "@/components/card-comp/CardComp";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import StatCard from "@/components/statical-card/StaticalCard";
 import {
-  AlertCircle,
   Calendars,
   CheckCircle,
   FileText,
   ShieldCheck,
-  TrendingUp,
   Users,
   XCircle,
   Clock,
   User,
+  CreditCard,
+  DollarSign,
 } from "lucide-react";
 import { Link } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  fetchAdminSummary,
-  selectSummary,
-  type SummaryState,
-} from "@/store/slices/admin-slice/summary-slice/SummarySlice";
 import { useEffect } from "react";
-import type { AppDispatch } from "@/store/store";
+import type { AppDispatch, RootState } from "@/store/store";
 import { ScaleLoader } from "react-spinners";
 import Error from "@/components/error/Error";
 import {
@@ -31,17 +26,21 @@ import {
 } from "@/store/slices/admin-slice/pending-doctor-slice/pendingDoctorSlice";
 import { toast } from "react-toastify";
 import { getTimeAgo } from "@/lib/utils";
+import { fetchAdminDashboard, selectAdminDashboardState, type AdminDashboardState } from "@/store/slices/admin-slice/admin-dashboard-slice/adminDashboardSlice";
+import { NotFound } from "@/components/notfound/NotFound";
 
 function AdminPage() {
   const dispatch: AppDispatch = useDispatch();
-  const { data, loading, error } = useSelector(selectSummary) as SummaryState;
-  const { pendingDoctors } = useSelector(selectPendingDoctor) as PendingDoctorState;
+  const currentUserName = useSelector((state: RootState) => state.auth.fullName)?.split(' ')[0];
+
+  const { data: adminDashboardData, loading: adminDashboardLoading, error: adminDashboardError } = useSelector(selectAdminDashboardState) as AdminDashboardState
+  const { pendingDoctors, loading: pendingDoctorLoaing, error: pendingDoctorError } = useSelector(selectPendingDoctor) as PendingDoctorState;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         await Promise.all([
-          dispatch(fetchAdminSummary()),
+          dispatch(fetchAdminDashboard()),
           dispatch(fetchPendingDoctor()),
         ]);
       } catch (error: any) {
@@ -54,9 +53,6 @@ function AdminPage() {
     fetchData();
   }, [dispatch]);
 
-  const totalUser = data
-    ? data.totalDoctors + data.totalPatients + data.totalReceptionists + data.totalStudents
-    : 0;
 
   return (
     <DashboardLayout pageTitle="Admin page">
@@ -64,7 +60,7 @@ function AdminPage() {
         {/* ── Header ── */}
         <div>
           <div className="flex gap-3 items-end">
-            <h1 className="text-3xl text-(--color-text)">Welcome Back, John</h1>
+            <h1 className="text-3xl text-(--color-text)">Welcome Back, {currentUserName}</h1>
             <div className="flex gap-1 bg-red-100 px-3 py-0.5 text-red-400 rounded-full">
               <ShieldCheck className="w-5" />
               <span className="text-sm">Admin</span>
@@ -74,18 +70,61 @@ function AdminPage() {
         </div>
 
         {/* ── Stat cards ── */}
-        {loading ? (
+        {adminDashboardLoading ? (
           <div className="w-full flex items-center justify-center">
             <ScaleLoader color="#6d61ff" />
           </div>
-        ) : error ? (
-          <Error message={error} />
+        ) : adminDashboardError ? (
+          <Error message={adminDashboardError} />
         ) : (
-          <div className="grid max-sm:grid-cols-2 grid-cols-4 gap-4">
-            <StatCard Icon={Users} TrendIcon={TrendingUp} trendValue="5" label="Total User" value={totalUser} colorClass="text-blue-500 bg-blue-200" />
-            <StatCard Icon={ShieldCheck} TrendIcon={TrendingUp} trendValue="5" label="Active Doctors" value={Number(data?.totalVerified)} colorClass="text-green-500 bg-green-200" />
-            <StatCard Icon={Calendars} TrendIcon={TrendingUp} trendValue="5" label="Appointments Today" value={Number(data?.appointmentsToday)} colorClass="text-purple-500 bg-purple-200" />
-            <StatCard Icon={FileText} TrendIcon={TrendingUp} trendValue="5" label="Total Scans" value={1234} colorClass="text-orange-500 bg-orange-200" />
+          <div className="grid max-sm:grid-cols-1 grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            {/* Total Patients */}
+            <StatCard
+              Icon={Users}
+              label="Total Patients"
+              value={String(adminDashboardData?.totalPatients ?? 0)}
+              colorClass="text-blue-500 bg-blue-200"
+            />
+
+            {/* Total Doctors */}
+            <StatCard
+              Icon={ShieldCheck}
+              label="Total Doctors"
+              value={String(adminDashboardData?.totalDoctors ?? 0)}
+              colorClass="text-green-500 bg-green-200"
+            />
+
+            {/* Total Appointments */}
+            <StatCard
+              Icon={Calendars}
+              label="Total Appointments"
+              value={String(adminDashboardData?.totalAppointments ?? 0)}
+              colorClass="text-purple-500 bg-purple-200"
+            />
+
+            {/* Total Revenue */}
+            <StatCard
+              Icon={DollarSign}
+              label="Total Revenue"
+              value={`$${Number(adminDashboardData?.totalRevenue ?? 0)}`}
+              colorClass="text-orange-500 bg-orange-200"
+            />
+
+            {/* Today's Revenue */}
+            <StatCard
+              Icon={CreditCard}
+              label="Revenue Today"
+              value={`$${Number(adminDashboardData?.todayRevenue ?? 0)}`}
+              colorClass="text-red-500 bg-red-200"
+            />
+
+            {/* Month's Revenue */}
+            <StatCard
+              Icon={FileText}
+              label="Monthly Revenue"
+              value={`$${Number(adminDashboardData?.monthRevenue ?? 0)}`}
+              colorClass="text-indigo-500 bg-indigo-200"
+            />
           </div>
         )}
 
@@ -105,17 +144,14 @@ function AdminPage() {
             </div>
             <hr className="w-full" />
 
-            {loading ? (
+            {pendingDoctorLoaing ? (
               <div className="w-full flex items-center justify-center py-6">
                 <ScaleLoader color="#6d61ff" />
               </div>
-            ) : error ? (
-              <Error message={error} />
+            ) : pendingDoctorError ? (
+              <Error message={pendingDoctorError} />
             ) : !pendingDoctors?.length ? (
-              <div className="flex flex-col items-center justify-center py-10 text-center">
-                <AlertCircle className="w-10 h-10 mb-3" style={{ color: "var(--color-text-light)" }} />
-                <p style={{ color: "var(--color-text-light)" }} className="text-sm">No verifications found</p>
-              </div>
+              <NotFound message="No verifications found" />
             ) : (
               <div className="w-full space-y-3">
                 {pendingDoctors.map((doctor) => (
@@ -193,31 +229,6 @@ function AdminPage() {
                       </div>
                     </div>
 
-                    {/* Info pills
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {doctor.email && (
-                        <InfoPill icon={<Mail className="w-3 h-3" />} label={doctor.email} />
-                      )}
-                      {doctor.phoneNumber && (
-                        <InfoPill icon={<Phone className="w-3 h-3" />} label={doctor.phoneNumber} />
-                      )}
-                      {doctor.yearsOfExperience > 0 && (
-                        <InfoPill icon={<Award className="w-3 h-3" />} label={`${doctor.yearsOfExperience} yrs exp`} />
-                      )}
-                      {doctor.price > 0 && (
-                        <InfoPill icon={<DollarSign className="w-3 h-3" />} label={`$${doctor.price} / visit`} />
-                      )}
-                      {doctor.education && (
-                        <InfoPill icon={<GraduationCap className="w-3 h-3" />} label={doctor.education} />
-                      )}
-                      {doctor.languages && (
-                        <InfoPill icon={<Languages className="w-3 h-3" />} label={doctor.languages} />
-                      )}
-                      {doctor.country && (
-                        <InfoPill icon={<MapPin className="w-3 h-3" />} label={`${doctor.city}, ${doctor.country}`} />
-                      )}
-                    </div> */}
-
                     {/* Certificate link */}
                     {doctor.fullCertificateUrl && (
                       <a
@@ -260,25 +271,6 @@ function AdminPage() {
                   classProbs="orange"
                   path="/ai-models"
                 />
-              </div>
-            </CardComp>
-
-            <CardComp>
-              <div className="flex items-center justify-between w-full">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Total Patients</span>
-                <span className="text-sm text-gray-900 dark:text-white font-medium">{data?.totalPatients ?? "—"}</span>
-              </div>
-              <div className="flex items-center justify-between w-full">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Total Doctors</span>
-                <span className="text-sm text-gray-900 dark:text-white font-medium">{data?.totalDoctors ?? "—"}</span>
-              </div>
-              <div className="flex items-center justify-between w-full">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Receptionists</span>
-                <span className="text-sm text-gray-900 dark:text-white font-medium">{data?.totalReceptionists ?? "—"}</span>
-              </div>
-              <div className="flex items-center justify-between w-full">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Students</span>
-                <span className="text-sm text-gray-900 dark:text-white font-medium">{data?.totalStudents ?? "—"}</span>
               </div>
             </CardComp>
           </div>

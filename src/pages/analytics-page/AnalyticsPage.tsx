@@ -4,7 +4,7 @@ import Error from '@/components/error/Error';
 import StatCard from '@/components/statical-card/StaticalCard'
 import { fetchAdminSummary, selectSummary, type SummaryState } from '@/store/slices/admin-slice/summary-slice/SummarySlice';
 import type { AppDispatch } from '@/store/store';
-import { Calendars, FileText, ShieldCheck, TrendingUp, Users } from 'lucide-react'
+import { Calendars, FileText, ShieldCheck, Users } from 'lucide-react'
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { ScaleLoader } from 'react-spinners';
@@ -98,34 +98,26 @@ function AnalyticsPage() {
                 <div className="grid max-sm:grid-cols-2 grid-cols-4 gap-4">
                     <StatCard
                         Icon={Users}
-                        TrendIcon={TrendingUp}
-                        trendValue="5"
                         label="Total User"
-                        value={totalUser}
+                        value={String(totalUser)}
                         colorClass="text-blue-500 bg-blue-200"
                     />
                     <StatCard
                         Icon={ShieldCheck}
-                        TrendIcon={TrendingUp}
-                        trendValue="5"
                         label="Active Doctors"
-                        value={Number(data?.totalVerified)}
+                        value={String(data?.totalVerified)}
                         colorClass="text-green-500 bg-green-200"
                     />
                     <StatCard
                         Icon={Calendars}
-                        TrendIcon={TrendingUp}
-                        trendValue="5"
                         label="Appointments Today"
-                        value={Number(data?.appointmentsToday)}
+                        value={String(data?.appointmentsToday)}
                         colorClass="text-purple-500 bg-purple-200"
                     />
                     <StatCard
                         Icon={FileText}
-                        TrendIcon={TrendingUp}
-                        trendValue="5"
                         label="Total Scans"
-                        value={1234}
+                        value={String(1234)}
                         colorClass="text-orange-500 bg-orange-200"
                     />
                 </div>

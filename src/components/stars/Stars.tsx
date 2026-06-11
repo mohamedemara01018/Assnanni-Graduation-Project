@@ -2,7 +2,7 @@
 import { FaStar } from 'react-icons/fa'
 
 interface starsProps {
-    rating: Number,
+    rating: number,
     className: string,
 }
 function Stars({ rating, className }: starsProps) {

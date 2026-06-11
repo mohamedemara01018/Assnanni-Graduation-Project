@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "@/store/store";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
-import { Pill, Calendar, Download, User } from "lucide-react";
+import { Calendar, Download, Pill, User } from "lucide-react";
 import { Link } from "react-router";
 
 import {

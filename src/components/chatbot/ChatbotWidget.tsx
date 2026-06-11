@@ -82,88 +82,88 @@ const KNOWLEDGE_BASE: Array<{
   link?: string;
   linkText?: string;
 }> = [
-  {
-    keywords: ["hello", "hi", "hey", "greetings", "anyone there"],
-    answer:
-      "Hello! I am Assnani's AI Assistant. I am here to help you navigate our dental platform. You can ask me about booking appointments, uploading medical scans for AI analysis, checking pricing, or registering accounts!",
-  },
-  {
-    keywords: [
-      "appointment",
-      "book",
-      "schedule",
-      "reserve",
-      "doctor",
-      "dentist",
-      "visit",
-    ],
-    answer:
-      "Booking a dental appointment is easy! Browse our certified doctor list, select a doctor that fits your needs, choose an available time slot, and confirm. Would you like to view our available doctors?",
-    link: "/doctors-list",
-    linkText: "View Doctors List 📅",
-  },
-  {
-    keywords: [
-      "Analyse",
-      "symptom",
-      "xray",
-      "x-ray",
-      "mri",
-      "ct",
-      "dicom",
-      "image",
-      "analysis",
-      "ai model",
-    ],
-    answer:
-      "Assnani uses state-of-the-art AI models to analyze dental X-rays, MRIs, and CT scans in formats like DICOM, JPEG, and PNG. Analyses usually complete within 2-5 minutes with over 90% accuracy. You can upload your scan now:",
-    link: "/dental-chatbot",
-    linkText: "Upload Scan & Analyze 🧬",
-  },
-  {
-    keywords: [
-      "register",
-      "signup",
-      "sign up",
-      "create account",
-      "account",
-      "profile",
-    ],
-    answer:
-      "You can create an account on Assnani as a Patient, Doctor, Student Doctor, or Receptionist. Make sure to verify your email after signing up. Click below to start registration:",
-    link: "/register",
-    linkText: "Go to Registration Screen 🔐",
-  },
-  {
-    keywords: ["support", "contact", "phone", "email", "help", "chat", "live"],
-    answer:
-      "Need direct assistance? You can contact our support team at support@assnani.com or call +1 (555) 123-4567 (Mon-Fri, 9 AM - 6 PM EST). Alternatively, write a message on our support page:",
-    link: "/support",
-    linkText: "Send Support Message ✉️",
-  },
-  {
-    keywords: ["faq", "questions", "how it works"],
-    answer:
-      "We have answers for most common questions in our FAQ page. Check it out here:",
-    link: "/faq",
-    linkText: "Browse FAQ Center 💡",
-  },
-  {
-    keywords: [
-      "payment",
-      "billing",
-      "insurance",
-      "price",
-      "fee",
-      "cost",
-      "receipt",
-    ],
-    answer:
-      "We support major credit/debit cards and digital payment options. For patient safety and records transparency, your payments generate automated receipts sent to your email. You can manage bills in your profile details.",
-    link: "/support",
-    linkText: "Inquire about billing 💳",
-  },
-];
+    {
+      keywords: ["hello", "hi", "hey", "greetings", "anyone there"],
+      answer:
+        "Hello! I am Assnani's AI Assistant. I am here to help you navigate our dental platform. You can ask me about booking appointments, uploading medical scans for AI analysis, checking pricing, or registering accounts!",
+    },
+    {
+      keywords: [
+        "appointment",
+        "book",
+        "schedule",
+        "reserve",
+        "doctor",
+        "dentist",
+        "visit",
+      ],
+      answer:
+        "Booking a dental appointment is easy! Browse our certified doctor list, select a doctor that fits your needs, choose an available time slot, and confirm. Would you like to view our available doctors?",
+      link: "/doctors-list",
+      linkText: "View Doctors List 📅",
+    },
+    {
+      keywords: [
+        "Analyse",
+        "symptom",
+        "xray",
+        "x-ray",
+        "mri",
+        "ct",
+        "dicom",
+        "image",
+        "analysis",
+        "ai model",
+      ],
+      answer:
+        "Assnani uses state-of-the-art AI models to analyze dental X-rays, MRIs, and CT scans in formats like DICOM, JPEG, and PNG. Analyses usually complete within 2-5 minutes with over 90% accuracy. You can upload your scan now:",
+      link: "/dental-chatbot",
+      linkText: "Upload Scan & Analyze 🧬",
+    },
+    {
+      keywords: [
+        "register",
+        "signup",
+        "sign up",
+        "create account",
+        "account",
+        "profile",
+      ],
+      answer:
+        "You can create an account on Assnani as a Patient, Doctor, Student Doctor, or Receptionist. Make sure to verify your email after signing up. Click below to start registration:",
+      link: "/register",
+      linkText: "Go to Registration Screen 🔐",
+    },
+    {
+      keywords: ["support", "contact", "phone", "email", "help", "chat", "live"],
+      answer:
+        "Need direct assistance? You can contact our support team at support@assnani.com or call +1 (555) 123-4567 (Mon-Fri, 9 AM - 6 PM EST). Alternatively, write a message on our support page:",
+      link: "/support",
+      linkText: "Send Support Message ✉️",
+    },
+    {
+      keywords: ["faq", "questions", "how it works"],
+      answer:
+        "We have answers for most common questions in our FAQ page. Check it out here:",
+      link: "/faq",
+      linkText: "Browse FAQ Center 💡",
+    },
+    {
+      keywords: [
+        "payment",
+        "billing",
+        "insurance",
+        "price",
+        "fee",
+        "cost",
+        "receipt",
+      ],
+      answer:
+        "We support major credit/debit cards and digital payment options. For patient safety and records transparency, your payments generate automated receipts sent to your email. You can manage bills in your profile details.",
+      link: "/support",
+      linkText: "Inquire about billing 💳",
+    },
+  ];
 const TRIAGE_QUESTIONS = [
   {
     id: "has_pain",
@@ -447,7 +447,6 @@ export default function ChatbotWidget() {
     } // Add this closing brace
 
     const userMsg: Message = {
-      // eslint-disable-next-line react-hooks/purity
       id: `${Date.now()}-${messageIdCounter.current++}`,
       sender: "user",
       text,
@@ -536,11 +535,10 @@ export default function ChatbotWidget() {
 
       {isOpen && (
         <div
-          className={`fixed bottom-6  right-6 z-50 flex flex-col bg-(--color-surface) border border-(--color-border) shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 ${
-            isMaximized
+          className={`fixed bottom-6 right-6 z-50 flex flex-col bg-(--color-surface) border border-(--color-border) shadow-2xl rounded-2xl overflow-hidden transition-all duration-300 ${isMaximized
               ? "w-[calc(100vw-3rem)] h-[calc(100vh-3rem)] max-w-4xl max-h-[800px]"
-              : "w-[380px] max-sm:w-full max-sm:h-full h-[580px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)]"
-          }`}
+              : "w-[380px] h-[580px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)]"
+            }`}
         >
           <div className="flex items-center justify-between px-4 py-3 bg-linear-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 text-white select-none">
             <div className="flex items-center space-x-3">
@@ -600,11 +598,10 @@ export default function ChatbotWidget() {
                   )}
                   <div className="flex flex-col space-y-1">
                     <div
-                      className={`px-3.5 py-2.5 text-sm shadow-sm leading-relaxed ${
-                        msg.sender === "user"
+                      className={`px-3.5 py-2.5 text-sm shadow-sm leading-relaxed ${msg.sender === "user"
                           ? "bg-blue-600 text-white rounded-2xl rounded-tr-none"
                           : "bg-(--color-surface) text-(--color-text) border border-(--color-border) rounded-2xl rounded-tl-none"
-                      }`}
+                        }`}
                     >
                       <p className="whitespace-pre-wrap">{msg.text}</p>
 
@@ -636,9 +633,8 @@ export default function ChatbotWidget() {
                       )}
                     </div>
                     <span
-                      className={`text-[9px] text-gray-400 px-1 ${
-                        msg.sender === "user" ? "text-right" : "text-left ml-8"
-                      }`}
+                      className={`text-[9px] text-gray-400 px-1 ${msg.sender === "user" ? "text-right" : "text-left ml-8"
+                        }`}
                     >
                       {msg.timestamp}
                     </span>
