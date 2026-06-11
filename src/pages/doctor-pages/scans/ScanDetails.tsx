@@ -97,7 +97,7 @@ const ScanDetails = () => {
       const response = await axios.get(`${backendUrl}Scans/${scanId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log(response);
+
       return response.data;
     },
     enabled: !!scanId,

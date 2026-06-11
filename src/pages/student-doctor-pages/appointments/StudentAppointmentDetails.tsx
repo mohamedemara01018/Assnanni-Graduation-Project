@@ -99,6 +99,24 @@ const StudentAppointmentDetails = () => {
     .join("")
     .toUpperCase();
 
+  const getStatusStyles = () => {
+    switch (appointment.status) {
+      case "Upcoming":
+      case "Confirmed":
+        return "bg-blue-50 text-blue-600 border-blue-100";
+      case "Completed":
+        return "bg-emerald-50 text-emerald-600 border-emerald-100";
+      case "Cancelled":
+        return "bg-red-50 text-red-600 border-red-100";
+      case "Pending":
+        return "bg-yellow-50 text-yellow-600 border-yellow-100";
+      case "Rescheduled":
+        return "bg-purple-50 text-purple-600 border-purple-100";
+      default:
+        return "bg-gray-50 text-gray-600 border-gray-100";
+    }
+  };
+
   return (
     <DashboardLayout pageTitle="Appointment Details">
       <div className="-mt-6 -ml-6 bg-(--color-bg) min-h-screen p-8">
@@ -120,7 +138,9 @@ const StudentAppointmentDetails = () => {
                 Appointment ID: {appointment.id}
               </p>
             </div>
-            <div className="bg-emerald-50 text-emerald-600 px-4 py-1.5 rounded-xl border border-emerald-100 text-sm font-bold">
+            <div
+              className={`${getStatusStyles()} px-4 py-1.5 rounded-xl border text-sm font-bold`}
+            >
               {appointment.status}
             </div>
           </div>
@@ -238,19 +258,23 @@ const StudentAppointmentDetails = () => {
           )}
 
           {/* Receptionist Actions */}
-          {role === "receptionist" && (
-            <div className="flex gap-4 mt-12 pt-10 border-t border-(--color-border)">
-              <NavLink
-                to={`/receptionist/reschedule/${appointment.id}`}
-                className="flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-sm hover:shadow-md active:scale-[0.98] text-center"
-              >
-                Reschedule
-              </NavLink>
-              <button className="flex-1 py-3 px-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.98]">
-                Cancel Appointment
-              </button>
-            </div>
-          )}
+          {role === "receptionist" &&
+            appointment.status !== "Cancelled" &&
+            appointment.status !== "Completed" && (
+              <div className="flex gap-4 mt-12 pt-10 border-t border-(--color-border)">
+                {appointment.status !== "Rescheduled" && (
+                  <NavLink
+                    to={`/receptionist/reschedule/${appointment.id}`}
+                    className="flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-sm hover:shadow-md active:scale-[0.98] text-center"
+                  >
+                    Reschedule
+                  </NavLink>
+                )}
+                <button className="flex-1 py-3 px-6 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 font-bold rounded-xl transition-all hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.98]">
+                  Cancel Appointment
+                </button>
+              </div>
+            )}
         </div>
       </div>
     </DashboardLayout>

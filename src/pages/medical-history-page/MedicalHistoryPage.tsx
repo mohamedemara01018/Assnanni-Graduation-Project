@@ -5,7 +5,7 @@ import MedicalHistoryInDoctorDashboard from "../doctor-pages/patients/MedicalHis
 
 const MedicalHistory = () => {
   const role = useSelector((state: RootState) => state.auth.role);
-  console.log(role);
+
   if (role == "doctor") {
     return <MedicalHistoryInDoctorDashboard />;
   }
