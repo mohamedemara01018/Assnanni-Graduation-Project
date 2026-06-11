@@ -132,3 +132,12 @@ export const formatDateTime = (isoString: string): FormattedDateTime => {
     rawDate
   };
 };
+
+
+export function pct(val: number) { return `${(val * 100).toFixed(1)}%`; }
+
+export function getBarColor(val: number) {
+  if (val >= 0.93) return 'bg-emerald-500';
+  if (val >= 0.85) return 'bg-blue-500';
+  return 'bg-amber-500';
+}
