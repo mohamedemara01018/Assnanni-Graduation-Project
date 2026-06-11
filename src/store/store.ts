@@ -37,7 +37,9 @@ import singleModelReducer from './slices/admin-slice/single-model-slice/singleMo
 import updateAIModelReducer from './slices/admin-slice/update-aI-model-slice/updateAIModelSlice'
 import deleteAIModelReducer from './slices/admin-slice/delete-aI-model-slice/deleteAIModelSlice'
 import createModelReducer from './slices/admin-slice/create-ai-model-slice/createAIModelSlice'
-
+import favoriteDoctorsReducer from './slices/patient-slice/favorites-slice/favoritesSlice'
+import deleteFavoriteReducer from './slices/patient-slice/remove-doctor-from-favorites-slice/removeDoctorFromFavoritesSlice'
+import addFavoriteReducer from './slices/patient-slice/add-doctor-to-favorites-slice/addDoctorToFavoritesSlice'
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -82,7 +84,10 @@ export const store = configureStore({
     editFeedbackSlice: editFeedbackReducer,
     deleteFeedbackSlice: deleteFeedbackReducer,
     medicalHistorySlice: medicalHistoryReducer,
-    createPaymentSlice: createPaymentReducer
+    createPaymentSlice: createPaymentReducer,
+    favoriteDoctorsSlice: favoriteDoctorsReducer,
+    deleteFavoriteSlice: deleteFavoriteReducer,
+    addFavoriteSlice: addFavoriteReducer
   },
 });
 

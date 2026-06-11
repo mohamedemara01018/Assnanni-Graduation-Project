@@ -61,6 +61,7 @@ export const roleRoutePaths = {
     "appointments",
     "prescriptions",
     "medical-history",
+    'favorites'
   ],
 };
 

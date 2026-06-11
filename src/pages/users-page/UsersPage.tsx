@@ -827,8 +827,8 @@ const UserAvatar = ({ src, alt }: { src: string; alt: string }) => {
   }
 
   return (
-    <div className="w-full h-full bg-[var(--color-bg-blue)] border border-[var(--color-primary)]/20 flex items-center justify-center">
-      <User className="w-5 h-5 text-[var(--color-primary)]" />
+    <div className="w-full h-full bg-(--color-bg-blue) border border-(--color-primary)/20 flex items-center justify-center">
+      <User className="w-5 h-5 text-(--color-primary)" />
     </div>
   );
 };

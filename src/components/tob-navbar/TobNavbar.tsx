@@ -1,9 +1,8 @@
-import { IoIosNotificationsOutline } from "react-icons/io";
 import SearchInput from "../search-input/SearchInput";
 import { Link } from "react-router";
 import ThemeToggle from "../theme-toggle/ThemeToggle";
 import UserComp from "../user-comp/UserComp";
-import { List } from "lucide-react";
+import { Bell, Heart, List } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -58,10 +57,19 @@ function TobNavbar({ collapsed, setCollapsed, pageTitle }: TobNavbarProb) {
         </div>
         <ThemeToggle />
         <Link
+          to={"/favorites"}
+          className="relative p-2  hover:bg-(--color-bg-link-hover) rounded-lg text-2xl cursor-pointer"
+        >
+          <Heart />
+          {unreadCount > 0 && (
+            <span className="w-2 h-2 bg-red-500 rounded-full absolute top-1 right-2"></span>
+          )}
+        </Link>
+        <Link
           to={"/notification"}
           className="relative p-2  hover:bg-(--color-bg-link-hover) rounded-lg text-2xl cursor-pointer"
         >
-          <IoIosNotificationsOutline className="text-(--color-text)" />
+          <Bell className="text-(--color-text)" />
           {unreadCount > 0 && (
             <span className="w-2 h-2 bg-red-500 rounded-full absolute top-1 right-2"></span>
           )}

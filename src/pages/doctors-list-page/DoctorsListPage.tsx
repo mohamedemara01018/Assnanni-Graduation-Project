@@ -15,8 +15,9 @@ import Pagination from "@/components/pagination/Pagination";
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import { allDoctorsState, fetchAllDoctors, type Doctor } from "@/store/slices/patient-slice/all-doctors-slice/allDoctorsSlice";
-import { SlidersHorizontal, User, X, Stethoscope, CalendarCheck, ChevronDown, MapPin, Sliders, ArrowUpDown } from "lucide-react";
+import { SlidersHorizontal, User, X, Stethoscope, CalendarCheck, ChevronDown, MapPin, Sliders, ArrowUpDown, Heart } from "lucide-react";
 import { toast } from "react-toastify";
+import { addDoctorToFavorites, selectAddFavoriteState, type AddFavoriteState } from "@/store/slices/patient-slice/add-doctor-to-favorites-slice/addDoctorToFavoritesSlice";
 
 // ── Quick filter tabs ──────────────────────────────────────────────────────────
 
@@ -160,11 +161,10 @@ function DoctorList() {
 
         {/* ── Sidebar (desktop) ──────────────────────────────────────────────── */}
         <aside
-          className={`self-start sticky top-4 shrink-0 max-sm:hidden rounded-2xl border bg-(--color-surface) transition-all duration-300 ${
-            desktopSidebarOpen
-              ? "w-[260px] border-(--color-border) opacity-100"
-              : "w-0 border-transparent overflow-hidden opacity-0 pointer-events-none"
-          }`}
+          className={`self-start sticky top-4 shrink-0 max-sm:hidden rounded-2xl border bg-(--color-surface) transition-all duration-300 ${desktopSidebarOpen
+            ? "w-[260px] border-(--color-border) opacity-100"
+            : "w-0 border-transparent overflow-hidden opacity-0 pointer-events-none"
+            }`}
           style={{ boxShadow: desktopSidebarOpen ? "var(--shadow)" : "none" }}
         >
           <div className="flex items-center justify-between px-4 py-3.5 border-b border-(--color-border)">
@@ -394,11 +394,10 @@ function DoctorList() {
             <NotFound subMessage="No doctors found matching your criteria" />
           ) : (
             <div
-              className={`grid grid-cols-1 gap-4 transition-all duration-300 ${
-                desktopSidebarOpen
-                  ? "md:grid-cols-2 xl:grid-cols-3"
-                  : "md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-              }`}
+              className={`grid grid-cols-1 gap-4 transition-all duration-300 ${desktopSidebarOpen
+                ? "md:grid-cols-2 xl:grid-cols-3"
+                : "md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                }`}
             >
               {data.items.map((doctor: Doctor) => (
                 <DoctorCard key={doctor.doctorId} doctor={doctor} />
@@ -422,11 +421,29 @@ function DoctorList() {
   );
 }
 
-
 export function DoctorCard({ doctor }: { doctor: Doctor }) {
   const isOnline = doctor.status?.toLowerCase() === "available";
   const role = useSelector((state: RootState) => state.auth?.role);
+
+  // Accessing loading specifically from the operational state template
+  const { loading } = useSelector(selectAddFavoriteState) as AddFavoriteState;
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+
+  // Triggered clean onClick action for favorites
+  const handleFavoriteClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevents nested action bubbling
+    if (loading) return; // Prevent multiple clicks while waiting for the response
+
+    dispatch(addDoctorToFavorites(Number(doctor.doctorId)))
+      .unwrap()
+      .then(() => {
+        toast.success(`Added Dr. ${doctor.name} to your favorites!`);
+      })
+      .catch((err) => {
+        toast.error(err || "Could not save to favorites.");
+      });
+  };
 
   const handleBookingClick = (id: number) => {
     if (role === "guest") {
@@ -472,9 +489,23 @@ export function DoctorCard({ doctor }: { doctor: Doctor }) {
               {doctor.name?.trim().length > 0 ? `Dr. ${doctor.name}` : "Unknown Doctor"}
             </h2>
             {/* Dynamic Price Flag */}
-            <span className="text-xs font-bold text-(--color-primary) bg-(--color-bg-blue) px-2 py-0.5 rounded-md border border-primary/10 shrink-0">
-              ${doctor.price}
-            </span>
+            <div className="flex gap-2">
+              <span className="text-xs font-bold text-(--color-primary) bg-(--color-bg-blue) px-2 py-0.5 rounded-md border border-primary/10 shrink-0">
+                ${doctor.price}
+              </span>
+              {
+                role === 'patient' && (
+                  <button
+                    type="button"
+                    onClick={handleFavoriteClick}
+                    disabled={loading}
+                    className="disabled:opacity-50"
+                  >
+                    <Heart className="text-red-500 fill-red-500 cursor-pointer hover:scale-110 duration-150 w-5 h-5" />
+                  </button>
+                )
+              }
+            </div>
           </div>
 
           {/* Specialization Field - Fixed mapping */}

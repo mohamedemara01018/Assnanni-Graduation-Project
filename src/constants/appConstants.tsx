@@ -73,6 +73,7 @@ import StudentAppointmentDetails from "@/pages/student-doctor-pages/appointments
 import MedicalHistory from "@/pages/medical-history-page/MedicalHistoryPage";
 import ChatBot from "@/components/chatbot/Chatbot";
 import SingleAiModelPage from "@/pages/single-ai-model-page/SingleAiModelPage";
+import FavoritesPage from "@/pages/favorites-page/FavoritesPage";
 
 // ProtectedRoute component for role-based access control
 export const ProtectedRoute = ({
@@ -117,6 +118,7 @@ export const routeElements = {
   // Patient routes
   "/patient": <PatientPage />,
   prescriptions: <PrescriptionsPage />,
+  'favorites': <FavoritesPage />,
   // Admin routes
   "/admin": <AdminPage />,
   users: <UsersPage />,
