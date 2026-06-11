@@ -140,19 +140,23 @@ function AppointmentsCard({
                 </button>
               )}
 
-              {role === "receptionist" && (
-                <>
-                  <NavLink
-                    to={`/receptionist/reschedule/${id}`}
-                    className="text-xs font-bold text-gray-600 hover:text-gray-800 underline-offset-4 hover:underline"
-                  >
-                    Reschedule
-                  </NavLink>
-                  <button className="text-xs font-bold text-red-500 hover:text-red-600 underline-offset-4 hover:underline">
-                    Cancel
-                  </button>
-                </>
-              )}
+              {role === "receptionist" &&
+                status !== "Cancelled" &&
+                status !== "Completed" && (
+                  <>
+                    {status !== "Rescheduled" && (
+                      <NavLink
+                        to={`/receptionist/reschedule/${id}`}
+                        className="text-xs font-bold text-gray-600 hover:text-gray-800 underline-offset-4 hover:underline"
+                      >
+                        Reschedule
+                      </NavLink>
+                    )}
+                    <button className="text-xs font-bold text-red-500 hover:text-red-600 underline-offset-4 hover:underline">
+                      Cancel
+                    </button>
+                  </>
+                )}
             </div>
           </>
         )}

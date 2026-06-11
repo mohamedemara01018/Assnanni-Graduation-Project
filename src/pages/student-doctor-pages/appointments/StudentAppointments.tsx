@@ -60,7 +60,6 @@ const StudentAppointments = () => {
     isLoading,
     isError,
     error,
-    isSuccess,
   } = useQuery<ApiResponse<StudentAppointmentsResponse>, Error>({
     queryKey: [
       "studentAppointments",
@@ -130,13 +129,6 @@ const StudentAppointments = () => {
     },
   });
 
-  // Success and failure toast notifications
-  useEffect(() => {
-    if (isSuccess && responseBody) {
-      toast.success(responseBody.message || "Appointments loaded successfully");
-    }
-  }, [isSuccess, responseBody]);
-
   useEffect(() => {
     if (isError && error) {
       const err = error as any;
@@ -163,7 +155,9 @@ const StudentAppointments = () => {
             ? "Completed"
             : apiApp.status === "Cancelled"
               ? "Cancelled"
-              : (apiApp.status as AppointmentData["status"]),
+              : apiApp.status === "Rescheduled"
+                ? "Rescheduled"
+                : (apiApp.status as AppointmentData["status"]),
     meetingType: apiApp.mode === "Online" ? "Video Call" : "In-Person",
   });
 
