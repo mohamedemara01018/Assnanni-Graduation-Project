@@ -99,6 +99,24 @@ const StudentAppointmentDetails = () => {
     .join("")
     .toUpperCase();
 
+  const getStatusStyles = () => {
+    switch (appointment.status) {
+      case "Upcoming":
+      case "Confirmed":
+        return "bg-blue-50 text-blue-600 border-blue-100";
+      case "Completed":
+        return "bg-emerald-50 text-emerald-600 border-emerald-100";
+      case "Cancelled":
+        return "bg-red-50 text-red-600 border-red-100";
+      case "Pending":
+        return "bg-yellow-50 text-yellow-600 border-yellow-100";
+      case "Rescheduled":
+        return "bg-purple-50 text-purple-600 border-purple-100";
+      default:
+        return "bg-gray-50 text-gray-600 border-gray-100";
+    }
+  };
+
   return (
     <DashboardLayout pageTitle="Appointment Details">
       <div className="-mt-6 -ml-6 bg-(--color-bg) min-h-screen p-8">
@@ -120,7 +138,9 @@ const StudentAppointmentDetails = () => {
                 Appointment ID: {appointment.id}
               </p>
             </div>
-            <div className="bg-emerald-50 text-emerald-600 px-4 py-1.5 rounded-xl border border-emerald-100 text-sm font-bold">
+            <div
+              className={`${getStatusStyles()} px-4 py-1.5 rounded-xl border text-sm font-bold`}
+            >
               {appointment.status}
             </div>
           </div>

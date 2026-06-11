@@ -66,7 +66,7 @@ const AllAppointments = () => {
   const queryClient = useQueryClient();
 
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
-  console.log(backendUrl);
+
   const token = Cookies.get("jwtToken");
   const [nameDescription, setNameDescription] = useState("");
 

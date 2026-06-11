@@ -20,7 +20,6 @@ const Card = ({
   onMarkViewed,
   isMarkingViewed,
 }: Props) => {
-  console.log(children);
   return (
     <div className="flex bg-(--color-bg) justify-between p-4 items-center rounded-xl border border-(--color-border)/50 hover:border-(--color-border) transition-all shadow-sm">
       <div className="flex gap-4 items-center flex-1 ">
