@@ -78,6 +78,7 @@ const ScanDetails = () => {
   const [isViewReviewOpen, setIsViewReviewOpen] = useState(false);
   const [hasSubmittedReview, setHasSubmittedReview] = useState(false);
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
+  const [viewerImageUrl, setViewerImageUrl] = useState("");
 
   const {
     register: registerReview,
@@ -96,6 +97,7 @@ const ScanDetails = () => {
       const response = await axios.get(`${backendUrl}Scans/${scanId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log(response);
       return response.data;
     },
     enabled: !!scanId,
@@ -129,9 +131,13 @@ const ScanDetails = () => {
   });
 
   const annotatedImageUrl = annotatedImageUrlData?.data as string | null;
-  // Prefer: dedicated annotated-image endpoint → annotatedImageUrl field → fileUrl
-  const displayImageUrl = resolveAssetUrl(
-    annotatedImageUrl || scan?.annotatedImageUrl || scan?.fileUrl || "",
+  // Original image URL with backend prefix
+  const originalImageUrl = scan?.fileUrl
+    ? `https://asnani.runasp.net//${scan.fileUrl}`
+    : "";
+  // Annotated image URL
+  const displayAnnotatedImageUrl = resolveAssetUrl(
+    annotatedImageUrl || scan?.annotatedImageUrl || "",
   );
 
   const { data: reportData, isLoading: isReportLoading } = useQuery({
@@ -356,35 +362,68 @@ const ScanDetails = () => {
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
           {/* Main Content - Image & Findings */}
           <div className="xl:col-span-2 space-y-8">
-            {/* Scan Image Card */}
-            <div className="bg-(--color-surface) rounded-3xl border border-(--color-border) overflow-hidden shadow-sm">
-              <div className="p-6 border-b border-(--color-border) flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/30">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-xl">
-                    <LuScanLine size={20} />
+            {/* Scan Images - Side by Side */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Original Image Card */}
+              <div className="bg-(--color-surface) rounded-3xl border border-(--color-border) overflow-hidden shadow-sm">
+                <div className="p-6 border-b border-(--color-border) flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/30">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 rounded-xl">
+                      <LuScanLine size={20} />
+                    </div>
+                    <span className="font-bold text-(--color-text)">
+                      Original Radiograph
+                    </span>
                   </div>
-                  <span className="font-bold text-(--color-text)">
-                    Original Radiograph
+                  <span
+                    className={`px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+                      isCompletedStatus
+                        ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                        : "bg-yellow-50 text-yellow-600 border-yellow-100"
+                    }`}
+                  >
+                    {scan.status}
                   </span>
                 </div>
-                <span
-                  className={`px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
-                    isCompletedStatus
-                      ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-                      : "bg-yellow-50 text-yellow-600 border-yellow-100"
-                  }`}
-                >
-                  {scan.status}
-                </span>
+                <div className="p-6 flex justify-center bg-black/5 dark:bg-black/20">
+                  <img
+                    src={originalImageUrl}
+                    alt="Original Radiographic Scan"
+                    onClick={() => {
+                      setViewerImageUrl(originalImageUrl);
+                      setIsImageViewerOpen(true);
+                    }}
+                    className="max-h-[400px] rounded-2xl shadow-2xl object-contain border-4 border-white dark:border-gray-800 cursor-zoom-in"
+                  />
+                </div>
               </div>
-              <div className="p-8 flex justify-center bg-black/5 dark:bg-black/20">
-                <img
-                  src={displayImageUrl}
-                  alt="Radiographic Scan"
-                  onClick={() => setIsImageViewerOpen(true)}
-                  className="max-h-[500px] rounded-2xl shadow-2xl object-contain border-4 border-white dark:border-gray-800 cursor-zoom-in"
-                />
-              </div>
+
+              {/* Annotated Image Card */}
+              {displayAnnotatedImageUrl && (
+                <div className="bg-(--color-surface) rounded-3xl border border-(--color-border) overflow-hidden shadow-sm">
+                  <div className="p-6 border-b border-(--color-border) flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/30">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-purple-50 dark:bg-purple-900/20 text-purple-600 rounded-xl">
+                        <LuScanLine size={20} />
+                      </div>
+                      <span className="font-bold text-(--color-text)">
+                        Annotated Radiograph
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-6 flex justify-center bg-black/5 dark:bg-black/20">
+                    <img
+                      src={displayAnnotatedImageUrl}
+                      alt="Annotated Radiographic Scan"
+                      onClick={() => {
+                        setViewerImageUrl(displayAnnotatedImageUrl);
+                        setIsImageViewerOpen(true);
+                      }}
+                      className="max-h-[400px] rounded-2xl shadow-2xl object-contain border-4 border-white dark:border-gray-800 cursor-zoom-in"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* AI Insights Card */}
@@ -899,7 +938,7 @@ const ScanDetails = () => {
               Close
             </button>
             <img
-              src={displayImageUrl}
+              src={viewerImageUrl}
               alt="Radiographic Scan Enlarged"
               className="max-w-[96vw] max-h-[92vh] object-contain rounded-2xl shadow-2xl border-4 border-white/20"
             />
