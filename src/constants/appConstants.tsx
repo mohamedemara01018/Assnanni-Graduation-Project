@@ -109,6 +109,7 @@ export const homePageByRole = {
   studentDoctor: <StudentDoctorDashboard />,
   receptionist: <ReceptionistDashboard />,
   admin: <AdminPage />,
+  // 'doctor_pendingapproval': <WaitingPage />
   // guest: <Landing />,
 };
 
@@ -157,6 +158,7 @@ export const routeElements = {
   "appointments/doctor-appointments/:id": <AppointmentDetails />,
   "doctor-appointments/:id": <StudentAppointmentDetails />,
   "doctor-appointments-dashboard": <AllAppointments />,
+  // "waiting": <WaitingPage />,
 
   "doctor-learning-sessions": <LearningSessions />,
   "doctor-learning-sessions/create": <CreateLearningSession />,

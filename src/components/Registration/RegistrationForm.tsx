@@ -149,11 +149,14 @@ const RegistrationForm = ({
           typeof response.data === "string"
             ? response.data
             : JSON.stringify(response.data);
+        console.log(responseText)
         const doctorIdMatch = responseText.match(/DoctorId:\s*(\d+)/);
         if (doctorIdMatch) {
           doctorId = doctorIdMatch[1];
         }
       }
+
+
 
       navigator("/verify-email", {
         state: { isDoctor: doctor, isStudentDoctor: studentDoctor, doctorId },
@@ -226,9 +229,8 @@ const RegistrationForm = ({
               <div className="relative">
                 <input
                   type="text"
-                  className={`${inputBaseClass} ${
-                    errors.firstName ? inputErrorClass : inputBorderClass
-                  }`}
+                  className={`${inputBaseClass} ${errors.firstName ? inputErrorClass : inputBorderClass
+                    }`}
                   placeholder="John"
                   id="firstName"
                   {...register("firstName", {
@@ -248,9 +250,8 @@ const RegistrationForm = ({
               <div className="relative">
                 <input
                   type="text"
-                  className={`${inputBaseClass} ${
-                    errors.lastName ? inputErrorClass : inputBorderClass
-                  }`}
+                  className={`${inputBaseClass} ${errors.lastName ? inputErrorClass : inputBorderClass
+                    }`}
                   id="lastName"
                   placeholder="Doe"
                   {...register("lastName", {
@@ -272,9 +273,8 @@ const RegistrationForm = ({
               <input
                 type="email"
                 placeholder="John.doe@example.com"
-                className={`${inputBaseClass} ${
-                  errors.email ? inputErrorClass : inputBorderClass
-                }`}
+                className={`${inputBaseClass} ${errors.email ? inputErrorClass : inputBorderClass
+                  }`}
                 id="email"
                 {...register("email", {
                   pattern: {
@@ -297,9 +297,8 @@ const RegistrationForm = ({
             <div className="relative">
               <input
                 type="text"
-                className={`${inputBaseClass} ${
-                  errors.phoneNumber ? inputErrorClass : inputBorderClass
-                }`}
+                className={`${inputBaseClass} ${errors.phoneNumber ? inputErrorClass : inputBorderClass
+                  }`}
                 placeholder="+1 (555) 000-000"
                 id="phoneNumber"
                 {...register("phoneNumber", {
@@ -333,9 +332,8 @@ const RegistrationForm = ({
                 type="password"
                 id="password"
                 placeholder="password"
-                className={`${inputBaseClass} ${
-                  errors.password ? inputErrorClass : inputBorderClass
-                }`}
+                className={`${inputBaseClass} ${errors.password ? inputErrorClass : inputBorderClass
+                  }`}
                 {...register("password", {
                   required: "Password is Required",
                   minLength: {
@@ -362,9 +360,8 @@ const RegistrationForm = ({
             <div className="relative">
               <input
                 type="password"
-                className={`${inputBaseClass} ${
-                  errors.confirmPassword ? inputErrorClass : inputBorderClass
-                }`}
+                className={`${inputBaseClass} ${errors.confirmPassword ? inputErrorClass : inputBorderClass
+                  }`}
                 id="cPassword"
                 placeholder="confirm password"
                 {...register("confirmPassword", {
@@ -388,9 +385,8 @@ const RegistrationForm = ({
                   <div className="relative">
                     <input
                       type="date"
-                      className={`${inputBaseClass} ${
-                        errors.dateOfBirth ? inputErrorClass : inputBorderClass
-                      }`}
+                      className={`${inputBaseClass} ${errors.dateOfBirth ? inputErrorClass : inputBorderClass
+                        }`}
                       id="dateOfBirth"
                       {...register("dateOfBirth", {
                         required: "Date of Birth is Required",
@@ -408,9 +404,8 @@ const RegistrationForm = ({
                   </label>
                   <div className="relative">
                     <select
-                      className={`${inputBaseClass} ${
-                        errors.gender ? inputErrorClass : inputBorderClass
-                      }`}
+                      className={`${inputBaseClass} ${errors.gender ? inputErrorClass : inputBorderClass
+                        }`}
                       id="gender"
                       {...register("gender", {
                         required: "Gender is Required",
@@ -435,9 +430,8 @@ const RegistrationForm = ({
                   <div className="relative">
                     <input
                       type="text"
-                      className={`${inputBaseClass} ${
-                        errors.address ? inputErrorClass : inputBorderClass
-                      }`}
+                      className={`${inputBaseClass} ${errors.address ? inputErrorClass : inputBorderClass
+                        }`}
                       id="address"
                       placeholder="123 Main St"
                       {...register("address", {
@@ -456,9 +450,8 @@ const RegistrationForm = ({
                   </label>
                   <div className="relative">
                     <select
-                      className={`${inputBaseClass} ${
-                        errors.bloodType ? inputErrorClass : inputBorderClass
-                      }`}
+                      className={`${inputBaseClass} ${errors.bloodType ? inputErrorClass : inputBorderClass
+                        }`}
                       id="bloodType"
                       {...register("bloodType", {
                         required: "Blood Type is Required",

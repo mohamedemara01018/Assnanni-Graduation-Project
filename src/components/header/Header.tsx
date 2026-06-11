@@ -19,6 +19,8 @@ function Header() {
     { name: "Support", path: "/support" },
   ];
 
+  console.log(role)
+
   const isMobile = useMediaQuery("(max-width: 955px)");
 
   return (
@@ -44,12 +46,11 @@ function Header() {
                         <NavLink
                           to={link.path}
                           className={({ isActive, isPending }) =>
-                            `px-4 py-2 block rounded-md  hover:bg-(--color-bg-link-hover) font-semibold ${
-                              isPending
-                                ? ""
-                                : isActive
-                                  ? "bg-(--color-bg-blue) text-(--color-text-blue)"
-                                  : "hover:bg-(--color-bg-link-hover)"
+                            `px-4 py-2 block rounded-md  hover:bg-(--color-bg-link-hover) font-semibold ${isPending
+                              ? ""
+                              : isActive
+                                ? "bg-(--color-bg-blue) text-(--color-text-blue)"
+                                : "hover:bg-(--color-bg-link-hover)"
                             }`
                           }
                         >
@@ -79,7 +80,7 @@ function Header() {
 
           <ThemeToggle />
 
-          {!isMobile && role == "guest" && (
+          {!isMobile && (role == "guest" || role == 'doctor_pendingapproval') && (
             <div className="flex items-center gap-2">
               <Link
                 to={"/login"}
@@ -109,12 +110,11 @@ function Header() {
                         <NavLink
                           to={link.path}
                           className={({ isActive, isPending }) =>
-                            `px-4 py-2 block rounded-md  hover:bg-(--color-bg-link-hover) font-semibold ${
-                              isPending
-                                ? ""
-                                : isActive
-                                  ? "bg-(--color-bg-blue) text-(--color-text-blue)"
-                                  : "hover:bg-(--color-bg-link-hover)"
+                            `px-4 py-2 block rounded-md  hover:bg-(--color-bg-link-hover) font-semibold ${isPending
+                              ? ""
+                              : isActive
+                                ? "bg-(--color-bg-blue) text-(--color-text-blue)"
+                                : "hover:bg-(--color-bg-link-hover)"
                             }`
                           }
                         >
@@ -125,7 +125,7 @@ function Header() {
                   })}
               </ul>
 
-              {role == "guest" && (
+              {(role == "guest" || role == 'doctor_pendingapproval') && (
                 <div
                   className="flex flex-col pt-2 gap-2"
                   onClick={() => setMobileMenu(false)}

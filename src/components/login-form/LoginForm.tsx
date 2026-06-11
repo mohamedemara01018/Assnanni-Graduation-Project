@@ -18,6 +18,7 @@ function LoginForm() {
     (state: RootState) => state.config.backendUrl,
   )}Authentications/`;
 
+  console.log('login page')
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
@@ -44,12 +45,16 @@ function LoginForm() {
       ) {
         sessionStorage.removeItem("redirectAfterAuth");
         navigate(redirect);
-      } else navigate("/");
+      } else if (response.data.data?.roles.toLowerCase() == "Doctor_PendingApproval".toLowerCase()) {
+        navigate("/waiting");
+      } else {
+        navigate('/')
+      }
     } catch (error: any) {
       toast.error(
         error?.response?.data?.message ||
-          error.message ||
-          "Something went wrong",
+        error.message ||
+        "Something went wrong",
       );
     }
   };

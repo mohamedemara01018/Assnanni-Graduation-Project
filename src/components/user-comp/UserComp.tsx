@@ -2,18 +2,20 @@
 import { useState, useRef, useEffect } from "react";
 import { Settings, LogOut, ChevronDown, User, UserCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../store/slices/auth/authSlice";
 import { clearEmail } from "../../store/slices/email/emailSlice";
 import Cookies from "js-cookie";
+import type { RootState } from "@/store/store";
 
 function UserComp() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const role = useSelector((state: RootState) => state.auth.role);
+  const userProfileCookie = role == 'doctor_pendingapproval' ? null : Cookies.get("userProfile");
 
-  const userProfileCookie = Cookies.get("userProfile");
   const userProfile = userProfileCookie ? JSON.parse(userProfileCookie) : null;
   const fullName = userProfile?.fullName || userProfile?.name || "User";
   let imageUrl = userProfile?.imageUrl;
