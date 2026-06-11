@@ -8,6 +8,7 @@ export const roleRoutePaths = {
     "admin-doctors",
     "analytics",
     "ai-models",
+    "ai-models/:id",
   ],
   doctor: [
     "/doctor",
