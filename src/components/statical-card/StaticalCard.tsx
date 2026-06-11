@@ -3,19 +3,15 @@ import type { LucideIcon } from "lucide-react";
 interface StatCardProps {
   // Use LucideIcon type if you're passing the component itself
   Icon: LucideIcon;
-  TrendIcon: LucideIcon;
   label: string;
-  value: number;
-  trendValue?: string;
+  value: string;
   colorClass?: string; // To handle different colors like blue, green, etc.
 }
 
 function StatCard({
   Icon,
-  TrendIcon,
   label,
   value,
-  trendValue,
   colorClass = "bg-blue-100",
 }: StatCardProps) {
   return (
@@ -24,10 +20,6 @@ function StatCard({
         <div className={`p-2 rounded-lg ${colorClass}`}>
           <Icon size={20} className="text-current" />
         </div>
-      <div className="flex items-center text-green-500 text-sm font-medium">
-        <TrendIcon size={16} className="mr-1" />
-        {trendValue ? <span>{trendValue}</span> : null}
-      </div>
       </div>
 
       <div className="space-y-1">

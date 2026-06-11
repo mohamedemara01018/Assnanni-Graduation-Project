@@ -31,6 +31,15 @@ import rejectedDoctorsReducer from './slices/admin-slice/rejected-doctors-slice/
 import verifiedDoctorsReducer from './slices/admin-slice/verified-doctors-slice/verifiedDoctorSlice';
 import toggleStatusUsersReducer from './slices/admin-slice/toggle-status-users-slice/toggleStatusUsersSlice';
 import createPaymentReducer from './slices/patient-slice/create-payment-slice/createPaymentSlice';
+import adminDashboardReducer from './slices/admin-slice/admin-dashboard-slice/adminDashboardSlice'
+import aiModelsReducer from './slices/admin-slice/ai-model-slice/aiModelsSlice'
+import singleModelReducer from './slices/admin-slice/single-model-slice/singleModelSlice';
+import updateAIModelReducer from './slices/admin-slice/update-aI-model-slice/updateAIModelSlice'
+import deleteAIModelReducer from './slices/admin-slice/delete-aI-model-slice/deleteAIModelSlice'
+import createModelReducer from './slices/admin-slice/create-ai-model-slice/createAIModelSlice'
+import favoriteDoctorsReducer from './slices/patient-slice/favorites-slice/favoritesSlice'
+import deleteFavoriteReducer from './slices/patient-slice/remove-doctor-from-favorites-slice/removeDoctorFromFavoritesSlice'
+import addFavoriteReducer from './slices/patient-slice/add-doctor-to-favorites-slice/addDoctorToFavoritesSlice'
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -38,6 +47,7 @@ export const store = configureStore({
     config: configReducer,
 
     // admin dashboard
+    adminDashboardSlice: adminDashboardReducer,
     summarySlice: summaryReducer,
     usersSlice: usersReducer,
     pendingDoctorsSlice: pendingDoctorReducer,
@@ -47,6 +57,11 @@ export const store = configureStore({
     rejectedDoctorsSlice: rejectedDoctorsReducer,
     verifiedDoctorsSlice: verifiedDoctorsReducer,
     toggleStatusUsersSlice: toggleStatusUsersReducer,
+    aiModelsSlice: aiModelsReducer,
+    singleModelSlice: singleModelReducer,
+    updateAIModelSlice: updateAIModelReducer,
+    deleteAIModelSlice: deleteAIModelReducer,
+    createModelSlice: createModelReducer,
 
 
     // patient dashoard
@@ -69,7 +84,10 @@ export const store = configureStore({
     editFeedbackSlice: editFeedbackReducer,
     deleteFeedbackSlice: deleteFeedbackReducer,
     medicalHistorySlice: medicalHistoryReducer,
-    createPaymentSlice: createPaymentReducer
+    createPaymentSlice: createPaymentReducer,
+    favoriteDoctorsSlice: favoriteDoctorsReducer,
+    deleteFavoriteSlice: deleteFavoriteReducer,
+    addFavoriteSlice: addFavoriteReducer
   },
 });
 

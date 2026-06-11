@@ -9,7 +9,6 @@ import {
   FileText,
   Pill,
   Stethoscope,
-  TrendingUp,
   User,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
@@ -94,32 +93,32 @@ function PatientPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <StatCard
             Icon={Calendar}
-            TrendIcon={TrendingUp}
+            // TrendIcon={TrendingUp}
             label="Upcoming"
-            value={data.stats.upcomingAppointments}
+            value={String(data.stats.upcomingAppointments)}
             colorClass="text-green-500 bg-green-200"
           />
 
           <StatCard
             Icon={Pill}
-            TrendIcon={TrendingUp}
+            // TrendIcon={TrendingUp}
             label="Prescriptions"
-            value={data.stats.prescriptions}
+            value={String(data.stats.prescriptions)}
             colorClass="text-green-500 bg-green-200"
           />
           <StatCard
             Icon={FileText}
-            TrendIcon={TrendingUp}
+            // TrendIcon={TrendingUp}
             label="Records"
-            value={data.stats.medicalRecords}
+            value={String(data.stats.medicalRecords)}
             colorClass="text-purple-500 bg-purple-200"
           />
 
           <StatCard
             Icon={Activity}
-            TrendIcon={TrendingUp}
+            // TrendIcon={TrendingUp}
             label="Lab Results"
-            value={data.stats.labResults}
+            value={String(data.stats.labResults)}
             colorClass="text-orange-500 bg-orange-200"
           />
         </div>

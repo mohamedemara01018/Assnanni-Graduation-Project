@@ -1,29 +1,30 @@
+/* eslint-disable react-hooks/static-components */
 import { useState, useRef, useEffect } from "react";
-import { CiSettings, CiUser } from "react-icons/ci";
-import { FiLogOut, FiChevronDown } from "react-icons/fi";
+import { Settings, LogOut, ChevronDown, User, UserCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router";
 import { useDispatch } from "react-redux";
 import { logout } from "../../store/slices/auth/authSlice";
 import { clearEmail } from "../../store/slices/email/emailSlice";
 import Cookies from "js-cookie";
-import { User } from "lucide-react";
 
 function UserComp() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const userProfileCookie = Cookies.get("userProfile");
-
   const userProfile = userProfileCookie ? JSON.parse(userProfileCookie) : null;
   const fullName = userProfile?.fullName || userProfile?.name || "User";
   let imageUrl = userProfile?.imageUrl;
+  if (String(imageUrl)?.length === 26) imageUrl = "";
 
-  if (String(imageUrl)?.length === 26) {
-    imageUrl = "";
-  }
+  const initials = fullName
+    .split(" ")
+    .map((n: string) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -31,115 +32,135 @@ function UserComp() {
         setShowUserMenu(false);
       }
     };
-
-    if (showUserMenu) {
-      document.addEventListener("mousedown", handler);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handler);
-    };
+    if (showUserMenu) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, [showUserMenu]);
 
   const handleLogout = () => {
     dispatch(logout());
     dispatch(clearEmail());
-
     setShowUserMenu(false);
-
     navigate("/");
+  };
+
+  const Avatar = ({ size = "sm" }: { size?: "sm" | "md" }) => {
+    const dim = size === "sm" ? "w-8 h-8" : "w-9 h-9";
+    return (
+      <div
+        className={`${dim} rounded-full shrink-0 flex items-center justify-center overflow-hidden font-semibold text-xs`}
+        style={{ background: "var(--color-bg-blue)", color: "var(--color-primary)" }}
+      >
+        {imageUrl ? (
+          <img src={imageUrl} alt={fullName} className="w-full h-full object-cover" />
+        ) : initials ? (
+          <span>{initials}</span>
+        ) : (
+          <User className="w-4 h-4" style={{ color: "var(--color-primary)" }} />
+        )}
+      </div>
+    );
   };
 
   return (
     <div className="relative" ref={menuRef}>
-      {/* Trigger */}
+      {/* ── Trigger ── */}
       <button
         onClick={() => setShowUserMenu((prev) => !prev)}
         aria-haspopup="true"
         aria-expanded={showUserMenu}
-        className="flex items-center gap-2.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-2.5 py-1.5 hover:border-gray-300 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 transition-all cursor-pointer"
+        className="flex items-center gap-2.5 rounded-xl px-2.5 py-1.5 transition-all cursor-pointer"
+        style={{
+          background: showUserMenu ? "var(--color-bg-link-hover)" : "transparent",
+          border: "1px solid var(--color-border)",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--color-bg-link-hover)")}
+        onMouseLeave={(e) => (e.currentTarget.style.background = showUserMenu ? "var(--color-bg-link-hover)" : "transparent")}
       >
-        <div className="w-8 h-8 rounded-full bg-(--color-bg-blue) border border-primary/20 flex items-center justify-center">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt="Profile Image"
-              className="w-8 h-8 rounded-full text-(--color-primary)"
-            />
-          ) : (
-            <User className="w-4 h-4 text-(--color-primary)" />
-          )}
-        </div>
-
-        <span className="text-sm font-medium text-gray-800 dark:text-gray-200 max-sm:hidden">
+        <Avatar size="sm" />
+        <span
+          className="text-sm font-medium max-sm:hidden"
+          style={{ color: "var(--color-text)" }}
+        >
           {fullName}
         </span>
-
-        <FiChevronDown
-          className={`h-3.5 w-3.5 text-gray-400 transition-transform duration-200 ${
-            showUserMenu ? "rotate-180" : ""
-          }`}
+        <ChevronDown
+          className={`h-3.5 w-3.5 transition-transform duration-200 max-sm:hidden ${showUserMenu ? "rotate-180" : ""}`}
+          style={{ color: "var(--color-text-light)" }}
         />
       </button>
 
-      {/* Dropdown */}
+      {/* ── Dropdown ── */}
       {showUserMenu && (
-        <div className="absolute right-0 top-full mt-2 w-52 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 overflow-hidden z-40 shadow-lg">
-          {/* User Info */}
-          <div className="flex items-center gap-3 px-3.5 py-3 border-b border-gray-100 dark:border-gray-800">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-(--color-bg-blue) border border-primary/20 shrink-0">
-              {imageUrl ? (
-                <img
-                  src={imageUrl}
-                  alt="Profile Image"
-                  className="w-9 h-9 rounded-full text-(--color-primary)"
-                />
-              ) : (
-                <User className="w-4 h-4 text-(--color-primary)" />
-              )}
-            </div>
-
+        <div
+          className="absolute right-0 top-full mt-2 w-56 rounded-2xl overflow-hidden z-40"
+          style={{
+            background: "var(--color-surface)",
+            border: "1px solid var(--color-border)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+          }}
+        >
+          {/* User info header */}
+          <div
+            className="flex items-center gap-3 px-4 py-3.5"
+            style={{ borderBottom: "1px solid var(--color-border)" }}
+          >
+            <Avatar size="md" />
             <div className="min-w-0">
-              <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+              <p
+                className="text-sm font-semibold truncate"
+                style={{ color: "var(--color-text)" }}
+              >
                 {fullName}
               </p>
-
-              <p className="text-xs text-gray-400 dark:text-gray-500 truncate">
+              <p
+                className="text-xs truncate mt-0.5"
+                style={{ color: "var(--color-text-light)" }}
+              >
                 {userProfile?.email || "user@example.com"}
               </p>
             </div>
           </div>
 
-          {/* Links */}
-          <div className="py-1">
-            <Link
-              to="/profile"
-              onClick={() => setShowUserMenu(false)}
-              className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-            >
-              <CiUser className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />
-              Profile
-            </Link>
-
-            <Link
-              to="/settings"
-              onClick={() => setShowUserMenu(false)}
-              className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
-            >
-              <CiSettings className="h-4 w-4 text-gray-400 dark:text-gray-500 shrink-0" />
-              Settings
-            </Link>
+          {/* Nav links */}
+          <div className="py-1.5">
+            {[
+              { to: "/profile", icon: UserCircle, label: "Profile" },
+              { to: "/settings", icon: Settings, label: "Settings" },
+            ].map(({ to, icon: Icon, label }) => (
+              <Link
+                key={to}
+                to={to}
+                onClick={() => setShowUserMenu(false)}
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm transition-colors"
+                style={{ color: "var(--color-text-light)" }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "var(--color-bg-link-hover)";
+                  e.currentTarget.style.color = "var(--color-text)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.color = "var(--color-text-light)";
+                }}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                {label}
+              </Link>
+            ))}
           </div>
 
-          <div className="h-px bg-gray-100 dark:bg-gray-800" />
+          {/* Divider */}
+          <div style={{ height: 1, background: "var(--color-border)" }} />
 
           {/* Logout */}
-          <div className="py-1">
+          <div className="py-1.5">
             <button
               onClick={handleLogout}
-              className="flex w-full items-center gap-2.5 px-3.5 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+              className="flex w-full items-center gap-2.5 px-4 py-2.5 text-sm transition-colors"
+              style={{ color: "#dc2626" }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(220,38,38,0.07)")}
+              onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
             >
-              <FiLogOut className="h-4 w-4 shrink-0" />
+              <LogOut className="h-4 w-4 shrink-0" />
               Log out
             </button>
           </div>

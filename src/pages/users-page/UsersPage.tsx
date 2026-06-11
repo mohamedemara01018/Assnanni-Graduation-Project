@@ -1,3 +1,4 @@
+
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import {
   fetchAdminSummary,
@@ -41,14 +42,8 @@ import {
   selectToggleStatusState,
 } from "@/store/slices/admin-slice/toggle-status-users-slice/toggleStatusUsersSlice";
 
-type UserRole =
-  | ""
-  | "Doctor"
-  | "Patient"
-  | "Receptionist"
-  | "Student"
-  | "Admin";
-type UserGender = "" | "male" | "female";
+type UserRole = "" | "Doctor" | "Patient" | "Receptionist" | "Studentdoctor" | "Admin";
+type UserGender = "" | "Male" | "Female";
 
 // ─── Role config ──────────────────────────────────────────────────────────────
 
@@ -56,6 +51,7 @@ const roleConfig: Record<string, { bg: string; color: string }> = {
   admin: { bg: "rgba(220,38,38,0.08)", color: "#dc2626" },
   doctor: { bg: "var(--color-bg-blue)", color: "var(--color-text-blue)" },
   "student-doctor": { bg: "rgba(147,51,234,0.08)", color: "#9333ea" },
+  studentdoctor: { bg: "rgba(147,51,234,0.08)", color: "#9333ea" },
   receptionist: { bg: "rgba(22,163,74,0.08)", color: "var(--color-success)" },
   patient: { bg: "rgba(234,179,8,0.08)", color: "#ca8a04" },
 };
@@ -117,12 +113,6 @@ function UserDetailModal({
   onToggleStatus: () => void;
   toggling: boolean;
 }) {
-  const initials = user.fullName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
   const roleStyle = getRoleStyle(user.role);
 
   return (
@@ -154,28 +144,9 @@ function UserDetailModal({
         >
           <div className="flex items-center gap-3">
             <div className="relative shrink-0">
-              {user.imageUrl ? (
-                <img
-                  src={user.imageUrl}
-                  alt={user.fullName}
-                  className="w-12 h-12 rounded-xl object-cover"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.display =
-                      "none";
-                  }}
-                />
-              ) : (
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, var(--color-primary), var(--color-primary-light))",
-                  }}
-                >
-                  {initials}
-                </div>
-              )}
-              {/* Online dot */}
+              <div className="w-12 h-12 rounded-full overflow-hidden">
+                <UserAvatar src={user.imageUrl} alt={user.fullName} />
+              </div>
               <span
                 className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2"
                 style={{
@@ -223,7 +194,7 @@ function UserDetailModal({
               background: user.isActive
                 ? "rgba(22,163,74,0.07)"
                 : "rgba(220,38,38,0.06)",
-              border: `1px solid ${user.isActive ? "rgba(22,163,74,0.22)" : "rgba(220,38,38,0.2)"}`,
+              border: `1px solid ${user.isActive ? "rgba(22,163,74,0.22)" : "rgba(220,38,38,0.2)"} `,
             }}
           >
             <div className="flex items-center gap-2">
@@ -253,7 +224,7 @@ function UserDetailModal({
                   ? "rgba(220,38,38,0.08)"
                   : "rgba(22,163,74,0.08)",
                 color: user.isActive ? "#dc2626" : "var(--color-success)",
-                border: `1px solid ${user.isActive ? "rgba(220,38,38,0.2)" : "rgba(22,163,74,0.2)"}`,
+                border: `1px solid ${user.isActive ? "rgba(220,38,38,0.2)" : "rgba(22,163,74,0.2)"} `,
               }}
             >
               {toggling ? (
@@ -382,38 +353,38 @@ function UsersPage() {
       fetchAdminUsers({
         SearchTerm: searchQuery,
         Role: filterRole,
-        gender: filterGender,
+        Gender: filterGender,
         PageNumber: pageNumber,
         PageSize: pageSize,
-      }),
+      })
     );
   }, [dispatch, searchQuery, filterRole, filterGender, pageNumber, pageSize]);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setPageNumber(1);
   }, [searchQuery, filterRole, filterGender]);
 
   const handleToggleStatus = async (user: UserType) => {
     try {
       await dispatch(fetchToggleUserStatus(user.id)).unwrap();
-      toast.success(
-        `${user.fullName} is now ${user.isActive ? "inactive" : "active"}.`,
-      );
+      toast.success(`${user.fullName} is now ${user.isActive ? "inactive" : "active"}.`);
       dispatch(resetToggleStatusState());
+
       // Re-fetch to update list
       dispatch(
         fetchAdminUsers({
           SearchTerm: searchQuery,
           Role: filterRole,
-          gender: filterGender,
+          Gender: filterGender,
           PageNumber: pageNumber,
           PageSize: pageSize,
-        }),
+        })
       );
-      // Update modal user state
+
+      // Update local detailed modal state reactively if open
       setSelectedUser((prev) =>
-        prev ? { ...prev, isActive: !prev.isActive } : null,
+        prev && prev.id === user.id ? { ...prev, isActive: !prev.isActive } : prev
       );
     } catch (err: any) {
       toast.error(err || "Failed to toggle status");
@@ -422,9 +393,9 @@ function UsersPage() {
 
   const totalUser = data
     ? data.totalDoctors +
-      data.totalPatients +
-      data.totalReceptionists +
-      data.totalStudents
+    data.totalPatients +
+    data.totalReceptionists +
+    data.totalStudents
     : 0;
 
   const stats = [
@@ -532,7 +503,7 @@ function UsersPage() {
                     { value: "", label: "All Roles" },
                     { value: "Patient", label: "Patient" },
                     { value: "Doctor", label: "Doctor" },
-                    { value: "Student", label: "Student Doctor" },
+                    { value: "Studentdoctor", label: "Student Doctor" },
                     { value: "Receptionist", label: "Receptionist" },
                     { value: "Admin", label: "Admin" },
                   ],
@@ -542,8 +513,8 @@ function UsersPage() {
                     setFilterGender(e.target.value as UserGender),
                   options: [
                     { value: "", label: "All Genders" },
-                    { value: "male", label: "Male" },
-                    { value: "female", label: "Female" },
+                    { value: "Male", label: "Male" },
+                    { value: "Female", label: "Female" },
                   ],
                 },
               ].map((sel, i) => (
@@ -632,7 +603,7 @@ function UsersPage() {
                     ].map((h) => (
                       <th
                         key={h}
-                        className={`px-5 py-3 text-xs font-semibold uppercase tracking-widest ${h === "Actions" ? "text-right" : "text-left"}`}
+                        className={`px - 5 py - 3 text - xs font - semibold uppercase tracking - widest ${h === "Actions" ? "text-right" : "text-left"} `}
                         style={{ color: "var(--color-text-light)" }}
                       >
                         {h}
@@ -665,13 +636,12 @@ function UsersPage() {
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-3">
                             <div className="relative shrink-0">
-                              <div className="w-9 h-9 rounded-full">
+                              <div className="w-9 h-9 rounded-full overflow-hidden">
                                 <UserAvatar
                                   src={user.imageUrl}
                                   alt={user.fullName}
                                 />
                               </div>
-
                               <span
                                 className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2"
                                 style={{
@@ -773,7 +743,6 @@ function UsersPage() {
                         {/* Actions */}
                         <td className="px-5 py-4">
                           <div className="flex items-center justify-end gap-2">
-                            {/* Toggle status */}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -788,7 +757,7 @@ function UsersPage() {
                                 color: user.isActive
                                   ? "#dc2626"
                                   : "var(--color-success)",
-                                border: `1px solid ${user.isActive ? "rgba(220,38,38,0.18)" : "rgba(22,163,74,0.18)"}`,
+                                border: `1px solid ${user.isActive ? "rgba(220,38,38,0.18)" : "rgba(22,163,74,0.18)"} `,
                               }}
                               title={user.isActive ? "Deactivate" : "Activate"}
                             >
@@ -841,6 +810,8 @@ function UsersPage() {
 
 export default UsersPage;
 
+// ─── Avatar Loader Helper ─────────────────────────────────────────────────────
+
 const UserAvatar = ({ src, alt }: { src: string; alt: string }) => {
   const [imageError, setImageError] = useState(false);
 
@@ -849,14 +820,14 @@ const UserAvatar = ({ src, alt }: { src: string; alt: string }) => {
       <img
         src={src}
         className="object-cover w-full h-full"
-        alt={alt || "doctor image"}
+        alt={alt || "user image"}
         onError={() => setImageError(true)}
       />
     );
   }
 
   return (
-    <div className="w-full h-full rounded-full bg-(--color-bg-blue) border border-primary/20 flex items-center justify-center">
+    <div className="w-full h-full bg-(--color-bg-blue) border border-(--color-primary)/20 flex items-center justify-center">
       <User className="w-5 h-5 text-(--color-primary)" />
     </div>
   );

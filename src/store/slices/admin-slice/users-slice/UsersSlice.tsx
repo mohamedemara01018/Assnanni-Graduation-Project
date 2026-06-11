@@ -29,7 +29,7 @@ interface UsersResponse {
 interface FetchUsersParams {
   SearchTerm?: string;
   Role?: string;
-  gender?: "" | "male" | "female";
+  Gender?: "" | "Male" | "Female";
   PageNumber?: number;
   PageSize?: number;
 }
@@ -58,12 +58,31 @@ export const fetchAdminUsers = createAsyncThunk<
 >(
   "users/fetchAdminUsers",
   async (
-    { SearchTerm = "", Role = "", gender = "", PageNumber = 1, PageSize = 10 },
+    { SearchTerm = "", Role = "", Gender = "", PageNumber, PageSize },
     { rejectWithValue },
   ) => {
     const cookieToken = Cookies.get("jwtToken");
     try {
-      const response = await fetch(`${backendUrl}Admin/users/all`, {
+
+      const searchParams = new URLSearchParams();
+
+      if (SearchTerm) {
+        searchParams.append("SearchTerm", SearchTerm);
+      }
+      if (Role) {
+        searchParams.append("Role", Role);
+      }
+      if (Gender) {
+        searchParams.append("Gender", Gender);
+      }
+      if (PageNumber) {
+        searchParams.append("PageNumber", String(PageNumber));
+      }
+      if (PageSize) {
+        searchParams.append("PageSize", String(PageSize));
+      }
+
+      const response = await fetch(`${backendUrl}Admin/users/all?${searchParams}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${cookieToken}`,
@@ -71,7 +90,7 @@ export const fetchAdminUsers = createAsyncThunk<
         },
         body: JSON.stringify({
           SearchTerm,
-          gender,
+          Gender,
           Role,
           PageNumber,
           PageSize,

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { Link, NavLink, useNavigate } from "react-router";
 import {
+  Bell,
   Brain,
   BriefcaseMedical,
   Calendar,
@@ -184,7 +185,7 @@ const sidebarDataRole = {
     { icon: Stethoscope, label: "Doctors", path: "/admin-doctors" },
     { icon: FileText, label: "Analytics", path: "/analytics" },
     { icon: Brain, label: "AI Models", path: "/ai-models" },
-    { icon: Users, label: "Notifications", path: "/notification" },
+    { icon: Bell, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ],
 
@@ -196,29 +197,25 @@ const sidebarDataRole = {
     { icon: FileText, label: "Medical History", path: "/medical-history" },
     { icon: Star, label: "My Feedback", path: "/my-feedbacks" },
     { icon: BriefcaseMedical, label: "My Doctors", path: "/my-doctors" },
-    { icon: Users, label: "Notifications", path: "/notification" },
+    { icon: Bell, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ],
 
   doctor: [
     { icon: LayoutDashboard, label: "Dashboard", path: "/doctor" },
     { icon: Calendar, label: "Schedule", path: "/doctor-schedule" },
-    {
-      icon: Calendar,
-      label: "Appointments",
-      path: "/doctor-appointments-dashboard",
-    },
+    { icon: Calendar, label: "Appointments", path: "/doctor-appointments-dashboard" },
     { icon: Users, label: "Patients", path: "/doctor-patients" },
     { icon: Scan, label: "Scans", path: "/scan/upload" },
     { icon: FileText, label: "Reports", path: "/doctor-reports" },
-    { icon: Users, label: "Notifications", path: "/notification" },
+    { icon: Bell, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ],
 
   studentDoctor: [
     { icon: LayoutDashboard, label: "Dashboard", path: "/student-doctor" },
     { icon: Calendar, label: "Appointments", path: "/doctor-appointments" },
-    { icon: Users, label: "Notifications", path: "/notification" },
+    { icon: Bell, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ],
 
@@ -226,7 +223,7 @@ const sidebarDataRole = {
     { icon: LayoutDashboard, label: "Dashboard", path: "/receptionist" },
     { icon: Users, label: "Patients", path: "/doctor-patients" },
     { icon: Calendar, label: "Appointments", path: "/doctor-appointments" },
-    { icon: Users, label: "Notifications", path: "/notification" },
+    { icon: Bell, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
   ],
 };
