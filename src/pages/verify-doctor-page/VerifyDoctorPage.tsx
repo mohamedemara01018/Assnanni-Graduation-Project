@@ -75,7 +75,9 @@ function VerifyDoctorPage() {
   const [showOtherInput, setShowOtherInput] = useState(false);
   const [otherLanguageText, setOtherLanguageText] = useState("");
 
-  const { data: specializations = [] } = useQuery<{ id: number; name: string }[]>({
+  const { data: specializations = [] } = useQuery<
+    { id: number; name: string }[]
+  >({
     queryKey: ["specializations", backendUrl],
     enabled: Boolean(backendUrl),
     queryFn: async () => {
@@ -667,11 +669,13 @@ function VerifyDoctorPage() {
                   <label htmlFor="languages" className={labelClass}>
                     Languages
                   </label>
-                  
+
                   {/* Selected languages displayed as ovals/badges above the input */}
                   <div className="flex flex-wrap gap-2 mb-2 min-h-[42px] p-2 rounded-xl border border-dashed border-(--color-border) bg-linear-to-br from-[#00AFE5]/5 to-transparent items-center">
                     {selectedLanguages.length === 0 ? (
-                      <span className="text-xs text-gray-400 italic px-2">No languages selected yet.</span>
+                      <span className="text-xs text-gray-400 italic px-2">
+                        No languages selected yet.
+                      </span>
                     ) : (
                       selectedLanguages.map((lang) => (
                         <span
@@ -699,7 +703,9 @@ function VerifyDoctorPage() {
                     onChange={handleSelectLanguage}
                     defaultValue=""
                   >
-                    <option value="" disabled>Select a language...</option>
+                    <option value="" disabled>
+                      Select a language...
+                    </option>
                     <option value="Arabic">Arabic</option>
                     <option value="English">English</option>
                     <option value="French">French</option>

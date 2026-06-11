@@ -38,16 +38,15 @@ const CreateMedicalRecord = () => {
         },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
     },
     onSuccess: () => {
-      toast.success("Medical record draft saved successfully");
       navigate("/student-doctor");
     },
     onError: (error: any) => {
       toast.error(
-        error.response?.data?.message || "Failed to save medical record"
+        error.response?.data?.message || "Failed to save medical record",
       );
     },
   });
@@ -77,7 +76,8 @@ const CreateMedicalRecord = () => {
                 Create Clinical Record Draft
               </h2>
               <p className="text-xs text-(--color-text-light) mt-0.5">
-                Appointment ID: <span className="font-mono text-blue-500 font-bold">{id}</span>
+                Appointment ID:{" "}
+                <span className="font-mono text-blue-500 font-bold">{id}</span>
               </p>
             </div>
           </div>
@@ -108,11 +108,15 @@ const CreateMedicalRecord = () => {
                   Primary Diagnosis
                 </label>
                 <input
-                  {...register("diagnosis", { required: "Diagnosis is required" })}
+                  {...register("diagnosis", {
+                    required: "Diagnosis is required",
+                  })}
                   type="text"
                   placeholder="Clinical diagnosis..."
                   className={`w-full px-4 py-3 rounded-xl border ${
-                    errors.diagnosis ? "border-red-500" : "border-(--color-border)"
+                    errors.diagnosis
+                      ? "border-red-500"
+                      : "border-(--color-border)"
                   } bg-(--color-bg) text-(--color-text) focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm`}
                 />
                 {errors.diagnosis && (
@@ -128,7 +132,9 @@ const CreateMedicalRecord = () => {
                 Clinical Notes & Observations
               </label>
               <textarea
-                {...register("notes", { required: "Clinical notes are required" })}
+                {...register("notes", {
+                  required: "Clinical notes are required",
+                })}
                 rows={8}
                 placeholder="Detailed findings, treatment provided, and recommendations..."
                 className={`w-full px-4 py-3 rounded-xl border ${

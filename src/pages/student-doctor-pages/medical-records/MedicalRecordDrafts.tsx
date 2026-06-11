@@ -57,16 +57,16 @@ const MedicalRecordDrafts = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
     },
     onSuccess: () => {
-      toast.success("Medical record draft submitted successfully for supervision review!");
       queryClient.invalidateQueries({ queryKey: ["medical-drafts"] });
     },
     onError: (error: any) => {
       toast.error(
-        error.response?.data?.message || "Failed to submit medical record draft"
+        error.response?.data?.message ||
+          "Failed to submit medical record draft",
       );
     },
   });
@@ -84,7 +84,7 @@ const MedicalRecordDrafts = () => {
         `${backendUrl}StudentDoctor/medical-record-drafts`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       return response.data;
     },
@@ -95,7 +95,9 @@ const MedicalRecordDrafts = () => {
   // Handle toast notifications on mount / successful fetch
   useEffect(() => {
     if (isSuccess && responseBody) {
-      toast.success(responseBody.message || "Medical drafts loaded successfully");
+      toast.success(
+        responseBody.message || "Medical drafts loaded successfully",
+      );
     }
   }, [isSuccess, responseBody]);
 
@@ -103,12 +105,14 @@ const MedicalRecordDrafts = () => {
     if (isError && error) {
       const err = error as any;
       toast.error(
-        err.response?.data?.message || "Failed to load medical drafts from server. Using offline data."
+        err.response?.data?.message ||
+          "Failed to load medical drafts from server. Using offline data.",
       );
     }
   }, [isError, error]);
 
-  const drafts: MedicalDraft[] = responseBody?.data || (isError ? fallbackDrafts : []);
+  const drafts: MedicalDraft[] =
+    responseBody?.data || (isError ? fallbackDrafts : []);
 
   return (
     <DashboardLayout pageTitle="Medical Record Drafts">
@@ -129,7 +133,8 @@ const MedicalRecordDrafts = () => {
               Clinical Record Drafts
             </h1>
             <p className="text-sm text-(--color-text-light) mt-1">
-              Review and update your clinical documentations before final submission
+              Review and update your clinical documentations before final
+              submission
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -178,14 +183,20 @@ const MedicalRecordDrafts = () => {
                         Appt ID: {draft.appointmentId}
                       </span>
                     </div>
-                    
+
                     <div className="flex flex-col sm:flex-row sm:items-center gap-x-6 gap-y-1.5 text-xs text-(--color-text-light)">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-bold text-violet-500 uppercase tracking-tight text-[9px] shrink-0">Diagnosis:</span>
-                        <span className="text-(--color-text) font-semibold truncate">{draft.diagnosis}</span>
+                        <span className="font-bold text-violet-500 uppercase tracking-tight text-[9px] shrink-0">
+                          Diagnosis:
+                        </span>
+                        <span className="text-(--color-text) font-semibold truncate">
+                          {draft.diagnosis}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1.5 min-w-0">
-                        <span className="font-bold text-gray-500 uppercase tracking-tight text-[9px] shrink-0">Notes:</span>
+                        <span className="font-bold text-gray-500 uppercase tracking-tight text-[9px] shrink-0">
+                          Notes:
+                        </span>
                         <span className="truncate">{draft.notes}</span>
                       </div>
                     </div>
@@ -195,14 +206,22 @@ const MedicalRecordDrafts = () => {
                 {/* Right Section: Buttons */}
                 <div className="flex items-center gap-3 shrink-0 self-end lg:self-auto w-full lg:w-auto pt-4 lg:pt-0 border-t lg:border-t-0 border-(--color-border)">
                   <button
-                    onClick={() => navigate(`/student-doctor/medical-record-drafts/${draft.id}`)}
+                    onClick={() =>
+                      navigate(
+                        `/student-doctor/medical-record-drafts/${draft.id}`,
+                      )
+                    }
                     className="flex-1 lg:flex-initial px-5 py-2.5 bg-gray-50 hover:bg-gray-100 dark:bg-gray-850 dark:hover:bg-gray-800 border border-(--color-border) text-(--color-text) text-xs font-bold rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm active:scale-95"
                   >
                     <BsEye size={14} className="text-gray-500" />
                     View Details
                   </button>
                   <button
-                    onClick={() => navigate(`/student-doctor/medical-record-drafts/update/${draft.id}`)}
+                    onClick={() =>
+                      navigate(
+                        `/student-doctor/medical-record-drafts/update/${draft.id}`,
+                      )
+                    }
                     className="flex-1 lg:flex-initial px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-blue-500/10 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
                   >
                     <BsPencilSquare size={14} />
@@ -213,7 +232,8 @@ const MedicalRecordDrafts = () => {
                     disabled={submitMutation.isPending}
                     className="flex-1 lg:flex-initial px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-emerald-500/10 cursor-pointer flex items-center justify-center gap-1.5 active:scale-95"
                   >
-                    {submitMutation.isPending && submitMutation.variables === draft.id ? (
+                    {submitMutation.isPending &&
+                    submitMutation.variables === draft.id ? (
                       "Submitting..."
                     ) : (
                       <>
@@ -229,13 +249,17 @@ const MedicalRecordDrafts = () => {
         ) : (
           <div className="bg-(--color-surface) rounded-3xl border-2 border-dashed border-(--color-border) p-16 flex flex-col items-center text-center shadow-sm">
             <div className="w-20 h-20 bg-gray-50 dark:bg-gray-800/50 rounded-full flex items-center justify-center mb-6">
-              <BsFileEarmarkMedical size={40} className="text-(--color-text-light) opacity-25" />
+              <BsFileEarmarkMedical
+                size={40}
+                className="text-(--color-text-light) opacity-25"
+              />
             </div>
             <h2 className="text-xl font-bold text-(--color-text) mb-2">
               No Drafts Found
             </h2>
             <p className="text-sm text-(--color-text-light) max-w-sm leading-relaxed">
-              You don't have any medical record drafts yet. Once clinical record drafts are generated, they will be listed here.
+              You don't have any medical record drafts yet. Once clinical record
+              drafts are generated, they will be listed here.
             </p>
           </div>
         )}

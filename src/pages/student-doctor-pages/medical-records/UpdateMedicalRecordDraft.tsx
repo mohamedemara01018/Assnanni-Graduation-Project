@@ -8,7 +8,11 @@ import { toast } from "react-toastify";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import { useParams, useNavigate } from "react-router";
 import { useEffect } from "react";
-import { BsArrowLeft, BsFileMedicalFill, BsInfoCircleFill } from "react-icons/bs";
+import {
+  BsArrowLeft,
+  BsFileMedicalFill,
+  BsInfoCircleFill,
+} from "react-icons/bs";
 import { ScaleLoader } from "react-spinners";
 
 interface UpdateDraftFormInputs {
@@ -44,7 +48,7 @@ const UpdateMedicalRecordDraft = () => {
         `${backendUrl}StudentDoctor/medical-record-drafts/${draftId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       return response.data;
     },
@@ -69,7 +73,6 @@ const UpdateMedicalRecordDraft = () => {
         notes: responseBody.data.notes,
         diagnosis: responseBody.data.diagnosis,
       });
-      toast.success("Draft details pre-loaded successfully");
     }
   }, [isSuccess, responseBody, reset]);
 
@@ -97,19 +100,21 @@ const UpdateMedicalRecordDraft = () => {
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       return response.data;
     },
-    onSuccess: (data) => {
-      toast.success(data?.message || "Medical record draft updated successfully");
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["medical-drafts"] });
-      queryClient.invalidateQueries({ queryKey: ["medical-draft-details", draftId] });
+      queryClient.invalidateQueries({
+        queryKey: ["medical-draft-details", draftId],
+      });
       navigate("/student-doctor/medical-record-drafts");
     },
     onError: (error: any) => {
       toast.error(
-        error.response?.data?.message || "Failed to update medical record draft"
+        error.response?.data?.message ||
+          "Failed to update medical record draft",
       );
     },
   });
@@ -150,7 +155,10 @@ const UpdateMedicalRecordDraft = () => {
                     Update Medical Record Draft
                   </h2>
                   <p className="text-xs text-(--color-text-light) mt-0.5">
-                    Modifying draft ID: <span className="font-mono text-blue-500 font-bold">{draftId}</span>
+                    Modifying draft ID:{" "}
+                    <span className="font-mono text-blue-500 font-bold">
+                      {draftId}
+                    </span>
                   </p>
                 </div>
               </div>
@@ -176,7 +184,9 @@ const UpdateMedicalRecordDraft = () => {
                     type="text"
                     placeholder="e.g., Routine Checkup, Emergency Root Canal"
                     className={`w-full px-4 py-3 rounded-xl border ${
-                      errors.title ? "border-red-500" : "border-(--color-border)"
+                      errors.title
+                        ? "border-red-500"
+                        : "border-(--color-border)"
                     } bg-(--color-bg) text-(--color-text) focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm`}
                   />
                   {errors.title && (
@@ -192,11 +202,15 @@ const UpdateMedicalRecordDraft = () => {
                     Primary Diagnosis
                   </label>
                   <input
-                    {...register("diagnosis", { required: "Diagnosis is required" })}
+                    {...register("diagnosis", {
+                      required: "Diagnosis is required",
+                    })}
                     type="text"
                     placeholder="Clinical diagnosis..."
                     className={`w-full px-4 py-3 rounded-xl border ${
-                      errors.diagnosis ? "border-red-500" : "border-(--color-border)"
+                      errors.diagnosis
+                        ? "border-red-500"
+                        : "border-(--color-border)"
                     } bg-(--color-bg) text-(--color-text) focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm`}
                   />
                   {errors.diagnosis && (
@@ -213,7 +227,9 @@ const UpdateMedicalRecordDraft = () => {
                   Clinical Notes & Observations
                 </label>
                 <textarea
-                  {...register("notes", { required: "Clinical notes are required" })}
+                  {...register("notes", {
+                    required: "Clinical notes are required",
+                  })}
                   rows={8}
                   placeholder="Detailed findings, treatment provided, and recommendations..."
                   className={`w-full px-4 py-3 rounded-xl border ${

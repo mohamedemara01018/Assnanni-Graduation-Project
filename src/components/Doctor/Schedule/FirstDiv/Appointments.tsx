@@ -9,15 +9,15 @@ export interface AppointmentsProps {
 
 const Appointments = ({ role, appointments = [] }: AppointmentsProps) => {
   return (
-    <div className="bg-(--color-surface) p-6 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm">
+    <div className="bg-(--color-surface) p-6 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-x-scroll scroll-m-1 relative">
       <div className="flex items-center gap-2 mb-6">
         <BsCalendarEvent className="text-xl text-blue-500" />
-        <h3 className="text-(--color-text) font-medium text-lg">
+        <h3 className="text-(--color-text) font-medium text-lg ">
           Today's Appointments
         </h3>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 max-h-60 ">
         {appointments.length > 0 ? (
           appointments.map((apt) => {
             const status = apt.status || "Pending";

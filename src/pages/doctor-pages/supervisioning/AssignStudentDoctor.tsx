@@ -65,7 +65,6 @@ const AssignStudentDoctor = () => {
       );
 
       if (response.data.succeeded) {
-        toast.success("Student doctor assigned successfully");
         navigate("/doctor-supervisioning");
       } else {
         toast.error(response.data.message || "Assignment failed");

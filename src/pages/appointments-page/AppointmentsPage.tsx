@@ -6,14 +6,26 @@ import { FaPlus } from "react-icons/fa";
 import { Link } from "react-router";
 import LazyImage from "@/components/ui/LazyImage";
 import {
-  Calendar, Clock, MapPin, ChevronRight, Stethoscope,
-  CalendarX, RefreshCw, Eye, User, Star,
-  CheckCircle, XCircle, AlertCircle,
+  Calendar,
+  Clock,
+  MapPin,
+  ChevronRight,
+  Stethoscope,
+  CalendarX,
+  RefreshCw,
+  Eye,
+  User,
+  Star,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
 } from "lucide-react";
 import { useSelector, useDispatch } from "react-redux";
 import type { AppDispatch } from "@/store/store";
 import {
-  allAppointmentsState, fetchAllAppointments, type AppointmentStatus,
+  allAppointmentsState,
+  fetchAllAppointments,
+  type AppointmentStatus,
 } from "@/store/slices/patient-slice/all-appointments-slice/allAppointmentsSlice";
 import MiniLoading from "@/components/mini-loading/MiniLoading";
 import Error from "@/components/error/Error";
@@ -38,14 +50,34 @@ interface SelectedAppointment {
 
 // ── Status config ─────────────────────────────────────────────────────────────
 
-type StatusKey = "upcoming" | "completed" | "confirmed" | "cancelled" | "noshow";
+type StatusKey =
+  | "upcoming"
+  | "completed"
+  | "confirmed"
+  | "cancelled"
+  | "noshow";
 
 const STATUS_CONFIG: Record<StatusKey, { pill: string; dot: string }> = {
-  upcoming: { pill: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800/50", dot: "bg-blue-500" },
-  completed: { pill: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50", dot: "bg-emerald-500" },
-  confirmed: { pill: "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800/50", dot: "bg-green-500" },
-  cancelled: { pill: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50", dot: "bg-red-400" },
-  noshow: { pill: "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800/50", dot: "bg-amber-400" },
+  upcoming: {
+    pill: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-blue-200 dark:border-blue-800/50",
+    dot: "bg-blue-500",
+  },
+  completed: {
+    pill: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800/50",
+    dot: "bg-emerald-500",
+  },
+  confirmed: {
+    pill: "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800/50",
+    dot: "bg-green-500",
+  },
+  cancelled: {
+    pill: "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800/50",
+    dot: "bg-red-400",
+  },
+  noshow: {
+    pill: "bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800/50",
+    dot: "bg-amber-400",
+  },
 };
 
 const getStatusCfg = (status: AppointmentStatus) =>
@@ -72,23 +104,37 @@ function AppointmentsPage() {
   const [showReschedule, setShowReschedule] = useState(false);
   const [showCancel, setShowCancel] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<SelectedAppointment | null>(null);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<SelectedAppointment | null>(null);
 
   const dispatch: AppDispatch = useDispatch();
   const { data, loading, error } = useSelector(allAppointmentsState);
-  const appointments = Array.isArray(data?.appointments.items) ? data?.appointments.items : [];
+  const appointments = Array.isArray(data?.appointments.items)
+    ? data?.appointments.items
+    : [];
 
   useEffect(() => {
-    dispatch(fetchAllAppointments({
-      search, AppointmentStatus: appointmentStatus,
-      BookingType: "", PageNumber: pageNumber, PageSize: pageSize,
-    }));
+    dispatch(
+      fetchAllAppointments({
+        search,
+        AppointmentStatus: appointmentStatus,
+        BookingType: "",
+        PageNumber: pageNumber,
+        PageSize: pageSize,
+      }),
+    );
   }, [dispatch, search, appointmentStatus, pageNumber, pageSize]);
 
-  const refetch = () => dispatch(fetchAllAppointments({
-    search, AppointmentStatus: appointmentStatus,
-    BookingType: "", PageNumber: pageNumber, PageSize: pageSize,
-  }));
+  const refetch = () =>
+    dispatch(
+      fetchAllAppointments({
+        search,
+        AppointmentStatus: appointmentStatus,
+        BookingType: "",
+        PageNumber: pageNumber,
+        PageSize: pageSize,
+      }),
+    );
 
   const buildSelected = (appt: any): SelectedAppointment => ({
     id: String(appt.id),
@@ -100,21 +146,67 @@ function AppointmentsPage() {
     doctorImage: appt.doctorImage ?? "",
   });
 
-  const openReschedule = (appt: any) => { setSelectedAppointment(buildSelected(appt)); setShowReschedule(true); };
-  const openCancel = (appt: any) => { setSelectedAppointment(buildSelected(appt)); setShowCancel(true); };
-  const openFeedback = (appt: any) => { setSelectedAppointment(buildSelected(appt)); setShowFeedback(true); };
-  const closeReschedule = () => { setShowReschedule(false); setSelectedAppointment(null); };
-  const closeCancel = () => { setShowCancel(false); setSelectedAppointment(null); };
-  const closeFeedback = () => { setShowFeedback(false); setSelectedAppointment(null); };
+  const openReschedule = (appt: any) => {
+    setSelectedAppointment(buildSelected(appt));
+    setShowReschedule(true);
+  };
+  const openCancel = (appt: any) => {
+    setSelectedAppointment(buildSelected(appt));
+    setShowCancel(true);
+  };
+  const openFeedback = (appt: any) => {
+    setSelectedAppointment(buildSelected(appt));
+    setShowFeedback(true);
+  };
+  const closeReschedule = () => {
+    setShowReschedule(false);
+    setSelectedAppointment(null);
+  };
+  const closeCancel = () => {
+    setShowCancel(false);
+    setSelectedAppointment(null);
+  };
+  const closeFeedback = () => {
+    setShowFeedback(false);
+    setSelectedAppointment(null);
+  };
 
   // ── Stats ──────────────────────────────────────────────────────────────────
 
   const statsConfig = [
-    { label: "Total", value: data?.total ?? 0, icon: Calendar, accent: "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" },
-    { label: "Upcoming", value: data?.upcoming ?? 0, icon: Clock, accent: "bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400" },
-    { label: "Completed", value: data?.completed ?? 0, icon: CheckCircle, accent: "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" },
-    { label: "Cancelled", value: data?.cancelled ?? 0, icon: XCircle, accent: "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400" },
-    { label: "Missed", value: data?.missedAppointments ?? 0, icon: AlertCircle, accent: "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400" },
+    {
+      label: "Total",
+      value: data?.total ?? 0,
+      icon: Calendar,
+      accent: "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400",
+    },
+    {
+      label: "Upcoming",
+      value: data?.upcoming ?? 0,
+      icon: Clock,
+      accent:
+        "bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400",
+    },
+    {
+      label: "Completed",
+      value: data?.completed ?? 0,
+      icon: CheckCircle,
+      accent:
+        "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400",
+    },
+    {
+      label: "Cancelled",
+      value: data?.cancelled ?? 0,
+      icon: XCircle,
+      accent: "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400",
+    },
+    {
+      label: "Missed",
+      value: data?.missedAppointments ?? 0,
+      icon: AlertCircle,
+      accent:
+        "bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400",
+    },
   ];
 
   // ── Render ─────────────────────────────────────────────────────────────────
@@ -122,16 +214,19 @@ function AppointmentsPage() {
   return (
     <DashboardLayout pageTitle="Patient">
       <div className="space-y-5">
-
         {/* ── Header ───────────────────────────────────────────────────────── */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between max-sm:gap-2">
           <div>
-            <h1 className="text-2xl font-semibold text-(--color-text)">Appointments</h1>
-            <p className="text-sm text-(--color-text-light) mt-0.5">Manage and view all your scheduled visits</p>
+            <h1 className="text-2xl font-semibold text-(--color-text) max-sm:text-lg">
+              Appointments
+            </h1>
+            <p className="text-sm text-(--color-text-light) mt-0.5 max-sm:text-xs">
+              Manage and view all your scheduled visits
+            </p>
           </div>
           <Link
             to="/doctors-list"
-            className="flex items-center gap-2 bg-(--color-primary) hover:bg-(--color-primary-light) active:scale-95 transition-all duration-150 px-4 py-2.5 rounded-xl text-white text-sm font-medium"
+            className="flex items-center gap-2 bg-(--color-primary) hover:bg-(--color-primary-light) active:scale-95 transition-all duration-150 px-4 py-2.5 rounded-xl text-white text-sm font-medium max-sm:text-sm max-sm:px-2 max-sm:py-1"
           >
             <FaPlus className="w-3 h-3" />
             Book Appointment
@@ -146,12 +241,18 @@ function AppointmentsPage() {
               className="rounded-2xl border border-(--color-border) bg-(--color-surface) p-4 flex items-center gap-3"
               style={{ boxShadow: "var(--shadow)" }}
             >
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${accent}`}>
+              <div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${accent}`}
+              >
                 <Icon className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xl font-bold text-(--color-text) leading-none">{value}</p>
-                <p className="text-[11px] text-(--color-text-light) mt-0.5">{label}</p>
+                <p className="text-xl font-bold text-(--color-text) leading-none">
+                  {value}
+                </p>
+                <p className="text-[11px] text-(--color-text-light) mt-0.5">
+                  {label}
+                </p>
               </div>
             </div>
           ))}
@@ -170,10 +271,11 @@ function AppointmentsPage() {
                 <button
                   key={tab.value}
                   onClick={() => setAppointmentStatus(tab.value)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-all duration-150 cursor-pointer ${active
-                    ? "bg-(--color-primary) text-white border-(--color-primary)"
-                    : "bg-(--color-bg) text-(--color-text-light) border-(--color-border) hover:border-primary/50 hover:text-(--color-primary)"
-                    }`}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-medium border transition-all duration-150 cursor-pointer ${
+                    active
+                      ? "bg-(--color-primary) text-white border-(--color-primary)"
+                      : "bg-(--color-bg) text-(--color-text-light) border-(--color-border) hover:border-primary/50 hover:text-(--color-primary)"
+                  }`}
                 >
                   {tab.label}
                 </button>
@@ -184,9 +286,13 @@ function AppointmentsPage() {
 
         {/* ── List ─────────────────────────────────────────────────────────── */}
         {loading ? (
-          <div className="p-10 flex justify-center"><MiniLoading /></div>
+          <div className="p-10 flex justify-center">
+            <MiniLoading />
+          </div>
         ) : error ? (
-          <div className="p-8"><Error message={error} /></div>
+          <div className="p-8">
+            <Error message={error} />
+          </div>
         ) : appointments.length === 0 ? (
           <div
             className="rounded-2xl border border-(--color-border) bg-(--color-surface)"
@@ -202,8 +308,10 @@ function AppointmentsPage() {
             <div className="space-y-3">
               {appointments.map((appointment, index) => {
                 const cfg = getStatusCfg(appointment.status);
-                const isCancelled = appointment.status.toLowerCase() === "cancelled";
-                const isCompleted = appointment.status.toLowerCase() === "completed";
+                const isCancelled =
+                  appointment.status.toLowerCase() === "cancelled";
+                const isCompleted =
+                  appointment.status.toLowerCase() === "completed";
                 const isMissed = appointment.status.toLowerCase() === "noshow";
 
                 return (
@@ -215,29 +323,40 @@ function AppointmentsPage() {
                     {/* Avatar + info */}
                     <div className="flex items-start gap-4 min-w-0">
                       <div className="relative shrink-0">
-                        {appointment.doctorImage?.trim() && !imageErrors[appointment.id] ? (
+                        {appointment.doctorImage?.trim() &&
+                        !imageErrors[appointment.id] ? (
                           <LazyImage
                             src={appointment.doctorImage}
                             alt={appointment.doctorName}
                             className="w-12 h-12 rounded-full object-cover ring-2 ring-(--color-border)"
-                            onError={() => setImageErrors((prev) => ({ ...prev, [appointment.id]: true }))}
+                            onError={() =>
+                              setImageErrors((prev) => ({
+                                ...prev,
+                                [appointment.id]: true,
+                              }))
+                            }
                           />
                         ) : (
                           <div className="w-12 h-12 rounded-full bg-(--color-bg-blue) border border-(--color-primary)/20 flex items-center justify-center">
                             <User className="w-6 h-6 text-(--color-primary)" />
                           </div>
                         )}
-                        <span className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-(--color-surface) ${cfg.dot}`} />
+                        <span
+                          className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-(--color-surface) ${cfg.dot}`}
+                        />
                       </div>
 
                       <div className="min-w-0 space-y-2">
                         <div>
                           {appointment.doctorName && (
-                            <h3 className="text-sm font-semibold text-(--color-text) truncate">{appointment.doctorName}</h3>
+                            <h3 className="text-sm font-semibold text-(--color-text) truncate">
+                              {appointment.doctorName}
+                            </h3>
                           )}
                           {appointment.specialty && (
                             <p className="text-xs text-(--color-text-light) flex items-center gap-1 mt-0.5">
-                              <Stethoscope className="w-3 h-3 shrink-0" />{appointment.specialty}
+                              <Stethoscope className="w-3 h-3 shrink-0" />
+                              {appointment.specialty}
                             </p>
                           )}
                         </div>
@@ -246,17 +365,20 @@ function AppointmentsPage() {
                         <div className="flex items-center gap-1.5 flex-wrap">
                           {appointment.date && (
                             <span className="inline-flex items-center gap-1 text-[11px] text-(--color-text-light) bg-(--color-bg) border border-(--color-border) rounded-md px-2 py-0.5">
-                              <Calendar className="w-3 h-3 shrink-0" />{parseDate(appointment.date).fullLabel}
+                              <Calendar className="w-3 h-3 shrink-0" />
+                              {parseDate(appointment.date).fullLabel}
                             </span>
                           )}
                           {appointment.time && (
                             <span className="inline-flex items-center gap-1 text-[11px] text-(--color-text-light) bg-(--color-bg) border border-(--color-border) rounded-md px-2 py-0.5">
-                              <Clock className="w-3 h-3 shrink-0" />{formatTime(appointment.time)}
+                              <Clock className="w-3 h-3 shrink-0" />
+                              {formatTime(appointment.time)}
                             </span>
                           )}
                           {appointment.type && (
                             <span className="inline-flex items-center gap-1 text-[11px] text-(--color-text-light) bg-(--color-bg) border border-(--color-border) rounded-md px-2 py-0.5">
-                              <MapPin className="w-3 h-3 shrink-0" />{appointment.type}
+                              <MapPin className="w-3 h-3 shrink-0" />
+                              {appointment.type}
                             </span>
                           )}
                         </div>
@@ -278,14 +400,16 @@ function AppointmentsPage() {
                                 onClick={() => openReschedule(appointment)}
                                 className="inline-flex items-center gap-1 text-xs font-medium text-(--color-text-light) hover:text-(--color-text) transition-colors cursor-pointer"
                               >
-                                <RefreshCw className="w-3 h-3" />Reschedule
+                                <RefreshCw className="w-3 h-3" />
+                                Reschedule
                               </button>
                               <span className="w-px h-3 bg-(--color-border)" />
                               <button
                                 onClick={() => openCancel(appointment)}
                                 className="inline-flex items-center gap-1 text-xs font-medium text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors cursor-pointer"
                               >
-                                <CalendarX className="w-3 h-3" />Cancel
+                                <CalendarX className="w-3 h-3" />
+                                Cancel
                               </button>
                             </>
                           )}
@@ -297,7 +421,8 @@ function AppointmentsPage() {
                                 onClick={() => openFeedback(appointment)}
                                 className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors cursor-pointer"
                               >
-                                <Star className="w-3 h-3" />Feedback
+                                <Star className="w-3 h-3" />
+                                Feedback
                               </button>
                             </>
                           )}
@@ -307,7 +432,9 @@ function AppointmentsPage() {
 
                     {/* Status badge + chevron */}
                     <div className="flex items-center gap-1.5 shrink-0 self-center">
-                      <span className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-lg border ${cfg.pill}`}>
+                      <span
+                        className={`inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-lg border ${cfg.pill}`}
+                      >
                         <CiClock2 className="w-3 h-3" />
                         <span className="capitalize">{appointment.status}</span>
                       </span>
@@ -320,7 +447,11 @@ function AppointmentsPage() {
 
             {/* Count */}
             <p className="text-xs text-(--color-text-light) px-1">
-              Showing <span className="font-semibold text-(--color-text)">{appointments.length}</span> appointment{appointments.length !== 1 ? "s" : ""}
+              Showing{" "}
+              <span className="font-semibold text-(--color-text)">
+                {appointments.length}
+              </span>{" "}
+              appointment{appointments.length !== 1 ? "s" : ""}
             </p>
           </>
         )}
@@ -365,7 +496,10 @@ function AppointmentsPage() {
           pageSize={pageSize}
           totalItems={data?.total ?? appointments.length}
           onPageChange={(page) => setPageNumber(page)}
-          onPageSizeChange={(size) => { setPageSize(size); setPageNumber(1); }}
+          onPageSizeChange={(size) => {
+            setPageSize(size);
+            setPageNumber(1);
+          }}
         />
       )}
     </DashboardLayout>

@@ -50,7 +50,6 @@ const CreateLearningSession = () => {
       );
 
       if (response.data.succeeded) {
-        toast.success("Learning session created successfully");
         navigate("/doctor-learning-sessions");
       } else {
         toast.error(response.data.message || "Failed to create session");

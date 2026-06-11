@@ -139,7 +139,6 @@ const LearningSessions = () => {
       );
     },
     onSuccess: () => {
-      toast.success("Session completed");
       queryClient.invalidateQueries({ queryKey: ["learning-sessions"] });
     },
     onError: (error: any) => {
@@ -160,7 +159,6 @@ const LearningSessions = () => {
       );
     },
     onSuccess: () => {
-      toast.success("Session canceled");
       queryClient.invalidateQueries({ queryKey: ["learning-sessions"] });
     },
     onError: (error: any) => {

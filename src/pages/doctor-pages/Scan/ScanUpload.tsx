@@ -26,7 +26,9 @@ const ScanUpload = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadStage, setUploadStage] = useState<"idle" | "sending" | "analyzing">("idle");
+  const [uploadStage, setUploadStage] = useState<
+    "idle" | "sending" | "analyzing"
+  >("idle");
   const inputFileRef = useRef<HTMLInputElement | null>(null);
 
   const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
@@ -78,7 +80,6 @@ const ScanUpload = () => {
       });
     },
     onSuccess: () => {
-      toast.success("Medical scan uploaded successfully!");
       setSelectedFile(null);
       setPreviewUrl(null);
       setFormSubmitted(false);
@@ -297,9 +298,7 @@ const ScanUpload = () => {
                   required: "Priority is required",
                 })}
                 className={`w-full px-5 py-4 bg-gray-50/50 dark:bg-gray-800/30 border rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-(--color-text) appearance-none cursor-pointer font-medium ${
-                  errors.priority
-                    ? "border-red-500"
-                    : "border-(--color-border)"
+                  errors.priority ? "border-red-500" : "border-(--color-border)"
                 }`}
               >
                 <option value="Normal">Normal</option>

@@ -53,10 +53,20 @@ const Patients = () => {
 
   // Modal State
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
-  const [selectedPatientId, setSelectedPatientId] = useState<number | string | null>(null);
-  const [selectedStudentIdInModal, setSelectedStudentIdInModal] = useState<number | null>(null);
+  const [selectedPatientId, setSelectedPatientId] = useState<
+    number | string | null
+  >(null);
+  const [selectedStudentIdInModal, setSelectedStudentIdInModal] = useState<
+    number | null
+  >(null);
 
-  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<AssignForm>();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors },
+  } = useForm<AssignForm>();
 
   // Filters and Pagination State
   const [search, setSearch] = useState("");
@@ -118,17 +128,18 @@ const Patients = () => {
         },
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
     },
     onSuccess: () => {
-      toast.success("Patient case assigned successfully");
       setIsAssignModalOpen(false);
       reset();
       queryClient.invalidateQueries({ queryKey: ["DoctorPatients"] });
     },
     onError: (err: any) => {
-      toast.error(err.response?.data?.message || "Failed to assign patient case");
+      toast.error(
+        err.response?.data?.message || "Failed to assign patient case",
+      );
     },
   });
 
@@ -138,9 +149,6 @@ const Patients = () => {
   const totalPages = paginatedData?.totalPages || 0;
 
   useEffect(() => {
-    if (isSuccess && data) {
-      toast.success("Patients list loaded successfully");
-    }
     if (isError) {
       console.error("Error fetching patients:", error);
       toast.error(
@@ -458,14 +466,19 @@ const Patients = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit(onAssignSubmit)} className="p-6 space-y-5 flex-1 overflow-y-auto">
+            <form
+              onSubmit={handleSubmit(onAssignSubmit)}
+              className="p-6 space-y-5 flex-1 overflow-y-auto"
+            >
               <div className="space-y-3">
                 <label className="text-sm font-bold text-(--color-text) ml-1">
                   Select Student Doctor
                 </label>
                 <div className="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
                   {studentsData?.data.map((student) => {
-                    const isSelected = Number(selectedStudentIdInModal) === student.studentDoctorId;
+                    const isSelected =
+                      Number(selectedStudentIdInModal) ===
+                      student.studentDoctorId;
                     return (
                       <div
                         key={student.studentDoctorId}
@@ -484,7 +497,8 @@ const Patients = () => {
                             {student.studentName}
                           </h4>
                           <p className="text-[11px] text-(--color-text-light) font-medium">
-                            {student.university} • {student.status || "Clinical Level"}
+                            {student.university} •{" "}
+                            {student.status || "Clinical Level"}
                           </p>
                         </div>
                         <div
@@ -494,7 +508,9 @@ const Patients = () => {
                               : "border-gray-300 dark:border-gray-600"
                           }`}
                         >
-                          {isSelected && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                          {isSelected && (
+                            <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                          )}
                         </div>
                       </div>
                     );
@@ -502,7 +518,9 @@ const Patients = () => {
                 </div>
                 <input
                   type="hidden"
-                  {...register("studentDoctorId", { required: "Please select a student" })}
+                  {...register("studentDoctorId", {
+                    required: "Please select a student",
+                  })}
                 />
                 {errors.studentDoctorId && (
                   <p className="text-[10px] text-red-500 font-bold uppercase ml-1 tracking-wider">
@@ -519,9 +537,13 @@ const Patients = () => {
                   {...register("notes", { required: "Notes are required" })}
                   placeholder="Instructions or context for the student..."
                   rows={3}
-                  className={`w-full px-4 py-3 rounded-xl border ${errors.notes ? 'border-red-500' : 'border-(--color-border)'} bg-(--color-bg) text-(--color-text) focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm resize-none`}
+                  className={`w-full px-4 py-3 rounded-xl border ${errors.notes ? "border-red-500" : "border-(--color-border)"} bg-(--color-bg) text-(--color-text) focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-sm resize-none`}
                 />
-                {errors.notes && <p className="text-[10px] text-red-500 font-bold uppercase ml-1 tracking-wider">{errors.notes.message}</p>}
+                {errors.notes && (
+                  <p className="text-[10px] text-red-500 font-bold uppercase ml-1 tracking-wider">
+                    {errors.notes.message}
+                  </p>
+                )}
               </div>
 
               <div className="pt-2 flex gap-3">

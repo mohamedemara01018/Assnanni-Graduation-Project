@@ -216,7 +216,6 @@ const WeeklySchedulePanel = () => {
       );
     },
     onSuccess: () => {
-      toast.success("Time range blocked successfully");
       queryClient.invalidateQueries({ queryKey: ["DoctorSchedules"] });
       setActiveRangeDay(null);
     },
@@ -238,7 +237,6 @@ const WeeklySchedulePanel = () => {
       );
     },
     onSuccess: () => {
-      toast.success("Time range restored successfully");
       queryClient.invalidateQueries({ queryKey: ["DoctorSchedules"] });
       setActiveRangeDay(null);
     },
@@ -420,7 +418,7 @@ const WeeklySchedulePanel = () => {
           };
         },
       );
-      toast.success("Time slot restored successfully");
+
       queryClient.invalidateQueries({ queryKey: ["DoctorSchedules"] });
     },
     onError: (error: any) => {
@@ -430,10 +428,6 @@ const WeeklySchedulePanel = () => {
   });
 
   useEffect(() => {
-    if (isFetchSuccess) {
-      toast.success("Weekly schedule loaded");
-    }
-
     if (isFetchError) {
       console.error("Failed to load schedules:", fetchError);
       toast.error("Failed to load schedules. Showing local data.");
@@ -512,9 +506,9 @@ const WeeklySchedulePanel = () => {
               {/* Day header */}
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-(--color-text)">
-                      {day.name}
-                    </span>
+                  <span className="text-sm font-semibold text-(--color-text)">
+                    {day.name}
+                  </span>
                   <span className="text-xs bg-(--color-primary-lighter) text-(--color-primary) font-medium px-2 py-0.5 rounded-full">
                     {day.slots.length} slot{day.slots.length !== 1 ? "s" : ""}
                   </span>

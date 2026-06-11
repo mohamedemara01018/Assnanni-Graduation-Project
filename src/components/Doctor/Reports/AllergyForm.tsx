@@ -64,7 +64,6 @@ const AllergyForm = ({ patientId }: AllergyFormProps) => {
     },
     onSuccess: (data) => {
       if (data.succeeded) {
-        toast.success("Allergy added successfully");
         setSelectedAllergy(null);
         setNotes("");
         // Invalidate queries if there's a list of patient allergies somewhere

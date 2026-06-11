@@ -311,7 +311,6 @@ const MyPrescriptionsPage = () => {
       );
     },
     onSuccess: async () => {
-      toast.success("Prescription updated successfully");
       setActiveModal(null);
       setSelectedPrescriptionId(null);
       await queryClient.invalidateQueries({

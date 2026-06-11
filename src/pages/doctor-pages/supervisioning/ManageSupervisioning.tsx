@@ -95,7 +95,6 @@ const ManageSupervisioning = () => {
       });
     },
     onSuccess: () => {
-      toast.success("Study case created successfully");
       setIsModalOpen(false);
       reset();
       setPreviewUrl(null);

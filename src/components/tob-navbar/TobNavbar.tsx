@@ -23,11 +23,14 @@ function TobNavbar({ collapsed, setCollapsed, pageTitle }: TobNavbarProb) {
   const { data: unreadCountData } = useQuery({
     queryKey: ["unread-count"],
     queryFn: async () => {
-      const response = await axios.get(`${backendUrl}Notification/unread-count`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.get(
+        `${backendUrl}Notification/unread-count`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
       return response.data;
     },
     enabled: !!token && !!backendUrl,
@@ -37,17 +40,17 @@ function TobNavbar({ collapsed, setCollapsed, pageTitle }: TobNavbarProb) {
   const unreadCount = unreadCountData?.data || 0;
 
   return (
-    <div className="wrapper flex items-center justify-between gap-2">
-      <div className="flex justify-center items-center gap-4 text-xl text-(--color-text)  font-semibold">
+    <div className="wrapper flex items-center justify-between gap-2 ">
+      <div className="flex justify-center items-center gap-4 text-xl text-(--color-text)  font-semibold max-sm:gap-2">
         {collapsed && (
           <button
             onClick={() => setCollapsed(true)}
-            className="cursor-pointer p-2 hover:bg-(--color-bg-link-hover) rounded-xl transition duration-150"
+            className="cursor-pointer p-2 hover:bg-(--color-bg-link-hover) rounded-xl transition duration-150 max-sm:text-sm"
           >
-            <List />
+            <List className="max-sm:text-sm" />
           </button>
         )}
-        <h1>{pageTitle}</h1>
+        <h1 className="max-sm:text-[20px]">{pageTitle}</h1>
       </div>
       <div className="flex items-center gap-2 font-extrabold">
         <div className="max-lg:hidden ">
@@ -70,4 +73,3 @@ function TobNavbar({ collapsed, setCollapsed, pageTitle }: TobNavbarProb) {
 }
 
 export default TobNavbar;
-

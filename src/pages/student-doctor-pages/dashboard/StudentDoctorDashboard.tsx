@@ -35,11 +35,11 @@ const StudentDoctorDashboard = () => {
   });
 
   return (
-    <DashboardLayout pageTitle={"Student Doctor Dashboard"}>
+    <DashboardLayout pageTitle={"Student Dashboard"}>
       <div className="-mt-6 -ml-6 bg-(--color-bg) rounded-2xl min-h-screen">
         <div className="p-6">
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-3xl text-(--color-text) font-bold font-sans">
+            <h1 className="text-3xl text-(--color-text) font-bold font-sans max-sm:text-xl">
               Welcome, Dr.{fullName || authName || "Student"}!
             </h1>
             <span className="flex text-[10px] py-1 px-3 items-center gap-2 bg-violet-100 rounded-full text-violet-600 font-bold uppercase tracking-wider">
@@ -47,7 +47,7 @@ const StudentDoctorDashboard = () => {
               Student
             </span>
           </div>
-          <p className="text-(--color-text-light) font-normal text-sm mb-6">
+          <p className="text-(--color-text-light) font-normal text-sm mb-6 max-sm:text-sm">
             Here's your learning dashboard for today
           </p>
 

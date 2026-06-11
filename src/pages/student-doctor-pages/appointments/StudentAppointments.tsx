@@ -118,8 +118,7 @@ const StudentAppointments = () => {
 
       return response.data;
     },
-    onSuccess: (data) => {
-      toast.success(data?.message || "Appointment confirmed successfully");
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["studentAppointments"] });
     },
     onError: (err: any) => {

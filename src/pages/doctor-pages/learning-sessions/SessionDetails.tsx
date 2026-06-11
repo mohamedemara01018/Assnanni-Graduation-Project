@@ -137,7 +137,6 @@ const SessionDetails = () => {
       );
     },
     onSuccess: () => {
-      toast.success("Attendance marked successfully");
       setIsAttendanceModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ["session-details", id] });
     },
@@ -162,7 +161,6 @@ const SessionDetails = () => {
       );
     },
     onSuccess: () => {
-      toast.success("Student evaluated successfully");
       setIsEvaluationModalOpen(false);
       queryClient.invalidateQueries({ queryKey: ["session-details", id] });
     },

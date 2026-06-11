@@ -50,11 +50,15 @@ const AddMedicalHistoryRecord = () => {
   const mutation = useMutation({
     mutationFn: async (payload: any) => {
       // 1. Create the Medical Record
-      const response = await axios.post(`${backendUrl}MedicalRecords`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await axios.post(
+        `${backendUrl}MedicalRecords`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       const medicalRecordId = response.data?.data || response.data;
 
@@ -72,7 +76,7 @@ const AddMedicalHistoryRecord = () => {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "multipart/form-data",
               },
-            }
+            },
           );
         });
 
@@ -80,12 +84,12 @@ const AddMedicalHistoryRecord = () => {
       }
     },
     onSuccess: () => {
-      toast.success("Medical record and attachments saved successfully!");
       navigate(`/doctor-patients/${id}/medical-history`);
     },
     onError: (err: any) => {
       toast.error(
-        err.response?.data?.message || "Failed to add medical record or attachments"
+        err.response?.data?.message ||
+          "Failed to add medical record or attachments",
       );
     },
   });

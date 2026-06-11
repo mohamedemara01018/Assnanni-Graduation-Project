@@ -65,9 +65,6 @@ const RegisterPatient = () => {
       );
 
       if (response.data.succeeded) {
-        toast.success(
-          response.data.message || "Patient registered successfully!",
-        );
         reset();
         navigate("/doctor-patients");
       } else {

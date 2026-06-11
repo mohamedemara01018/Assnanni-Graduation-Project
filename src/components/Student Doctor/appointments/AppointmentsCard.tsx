@@ -57,8 +57,8 @@ function AppointmentsCard({
   };
 
   return (
-    <div className="bg-(--color-surface) rounded-2xl p-6 flex gap-6 shadow-sm border border-(--color-border) hover:shadow-md transition-shadow">
-      <div className="shrink-0 w-12 h-12 bg-linear-to-br from-blue-400 to-emerald-400 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm overflow-hidden">
+    <div className="bg-(--color-surface) rounded-2xl p-6 flex gap-6 shadow-sm border border-(--color-border) hover:shadow-md transition-shadow max-sm:gap-3">
+      <div className="shrink-0 w-12 h-12 bg-linear-to-br from-blue-400 to-emerald-400 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-sm overflow-hidden max-sm:w-10 max-sm:h-10">
         {imageUrl ? (
           <LazyImage
             src={imageUrl}
@@ -70,17 +70,19 @@ function AppointmentsCard({
         )}
       </div>
 
-      <div className="grow flex flex-col gap-4">
+      <div className="grow flex flex-col gap-4 max-sm:gap-2">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="text-lg font-bold text-(--color-text)">{name}</h3>
-            <p className="text-sm text-(--color-text-light) font-medium">
+            <h3 className="text-lg font-bold text-(--color-text) max-sm:text-sm">
+              {name}
+            </h3>
+            <p className="text-sm max-sm:text-xs text-(--color-text-light) font-medium">
               {desc}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <div
-              className={`flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider ${getStatusStyles()}`}
+              className={`flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider max-sm:px-2 ${getStatusStyles()}`}
             >
               {status === "Upcoming" ? (
                 <FaRegClock size={12} />
@@ -97,7 +99,7 @@ function AppointmentsCard({
 
         {(status !== "Cancelled" || role === "receptionist") && (
           <>
-            <div className="flex flex-wrap gap-x-6 gap-y-2">
+            <div className="flex flex-wrap gap-x-6 gap-y-2 ">
               <div className="flex items-center gap-2 text-xs text-(--color-text-light) font-medium">
                 <BsCalendar3 className="text-gray-400" />
                 <span>{date}</span>

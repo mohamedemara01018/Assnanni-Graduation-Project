@@ -48,7 +48,7 @@ const RescheduleAppointment = () => {
           `${backendUrl}Receptionist/schedule-appointment/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
         return response.data.data;
       },
@@ -71,7 +71,7 @@ const RescheduleAppointment = () => {
         `${backendUrl}Receptionist/available-slots?date=${formattedDateForSlots}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       return response.data.data;
     },
@@ -86,19 +86,18 @@ const RescheduleAppointment = () => {
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       return response.data;
     },
-    onSuccess: (data) => {
-      toast.success(data.message || "Appointment rescheduled successfully!");
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["studentAppointments"] });
       queryClient.invalidateQueries({ queryKey: ["appointmentDetails", id] });
       navigate("/doctor-appointments");
     },
     onError: (err: any) => {
       toast.error(
-        err.response?.data?.message || "Failed to reschedule appointment"
+        err.response?.data?.message || "Failed to reschedule appointment",
       );
     },
   });

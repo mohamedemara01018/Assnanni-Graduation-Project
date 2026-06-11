@@ -32,7 +32,6 @@ export default function PasswordResetRequestPage() {
       const message = "Password reset instructions sent successfully.";
 
       if (isSuccess) {
-        toast.success(message);
         navigate("/password-reset/new");
         return;
       }

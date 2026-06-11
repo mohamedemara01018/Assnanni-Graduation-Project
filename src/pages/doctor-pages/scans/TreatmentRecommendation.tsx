@@ -1,6 +1,10 @@
-import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation, useNavigate, useParams } from "react-router";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/store";
+import Cookies from "js-cookie";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
 import { IoArrowBack } from "react-icons/io5";
 import {
@@ -9,7 +13,11 @@ import {
   HiOutlineSparkles,
 } from "react-icons/hi2";
 import { LuUser, LuScanLine } from "react-icons/lu";
-import { resolveAssetUrl } from "@/utils/resolveAssetUrl";
+import {
+  resolveAssetUrl,
+  resolveFetchableAssetUrl,
+} from "@/utils/resolveAssetUrl";
+import { toast } from "react-toastify";
 
 export interface TreatmentRecommendationData {
   by_Class: Record<string, number>;
@@ -24,6 +32,7 @@ export interface TreatmentRecommendationCache {
   patientName: string;
   patientId: number;
   scanId: number;
+  fileUrl?: string;
 }
 
 export type TreatmentRecommendationLocationState = TreatmentRecommendationCache;
@@ -32,12 +41,12 @@ export const treatmentRecommendationQueryKey = (scanId?: string) =>
   ["TreatmentRecommendation", scanId] as const;
 
 const formatClassName = (key: string) =>
-  key
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (char) => char.toUpperCase());
+  (key || "")
+    ?.replace(/_/g, " ")
+    ?.replace(/\b\w/g, (char) => char.toUpperCase()) || "";
 
 const injectPatientNameIntoReport = (report: string, patientName?: string) => {
-  if (!patientName) return report;
+  if (!patientName || !report) return report || "";
   return report.replace(/\[Patient Name[^\]]*\]/gi, patientName);
 };
 
@@ -47,16 +56,131 @@ const TreatmentRecommendation = () => {
   const location = useLocation();
   const locationState =
     location.state as TreatmentRecommendationLocationState | null;
+  const backendUrl = useSelector((state: RootState) => state.config.backendUrl);
+  const token = Cookies.get("jwtToken");
+  const queryClient = useQueryClient();
+
+  const [manualUploadMode, setManualUploadMode] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [progress, setProgress] = useState(0);
 
   const { data: cachedState } = useQuery({
     queryKey: treatmentRecommendationQueryKey(scanId),
     queryFn: async (): Promise<TreatmentRecommendationCache | null> => null,
-    staleTime: Infinity,
-    gcTime: 1000 * 60 * 60,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const state = cachedState ?? locationState;
   const recommendation = state?.recommendation;
+  const fileUrl = state?.fileUrl;
+
+  const generateRecommendationMutation = useMutation({
+    mutationFn: async (fileUrl: string) => {
+      const imageUrl = resolveFetchableAssetUrl(fileUrl);
+      const imageResponse = await axios.get(imageUrl, {
+        responseType: "blob",
+      });
+
+      const extension = fileUrl.split(".").pop()?.split("?")[0] || "jpg";
+      const file = new File(
+        [imageResponse.data],
+        `scan-${state?.scanId}.${extension}`,
+        { type: imageResponse.data.type || "image/jpeg" },
+      );
+
+      const formData = new FormData();
+      formData.append("formFile", file);
+
+      const response = await axios.post(
+        `${backendUrl}Scans/treatment-recommendation`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      return response.data;
+    },
+    onSuccess: (response) => {
+      if (!response.succeeded) {
+        toast.error(
+          response.message || "Failed to get treatment recommendation",
+        );
+        return;
+      }
+
+      const cacheData: TreatmentRecommendationCache = {
+        recommendation: response.data,
+        patientName: state?.patientName || "",
+        patientId: state?.patientId || 0,
+        scanId: state?.scanId || 0,
+        fileUrl: fileUrl,
+      };
+
+      queryClient.setQueryData(
+        treatmentRecommendationQueryKey(scanId),
+        cacheData,
+      );
+    },
+    onError: (err: any) => {
+      toast.error(
+        err.response?.data?.message || "Failed to get treatment recommendation",
+      );
+    },
+  });
+
+  const retryRecommendationMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append("formFile", file);
+
+      const response = await axios.post(
+        `${backendUrl}Scans/treatment-recommendation`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      return response.data;
+    },
+    onSuccess: (response) => {
+      if (!response.succeeded) {
+        toast.error(
+          response.message || "Failed to get treatment recommendation",
+        );
+        return;
+      }
+
+      const cacheData: TreatmentRecommendationCache = {
+        recommendation: response.data,
+        patientName: state?.patientName || "",
+        patientId: state?.patientId || 0,
+        scanId: state?.scanId || 0,
+      };
+
+      queryClient.setQueryData(
+        treatmentRecommendationQueryKey(scanId),
+        cacheData,
+      );
+
+      setManualUploadMode(false);
+      setUploadedFile(null);
+      toast.success("Treatment recommendation generated successfully");
+    },
+    onError: (err: any) => {
+      toast.error(
+        err.response?.data?.message || "Failed to get treatment recommendation",
+      );
+    },
+  });
 
   useEffect(() => {
     const style = document.createElement("style");
@@ -91,20 +215,77 @@ const TreatmentRecommendation = () => {
     window.print();
   };
 
+  useEffect(() => {
+    if (!recommendation && fileUrl && !manualUploadMode) {
+      setProgress(0);
+      generateRecommendationMutation.mutate(fileUrl);
+    }
+  }, [recommendation, fileUrl]);
+
+  useEffect(() => {
+    if (generateRecommendationMutation.isPending) {
+      const interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 95) return prev;
+          return prev + Math.random() * 5;
+        });
+      }, 500);
+
+      return () => clearInterval(interval);
+    } else {
+      setProgress(0);
+    }
+  }, [generateRecommendationMutation.isPending]);
+
   if (!recommendation) {
     return (
       <DashboardLayout pageTitle="Treatment Recommendation">
         <div className="p-8 text-center max-w-lg mx-auto">
-          <p className="text-(--color-text-light) font-medium mb-6">
-            No treatment recommendation data found. Please generate one from the
-            scan details page.
-          </p>
-          <button
-            onClick={() => navigate(`/scan/analysis/${scanId}`)}
-            className="text-blue-600 font-bold hover:underline"
-          >
-            Back to Scan Details
-          </button>
+          {generateRecommendationMutation.isPending ? (
+            <div className="space-y-6">
+              <div className="w-16 h-16 mx-auto rounded-full bg-teal-50 dark:bg-teal-900/20 text-teal-600 flex items-center justify-center">
+                <HiOutlineSparkles size={32} className="animate-pulse" />
+              </div>
+              <div>
+                <p className="text-(--color-text) font-bold text-lg mb-2">
+                  Generating Treatment Recommendations
+                </p>
+                <p className="text-(--color-text-light) font-medium">
+                  AI is analyzing the scan and generating personalized treatment
+                  plan...
+                </p>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-(--color-text-light) font-medium">
+                    Progress
+                  </span>
+                  <span className="text-teal-600 dark:text-teal-400 font-bold">
+                    {Math.round(progress)}%
+                  </span>
+                </div>
+                <div className="h-3 w-full rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-teal-500 to-emerald-500 transition-all duration-300 ease-out"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <p className="text-(--color-text-light) font-medium mb-6">
+                No treatment recommendation data found. Please generate one from
+                the scan details page.
+              </p>
+              <button
+                onClick={() => navigate(`/scan/analysis/${scanId}`)}
+                className="text-blue-600 font-bold hover:underline"
+              >
+                Back to Scan Details
+              </button>
+            </>
+          )}
         </div>
       </DashboardLayout>
     );
@@ -151,44 +332,94 @@ const TreatmentRecommendation = () => {
               <span>Print Report</span>
             </button>
 
-          {state && (
-            <>
-              <div className="flex items-center gap-3 px-5 py-3 bg-(--color-surface) border border-(--color-border) rounded-2xl print:hidden">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center border border-blue-100">
-                  <LuUser size={18} />
+            {state && (
+              <>
+                <div className="flex items-center gap-3 px-5 py-3 bg-(--color-surface) border border-(--color-border) rounded-2xl print:hidden">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center border border-blue-100">
+                    <LuUser size={18} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-(--color-text-light) uppercase tracking-wider">
+                      Patient
+                    </p>
+                    <p className="text-sm font-bold text-(--color-text)">
+                      {state.patientName}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[10px] font-bold text-(--color-text-light) uppercase tracking-wider">
-                    Patient
-                  </p>
-                  <p className="text-sm font-bold text-(--color-text)">
-                    {state.patientName}
-                  </p>
+                <div className="flex items-center gap-3 px-5 py-3 bg-(--color-surface) border border-(--color-border) rounded-2xl print:hidden">
+                  <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center border border-orange-100">
+                    <LuScanLine size={18} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-(--color-text-light) uppercase tracking-wider">
+                      Scan ID
+                    </p>
+                    <p className="text-sm font-bold text-(--color-text)">
+                      #{state.scanId}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-3 px-5 py-3 bg-(--color-surface) border border-(--color-border) rounded-2xl print:hidden">
-                <div className="w-10 h-10 rounded-xl bg-orange-50 text-orange-500 flex items-center justify-center border border-orange-100">
-                  <LuScanLine size={18} />
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold text-(--color-text-light) uppercase tracking-wider">
-                    Scan ID
-                  </p>
-                  <p className="text-sm font-bold text-(--color-text)">
-                    #{state.scanId}
-                  </p>
-                </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
           </div>
         </div>
 
         {recommendation.error && (
           <div className="mb-8 p-5 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-2xl">
-            <p className="text-sm font-bold text-red-700 dark:text-red-400">
+            <p className="text-sm font-bold text-red-700 dark:text-red-400 mb-4">
               {recommendation.error}
             </p>
+            {!manualUploadMode && (
+              <button
+                onClick={() => setManualUploadMode(true)}
+                className="text-sm font-bold text-red-700 dark:text-red-400 underline hover:text-red-800 dark:hover:text-red-300"
+              >
+                Upload image manually to retry
+              </button>
+            )}
+            {manualUploadMode && (
+              <div className="mt-4 space-y-3">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setUploadedFile(file);
+                    }
+                  }}
+                  className="text-sm text-gray-600 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-red-100 dark:file:bg-red-800 file:text-red-700 dark:file:text-red-300 hover:file:bg-red-200 dark:hover:file:bg-red-700"
+                />
+                {uploadedFile && (
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() =>
+                        retryRecommendationMutation.mutate(uploadedFile)
+                      }
+                      disabled={retryRecommendationMutation.isPending}
+                      className="flex items-center justify-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-xl font-bold transition-all active:scale-95 cursor-pointer disabled:opacity-50"
+                    >
+                      <HiOutlineSparkles className="text-lg" />
+                      <span>
+                        {retryRecommendationMutation.isPending
+                          ? "Generating..."
+                          : "Retry with uploaded image"}
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setManualUploadMode(false);
+                        setUploadedFile(null);
+                      }}
+                      className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-2 py-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         )}
 

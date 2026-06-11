@@ -175,7 +175,7 @@ const FirstDiv = () => {
                   <p className="text-[10px] font-bold text-violet-500 uppercase">
                     Supervisor: {scan.doctorName || "Assigned Doctor"}
                   </p>
-                  <p className="line-clamp-2 text-sm text-(--color-text-light)">
+                  <p className="line-clamp-2 text-sm max-sm:max-w-20 max-sm:overflow-x-clip text-(--color-text-light)">
                     {scan.description}
                   </p>
                   {scan.scanUrl && (

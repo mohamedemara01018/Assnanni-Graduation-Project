@@ -37,23 +37,25 @@ const Card = ({ title, date, size, type, fileUrl, onClick }: Props) => {
       onClick={onClick}
       className="flex justify-between items-center bg-(--color-bg) hover:bg-(--color-bg-link-hover) p-4 rounded-xl transition-colors duration-200 cursor-pointer mb-3 last:mb-0 group border border-(--color-border)"
     >
-      <div className="flex gap-4 items-center">
-        <div className={`${getIconBg()} p-3 rounded-lg`}>
+      <div className="flex gap-4 items-center max-sm:gap-2">
+        <div className={`${getIconBg()} p-3 rounded-lg max-sm:p-1`}>
           {getIcon()}
         </div>
         <div className="flex flex-col">
-          <h3 className="text-sm font-semibold text-(--color-text)">{title}</h3>
+          <h3 className="text-sm font-semibold text-(--color-text) max-sm:text-xs">
+            {title}
+          </h3>
           <p className="text-xs text-(--color-text-light) font-medium">
             {date} <span className="mx-1 text-(--color-border)">•</span> {size}
           </p>
         </div>
       </div>
-      <div className="flex items-center gap-3">
-        <span className="bg-(--color-surface) text-(--color-text-light) border border-(--color-border) text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow-sm">
+      <div className="flex items-center gap-3 max-sm:flex-col">
+        <span className="bg-(--color-surface) text-(--color-text-light) border border-(--color-border) text-[10px] max-sm:text-[8px] font-bold px-2 py-1 rounded uppercase tracking-wider shadow-sm">
           {type}
         </span>
         {fileUrl ? (
-          <a 
+          <a
             href={fileUrl}
             download
             title="Download Report"

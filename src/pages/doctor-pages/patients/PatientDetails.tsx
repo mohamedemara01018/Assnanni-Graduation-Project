@@ -109,9 +109,6 @@ const PatientDetails = () => {
   });
 
   useEffect(() => {
-    if (isSuccess && data?.succeeded) {
-      toast.success(data?.message || "Patient information loaded successfully");
-    }
     if (isError) {
       console.error("Error fetching patient info:", error);
       toast.error(
@@ -141,9 +138,6 @@ const PatientDetails = () => {
   });
 
   useEffect(() => {
-    if (isScansSuccess && scansData?.succeeded) {
-      toast.success(scansData?.message || "Patient scans loaded successfully");
-    }
     if (isScansError) {
       toast.error(
         (scansError as any)?.response?.data?.message ||
@@ -247,7 +241,9 @@ const PatientDetails = () => {
                 <DetailItem
                   icon={<IoWaterOutline />}
                   label="Blood Type"
-                  value={patient.personalInfo.bloodType.replace("_", " ")}
+                  value={
+                    patient.personalInfo.bloodType?.replace("_", " ") || "N/A"
+                  }
                 />
 
                 {/* Emergency Contact section removed or kept if available in real data */}
