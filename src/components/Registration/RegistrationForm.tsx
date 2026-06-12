@@ -1,16 +1,14 @@
 import { NavLink, useLocation, useNavigate } from "react-router";
 import { useEffect, useState } from "react";
-import { MdOutlineMail, MdBloodtype } from "react-icons/md";
-import { LuPhone } from "react-icons/lu";
-import { CiLock, CiCalendarDate, CiLocationOn } from "react-icons/ci";
-import { IoPersonCircleOutline } from "react-icons/io5";
-import { GrAlert } from "react-icons/gr";
+import {
+  Mail, Phone, Lock, Calendar, MapPin,
+  User, AlertCircle, Droplets, Loader2, Camera,
+} from "lucide-react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
-// import { setToken } from "@/store/slices/auth/authSlice";
 import { getEmail } from "@/store/slices/email/emailSlice";
 import type { RootState } from "@/store/store";
 
@@ -33,10 +31,84 @@ interface RegistrationFormProps {
   isStudentDoctorRegister?: boolean;
 }
 
+// ─── Reusable field wrapper ───────────────────────────────────────────────────
+
+function Field({
+  label,
+  error,
+  children,
+  required,
+}: {
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+  required?: boolean;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <label
+        className="text-xs font-semibold uppercase tracking-widest"
+        style={{ color: "var(--color-text-light)" }}
+      >
+        {label}
+        {required && (
+          <span style={{ color: "#dc2626" }} className="ml-0.5">*</span>
+        )}
+      </label>
+      {children}
+      {error && (
+        <p className="flex items-center gap-1 text-xs mt-0.5" style={{ color: "#dc2626" }}>
+          <AlertCircle className="w-3 h-3 shrink-0" />
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ─── Input with icon ──────────────────────────────────────────────────────────
+
+function InputIcon({
+  icon: Icon,
+  hasError,
+  children,
+}: {
+  icon: React.ElementType;
+  hasError?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="relative">
+      <div
+        className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center"
+        style={{ color: "var(--color-text-light)" }}
+      >
+        <Icon className="w-4 h-4" />
+      </div>
+      {/* inject border-color via wrapper; children must have pl-10 */}
+      <div
+        style={{
+          borderRadius: "0.75rem",
+          border: `1.5px solid ${hasError ? "#dc2626" : "var(--color-border)"}`,
+        }}
+        className="overflow-hidden transition-colors focus-within:!border-[var(--color-primary)]"
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+const inputCls =
+  "w-full bg-(--color-bg) text-(--color-text) placeholder:text-gray-400 placeholder:text-sm py-2.5 pl-10 pr-3 outline-none border-none focus:outline-none";
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 const RegistrationForm = ({
   isDoctorRegister = false,
   isStudentDoctorRegister = false,
 }: RegistrationFormProps) => {
+  // ── ALL ORIGINAL LOGIC — UNTOUCHED ──────────────────────────────────────────
   const authBase = useSelector((s: RootState) => s.config.backendUrl);
   const dispatch = useDispatch();
   const navigator = useNavigate();
@@ -61,26 +133,12 @@ const RegistrationForm = ({
   const password = watch("password");
   const imageFile = watch("image");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const labelClass =
-    "mb-1 inline-block text-sm font-medium text-(--color-text)";
-  const inputBaseClass =
-    "w-full rounded-xl border bg-(--color-bg) py-2.5 pl-12 pr-3 text-(--color-text) placeholder:text-gray-500 placeholder:text-sm transition focus:outline-none focus:ring-2 focus:ring-[#00AFE5]/30";
-  const inputBorderClass = "border-(--color-border)";
-  const inputErrorClass = "border-red-500";
-  const iconClass =
-    "absolute left-0 top-1/2 -translate-y-1/2 border-r-2 border-solid border-gray-300 px-2 text-4xl text-gray-500";
-  const errorClass = "ml-1 mt-1 text-xs font-light text-red-600";
 
   useEffect(() => {
     const selectedImage = imageFile?.[0];
-    if (!selectedImage) {
-      setImagePreview(null);
-      return;
-    }
-
+    if (!selectedImage) { setImagePreview(null); return; }
     const imageUrl = URL.createObjectURL(selectedImage);
     setImagePreview(imageUrl);
-
     return () => URL.revokeObjectURL(imageUrl);
   }, [imageFile]);
 
@@ -107,26 +165,17 @@ const RegistrationForm = ({
         formData.append("Password", data.password);
         formData.append("ConfirmPassword", data.confirmPassword);
         formData.append("PhoneNumber", data.phoneNumber);
-
-        if (data.image?.[0]) {
-          formData.append("ProfileImage", data.image[0]);
-        }
-
+        if (data.image?.[0]) formData.append("ProfileImage", data.image[0]);
         const response = await axios.post(
           authBase + "StudentDoctor/register",
           formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          },
+          { headers: { "Content-Type": "multipart/form-data" } },
         );
         return response;
       } else {
         const formattedDate = data.dateOfBirth
           ? `${data.dateOfBirth}T00:00:00Z`
           : new Date().toISOString();
-
         return axios.post(authBase + "Patient/register", {
           firstName: data.firstName,
           lastName: data.lastName,
@@ -142,22 +191,16 @@ const RegistrationForm = ({
     },
     onSuccess: (response: any, data) => {
       dispatch(getEmail(data.email));
-
       let doctorId = null;
       if (doctor && response && response.data) {
         const responseText =
           typeof response.data === "string"
             ? response.data
             : JSON.stringify(response.data);
-        console.log(responseText)
+        console.log(responseText);
         const doctorIdMatch = responseText.match(/DoctorId:\s*(\d+)/);
-        if (doctorIdMatch) {
-          doctorId = doctorIdMatch[1];
-        }
+        if (doctorIdMatch) doctorId = doctorIdMatch[1];
       }
-
-
-
       navigator("/verify-email", {
         state: { isDoctor: doctor, isStudentDoctor: studentDoctor, doctorId },
       });
@@ -177,336 +220,289 @@ const RegistrationForm = ({
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     registerMutation.mutate(data);
   };
+  // ── END ORIGINAL LOGIC ──────────────────────────────────────────────────────
+
   return (
-    <div className="register-container flex flex-col justify-center gap-4">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="flex flex-col gap-4">
-          {!isPatient && (
-            <div className="flex flex-col items-center gap-3 py-2">
-              <label htmlFor="image" className="cursor-pointer">
-                {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    alt="Selected profile preview"
-                    className="h-28 w-28 rounded-full object-cover ring-2 ring-[#00AFE5]/40"
-                  />
-                ) : (
-                  <div className="flex h-28 w-28 items-center justify-center rounded-full border-2 border-dashed border-[#00AFE5]/50 bg-[#00AFE5]/10">
-                    <IoPersonCircleOutline className="text-6xl text-[#00AFE5]" />
-                  </div>
-                )}
-              </label>
-              <input
-                id="image"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                {...register("image", {
-                  required: "Profile image is required",
-                })}
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
+
+      {/* ── Profile image (doctor / student) ── */}
+      {!isPatient && (
+        <div className="flex flex-col items-center gap-3 py-2">
+          <label htmlFor="image" className="cursor-pointer group relative">
+            {imagePreview ? (
+              <img
+                src={imagePreview}
+                alt="Profile preview"
+                className="w-24 h-24 rounded-2xl object-cover"
+                style={{ border: "2px solid var(--color-border)" }}
               />
-              <label
-                htmlFor="image"
-                className="cursor-pointer rounded-full bg-[#00AFE5] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
+            ) : (
+              <div
+                className="w-24 h-24 rounded-2xl flex items-center justify-center"
+                style={{
+                  background: "var(--color-bg-blue)",
+                  border: "2px dashed var(--color-primary-lighter)",
+                }}
               >
-                {imagePreview ? "Change profile image" : "Upload profile image"}
-              </label>
-              {!errors.image && (
-                <p className="text-xs text-gray-500">
-                  JPG, PNG, WEBP supported
-                </p>
-              )}
-              {errors.image?.message && (
-                <p className="text-xs text-red-600">{errors.image.message}</p>
-              )}
-            </div>
-          )}
-          <div className="name grid grid-cols-2 gap-3 max-sm:grid-cols-1">
-            <div>
-              <label htmlFor="firstName" className={labelClass}>
-                First Name
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  className={`${inputBaseClass} ${errors.firstName ? inputErrorClass : inputBorderClass
-                    }`}
-                  placeholder="John"
-                  id="firstName"
-                  {...register("firstName", {
-                    required: "First name is Required",
-                  })}
-                />
-                <IoPersonCircleOutline className={iconClass} />
+                <Camera className="w-8 h-8" style={{ color: "var(--color-primary)" }} />
               </div>
-              {errors.firstName?.message && (
-                <p className={errorClass}>{errors.firstName.message}</p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="lastName" className={labelClass}>
-                Last Name
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  className={`${inputBaseClass} ${errors.lastName ? inputErrorClass : inputBorderClass
-                    }`}
-                  id="lastName"
-                  placeholder="Doe"
-                  {...register("lastName", {
-                    required: "Last name is Required",
-                  })}
-                />
-                <IoPersonCircleOutline className={iconClass} />
-              </div>
-              {errors.lastName?.message && (
-                <p className={errorClass}>{errors.lastName.message}</p>
-              )}
-            </div>
-          </div>
-          <div>
-            <label htmlFor="email" className={labelClass}>
-              Email
-            </label>
-            <div className="relative">
-              <input
-                type="email"
-                placeholder="John.doe@example.com"
-                className={`${inputBaseClass} ${errors.email ? inputErrorClass : inputBorderClass
-                  }`}
-                id="email"
-                {...register("email", {
-                  pattern: {
-                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                    message: "Please, make sure your Email Address is correct",
-                  },
-                  required: "Email Address is Required",
-                })}
-              />
-              <MdOutlineMail className={iconClass} />
-            </div>
-            {errors.email?.message && (
-              <p className={errorClass}>{errors.email.message}</p>
             )}
-          </div>
-          <div>
-            <label htmlFor="phoneNumber" className={labelClass}>
-              Phone Number
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                className={`${inputBaseClass} ${errors.phoneNumber ? inputErrorClass : inputBorderClass
-                  }`}
-                placeholder="+1 (555) 000-000"
-                id="phoneNumber"
-                {...register("phoneNumber", {
-                  required: "Phone Number is Required",
-                  minLength: {
-                    value: 11,
-                    message: "The Phone number must be 11 number",
-                  },
-                  maxLength: {
-                    value: 11,
-                    message: "The Phone number must be 11 number",
-                  },
-                  pattern: {
-                    value: /^01[0-2]\d{1,8}$/i,
-                    message: "Please, make sure your number is correct",
-                  },
-                })}
-              />
-              <LuPhone className={iconClass} />
-            </div>
-            {errors.phoneNumber?.message && (
-              <p className={errorClass}>{errors.phoneNumber?.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="password" className={labelClass}>
-              Password
-            </label>
-            <div className="relative">
-              <input
-                type="password"
-                id="password"
-                placeholder="password"
-                className={`${inputBaseClass} ${errors.password ? inputErrorClass : inputBorderClass
-                  }`}
-                {...register("password", {
-                  required: "Password is Required",
-                  minLength: {
-                    value: 8,
-                    message: "Password must be at least 8 characters",
-                  },
-                  pattern: {
-                    value:
-                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/,
-                    message: "Min 8 chars, 1 uppercase, 1 lowercase, 1 number",
-                  },
-                })}
-              />
-              <CiLock className={iconClass} />
-            </div>
-            {errors.password?.message && (
-              <p className={errorClass}>{errors.password?.message}</p>
-            )}
-          </div>
-          <div>
-            <label htmlFor="cPassword" className={labelClass}>
-              Confirm Password
-            </label>
-            <div className="relative">
-              <input
-                type="password"
-                className={`${inputBaseClass} ${errors.confirmPassword ? inputErrorClass : inputBorderClass
-                  }`}
-                id="cPassword"
-                placeholder="confirm password"
-                {...register("confirmPassword", {
-                  validate: (value) =>
-                    value === password || "Passwords do not match",
-                })}
-              />
-              <CiLock className={iconClass} />
-            </div>
-            {errors.confirmPassword?.message && (
-              <p className={errorClass}>{errors.confirmPassword?.message}</p>
-            )}
-          </div>
-          {isPatient && (
-            <>
-              <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
-                <div>
-                  <label htmlFor="dateOfBirth" className={labelClass}>
-                    Date of Birth
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="date"
-                      className={`${inputBaseClass} ${errors.dateOfBirth ? inputErrorClass : inputBorderClass
-                        }`}
-                      id="dateOfBirth"
-                      {...register("dateOfBirth", {
-                        required: "Date of Birth is Required",
-                      })}
-                    />
-                    <CiCalendarDate className={iconClass} />
-                  </div>
-                  {errors.dateOfBirth?.message && (
-                    <p className={errorClass}>{errors.dateOfBirth.message}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="gender" className={labelClass}>
-                    Gender
-                  </label>
-                  <div className="relative">
-                    <select
-                      className={`${inputBaseClass} ${errors.gender ? inputErrorClass : inputBorderClass
-                        }`}
-                      id="gender"
-                      {...register("gender", {
-                        required: "Gender is Required",
-                      })}
-                    >
-                      <option value="">Select Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                    </select>
-                    <IoPersonCircleOutline className={iconClass} />
-                  </div>
-                  {errors.gender?.message && (
-                    <p className={errorClass}>{errors.gender.message}</p>
-                  )}
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-3 max-sm:grid-cols-1">
-                <div>
-                  <label htmlFor="address" className={labelClass}>
-                    Address
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      className={`${inputBaseClass} ${errors.address ? inputErrorClass : inputBorderClass
-                        }`}
-                      id="address"
-                      placeholder="123 Main St"
-                      {...register("address", {
-                        required: "Address is Required",
-                      })}
-                    />
-                    <CiLocationOn className={iconClass} />
-                  </div>
-                  {errors.address?.message && (
-                    <p className={errorClass}>{errors.address.message}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="bloodType" className={labelClass}>
-                    Blood Type
-                  </label>
-                  <div className="relative">
-                    <select
-                      className={`${inputBaseClass} ${errors.bloodType ? inputErrorClass : inputBorderClass
-                        }`}
-                      id="bloodType"
-                      {...register("bloodType", {
-                        required: "Blood Type is Required",
-                      })}
-                    >
-                      <option value="">Select Blood Type</option>
-                      <option value="A_Positive">A+</option>
-                      <option value="A_Negative">A-</option>
-                      <option value="B_Positive">B+</option>
-                      <option value="B_Negative">B-</option>
-                      <option value="AB_Positive">AB+</option>
-                      <option value="AB_Negative">AB-</option>
-                      <option value="O_Positive">O+</option>
-                      <option value="O_Negative">O-</option>
-                    </select>
-                    <MdBloodtype className={iconClass} />
-                  </div>
-                  {errors.bloodType?.message && (
-                    <p className={errorClass}>{errors.bloodType.message}</p>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
-          {isDoctor && (
-            <div className="bg-[#00E0a5]/20 p-2 rounded-sm font-semibold  text-[#00AFe5]">
-              <p className="flex gap-2">
-                <GrAlert className="translate-y-0.5 text-xl" />
-                After registration, you'll need to upload your medical license
-                and credentials for verification.
-              </p>
-            </div>
-          )}
-          <div className=" max-sm:w-11/12 w-1/3 m-auto">
-            <button
-              disabled={registerMutation.isPending}
-              className="self-center text-white bg-[#00AFE5]  w-full rounded-3xl m-auto py-2 px-6 font-bold cursor-pointer hover:bg-blue-500 disabled:opacity-70 disabled:cursor-not-allowed"
+            {/* overlay */}
+            <div
+              className="absolute inset-0 rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              style={{ background: "rgba(0,0,0,0.35)" }}
             >
-              {registerMutation.isPending ? "Registering..." : "Register"}
-            </button>
-          </div>
-          <div>
-            <p className=" mb-4 flex justify-center gap-1 max-sm:flex-col">
-              Already have an account?{" "}
-              <NavLink
-                to="/login"
-                className="text-[#0c86ab] inline-block   font-semibold"
-              >
-                Sign in
-              </NavLink>
+              <Camera className="w-6 h-6 text-white" />
+            </div>
+          </label>
+
+          <input
+            id="image"
+            type="file"
+            accept="image/*"
+            className="hidden"
+            {...register("image", { required: "Profile image is required" })}
+          />
+
+          <label
+            htmlFor="image"
+            className="cursor-pointer text-xs font-semibold px-4 py-1.5 rounded-full transition-opacity hover:opacity-80"
+            style={{ background: "var(--color-primary)", color: "#fff" }}
+          >
+            {imagePreview ? "Change photo" : "Upload photo"}
+          </label>
+
+          {!errors.image && (
+            <p className="text-xs" style={{ color: "var(--color-text-light)" }}>
+              JPG, PNG or WEBP
             </p>
-          </div>
+          )}
+          {errors.image?.message && (
+            <p className="text-xs flex items-center gap-1" style={{ color: "#dc2626" }}>
+              <AlertCircle className="w-3 h-3" />{errors.image.message}
+            </p>
+          )}
         </div>
-      </form>
-    </div>
+      )}
+
+      {/* ── Name row ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Field label="First Name" error={errors.firstName?.message} required>
+          <InputIcon icon={User} hasError={!!errors.firstName}>
+            <input
+              type="text"
+              className={inputCls}
+              placeholder="John"
+              id="firstName"
+              {...register("firstName", { required: "First name is required" })}
+            />
+          </InputIcon>
+        </Field>
+
+        <Field label="Last Name" error={errors.lastName?.message} required>
+          <InputIcon icon={User} hasError={!!errors.lastName}>
+            <input
+              type="text"
+              className={inputCls}
+              placeholder="Doe"
+              id="lastName"
+              {...register("lastName", { required: "Last name is required" })}
+            />
+          </InputIcon>
+        </Field>
+      </div>
+
+      {/* ── Email ── */}
+      <Field label="Email" error={errors.email?.message} required>
+        <InputIcon icon={Mail} hasError={!!errors.email}>
+          <input
+            type="email"
+            className={inputCls}
+            placeholder="john.doe@example.com"
+            id="email"
+            {...register("email", {
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: "Please enter a valid email address",
+              },
+              required: "Email address is required",
+            })}
+          />
+        </InputIcon>
+      </Field>
+
+      {/* ── Phone ── */}
+      <Field label="Phone Number" error={errors.phoneNumber?.message} required>
+        <InputIcon icon={Phone} hasError={!!errors.phoneNumber}>
+          <input
+            type="text"
+            className={inputCls}
+            placeholder="+1 (555) 000-0000"
+            id="phoneNumber"
+            {...register("phoneNumber", {
+              required: "Phone number is required",
+              minLength: { value: 11, message: "Phone number must be 11 digits" },
+              maxLength: { value: 11, message: "Phone number must be 11 digits" },
+              pattern: {
+                value: /^01[0-2]\d{1,8}$/i,
+                message: "Please enter a valid phone number",
+              },
+            })}
+          />
+        </InputIcon>
+      </Field>
+
+      {/* ── Password row ── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Field label="Password" error={errors.password?.message} required>
+          <InputIcon icon={Lock} hasError={!!errors.password}>
+            <input
+              type="password"
+              className={inputCls}
+              placeholder="••••••••"
+              id="password"
+              {...register("password", {
+                required: "Password is required",
+                minLength: { value: 8, message: "Password must be at least 8 characters" },
+                pattern: {
+                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/,
+                  message: "Min 8 chars, 1 uppercase, 1 lowercase, 1 number",
+                },
+              })}
+            />
+          </InputIcon>
+        </Field>
+
+        <Field label="Confirm Password" error={errors.confirmPassword?.message} required>
+          <InputIcon icon={Lock} hasError={!!errors.confirmPassword}>
+            <input
+              type="password"
+              className={inputCls}
+              placeholder="••••••••"
+              id="cPassword"
+              {...register("confirmPassword", {
+                validate: (value) => value === password || "Passwords do not match",
+              })}
+            />
+          </InputIcon>
+        </Field>
+      </div>
+
+      {/* ── Patient-only fields ── */}
+      {isPatient && (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Field label="Date of Birth" error={errors.dateOfBirth?.message} required>
+              <InputIcon icon={Calendar} hasError={!!errors.dateOfBirth}>
+                <input
+                  type="date"
+                  className={inputCls}
+                  id="dateOfBirth"
+                  {...register("dateOfBirth", { required: "Date of birth is required" })}
+                />
+              </InputIcon>
+            </Field>
+
+            <Field label="Gender" error={errors.gender?.message} required>
+              <InputIcon icon={User} hasError={!!errors.gender}>
+                <select
+                  className={inputCls}
+                  id="gender"
+                  {...register("gender", { required: "Gender is required" })}
+                >
+                  <option value="">Select gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+              </InputIcon>
+            </Field>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Field label="Address" error={errors.address?.message} required>
+              <InputIcon icon={MapPin} hasError={!!errors.address}>
+                <input
+                  type="text"
+                  className={inputCls}
+                  placeholder="123 Main St"
+                  id="address"
+                  {...register("address", { required: "Address is required" })}
+                />
+              </InputIcon>
+            </Field>
+
+            <Field label="Blood Type" error={errors.bloodType?.message} required>
+              <InputIcon icon={Droplets} hasError={!!errors.bloodType}>
+                <select
+                  className={inputCls}
+                  id="bloodType"
+                  {...register("bloodType", { required: "Blood type is required" })}
+                >
+                  <option value="">Select blood type</option>
+                  <option value="A_Positive">A+</option>
+                  <option value="A_Negative">A-</option>
+                  <option value="B_Positive">B+</option>
+                  <option value="B_Negative">B-</option>
+                  <option value="AB_Positive">AB+</option>
+                  <option value="AB_Negative">AB-</option>
+                  <option value="O_Positive">O+</option>
+                  <option value="O_Negative">O-</option>
+                </select>
+              </InputIcon>
+            </Field>
+          </div>
+        </>
+      )}
+
+      {/* ── Doctor notice banner ── */}
+      {isDoctor && (
+        <div
+          className="flex items-start gap-3 rounded-xl px-4 py-3"
+          style={{
+            background: "var(--color-bg-blue)",
+            border: "1px solid var(--color-primary-lighter)",
+          }}
+        >
+          <AlertCircle
+            className="w-4 h-4 mt-0.5 shrink-0"
+            style={{ color: "var(--color-primary)" }}
+          />
+          <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-blue)" }}>
+            After registration, you'll need to upload your medical license and
+            credentials for verification.
+          </p>
+        </div>
+      )}
+
+      {/* ── Divider ── */}
+      <div style={{ height: 1, background: "var(--color-border)" }} />
+
+      {/* ── Submit ── */}
+      <button
+        type="submit"
+        disabled={registerMutation.isPending}
+        className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+        style={{ background: "var(--color-primary)" }}
+      >
+        {registerMutation.isPending ? (
+          <><Loader2 className="w-4 h-4 animate-spin" /> Registering…</>
+        ) : (
+          "Create Account"
+        )}
+      </button>
+
+      {/* ── Sign-in link ── */}
+      <p className="text-center text-sm" style={{ color: "var(--color-text-light)" }}>
+        Already have an account?{" "}
+        <NavLink
+          to="/login"
+          className="font-semibold underline underline-offset-4 transition-opacity hover:opacity-75"
+          style={{ color: "var(--color-primary)" }}
+        >
+          Sign in
+        </NavLink>
+      </p>
+    </form>
   );
 };
 
