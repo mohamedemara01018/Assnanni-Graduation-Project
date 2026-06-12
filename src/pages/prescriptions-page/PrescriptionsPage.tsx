@@ -270,7 +270,7 @@ function PrescriptionCard({ prescription }: { prescription: Prescription }) {
             <img
               src={prescription.doctorImage}
               alt={prescription.doctorName}
-              className="w-12 h-12 rounded-xl object-cover shrink-0"
+              className="w-12 h-12 rounded-full object-cover shrink-0"
               style={{ border: "1.5px solid var(--color-border)" }}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).style.display = "none";
@@ -278,7 +278,7 @@ function PrescriptionCard({ prescription }: { prescription: Prescription }) {
             />
           ) : (
             <div
-              className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+              className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
               style={{
                 backgroundColor: "rgba(22,163,74,0.1)",
                 border: "1.5px solid rgba(22,163,74,0.2)",

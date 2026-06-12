@@ -1,7 +1,9 @@
 import CardComp from '@/components/card-comp/CardComp';
 import DashboardLayout from '@/components/dashboard-layout/DashboardLayout'
 import Error from '@/components/error/Error';
+import MiniLoading from '@/components/mini-loading/MiniLoading';
 import StatCard from '@/components/statical-card/StaticalCard'
+import { fetchAdminDashboardAnalysis, selectAnalyticsDashboardState, type AnalyticsDashboardState } from '@/store/slices/admin-slice/analtics-dashboard-slice/analticsDashboardSlice';
 import { fetchAdminSummary, selectSummary, type SummaryState } from '@/store/slices/admin-slice/summary-slice/SummarySlice';
 import type { AppDispatch } from '@/store/store';
 import { Calendars, FileText, ShieldCheck, Users } from 'lucide-react'
@@ -15,51 +17,6 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Line, Legend, Li
 // import { RechartsDevtools } from '@recharts/devtools';
 
 
-const analticsData = [
-    {
-        name: 'Page A',
-        uv: 4000,
-        pv: 2400,
-        amt: 2400,
-    },
-    {
-        name: 'Page B',
-        uv: 3000,
-        pv: 1398,
-        amt: 2210,
-    },
-    {
-        name: 'Page C',
-        uv: 2000,
-        pv: 9800,
-        amt: 2290,
-    },
-    {
-        name: 'Page D',
-        uv: 2780,
-        pv: 3908,
-        amt: 2000,
-    },
-    {
-        name: 'Page E',
-        uv: 1890,
-        pv: 4800,
-        amt: 2181,
-    },
-    {
-        name: 'Page F',
-        uv: 2390,
-        pv: 3800,
-        amt: 2500,
-    },
-    {
-        name: 'Page G',
-        uv: 3490,
-        pv: 4300,
-        amt: 2100,
-    },
-];
-
 
 
 
@@ -70,10 +27,20 @@ function AnalyticsPage() {
         useSelector(selectSummary) as SummaryState;
 
 
+    const {
+        data: analticsData,
+        loading: analyticsLoading,
+        error: analticsError
+    } = useSelector(selectAnalyticsDashboardState) as AnalyticsDashboardState
+
 
     useEffect(() => {
-        dispatch(fetchAdminSummary())
+        Promise.all([
+            dispatch(fetchAdminSummary()),
+            dispatch(fetchAdminDashboardAnalysis())
+        ])
     }, [dispatch]);
+
 
     const totalUser = data
         ? data.totalDoctors +
@@ -136,128 +103,135 @@ function AnalyticsPage() {
                     </select>
                 </div>
 
-                <div className='grid grid-cols-1 xl:grid-cols-2 gap-4'>
-                    <CardComp>
-                        <h2 className='text-lg'>Patient Growth</h2>
-                        <AreaChart
-                            style={{ width: '100%', maxWidth: '700px', maxHeight: '70vh', aspectRatio: 1.618 }}
-                            responsive
-                            data={analticsData}
-                            margin={{
-                                top: 20,
-                                right: 0,
-                                left: 0,
-                                bottom: 0,
-                            }}
-                            onContextMenu={(_, e) => e.preventDefault()}
-                        >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" niceTicks="snap125" />
-                            <YAxis width="auto" niceTicks="snap125" />
-                            <Tooltip
-                                contentStyle={{
-                                    backgroundColor: 'var(--color-surface)',
-                                    borderColor: 'var(--color-border)',
-                                }} />
-                            <Area type="monotone" dataKey="uv" fill="var(--chart-1)" />
-                            {/* <RechartsDevtools /> */}
-                        </AreaChart>
-                    </CardComp>
 
-                    <CardComp>
-                        <h2 className='text-lg'>Appointments </h2>
-                        <LineChart
-                            style={{ width: '100%', maxWidth: '700px', height: '100%', maxHeight: '70vh', aspectRatio: 1.618 }}
-                            responsive
-                            data={analticsData}
-                            margin={{
-                                top: 5,
-                                right: 0,
-                                left: 0,
-                                bottom: 5,
-                            }}
-                        >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" stroke="var(--color-text-light)" />
-                            <YAxis width="auto" stroke="var(--color-text-light)" />
-                            <Tooltip
-                                cursor={{
-                                    stroke: 'var(--color-border-2)',
-                                }}
-                                contentStyle={{
-                                    backgroundColor: 'var(--color-surface)',
-                                    borderColor: 'var(--color-border)',
-                                }}
-                            />
-                            <Legend />
-                            <Line
-                                type="monotone"
-                                dataKey="pv"
-                                stroke="var(--chart-2)"
-                                strokeWidth={2}
-                                dot={{
-                                    fill: 'var(--color-surface-base)',
-                                }}
-                                activeDot={{ r: 8, stroke: 'var(--color-surface-base)' }}
-                            />
-                        </LineChart>
-                    </CardComp>
+                {analyticsLoading ?
+                    <MiniLoading />
+                    : analticsError ?
+                        <Error message={analticsError || 'there is error when fetch anatics dashboard'} />
+                        : <div className='grid grid-cols-1 xl:grid-cols-2 gap-4'>
+                            {analticsData?.patientGrowth && <CardComp>
+                                <h2 className='text-lg'>Patient Growth</h2>
+                                <AreaChart
+                                    style={{ width: '100%', maxWidth: '700px', maxHeight: '70vh', aspectRatio: 1.618 }}
+                                    responsive
+                                    data={analticsData?.patientGrowth}
+                                    margin={{
+                                        top: 20,
+                                        right: 0,
+                                        left: 0,
+                                        bottom: 0,
+                                    }}
+                                    onContextMenu={(_, e) => e.preventDefault()}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="date" niceTicks="snap125" />
+                                    <YAxis width="auto" niceTicks="snap125" />
+                                    <Tooltip
+                                        contentStyle={{
+                                            backgroundColor: 'var(--color-surface)',
+                                            borderColor: 'var(--color-border)',
+                                        }} />
+                                    <Area type="monotone" dataKey="count" fill="var(--chart-1)" />
+                                    {/* <RechartsDevtools /> */}
+                                </AreaChart>
+                            </CardComp>}
+                            {
+                                analticsData?.appointmentsChart && <CardComp>
+                                    <h2 className='text-lg'>Appointments </h2>
+                                    <LineChart
+                                        style={{ width: '100%', maxWidth: '700px', height: '100%', maxHeight: '70vh', aspectRatio: 1.618 }}
+                                        responsive
+                                        data={analticsData?.appointmentsChart}
+                                        margin={{
+                                            top: 5,
+                                            right: 0,
+                                            left: 0,
+                                            bottom: 5,
+                                        }}
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" />
+                                        <XAxis dataKey={'date'} stroke="var(--color-text-light)" />
+                                        <YAxis width="auto" stroke="var(--color-text-light)" />
+                                        <Tooltip
+                                            cursor={{
+                                                stroke: 'var(--color-border-2)',
+                                            }}
+                                            contentStyle={{
+                                                backgroundColor: 'var(--color-surface)',
+                                                borderColor: 'var(--color-border)',
+                                            }}
+                                        />
+                                        <Legend />
+                                        <Line
+                                            type="monotone"
+                                            dataKey="count"
+                                            stroke="var(--chart-2)"
+                                            strokeWidth={2}
+                                            dot={{
+                                                fill: 'var(--color-surface-base)',
+                                            }}
+                                            activeDot={{ r: 8, stroke: 'var(--color-surface-base)' }}
+                                        />
+                                    </LineChart>
+                                </CardComp>}
 
-                    <CardComp>
-                        <h2 className='text-lg'>Doctor Activity (Top 5)</h2>
-                        <BarChart
-                            style={{ width: '100%', maxWidth: '700px', maxHeight: '70vh', aspectRatio: 1.618 }}
-                            responsive
-                            data={analticsData}
-                            margin={{
-                                top: 20,
-                                right: 0,
-                                left: 0,
-                                bottom: 5,
-                            }}
-                        >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis yAxisId="left" orientation="left" stroke="var(--color-text-light)" width="auto" />
-                            <Tooltip
-                                contentStyle={{
-                                    backgroundColor: 'var(--color-surface)',
-                                    borderColor: 'var(--color-border)',
-                                }} />
-                            <Legend />
-                            <Bar yAxisId="left" dataKey="pv" fill="var(--chart-3)" />
+                            {analticsData?.topDoctors && <CardComp>
+                                <h2 className='text-lg'>Doctor Activity (Top 5)</h2>
+                                <BarChart
+                                    style={{ width: '100%', maxWidth: '700px', maxHeight: '70vh', aspectRatio: 1.618 }}
+                                    responsive
+                                    data={analticsData.topDoctors}
+                                    margin={{
+                                        top: 20,
+                                        right: 0,
+                                        left: 0,
+                                        bottom: 5,
+                                    }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="doctorName" />
+                                    <YAxis yAxisId="left" orientation="left" stroke="var(--color-text-light)" width="auto" />
+                                    <Tooltip
+                                        contentStyle={{
+                                            backgroundColor: 'var(--color-surface)',
+                                            borderColor: 'var(--color-border)',
+                                        }} />
+                                    <Legend />
+                                    <Bar yAxisId="left" dataKey="totalAppointments" fill="var(--chart-3)" />
 
-                        </BarChart>
-                    </CardComp>
+                                </BarChart>
+                            </CardComp>}
 
-                    <CardComp>
-                        <h2 className='text-lg'>Revenue & Payments</h2>
-                        <AreaChart
-                            style={{ width: '100%', maxWidth: '700px', maxHeight: '70vh', aspectRatio: 1.618 }}
-                            responsive
-                            data={analticsData}
-                            margin={{
-                                top: 20,
-                                right: 0,
-                                left: 0,
-                                bottom: 0,
-                            }}
-                            onContextMenu={(_, e) => e.preventDefault()}
-                        >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" niceTicks="snap125" />
-                            <YAxis width="auto" niceTicks="snap125" />
-                            <Tooltip
-                                contentStyle={{
-                                    backgroundColor: 'var(--color-surface)',
-                                    borderColor: 'var(--color-border)',
-                                }} />
-                            <Area type="monotone" dataKey="uv" fill="var(--chart-4)" />
-                            {/* <RechartsDevtools /> */}
-                        </AreaChart>
-                    </CardComp>
+                            {analticsData?.revenueChart && <CardComp>
+                                <h2 className='text-lg'>Revenue & Payments</h2>
+                                <AreaChart
+                                    style={{ width: '100%', maxWidth: '700px', maxHeight: '70vh', aspectRatio: 1.618 }}
+                                    responsive
+                                    data={analticsData.revenueChart}
+                                    margin={{
+                                        top: 20,
+                                        right: 0,
+                                        left: 0,
+                                        bottom: 0,
+                                    }}
+                                    onContextMenu={(_, e) => e.preventDefault()}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="month" niceTicks="snap125" />
+                                    <YAxis width="auto" niceTicks="snap125" />
+                                    <Tooltip
+                                        contentStyle={{
+                                            backgroundColor: 'var(--color-surface)',
+                                            borderColor: 'var(--color-border)',
+                                        }} />
+                                    <Area type="monotone" dataKey="revenue" fill="var(--chart-4)" />
+                                    {/* <RechartsDevtools /> */}
+                                </AreaChart>
+                            </CardComp>}
 
-                </div>
+                        </div>
+                }
+
             </div>
 
         </DashboardLayout>

@@ -48,7 +48,7 @@ function Login() {
               <p className="text-[10px] uppercase tracking-widest opacity-75 mb-0.5">
                 Trusted by
               </p>
-              <p className="text-2xl font-bold">12,000+ Specialists</p>
+              <p className="text-2xl font-bold">5+ Specialists</p>
             </div>
             <Users2 className="w-10 h-10 text-white opacity-75" />
           </div>

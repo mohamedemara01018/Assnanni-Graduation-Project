@@ -41,7 +41,9 @@ import favoriteDoctorsReducer from './slices/patient-slice/favorites-slice/favor
 import deleteFavoriteReducer from './slices/patient-slice/remove-doctor-from-favorites-slice/removeDoctorFromFavoritesSlice'
 import addFavoriteReducer from './slices/patient-slice/add-doctor-to-favorites-slice/addDoctorToFavoritesSlice';
 import verifyDoctorReducer from './slices/admin-slice/verify-doctor-account-slice/verifyDoctorAccountSlice';
-import rejectDoctorReducer from './slices/admin-slice/reject-doctor-account-slice/rejectDoctorAccountSlice'
+import rejectDoctorReducer from './slices/admin-slice/reject-doctor-account-slice/rejectDoctorAccountSlice';
+import analyticsDashboardReducer from './slices/admin-slice/analtics-dashboard-slice/analticsDashboardSlice';
+
 
 export const store = configureStore({
   reducer: {
@@ -67,6 +69,7 @@ export const store = configureStore({
     createModelSlice: createModelReducer,
     verifyDoctorSlice: verifyDoctorReducer,
     rejectDoctorSlice: rejectDoctorReducer,
+    analyticsDashboardSlice: analyticsDashboardReducer,
 
 
     // patient dashoard
