@@ -39,6 +39,7 @@ function LoginForm() {
       await dispatch(fetchUserProfile());
       toast.success("Welcome back!");
       const redirect = sessionStorage.getItem("redirectAfterAuth");
+      console.log(response.data.data?.roles.toLowerCase())
       if (
         redirect &&
         response.data.data?.roles.toLowerCase() == "Patient".toLowerCase()
@@ -46,7 +47,9 @@ function LoginForm() {
         sessionStorage.removeItem("redirectAfterAuth");
         navigate(redirect);
       } else if (response.data.data?.roles.toLowerCase() == "Doctor_PendingApproval".toLowerCase()) {
-        navigate("/waiting");
+        navigate("/waiting-doctor");
+      } else if (response.data.data?.roles.toLowerCase() == "student_doctor_pending".toLowerCase()) {
+        navigate("/waiting-student");
       } else {
         navigate('/')
       }

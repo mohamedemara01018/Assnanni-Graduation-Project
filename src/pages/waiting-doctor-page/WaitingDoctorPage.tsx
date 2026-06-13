@@ -2,7 +2,7 @@ import { Clock, CheckCircle, Loader, Stethoscope } from "lucide-react";
 import { Link } from "react-router";
 import { useSelector } from 'react-redux'
 import type { RootState } from "@/store/store";
-function WaitingPage() {
+function WaitingDoctorPage() {
     const role = useSelector((state: RootState) => state?.auth.role)
     console.log(role)
     return (
@@ -97,4 +97,4 @@ function WaitingPage() {
     );
 }
 
-export default WaitingPage;
+export default WaitingDoctorPage;

@@ -52,7 +52,8 @@ import {
   routeElements,
 } from "./constants/appConstants";
 import { logout } from "./store/slices/auth/authSlice";
-import WaitingPage from "./pages/waiting-page/WaitingPage";
+import WaitingDoctorPage from "./pages/waiting-doctor-page/WaitingDoctorPage";
+import WaitingStudentDoctorPage from "./pages/waiting-student-doctor-page/waitingStudentDoctorPage";
 // (Removed unused imports that caused TS6133 build failures)
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -136,7 +137,7 @@ function PublicRoutes({ role }: { role: string }) {
     <Route element={<PublicLayout />}>
       <Route path="/" element={<Landing />} />
 
-      {(role === "guest" || role == 'doctor_pendingapproval') && <Route path="/login" element={<Login />} />}
+      {(role === "guest" || role == 'doctor_pendingapproval' || role == 'student_doctor_pending') && <Route path="/login" element={<Login />} />}
 
       <Route path="/register">
         <Route index element={<RoleSelection />} />
@@ -153,7 +154,8 @@ function PublicRoutes({ role }: { role: string }) {
         </Route>
       </Route>
 
-      <Route path="/waiting" element={<WaitingPage />} />
+      <Route path="/waiting-doctor" element={<WaitingDoctorPage />} />
+      <Route path="/waiting-student" element={<WaitingStudentDoctorPage />} />
 
 
       <Route path="/verify-email" element={<VerifyEmailPage />} />
