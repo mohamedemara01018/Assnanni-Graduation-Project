@@ -52,7 +52,9 @@ import {
   routeElements,
 } from "./constants/appConstants";
 import { logout } from "./store/slices/auth/authSlice";
-import WaitingPage from "./pages/waiting-page/WaitingPage";
+import WaitingDoctorPage from "./pages/waiting-doctor-page/WaitingDoctorPage";
+import WaitingStudentDoctorPage from "./pages/waiting-student-doctor-page/waitingStudentDoctorPage";
+import CheckEmailPage from "./pages/check-email/CheckEmail";
 // (Removed unused imports that caused TS6133 build failures)
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -136,7 +138,7 @@ function PublicRoutes({ role }: { role: string }) {
     <Route element={<PublicLayout />}>
       <Route path="/" element={<Landing />} />
 
-      {(role === "guest" || role == 'doctor_pendingapproval') && <Route path="/login" element={<Login />} />}
+      {(role === "guest" || role == 'doctor_pendingapproval' || role == 'student_doctor_pending') && <Route path="/login" element={<Login />} />}
 
       <Route path="/register">
         <Route index element={<RoleSelection />} />
@@ -153,7 +155,8 @@ function PublicRoutes({ role }: { role: string }) {
         </Route>
       </Route>
 
-      <Route path="/waiting" element={<WaitingPage />} />
+      <Route path="/waiting-doctor" element={<WaitingDoctorPage />} />
+      <Route path="/waiting-student" element={<WaitingStudentDoctorPage />} />
 
 
       <Route path="/verify-email" element={<VerifyEmailPage />} />
@@ -161,7 +164,6 @@ function PublicRoutes({ role }: { role: string }) {
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/faq" element={<FAQPage />} />
-      <Route path="/support" element={<SupportPage />} />
       <Route path="/onboarding" element={<OnboardingPage />} />
 
       <Route path="/password-reset" element={<PasswordResetRequestPage />} />
@@ -170,6 +172,11 @@ function PublicRoutes({ role }: { role: string }) {
         path="/password-reset/success"
         element={<PasswordResetSuccessPage />}
       />
+      <Route
+        path="/check-email"
+        element={<CheckEmailPage />}
+      />
+
     </Route>
   );
 }
@@ -264,6 +271,7 @@ const App = () => {
           <Route path="/" element={homePage ?? <PublicLayout />}>
             {!homePage && <Route index element={<Landing />} />}
           </Route>
+          <Route path="/support" element={<SupportPage />} />
 
           {PublicRoutes({ role })}
           {FeatureRoutes()}

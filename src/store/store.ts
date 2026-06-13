@@ -43,7 +43,10 @@ import addFavoriteReducer from './slices/patient-slice/add-doctor-to-favorites-s
 import verifyDoctorReducer from './slices/admin-slice/verify-doctor-account-slice/verifyDoctorAccountSlice';
 import rejectDoctorReducer from './slices/admin-slice/reject-doctor-account-slice/rejectDoctorAccountSlice';
 import analyticsDashboardReducer from './slices/admin-slice/analtics-dashboard-slice/analticsDashboardSlice';
-
+import supportTicketReducer from './slices/support-slice/create-support-ticket-slice/createSupportTicketSlice'
+import supportTicketsReducer from './slices/support-slice/support-tickets-slice/supportTicketsSlice'
+import supportReplyReducer from './slices/support-slice/support-reply-slice/supportReplySlice';
+import singleTicketReducer from './slices/support-slice/single-ticket-slice/singleTicketSlice'
 
 export const store = configureStore({
   reducer: {
@@ -95,7 +98,15 @@ export const store = configureStore({
     createPaymentSlice: createPaymentReducer,
     favoriteDoctorsSlice: favoriteDoctorsReducer,
     deleteFavoriteSlice: deleteFavoriteReducer,
-    addFavoriteSlice: addFavoriteReducer
+    addFavoriteSlice: addFavoriteReducer,
+
+
+    // support ticket 
+
+    supportTicketSlice: supportTicketReducer,
+    supportTicketsSlice: supportTicketsReducer,
+    supportReplySlice: supportReplyReducer,
+    singleTicketSlice: singleTicketReducer
   },
 });
 

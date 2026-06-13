@@ -1,4 +1,3 @@
-import SearchInput from "../search-input/SearchInput";
 import { Link } from "react-router";
 import ThemeToggle from "../theme-toggle/ThemeToggle";
 import UserComp from "../user-comp/UserComp";
@@ -52,9 +51,6 @@ function TobNavbar({ collapsed, setCollapsed, pageTitle }: TobNavbarProb) {
         <h1 className="max-sm:text-[20px]">{pageTitle}</h1>
       </div>
       <div className="flex items-center gap-2 font-extrabold">
-        <div className="max-lg:hidden ">
-          <SearchInput />
-        </div>
         <ThemeToggle />
         <Link
           to={"/favorites"}

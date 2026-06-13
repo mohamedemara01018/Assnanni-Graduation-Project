@@ -263,8 +263,9 @@ function VerifyDoctorPage() {
         response.data?.data?.message || response.data?.message ||
         (isStudentDoctor ? "Student doctor verification submitted." : "Doctor verification submitted.");
       toast.success(successMessage);
-      if (!isStudentDoctor) navigator("/waiting");
-      else navigator("/");
+      if (isStudentDoctor) navigator("/waiting-student");
+      else if (!isStudentDoctor) navigator("/waiting-doctor");
+      // else navigator("/");
     } catch (error: any) {
       const errorMessage = axios.isAxiosError(error)
         ? error.response?.data?.message || error.response?.data || error.message || "Verification failed"
