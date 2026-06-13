@@ -9,6 +9,8 @@ export const roleRoutePaths = {
     "analytics",
     "ai-models",
     "ai-models/:id",
+    'messages',
+    'messages/:id'
   ],
   doctor: [
     "/doctor",

@@ -74,6 +74,8 @@ import MedicalHistory from "@/pages/medical-history-page/MedicalHistoryPage";
 import ChatBot from "@/components/chatbot/Chatbot";
 import SingleAiModelPage from "@/pages/single-ai-model-page/SingleAiModelPage";
 import FavoritesPage from "@/pages/favorites-page/FavoritesPage";
+import MessagesPage from "@/pages/messages-page/MessagesPage";
+import MessageDetailPage from "@/pages/message-detail-page/MessageDetailPage";
 
 // ProtectedRoute component for role-based access control
 export const ProtectedRoute = ({
@@ -158,7 +160,8 @@ export const routeElements = {
   "appointments/doctor-appointments/:id": <AppointmentDetails />,
   "doctor-appointments/:id": <StudentAppointmentDetails />,
   "doctor-appointments-dashboard": <AllAppointments />,
-  // "waiting": <WaitingPage />,
+  "messages": <MessagesPage />,
+  "messages/:id": <MessageDetailPage />,
 
   "doctor-learning-sessions": <LearningSessions />,
   "doctor-learning-sessions/create": <CreateLearningSession />,

@@ -10,6 +10,7 @@ import {
   Calendar,
   FileText,
   LayoutDashboard,
+  Mail,
   Pill,
   Scan,
   Settings,
@@ -187,6 +188,7 @@ const sidebarDataRole = {
     { icon: Brain, label: "AI Models", path: "/ai-models" },
     { icon: Bell, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
+    { icon: Mail, label: "Messages", path: "/messages" },
   ],
 
   patient: [
@@ -199,6 +201,7 @@ const sidebarDataRole = {
     { icon: BriefcaseMedical, label: "My Doctors", path: "/my-doctors" },
     { icon: Bell, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
+    { icon: Mail, label: "Support", path: "/support" },
   ],
 
   doctor: [
@@ -210,6 +213,8 @@ const sidebarDataRole = {
     { icon: FileText, label: "Reports", path: "/doctor-reports" },
     { icon: Bell, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
+    { icon: Mail, label: "Support", path: "/support" },
+
   ],
 
   studentDoctor: [
@@ -217,6 +222,8 @@ const sidebarDataRole = {
     { icon: Calendar, label: "Appointments", path: "/doctor-appointments" },
     { icon: Bell, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
+    { icon: Mail, label: "Support", path: "/support" },
+
   ],
 
   receptionist: [
@@ -225,5 +232,6 @@ const sidebarDataRole = {
     { icon: Calendar, label: "Appointments", path: "/doctor-appointments" },
     { icon: Bell, label: "Notifications", path: "/notification" },
     { icon: Settings, label: "Settings", path: "/settings" },
+    { icon: Mail, label: "Support", path: "/support" },
   ],
 };

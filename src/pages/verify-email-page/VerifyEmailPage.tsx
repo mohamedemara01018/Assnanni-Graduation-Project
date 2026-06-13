@@ -1,6 +1,5 @@
 import { setToken } from "@/store/slices/auth/authSlice";
 import { clearEmail } from "@/store/slices/email/emailSlice";
-import { MdOutlineMail } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useLocation } from "react-router";
 import { toast } from "react-toastify";
@@ -14,6 +13,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import type { RootState } from "@/store/store";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { Mail, ArrowLeft, ShieldCheck, Loader2 } from "lucide-react";
 
 function VerifyEmailPage() {
   const backendUrl = useSelector((s: RootState) => s.config.backendUrl);
@@ -22,6 +22,7 @@ function VerifyEmailPage() {
   const navigator = useNavigate();
   const location = useLocation();
   const [value, setValue] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const email = useSelector(
     (state: { email: { emailAddress: string } }) => state.email.emailAddress,
@@ -33,11 +34,11 @@ function VerifyEmailPage() {
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (value.length < 6) return;
 
-    const data = {
-      email,
-      code: value,
-    };
+    setIsSubmitting(true);
+    const data = { email, code: value };
+
     try {
       const state = location.state as {
         isDoctor?: boolean;
@@ -63,103 +64,166 @@ function VerifyEmailPage() {
       Cookies.remove("needsVerification");
 
       if (isDoctor || isStudentDoctor) {
-        navigator("/verify-doctor", {
-          state: { isStudentDoctor, doctorId },
-        });
+        navigator("/verify-doctor", { state: { isStudentDoctor, doctorId } });
       } else if (isPatient) {
         navigator("/");
       } else {
         navigator("/onboarding");
       }
 
-      toast.success("You have successfully verified your email address");
+      toast.success("Email verified successfully!");
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error?.response?.data?.message || error.message || "Verification failed");
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
   const returnToRegister = () => {
     dispatch(clearEmail());
     Cookies.remove("needsVerification");
     navigator("/register");
   };
 
+  const isComplete = value.length === 6;
+
   return (
-    <div className="flex min-h-[70vh] flex-col items-center justify-center px-4 py-10">
-      <div className="w-full max-w-[540px] rounded-2xl border border-(--color-border) bg-(--color-surface) p-6 shadow-xl sm:p-8">
-        <div className="mb-6 flex flex-col items-center gap-4 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#00AFE5]/15">
-            <MdOutlineMail className="h-8 w-8 text-[#00AFE5]" />
+    <div className="flex min-h-[80vh] items-center justify-center px-4 py-10">
+      <div className="w-full max-w-md space-y-4">
+
+        {/* ── Card ──────────────────────────────────────────────────────── */}
+        <div
+          className="rounded-2xl border p-7 sm:p-8"
+          style={{
+            backgroundColor: "var(--color-surface)",
+            borderColor: "var(--color-border)",
+            boxShadow: "var(--shadow)",
+          }}
+        >
+          {/* Header */}
+          <div className="flex flex-col items-center gap-4 text-center mb-7">
+            <div
+              className="w-16 h-16 rounded-2xl flex items-center justify-center"
+              style={{ backgroundColor: "var(--color-bg-blue)" }}
+            >
+              <ShieldCheck className="w-8 h-8" style={{ color: "var(--color-primary)" }} />
+            </div>
+
+            <div>
+              <h1 className="text-2xl font-semibold mb-1.5" style={{ color: "var(--color-text)" }}>
+                Verify Your Email
+              </h1>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-light)" }}>
+                We've sent a 6-digit code to
+              </p>
+              <div
+                className="inline-flex items-center gap-2 mt-2 px-3 py-1.5 rounded-xl border text-sm font-medium"
+                style={{
+                  backgroundColor: "var(--color-bg-blue)",
+                  borderColor: "var(--color-primary-lighter)",
+                  color: "var(--color-primary)",
+                }}
+              >
+                <Mail className="w-3.5 h-3.5 shrink-0" />
+                {email || "your email address"}
+              </div>
+            </div>
           </div>
-          <h1 className="text-2xl font-semibold text-(--color-text) sm:text-3xl">
-            Verify Your Email
-          </h1>
-          <p className="text-sm text-(--color-text-light) sm:text-base">
-            We've sent a 6-digit code to{" "}
-            <span className="font-semibold text-(--color-primary)">
-              {email}
-            </span>
-          </p>
-        </div>
-        <form onSubmit={onSubmit} className="flex flex-col gap-5">
-          <div className="flex flex-col items-center">
-            <p className="text-sm font-medium text-(--color-text)">
-              Enter Verification Code
-            </p>
-            <div className="my-4 flex items-center justify-center">
+
+          {/* Form */}
+          <form onSubmit={onSubmit} className="flex flex-col gap-6">
+            <div className="flex flex-col items-center gap-3">
+              <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--color-text-light)" }}>
+                Enter Verification Code
+              </p>
+
               <InputOTP
                 maxLength={6}
                 pattern={REGEXP_ONLY_DIGITS}
                 value={value}
                 onChange={setValue}
               >
-                <InputOTPGroup>
-                  <InputOTPSlot
-                    index={0}
-                    className="h-12 w-11 rounded-lg border-(--color-border) bg-(--color-bg) text-base font-semibold text-(--color-text) focus-visible:ring-2 focus-visible:ring-[#00AFE5]/30"
-                  />
-                  <InputOTPSlot
-                    index={1}
-                    className="h-12 w-11 rounded-lg border-(--color-border) bg-(--color-bg) text-base font-semibold text-(--color-text) focus-visible:ring-2 focus-visible:ring-[#00AFE5]/30"
-                  />
-                  <InputOTPSlot
-                    index={2}
-                    className="h-12 w-11 rounded-lg border-(--color-border) bg-(--color-bg) text-base font-semibold text-(--color-text) focus-visible:ring-2 focus-visible:ring-[#00AFE5]/30"
-                  />
-                  <InputOTPSlot
-                    index={3}
-                    className="h-12 w-11 rounded-lg border-(--color-border) bg-(--color-bg) text-base font-semibold text-(--color-text) focus-visible:ring-2 focus-visible:ring-[#00AFE5]/30"
-                  />
-                  <InputOTPSlot
-                    index={4}
-                    className="h-12 w-11 rounded-lg border-(--color-border) bg-(--color-bg) text-base font-semibold text-(--color-text) focus-visible:ring-2 focus-visible:ring-[#00AFE5]/30"
-                  />
-                  <InputOTPSlot
-                    index={5}
-                    className="h-12 w-11 rounded-lg border-(--color-border) bg-(--color-bg) text-base font-semibold text-(--color-text) focus-visible:ring-2 focus-visible:ring-[#00AFE5]/30"
-                  />
+                <InputOTPGroup className="gap-2">
+                  {[0, 1, 2, 3, 4, 5].map((i) => (
+                    <InputOTPSlot
+                      key={i}
+                      index={i}
+                      className="h-12 w-11 rounded-xl text-base font-bold transition-all"
+                      style={{
+                        backgroundColor: "var(--color-bg)",
+                        borderColor: "var(--color-border)",
+                        color: "var(--color-text)",
+                      }}
+                    />
+                  ))}
                 </InputOTPGroup>
               </InputOTP>
+
+              {/* Progress dots */}
+              <div className="flex items-center gap-1.5 mt-1">
+                {[0, 1, 2, 3, 4, 5].map((i) => (
+                  <span
+                    key={i}
+                    className="w-1.5 h-1.5 rounded-full transition-all duration-200"
+                    style={{
+                      backgroundColor: i < value.length
+                        ? "var(--color-primary)"
+                        : "var(--color-border)",
+                    }}
+                  />
+                ))}
+              </div>
             </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={!isComplete || isSubmitting}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-semibold text-white transition-all active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
+              style={{ backgroundColor: "var(--color-primary)" }}
+              onMouseEnter={(e) => {
+                if (!isSubmitting && isComplete)
+                  e.currentTarget.style.backgroundColor = "var(--color-primary-dark)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "var(--color-primary)";
+              }}
+            >
+              {isSubmitting ? (
+                <><Loader2 className="w-4 h-4 animate-spin" />Verifying…</>
+              ) : (
+                <><ShieldCheck className="w-4 h-4" />Verify Email</>
+              )}
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="my-5 h-px" style={{ backgroundColor: "var(--color-border)" }} />
+
+          {/* Footer actions */}
+          <div className="flex flex-col items-center gap-2">
+            <button
+              type="button"
+              onClick={returnToRegister}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-300 transition-colors cursor-pointer"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Wrong email? Return to register
+            </button>
           </div>
-          <button className="w-full cursor-pointer rounded-xl bg-[#00AFE5] py-3 text-sm font-semibold text-white shadow-md shadow-[#00AFE5]/30 transition-all hover:-translate-y-0.5 hover:bg-blue-500">
-            Verify Email
-          </button>
-        </form>
-        <div className="mt-4 text-center flex flex-col gap-2">
-          {/* <button
-            type="button"
-            className="cursor-pointer text-sm font-medium text-(--color-primary) transition-colors hover:text-(--color-primary-light)"
-          >
-            Didn't receive the code? Resend
-          </button> */}
+        </div>
+
+        {/* Hint below card */}
+        <p className="text-center text-xs" style={{ color: "var(--color-text-light)" }}>
+          Didn't receive the code? Check your spam folder or{" "}
           <button
             type="button"
-            className="cursor-pointer text-sm font-medium text-red-500 transition-colors hover:text-red-600"
-            onClick={() => returnToRegister()}
+            className="font-medium cursor-pointer transition-colors hover:opacity-75"
+            style={{ color: "var(--color-primary)" }}
           >
-            Wrong Email Address? return to register
+            resend
           </button>
-        </div>
+        </p>
       </div>
     </div>
   );

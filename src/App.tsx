@@ -54,6 +54,7 @@ import {
 import { logout } from "./store/slices/auth/authSlice";
 import WaitingDoctorPage from "./pages/waiting-doctor-page/WaitingDoctorPage";
 import WaitingStudentDoctorPage from "./pages/waiting-student-doctor-page/waitingStudentDoctorPage";
+import CheckEmailPage from "./pages/check-email/CheckEmail";
 // (Removed unused imports that caused TS6133 build failures)
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -163,7 +164,6 @@ function PublicRoutes({ role }: { role: string }) {
       <Route path="/terms" element={<TermsPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/faq" element={<FAQPage />} />
-      <Route path="/support" element={<SupportPage />} />
       <Route path="/onboarding" element={<OnboardingPage />} />
 
       <Route path="/password-reset" element={<PasswordResetRequestPage />} />
@@ -172,6 +172,11 @@ function PublicRoutes({ role }: { role: string }) {
         path="/password-reset/success"
         element={<PasswordResetSuccessPage />}
       />
+      <Route
+        path="/check-email"
+        element={<CheckEmailPage />}
+      />
+
     </Route>
   );
 }
@@ -266,6 +271,7 @@ const App = () => {
           <Route path="/" element={homePage ?? <PublicLayout />}>
             {!homePage && <Route index element={<Landing />} />}
           </Route>
+          <Route path="/support" element={<SupportPage />} />
 
           {PublicRoutes({ role })}
           {FeatureRoutes()}

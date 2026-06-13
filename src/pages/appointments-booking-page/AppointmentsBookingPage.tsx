@@ -498,10 +498,6 @@ export default function AppointmentBookingPage() {
             >
               <option value="">Select Payment Method</option>
               <option value="Cash">Cash at Clinic</option>
-              <option value="CreditCard">Credit Card</option>
-              <option value="VodafoneCash">Vodafone Cash</option>
-              <option value="BankTransfer">Bank Transfer</option>
-              <option value="Insurance">Insurance</option>
               <option value="OnlinePayment">Online Payment</option>
             </select>
           </SectionCard>

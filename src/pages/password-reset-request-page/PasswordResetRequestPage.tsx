@@ -32,25 +32,19 @@ export default function PasswordResetRequestPage() {
       const message = "Password reset instructions sent successfully.";
 
       if (isSuccess) {
-        navigate("/password-reset/new");
+        navigate(`/check-email?email=${encodeURIComponent(data.email)}`);
         return;
       }
 
       toast.error(message);
-      setError("email", {
-        type: "server",
-        message,
-      });
+      setError("email", { type: "server", message });
     } catch (error: unknown) {
       const message = axios.isAxiosError(error)
         ? error.response?.data?.message || error.message
         : "Unable to send reset instructions.";
 
       toast.error(message);
-      setError("email", {
-        type: "server",
-        message,
-      });
+      setError("email", { type: "server", message });
     }
   };
 
@@ -80,11 +74,10 @@ export default function PasswordResetRequestPage() {
                   id="email"
                   type="email"
                   aria-invalid={errors.email ? "true" : "false"}
-                  className={`w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:border-transparent ${
-                    errors.email
-                      ? "border-red-500 focus:ring-red-500 dark:border-red-400"
-                      : "border-gray-300 dark:border-gray-600 focus:ring-blue-500"
-                  }`}
+                  className={`w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-700 border rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:border-transparent ${errors.email
+                    ? "border-red-500 focus:ring-red-500 dark:border-red-400"
+                    : "border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+                    }`}
                   placeholder="your@email.com"
                   {...register("email", {
                     required: "You must provide your email",
