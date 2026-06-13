@@ -34,7 +34,7 @@ function DoctorsListPage() {
     (state: { auth: { role: string } }) => state.auth.role
   );
 
-  return role === "patient" ? (
+  return role.toLowerCase() === "patient".toLowerCase() ? (
     <DashboardLayout pageTitle="Patient">
       <DoctorList />
     </DashboardLayout>
@@ -75,8 +75,8 @@ function DoctorList() {
 
   useEffect(() => {
     dispatch(fetchAllDoctors({
+      Government: governorate,
       Search: search,
-      SpecializationId: 1,
       Experience: filters.experience,
       RatingFilter: filters.rating,
       Availability: filters.availability,
@@ -85,7 +85,7 @@ function DoctorList() {
       Page: pageNumber,
       PageSize: pageSize,
     }));
-  }, [dispatch, search, filters.availability, filters.experience, filters.gender, filters.rating, filters.sort, pageNumber, pageSize]);
+  }, [dispatch, search, filters.availability, filters.experience, filters.gender, filters.rating, filters.sort, pageNumber, pageSize, governorate]);
 
   const clearFilters = () => {
     setGovernorate("");
@@ -196,18 +196,8 @@ function DoctorList() {
                   value={governorate}
                   onChange={(v) => {
                     setGovernorate(v);
-                    setRegion("");
                   }}
                   options={governorates}
-                />
-
-                <FilterSelect
-                  id="region"
-                  label="Region"
-                  value={region}
-                  onChange={setRegion}
-                  disabled={!governorate}
-                  options={governorate && regions[governorate] ? regions[governorate] : []}
                 />
               </div>
             </div>

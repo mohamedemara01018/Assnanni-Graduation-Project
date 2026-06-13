@@ -46,7 +46,8 @@ import analyticsDashboardReducer from './slices/admin-slice/analtics-dashboard-s
 import supportTicketReducer from './slices/support-slice/create-support-ticket-slice/createSupportTicketSlice'
 import supportTicketsReducer from './slices/support-slice/support-tickets-slice/supportTicketsSlice'
 import supportReplyReducer from './slices/support-slice/support-reply-slice/supportReplySlice';
-import singleTicketReducer from './slices/support-slice/single-ticket-slice/singleTicketSlice'
+import singleTicketReducer from './slices/support-slice/single-ticket-slice/singleTicketSlice';
+import specializationsReducer from './slices/specializations-slice/specializationsSlice'
 
 export const store = configureStore({
   reducer: {
@@ -106,7 +107,13 @@ export const store = configureStore({
     supportTicketSlice: supportTicketReducer,
     supportTicketsSlice: supportTicketsReducer,
     supportReplySlice: supportReplyReducer,
-    singleTicketSlice: singleTicketReducer
+    singleTicketSlice: singleTicketReducer,
+
+
+    // specializationsSlice
+
+
+    specializationsSlice: specializationsReducer
   },
 });
 
