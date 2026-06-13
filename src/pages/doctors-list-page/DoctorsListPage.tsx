@@ -121,6 +121,7 @@ function DoctorList() {
 
                 dispatch(
                   fetchAllDoctors({
+                    Government: governorate,
                     Search: search,
                     SpecializationId: 1,
                     Experience: filters.experience,
