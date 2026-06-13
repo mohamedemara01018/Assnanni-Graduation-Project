@@ -13,13 +13,12 @@ import {
     selectSupportReplyState,
 } from "@/store/slices/support-slice/support-reply-slice/supportReplySlice"; // adjust path
 import { toast } from "react-toastify";
-import { ScaleLoader } from "react-spinners";
 import {
     ArrowLeft, Mail, Clock, CheckCircle, MessageSquare,
-    Tag, CalendarDays, UserRound, Loader2, Send, Trash2,
-    AlertTriangle, X,
+    Tag, CalendarDays, UserRound, Loader2, Send,
 } from "lucide-react";
 import DashboardLayout from "@/components/dashboard-layout/DashboardLayout";
+import MiniLoading from "@/components/mini-loading/MiniLoading";
 
 // ─── Status config (mirrors MessagesPage) ────────────────────────────────────
 
@@ -42,79 +41,6 @@ function formatDate(iso: string | null) {
     });
 }
 
-// ─── Delete Confirm Modal ─────────────────────────────────────────────────────
-
-function DeleteConfirmModal({
-    loading,
-    onConfirm,
-    onCancel,
-}: {
-    loading: boolean;
-    onConfirm: () => void;
-    onCancel: () => void;
-}) {
-    return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
-            onClick={onCancel}
-        >
-            <div
-                className="relative w-full max-w-sm rounded-2xl shadow-2xl p-6"
-                style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
-                onClick={(e) => e.stopPropagation()}
-            >
-                {/* Close */}
-                <button
-                    onClick={onCancel}
-                    className="absolute top-4 right-4 w-7 h-7 flex items-center justify-center rounded-lg transition-colors cursor-pointer"
-                    style={{ border: "1px solid var(--color-border)", color: "var(--color-text-light)" }}
-                >
-                    <X className="w-3.5 h-3.5" />
-                </button>
-
-                {/* Icon */}
-                <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                    style={{ background: "rgba(239,68,68,0.08)" }}
-                >
-                    <AlertTriangle className="w-6 h-6 text-red-500" />
-                </div>
-
-                <h3 className="text-base font-semibold mb-1" style={{ color: "var(--color-text)" }}>
-                    Delete this ticket?
-                </h3>
-                <p className="text-sm mb-6" style={{ color: "var(--color-text-light)" }}>
-                    This action cannot be undone. The ticket and all its data will be permanently removed.
-                </p>
-
-                <div className="flex gap-3">
-                    <button
-                        onClick={onCancel}
-                        disabled={loading}
-                        className="flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors cursor-pointer disabled:opacity-50"
-                        style={{ border: "1px solid var(--color-border)", color: "var(--color-text-light)", background: "var(--color-bg)" }}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={onConfirm}
-                        disabled={loading}
-                        className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white flex items-center justify-center gap-2 transition-opacity hover:opacity-90 disabled:opacity-50 cursor-pointer"
-                        style={{ background: "#ef4444" }}
-                    >
-                        {loading ? (
-                            <><Loader2 className="w-4 h-4 animate-spin" /> Deleting…</>
-                        ) : (
-                            <><Trash2 className="w-4 h-4" /> Delete</>
-                        )}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-}
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 function MessageDetailPage() {
@@ -128,9 +54,6 @@ function MessageDetailPage() {
         error: replyError } = useSelector(selectSupportReplyState);
 
     const [reply, setReply] = useState("");
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [deleteLoading, setDeleteLoading] = useState(false);
-
     // Fetch on mount
     useEffect(() => {
         if (id) dispatch(fetchSupportTicketById(Number(id)));
@@ -142,6 +65,7 @@ function MessageDetailPage() {
         if (replySuccess) {
             toast.success("Reply sent successfully!");
             dispatch(resetSupportReplyState());
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setReply("");
             if (id) dispatch(fetchSupportTicketById(Number(id)));
         }
@@ -157,30 +81,12 @@ function MessageDetailPage() {
         dispatch(replyToSupportTicket({ ticketId: ticket.id, reply: reply.trim() }));
     };
 
-    const handleDelete = async () => {
-        // Replace this with your actual delete thunk when available
-        // e.g. dispatch(deleteSupportTicket(ticket.id))
-        setDeleteLoading(true);
-        try {
-            await new Promise((r) => setTimeout(r, 800)); // placeholder
-            toast.success("Ticket deleted successfully!");
-            navigate(-1);
-        } catch {
-            toast.error("Failed to delete ticket. Please try again.");
-        } finally {
-            setDeleteLoading(false);
-            setShowDeleteModal(false);
-        }
-    };
 
     // ── Loading ───────────────────────────────────────────────────────────────
     if (loading) {
         return (
             <DashboardLayout pageTitle="Ticket Detail">
-                <div className="flex flex-col items-center justify-center py-24 gap-3">
-                    <ScaleLoader color="var(--color-primary)" radius={4} width={3.5} height={20} margin={2} />
-                    <p className="text-xs animate-pulse" style={{ color: "var(--color-text-light)" }}>Loading ticket…</p>
-                </div>
+                <MiniLoading />
             </DashboardLayout>
         );
     }
@@ -227,16 +133,6 @@ function MessageDetailPage() {
                         Back
                     </button>
 
-                    <button
-                        onClick={() => setShowDeleteModal(true)}
-                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-red-500 transition-colors cursor-pointer"
-                        style={{ border: "1px solid rgba(239,68,68,0.25)", background: "rgba(239,68,68,0.05)" }}
-                        onMouseEnter={(e) => (e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.1)"}
-                        onMouseLeave={(e) => (e.currentTarget as HTMLElement).style.background = "rgba(239,68,68,0.05)"}
-                    >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        Delete Ticket
-                    </button>
                 </div>
 
                 {/* ── Header card ── */}
@@ -326,61 +222,55 @@ function MessageDetailPage() {
                 )}
 
                 {/* ── Reply box ── */}
-                <div
-                    className="rounded-2xl px-6 py-5 space-y-3"
-                    style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
-                >
-                    <div className="flex items-center gap-2">
-                        <Send className="w-4 h-4" style={{ color: "var(--color-text-light)" }} />
-                        <h2 className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>
-                            {ticket.adminReply ? "Update Reply" : "Send Reply"}
-                        </h2>
-                    </div>
+                {ticket.status.toLowerCase() != 'Resolved'.toLowerCase() && (
+                    <div
+                        className="rounded-2xl px-6 py-5 space-y-3"
+                        style={{ background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+                    >
+                        <div className="flex items-center gap-2">
+                            <Send className="w-4 h-4" style={{ color: "var(--color-text-light)" }} />
+                            <h2 className="text-sm font-semibold" style={{ color: "var(--color-text)" }}>
+                                {ticket.adminReply ? "Update Reply" : "Send Reply"}
+                            </h2>
+                        </div>
 
-                    <textarea
-                        rows={5}
-                        value={reply}
-                        onChange={(e) => setReply(e.target.value)}
-                        placeholder="Write your response…"
-                        className="w-full resize-none rounded-xl text-sm outline-none transition-colors px-4 py-3"
-                        style={{
-                            background: "var(--color-bg)",
-                            border: "1.5px solid var(--color-border)",
-                            color: "var(--color-text)",
-                        }}
-                        onFocus={(e) => (e.currentTarget.style.borderColor = "var(--color-primary)")}
-                        onBlur={(e) => (e.currentTarget.style.borderColor = "var(--color-border)")}
-                    />
+                        <textarea
+                            rows={5}
+                            value={reply}
+                            onChange={(e) => setReply(e.target.value)}
+                            placeholder="Write your response…"
+                            className="w-full resize-none rounded-xl text-sm outline-none transition-colors px-4 py-3"
+                            style={{
+                                background: "var(--color-bg)",
+                                border: "1.5px solid var(--color-border)",
+                                color: "var(--color-text)",
+                            }}
+                            onFocus={(e) => (e.currentTarget.style.borderColor = "var(--color-primary)")}
+                            onBlur={(e) => (e.currentTarget.style.borderColor = "var(--color-border)")}
+                        />
 
-                    <div className="flex items-center justify-between">
-                        <p className="text-xs" style={{ color: "var(--color-text-light)" }}>
-                            {reply.length} / 1000
-                        </p>
-                        <button
-                            onClick={handleSendReply}
-                            disabled={!reply.trim() || replyLoading}
-                            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
-                            style={{ background: "var(--color-primary)" }}
-                        >
-                            {replyLoading ? (
-                                <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
-                            ) : (
-                                <><Send className="w-4 h-4" /> Send Reply</>
-                            )}
-                        </button>
+                        <div className="flex items-center justify-between">
+                            <p className="text-xs" style={{ color: "var(--color-text-light)" }}>
+                                {reply.length} / 1000
+                            </p>
+                            <button
+                                onClick={handleSendReply}
+                                disabled={!reply.trim() || replyLoading}
+                                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                                style={{ background: "var(--color-primary)" }}
+                            >
+                                {replyLoading ? (
+                                    <><Loader2 className="w-4 h-4 animate-spin" /> Sending…</>
+                                ) : (
+                                    <><Send className="w-4 h-4" /> Send Reply</>
+                                )}
+                            </button>
+                        </div>
                     </div>
-                </div>
+                )}
 
             </div>
 
-            {/* ── Delete confirm modal ── */}
-            {showDeleteModal && (
-                <DeleteConfirmModal
-                    loading={deleteLoading}
-                    onConfirm={handleDelete}
-                    onCancel={() => setShowDeleteModal(false)}
-                />
-            )}
         </DashboardLayout>
     );
 }
